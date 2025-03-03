@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: .
+    working_dir: /app
+    entrypoint: ["docker-init/entrypoint.sh"]
+    ports:
+      - '80:8000'
+      - '5173:5173'
+    volumes:
+      - .:/app
+      - /app/vendor
+      - /app/node_modules
+      - /app/public/build
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

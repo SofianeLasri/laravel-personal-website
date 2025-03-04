@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TranslationKey extends Model
 {
@@ -19,11 +20,18 @@ class TranslationKey extends Model
         'key' => 'string',
     ];
 
-    /**
-     * Find a translation key by its key.
-     */
+    public function translations(): HasMany|TranslationKey
+    {
+        return $this->hasMany(Translation::class);
+    }
+
     public static function findByKey(string $key): ?self
     {
         return self::where('key', $key)->first();
+    }
+
+    public static function findOrCreateByKey(string $key): self
+    {
+        return self::firstOrCreate(['key' => $key]);
     }
 }

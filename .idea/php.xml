@@ -155,6 +155,7 @@
       <path value="$PROJECT_DIR$/vendor/laminas/laminas-diactoros" />
       <path value="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge" />
       <path value="$PROJECT_DIR$/vendor/_laravel_idea" />
+      <path value="$PROJECT_DIR$/vendor/sl-projects/laravel-request-logger" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

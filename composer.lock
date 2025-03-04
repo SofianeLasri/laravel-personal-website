@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b7ade6971dbdd998a75be1499d0caf10",
+    "content-hash": "bdfd35fd370a3b37399a1d8accd41b3c",
     "packages": [
         {
             "name": "brick/math",
@@ -3537,6 +3537,61 @@
                 }
             ],
             "time": "2024-04-27T21:32:50+00:00"
+        },
+        {
+            "name": "sl-projects/laravel-request-logger",
+            "version": "v1.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SofianeLasri/laravel-request-logger.git",
+                "reference": "f98146680003ced89e735deef16638947d6ef95e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SofianeLasri/laravel-request-logger/zipball/f98146680003ced89e735deef16638947d6ef95e",
+                "reference": "f98146680003ced89e735deef16638947d6ef95e",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "fakerphp/faker": "^1.23",
+                "orchestra/testbench": "^9.7"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "SlProjects\\LaravelRequestLogger\\app\\Providers\\LaravelRequestLogger"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SlProjects\\LaravelRequestLogger\\": "src/",
+                    "SlProjects\\LaravelRequestLogger\\Database\\Factories\\": "src/database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sofiane Lasri",
+                    "email": "sofianelasri@sl-projects.com",
+                    "homepage": "https://sofianelasri.fr",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package to log all incoming HTTP requests",
+            "support": {
+                "issues": "https://github.com/SofianeLasri/laravel-request-logger/issues",
+                "source": "https://github.com/SofianeLasri/laravel-request-logger/tree/v1.0.8"
+            },
+            "time": "2025-02-25T08:37:36+00:00"
         },
         {
             "name": "symfony/clock",

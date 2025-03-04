@@ -1,7 +1,10 @@
+name: laravel-personal-website
+
 services:
   app:
     build:
       context: .
+    restart: unless-stopped
     working_dir: /app
     entrypoint: ["docker-init/entrypoint.sh"]
     ports:
@@ -12,6 +15,9 @@ services:
       - /app/vendor
       - /app/node_modules
       - /app/public/build
+    depends_on:
+      - mariadb
+      - redis
     networks:
       - app-network
 
@@ -21,6 +27,17 @@ services:
     tty: true
     ports:
       - "6379:6379"
+    networks:
+      - app-network
+
+  mariadb:
+    image: mariadb:latest
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
     networks:
       - app-network
 

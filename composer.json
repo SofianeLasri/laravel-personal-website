@@ -15,7 +15,8 @@
         "laravel/octane": "^2.8",
         "laravel/tinker": "^2.10.1",
         "sl-projects/laravel-request-logger": "^1.0",
-        "tightenco/ziggy": "^2.4"
+        "tightenco/ziggy": "^2.4",
+      "ext-imagick": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

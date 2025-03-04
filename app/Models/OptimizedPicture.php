@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class OptimizedPicture extends Model
 {
@@ -40,8 +41,26 @@ class OptimizedPicture extends Model
         'webp',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (OptimizedPicture $optimizedPicture) {
+            $optimizedPicture->deleteFile();
+        });
+    }
+
     public function picture(): BelongsTo
     {
         return $this->belongsTo(Picture::class);
+    }
+
+    public function deleteFile($disk = 'public'): void
+    {
+        if (Storage::disk($disk)->exists($this->path)) {
+            Storage::disk($disk)->delete($this->path);
+        }
+
+        if (config('app.cdn_disk')) {
+            $this->deleteFile(config('app.cdn_disk'));
+        }
     }
 }

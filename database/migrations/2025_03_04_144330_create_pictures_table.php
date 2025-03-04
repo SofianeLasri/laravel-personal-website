@@ -14,6 +14,7 @@ return new class extends Migration
             $table->integer('width')->nullable();
             $table->integer('height')->nullable();
             $table->bigInteger('size')->nullable();
+            $table->string('path_original')->nullable();
             $table->timestamps();
         });
     }

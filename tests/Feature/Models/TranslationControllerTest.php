@@ -195,6 +195,39 @@ class TranslationControllerTest extends TestCase
         $response->assertJsonValidationErrors(['locale']);
     }
 
+    public function test_it_can_create_in_fr_locale_and_cannot_update_in_english_locale()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/translations', [
+            'key' => 'test.key',
+            'locale' => 'fr',
+            'text' => 'Bonjour, le monde!',
+        ]);
+
+        $response->assertCreated();
+        $response->assertJson([
+            'data' => [
+                'key' => 'test.key',
+                'locale' => 'fr',
+                'text' => 'Bonjour, le monde!',
+            ],
+        ]);
+
+        $this->assertDatabaseHas('translations', [
+            'locale' => 'fr',
+            'text' => 'Bonjour, le monde!',
+        ]);
+
+        $response = $this->actingAs($user)->putJson('/api/translations', [
+            'key' => 'test.key',
+            'locale' => 'en',
+            'text' => 'Hello, world!',
+        ]);
+
+        $response->assertStatus(404);
+    }
+
     public function test_it_cannot_update_as_guest()
     {
         $translationKey = TranslationKey::factory()->create();

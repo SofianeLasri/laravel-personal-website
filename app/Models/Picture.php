@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Picture extends Model
 {
@@ -15,6 +16,11 @@ class Picture extends Model
         'height',
         'size',
     ];
+
+    public function optimizedPictures(): Picture|HasMany
+    {
+        return $this->hasMany(OptimizedPicture::class);
+    }
 
     /**
      * Get the optimized pictures for the picture.

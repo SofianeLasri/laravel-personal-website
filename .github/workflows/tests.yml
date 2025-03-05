@@ -53,7 +53,7 @@ jobs:
         run: npm run build
 
       - name: Tests
-        run: vendor/bin/phpunit --coverage-clover coverage.xml .
+        run: php artisan test --coverage --coverage-clover storage/coverage/coverage.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

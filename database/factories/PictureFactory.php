@@ -40,7 +40,8 @@ class PictureFactory extends Factory
     public function withOptimizedPicture(string $variant, string $format): PictureFactory
     {
         return $this->afterCreating(function (Picture $picture) use ($variant, $format) {
-            $picture->optimizedPictures()->create([
+            OptimizedPicture::factory()->create([
+                'picture_id' => $picture->id,
                 'variant' => $variant,
                 'format' => $format,
             ]);
@@ -52,7 +53,8 @@ class PictureFactory extends Factory
         return $this->afterCreating(function (Picture $picture) {
             foreach (OptimizedPicture::VARIANTS as $variant) {
                 foreach (OptimizedPicture::FORMATS as $format) {
-                    $picture->optimizedPictures()->create([
+                    OptimizedPicture::factory()->create([
+                        'picture_id' => $picture->id,
                         'variant' => $variant,
                         'format' => $format,
                     ]);

@@ -22,7 +22,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-          extensions: imagick, mbstring, ctype, filter, hash, openssl, session, tokenizer, xml
+          extensions: imagick, exif, gd
           tools: composer:v2
           coverage: xdebug
 

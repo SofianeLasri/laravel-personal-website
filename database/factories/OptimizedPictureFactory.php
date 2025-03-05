@@ -15,8 +15,6 @@ class OptimizedPictureFactory extends Factory
 
     public function definition(): array
     {
-        Storage::fake('public');
-
         return [
             'variant' => $this->faker->randomElement(OptimizedPicture::VARIANTS),
             'path' => $this->createDummyImage(),

@@ -23,7 +23,7 @@ class Picture extends Model
         'path_original',
     ];
 
-    public function optimizedPictures(): Picture|HasMany
+    public function optimizedPictures(): HasMany
     {
         return $this->hasMany(OptimizedPicture::class);
     }
@@ -59,75 +59,35 @@ class Picture extends Model
         $dimensions = $imageTranscodingService->getDimensions($originalImage);
         $highestDimension = max($dimensions['width'], $dimensions['height']);
 
-        $thumbnailOptimizedDimension = $this->getOptimizedDimension(OptimizedPicture::THUMBNAIL_SIZE, $highestDimension);
-        $smallOptimizedDimension = $this->getOptimizedDimension(OptimizedPicture::SMALL_SIZE, $highestDimension);
-        $mediumOptimizedDimension = $this->getOptimizedDimension(OptimizedPicture::MEDIUM_SIZE, $highestDimension);
-        $largeOptimizedDimension = $this->getOptimizedDimension(OptimizedPicture::LARGE_SIZE, $highestDimension);
+        $variants = [
+            'thumbnail' => OptimizedPicture::THUMBNAIL_SIZE,
+            'small' => OptimizedPicture::SMALL_SIZE,
+            'medium' => OptimizedPicture::MEDIUM_SIZE,
+            'large' => OptimizedPicture::LARGE_SIZE,
+            'full' => $highestDimension,
+        ];
 
         foreach (OptimizedPicture::FORMATS as $format) {
-            $fullsizeImage = $imageTranscodingService->transcode($originalImage, $highestDimension, $format);
-            $thumbnailImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $fullsizeImage, $thumbnailOptimizedDimension, $highestDimension, $format);
-            $smallImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $thumbnailImage, $smallOptimizedDimension, $highestDimension, $format);
-            $mediumImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $smallImage, $mediumOptimizedDimension, $highestDimension, $format);
-            $largeImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $mediumImage, $largeOptimizedDimension, $highestDimension, $format);
+            $previousImage = $originalImage;
+            $optimizedImages = [];
 
-            if (! $thumbnailImage || ! $smallImage || ! $mediumImage || ! $largeImage) {
-                Log::error('UploadedPicture optimization failed: transcoding failed', [
-                    'path' => $this->path_original,
-                ]);
+            foreach ($variants as $variant => $size) {
+                $optimizedDimension = $this->getOptimizedDimension($size, $highestDimension);
+                $optimizedImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $previousImage, $optimizedDimension, $highestDimension, $format);
 
-                return;
+                if (! $optimizedImage) {
+                    Log::error('UploadedPicture optimization failed: transcoding failed', [
+                        'path' => $this->path_original,
+                    ]);
+
+                    return;
+                }
+
+                $optimizedImages[$variant] = $optimizedImage;
+                $previousImage = $optimizedImage;
             }
 
-            $thumbnailPath = Str::beforeLast($this->path_original, '.').'_thumbnail.'.$format;
-            $smallPath = Str::beforeLast($this->path_original, '.').'_small.'.$format;
-            $mediumPath = Str::beforeLast($this->path_original, '.').'_medium.'.$format;
-            $largePath = Str::beforeLast($this->path_original, '.').'_large.'.$format;
-            $fullsizeImage = Str::beforeLast($this->path_original, '.').'_fullsize.'.$format;
-
-            Storage::disk('public')->put($thumbnailPath, $thumbnailImage);
-            Storage::disk('public')->put($smallPath, $smallImage);
-            Storage::disk('public')->put($mediumPath, $mediumImage);
-            Storage::disk('public')->put($largePath, $largeImage);
-            Storage::disk('public')->put($fullsizeImage, $fullsizeImage);
-
-            if (config('app.cdn_disk')) {
-                Storage::disk(config('app.cdn_disk'))->put($thumbnailPath, $thumbnailImage);
-                Storage::disk(config('app.cdn_disk'))->put($smallPath, $smallImage);
-                Storage::disk(config('app.cdn_disk'))->put($mediumPath, $mediumImage);
-                Storage::disk(config('app.cdn_disk'))->put($largePath, $largeImage);
-                Storage::disk(config('app.cdn_disk'))->put($fullsizeImage, $fullsizeImage);
-            }
-
-            $this->optimizedPictures()->create([
-                'variant' => 'thumbnail',
-                'path' => $thumbnailPath,
-                'format' => $format,
-            ]);
-
-            $this->optimizedPictures()->create([
-                'variant' => 'small',
-                'path' => $smallPath,
-                'format' => $format,
-            ]);
-
-            $this->optimizedPictures()->create([
-                'variant' => 'medium',
-                'path' => $mediumPath,
-                'format' => $format,
-            ]);
-
-            $this->optimizedPictures()->create([
-                'variant' => 'large',
-                'path' => $largePath,
-                'format' => $format,
-            ]);
-
-            $this->optimizedPictures()->create([
-                'variant' => 'full',
-                'path' => $fullsizeImage,
-                'format' => $format,
-            ]);
+            $this->storeOptimizedImages($optimizedImages, $format);
         }
 
         $this->update([
@@ -150,6 +110,24 @@ class Picture extends Model
     private function getOptimizedDimension(int $dimension, int $highestDimension): int
     {
         return min($dimension, $highestDimension);
+    }
+
+    private function storeOptimizedImages(array $optimizedImages, string $format): void
+    {
+        foreach ($optimizedImages as $variant => $image) {
+            $path = Str::beforeLast($this->path_original, '.')."_$variant.$format";
+            Storage::disk('public')->put($path, $image);
+
+            if (config('app.cdn_disk')) {
+                Storage::disk(config('app.cdn_disk'))->put($path, $image);
+            }
+
+            $this->optimizedPictures()->create([
+                'variant' => $variant,
+                'path' => $path,
+                'format' => $format,
+            ]);
+        }
     }
 
     public function deleteOptimized(): void

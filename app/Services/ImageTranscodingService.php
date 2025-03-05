@@ -50,8 +50,6 @@ class ImageTranscodingService
                     'max_surface' => Imagick::getResourceLimit(Imagick::RESOURCETYPE_AREA),
                 ]);
 
-                echo 'Image resolution exceeds maximum allowed resolution';
-
                 return null;
             }
 

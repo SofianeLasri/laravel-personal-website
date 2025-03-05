@@ -33,12 +33,36 @@ class ImageTranscodingServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_it_can_transcode_an_image()
+    public function test_it_can_transcode_a_webp_image()
     {
         $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toJpeg()->toString();
 
         $service = new ImageTranscodingService(new Driver);
         $transcodedImageContent = $service->transcode($image, 100, 'webp');
+
+        $this->assertNotEmpty($transcodedImageContent);
+        $this->assertNotEquals($image, $transcodedImageContent);
+    }
+
+    #[Test]
+    public function test_it_can_transcode_a_jpeg_image()
+    {
+        $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toJpeg()->toString();
+
+        $service = new ImageTranscodingService(new Driver);
+        $transcodedImageContent = $service->transcode($image, 100, 'jpeg');
+
+        $this->assertNotEmpty($transcodedImageContent);
+        $this->assertNotEquals($image, $transcodedImageContent);
+    }
+
+    #[Test]
+    public function test_it_can_transcode_a_png_image()
+    {
+        $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toPng()->toString();
+
+        $service = new ImageTranscodingService(new Driver);
+        $transcodedImageContent = $service->transcode($image, 100, 'png');
 
         $this->assertNotEmpty($transcodedImageContent);
         $this->assertNotEquals($image, $transcodedImageContent);

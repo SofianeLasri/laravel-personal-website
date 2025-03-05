@@ -38,7 +38,7 @@ class ImageTranscodingServiceTest extends TestCase
         $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toJpeg()->toString();
 
         $service = new ImageTranscodingService(new Driver);
-        $transcodedImageContent = $service->transcode($image, 100);
+        $transcodedImageContent = $service->transcode($image, 100, 'webp');
 
         $this->assertNotEmpty($transcodedImageContent);
         $this->assertNotEquals($image, $transcodedImageContent);

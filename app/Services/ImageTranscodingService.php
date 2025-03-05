@@ -63,12 +63,16 @@ class ImageTranscodingService
 
             echo "Codec: $codec\n";
 
-            return match ($codec) {
+            $output = match ($codec) {
                 'jpeg' => $image->encode(new JpegEncoder(quality: 85))->toString(),
                 'webp' => $image->encode(new WebpEncoder(quality: 85))->toString(),
                 'png' => $image->encode(new PngEncoder)->toString(),
                 default => $image->encode(new AvifEncoder(quality: 85))->toString(),
             };
+            echo "Transcoding successful\n";
+            echo "Output: $output\n";
+
+            return $output;
         } catch (RuntimeException $exception) {
             Log::error('Failed to transcode image', [
                 'exception' => $exception,

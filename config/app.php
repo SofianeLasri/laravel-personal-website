@@ -123,4 +123,33 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Imagick
+    |--------------------------------------------------------------------------
+    |
+    | These configuration options determine the maximum resolution of images
+    | that can be transcoded by Imagick. The maximum width, height, and area
+    | are used to prevent the transcoding of images that exceed these limits.
+    |
+    */
+
+    'imagick' => [
+        'max_width' => env('IMAGICK_MAX_WIDTH', 16000), // 16k
+        'max_height' => env('IMAGICK_MAX_HEIGHT', 16000), // 16k
+        'max_area' => env('IMAGICK_MAX_AREA', 128000000), // 128 megapixels
+    ],
+
+    'supported_image_formats' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic', 'heif', 'bmp', 'tiff'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | CDN Provider disk configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the disk that will be used to store files on the CDN.
+    |
+    */
+
+    'cdn_disk' => env('CDN_FILESYSTEM_DISK'),
 ];

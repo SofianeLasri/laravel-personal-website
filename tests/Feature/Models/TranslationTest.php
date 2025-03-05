@@ -4,6 +4,7 @@ namespace Tests\Feature\Models;
 
 use App\Models\Translation;
 use App\Models\TranslationKey;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
@@ -45,6 +46,23 @@ class TranslationTest extends TestCase
         $this->assertDatabaseHas('translations', [
             'id' => $translation->id,
             'translation_key_id' => TranslationKey::where('key', 'test.key')->first()->id,
+            'locale' => 'en',
+            'text' => 'Hello, world!',
+        ]);
+    }
+
+    public function test_it_cannot_create_two_translations_with_same_key_and_locale()
+    {
+        $translation = Translation::factory()->create([
+            'key' => 'test.key',
+            'locale' => 'en',
+            'text' => 'Hello, world!',
+        ]);
+
+        $this->expectException(Exception::class);
+
+        Translation::factory()->create([
+            'key' => 'test.key',
             'locale' => 'en',
             'text' => 'Hello, world!',
         ]);

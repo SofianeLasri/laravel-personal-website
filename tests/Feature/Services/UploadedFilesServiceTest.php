@@ -1,6 +1,6 @@
 <?php
 
-namespace Services;
+namespace Tests\Feature\Services;
 
 use App\Jobs\PictureJob;
 use App\Models\Picture;

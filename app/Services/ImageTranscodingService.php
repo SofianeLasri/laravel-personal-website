@@ -31,8 +31,6 @@ class ImageTranscodingService
      */
     public function transcode(string $source, ?int $resolution = null, string $codec = 'avif'): ?string
     {
-        echo "Transcoding image...\n";
-        echo "Source: $source\n";
         $image = $this->imageManager->read($source);
         try {
             $imageArea = $image->width() * $image->height();
@@ -52,8 +50,6 @@ class ImageTranscodingService
                     'max_surface' => Imagick::getResourceLimit(Imagick::RESOURCETYPE_AREA),
                 ]);
 
-                echo "Image resolution exceeds maximum allowed resolution\n";
-
                 return null;
             }
 
@@ -61,24 +57,16 @@ class ImageTranscodingService
                 $image->scale($resolution);
             }
 
-            echo "Codec: $codec\n";
-
-            $output = match ($codec) {
+            return match ($codec) {
                 'jpeg' => $image->encode(new JpegEncoder(quality: 85))->toString(),
                 'webp' => $image->encode(new WebpEncoder(quality: 85))->toString(),
                 'png' => $image->encode(new PngEncoder)->toString(),
                 default => $image->encode(new AvifEncoder(quality: 85))->toString(),
             };
-            echo "Transcoding successful\n";
-            echo "Output: $output\n";
-
-            return $output;
         } catch (RuntimeException $exception) {
             Log::error('Failed to transcode image', [
                 'exception' => $exception,
             ]);
-
-            echo "Failed to transcode image\n";
 
             return null;
         }

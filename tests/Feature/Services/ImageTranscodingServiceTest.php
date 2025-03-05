@@ -50,7 +50,7 @@ class ImageTranscodingServiceTest extends TestCase
         $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toJpeg()->toString();
 
         $service = new ImageTranscodingService(new Driver);
-        $transcodedImageContent = $service->transcode($image);
+        $transcodedImageContent = $service->transcode($image, null, 'webp');
 
         $this->assertNotEmpty($transcodedImageContent);
         $this->assertNotEquals($image, $transcodedImageContent);
@@ -74,7 +74,7 @@ class ImageTranscodingServiceTest extends TestCase
                 'max_surface' => 1024 * 1024,
             ]);
 
-        $transcodedImageContent = $service->transcode($image);
+        $transcodedImageContent = $service->transcode($image, null, 'webp');
         $this->assertNull($transcodedImageContent);
         $this->assertTrue(config('app.imagick.max_width') < 2000, 'La largeur dépasse la limite maximale');
         $this->assertTrue(config('app.imagick.max_height') < 2000, 'La hauteur dépasse la limite maximale');

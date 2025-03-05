@@ -68,8 +68,6 @@ class ImageTranscodingService
                 'exception' => $exception,
             ]);
 
-            echo $exception;
-
             return null;
         }
     }

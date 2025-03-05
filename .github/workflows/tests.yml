@@ -53,4 +53,9 @@ jobs:
         run: npm run build
 
       - name: Tests
-        run: php artisan test
+        run: vendor/bin/phpunit --coverage-clover coverage.xml .
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN  }}

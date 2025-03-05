@@ -67,6 +67,7 @@ class ImageTranscodingService
             Log::error('Failed to transcode image', [
                 'exception' => $exception,
             ]);
+            echo $exception;
 
             return null;
         }

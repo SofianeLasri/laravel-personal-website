@@ -288,6 +288,8 @@ class PictureTest extends TestCase
         );
 
         $picture->optimize();
+
+        $this->assertCount(0, $picture->optimizedPictures);
     }
 
     /**

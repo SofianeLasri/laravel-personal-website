@@ -52,8 +52,12 @@ jobs:
 
       - name: Build Assets
         run: npm run build
+
       - name: Tests
         run: php artisan test --coverage --coverage-clover coverage.xml --log-junit junit.xml
+
+      - name: Show Laravel log
+        run: cat storage/logs/laravel.log
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

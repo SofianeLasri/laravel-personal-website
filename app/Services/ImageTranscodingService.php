@@ -58,35 +58,14 @@ class ImageTranscodingService
             }
 
             echo "Encoding to format: $codec\n";
+            echo 'Imagick supports: '.implode(', ', Imagick::queryFormats())."\n";
 
-            $encodedPicture = match ($codec) {
+            return match ($codec) {
                 'jpeg' => $image->encode(new JpegEncoder(quality: 85))->toString(),
                 'webp' => $image->encode(new WebpEncoder(quality: 85))->toString(),
                 'png' => $image->encode(new PngEncoder)->toString(),
                 default => $image->encode(new AvifEncoder(quality: 85))->toString(),
             };
-
-            if ($encodedPicture === false) {
-                echo "Failed to encode image\n";
-                Log::error('Failed to encode image', [
-                    'image' => $image,
-                    'codec' => $codec,
-                ]);
-
-                return null;
-            }
-
-            if (empty($encodedPicture)) {
-                echo "Empty encoded image\n";
-                Log::error('Empty encoded image', [
-                    'image' => $image,
-                    'codec' => $codec,
-                ]);
-
-                return null;
-            }
-
-            return $encodedPicture;
         } catch (RuntimeException $exception) {
             Log::error('Failed to transcode image', [
                 'exception' => $exception,

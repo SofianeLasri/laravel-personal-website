@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Http\Controllers\TranslationController;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\User;
@@ -9,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
-#[CoversClass(Translation::class)]
+#[CoversClass(TranslationController::class)]
 class TranslationControllerTest extends TestCase
 {
     use RefreshDatabase;
@@ -18,7 +19,7 @@ class TranslationControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/api/translations', [
+        $response = $this->actingAs($user)->postJson(route('api.translation.store'), [
             'key' => 'test.key',
             'locale' => 'en',
             'text' => 'Hello, world!',
@@ -49,7 +50,7 @@ class TranslationControllerTest extends TestCase
         $user = User::factory()->create();
         $translationKey = TranslationKey::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/api/translations', [
+        $response = $this->actingAs($user)->postJson(route('api.translation.store'), [
             'translation_key_id' => $translationKey->id,
             'locale' => 'en',
             'text' => 'Hello, world!',
@@ -75,7 +76,7 @@ class TranslationControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/api/translations', [
+        $response = $this->actingAs($user)->postJson(route('api.translation.store'), [
             'locale' => 'en',
             'text' => 'Hello, world!',
         ]);
@@ -88,7 +89,7 @@ class TranslationControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/api/translations', [
+        $response = $this->actingAs($user)->postJson(route('api.translation.store'), [
             'key' => 'test.key',
             'locale' => 'invalid',
             'text' => 'Hello, world!',
@@ -100,7 +101,7 @@ class TranslationControllerTest extends TestCase
 
     public function test_it_cannot_create_as_guest()
     {
-        $response = $this->postJson('/api/translations', [
+        $response = $this->postJson(route('api.translation.store'), [
             'key' => 'test.key',
             'locale' => 'en',
             'text' => 'Hello, world!',
@@ -119,7 +120,7 @@ class TranslationControllerTest extends TestCase
             'text' => 'Hello, world!',
         ]);
 
-        $response = $this->actingAs($user)->putJson('/api/translations', [
+        $response = $this->actingAs($user)->putJson(route('api.translation.update'), [
             'key' => $translationKey->key,
             'locale' => 'en',
             'text' => 'Hello, world! (updated)',
@@ -152,7 +153,7 @@ class TranslationControllerTest extends TestCase
             'text' => 'Hello, world!',
         ]);
 
-        $response = $this->actingAs($user)->putJson('/api/translations', [
+        $response = $this->actingAs($user)->putJson(route('api.translation.update'), [
             'translation_key_id' => $translationKey->id,
             'locale' => 'en',
             'text' => 'Hello, world! (updated)',
@@ -185,7 +186,7 @@ class TranslationControllerTest extends TestCase
             'text' => 'Hello, world!',
         ]);
 
-        $response = $this->actingAs($user)->putJson('/api/translations', [
+        $response = $this->actingAs($user)->putJson(route('api.translation.update'), [
             'key' => $translationKey->key,
             'locale' => 'invalid',
             'text' => 'Hello, world! (updated)',
@@ -199,7 +200,7 @@ class TranslationControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/api/translations', [
+        $response = $this->actingAs($user)->postJson(route('api.translation.store'), [
             'key' => 'test.key',
             'locale' => 'fr',
             'text' => 'Bonjour, le monde!',
@@ -237,7 +238,7 @@ class TranslationControllerTest extends TestCase
             'text' => 'Hello, world!',
         ]);
 
-        $response = $this->putJson('/api/translations', [
+        $response = $this->putJson(route('api.translation.update'), [
             'key' => $translationKey->key,
             'locale' => 'en',
             'text' => 'Hello, world! (updated)',
@@ -250,7 +251,7 @@ class TranslationControllerTest extends TestCase
     {
         Translation::factory()->count(3)->create();
 
-        $response = $this->getJson('/api/translations');
+        $response = $this->getJson(route('api.translation.index'));
 
         $response->assertOk();
         $response->assertJsonCount(3, 'data');
@@ -265,7 +266,7 @@ class TranslationControllerTest extends TestCase
             'text' => 'Hello, world!',
         ]);
 
-        $response = $this->getJson("/api/translations/{$translationKey->key}/en");
+        $response = $this->getJson(route('api.translation.show', ['key' => $translationKey->key, 'locale' => 'en']));
 
         $response->assertOk();
         $response->assertJson([

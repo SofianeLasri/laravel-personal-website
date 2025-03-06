@@ -67,7 +67,18 @@ class ImageTranscodingService
             };
 
             if ($encodedPicture === false) {
+                echo "Failed to encode image\n";
                 Log::error('Failed to encode image', [
+                    'image' => $image,
+                    'codec' => $codec,
+                ]);
+
+                return null;
+            }
+
+            if (empty($encodedPicture)) {
+                echo "Empty encoded image\n";
+                Log::error('Empty encoded image', [
                     'image' => $image,
                     'codec' => $codec,
                 ]);

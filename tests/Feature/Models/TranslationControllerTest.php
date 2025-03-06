@@ -277,4 +277,11 @@ class TranslationControllerTest extends TestCase
             ],
         ]);
     }
+
+    public function test_show_bad_translation_returns_404()
+    {
+        $response = $this->getJson(route('api.translation.show', ['key' => 'bad.key', 'locale' => 'en']));
+
+        $response->assertStatus(404);
+    }
 }

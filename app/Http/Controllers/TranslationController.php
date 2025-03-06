@@ -55,13 +55,4 @@ class TranslationController extends Controller
 
         return new TranslationResource($translation);
     }
-
-    public function destroy(Translation $translation)
-    {
-        Gate::authorize('delete', $translation);
-
-        $translation->delete();
-
-        return response()->json();
-    }
 }

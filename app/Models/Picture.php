@@ -76,7 +76,6 @@ class Picture extends Model
                 $optimizedDimension = $this->getOptimizedDimension($size, $highestDimension);
                 $optimizedImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $previousImage, $optimizedDimension, $highestDimension, $format);
 
-                echo $optimizedImage.PHP_EOL;
                 if (empty($optimizedImage)) {
                     Log::error('UploadedPicture optimization failed: transcoding failed', [
                         'path' => $this->path_original,

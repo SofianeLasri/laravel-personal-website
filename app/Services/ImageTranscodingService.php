@@ -57,9 +57,6 @@ class ImageTranscodingService
                 $image->scale($resolution);
             }
 
-            echo "Encoding to format: $codec\n";
-            echo 'Imagick supports: '.implode(', ', Imagick::queryFormats())."\n";
-
             return match ($codec) {
                 'jpeg' => $image->encode(new JpegEncoder(quality: 85))->toString(),
                 'webp' => $image->encode(new WebpEncoder(quality: 85))->toString(),

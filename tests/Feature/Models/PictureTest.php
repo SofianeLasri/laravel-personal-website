@@ -87,7 +87,7 @@ class PictureTest extends TestCase
         $this->assertNull($nullResult);
     }
 
-    /*#[Test]
+    #[Test]
     public function test_optimize_creates_optimized_pictures()
     {
         $manager = new ImageManager(new Driver);
@@ -116,7 +116,7 @@ class PictureTest extends TestCase
         }
 
         Storage::disk('public')->assertMissing($path);
-    }*/
+    }
 
     #[Test]
     public function test_optimize_logs_warning_when_original_doesnt_exist()

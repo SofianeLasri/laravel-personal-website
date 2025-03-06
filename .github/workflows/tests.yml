@@ -52,6 +52,9 @@ jobs:
       - name: Build Assets
         run: npm run build
 
+      - name: Debug Imagick
+        run: php -i
+
       - name: Tests
         run: php artisan test --coverage --coverage-clover coverage.xml --log-junit junit.xml
 

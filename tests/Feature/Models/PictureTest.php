@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -265,6 +266,28 @@ class PictureTest extends TestCase
             Storage::disk('public')->assertExists($optimizedPicture->path);
             Storage::disk('cdn')->assertExists($optimizedPicture->path);
         }
+    }
+
+    #[Test]
+    public function test_optimize_with_transcoding_failure()
+    {
+        $picture = Picture::factory()->create();
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('UploadedPicture optimization failed: transcoding failed', [
+                'path' => $picture->path_original,
+            ]);
+
+        $this->instance(
+            ImageTranscodingService::class,
+            Mockery::mock(ImageTranscodingService::class, function ($mock) {
+                $mock->shouldReceive('transcode')->andReturnNull();
+                $mock->shouldReceive('getDimensions')->andReturn(['width' => 512, 'height' => 384]);
+            })
+        );
+
+        $picture->optimize();
     }
 
     /**

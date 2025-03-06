@@ -54,7 +54,8 @@ class Picture extends Model
         $this->deleteOptimized();
 
         $originalImage = Storage::disk('public')->get($this->path_original);
-        $imageTranscodingService = new ImageTranscodingService(new Driver);
+        // $imageTranscodingService = new ImageTranscodingService(new Driver);
+        $imageTranscodingService = app(ImageTranscodingService::class);
 
         $dimensions = $imageTranscodingService->getDimensions($originalImage);
         $highestDimension = max($dimensions['width'], $dimensions['height']);
@@ -75,7 +76,8 @@ class Picture extends Model
                 $optimizedDimension = $this->getOptimizedDimension($size, $highestDimension);
                 $optimizedImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $previousImage, $optimizedDimension, $highestDimension, $format);
 
-                if (! $optimizedImage) {
+                echo $optimizedImage.PHP_EOL;
+                if (empty($optimizedImage)) {
                     Log::error('UploadedPicture optimization failed: transcoding failed', [
                         'path' => $this->path_original,
                     ]);
@@ -98,7 +100,7 @@ class Picture extends Model
         $this->deleteOriginal();
     }
 
-    private function transcodeIfItIsWorthIt($imageTranscodingService, $previousImage, $optimizedDimension, $highestDimension, $format): string
+    private function transcodeIfItIsWorthIt($imageTranscodingService, $previousImage, $optimizedDimension, $highestDimension, $format): ?string
     {
         if ($optimizedDimension < $highestDimension) {
             return $imageTranscodingService->transcode($previousImage, $optimizedDimension, $format);

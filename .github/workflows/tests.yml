@@ -21,7 +21,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.4
+          extensions: imagick
           tools: composer:v2
           coverage: xdebug
 
@@ -51,10 +52,6 @@ jobs:
 
       - name: Build Assets
         run: npm run build
-
-      - name: Debug Imagick
-        run: php -i
-
       - name: Tests
         run: php artisan test --coverage --coverage-clover coverage.xml --log-junit junit.xml
 

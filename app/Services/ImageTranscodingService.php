@@ -57,12 +57,25 @@ class ImageTranscodingService
                 $image->scale($resolution);
             }
 
-            return match ($codec) {
+            echo "Encoding to format: $codec\n";
+
+            $encodedPicture = match ($codec) {
                 'jpeg' => $image->encode(new JpegEncoder(quality: 85))->toString(),
                 'webp' => $image->encode(new WebpEncoder(quality: 85))->toString(),
                 'png' => $image->encode(new PngEncoder)->toString(),
                 default => $image->encode(new AvifEncoder(quality: 85))->toString(),
             };
+
+            if ($encodedPicture === false) {
+                Log::error('Failed to encode image', [
+                    'image' => $image,
+                    'codec' => $codec,
+                ]);
+
+                return null;
+            }
+
+            return $encodedPicture;
         } catch (RuntimeException $exception) {
             Log::error('Failed to transcode image', [
                 'exception' => $exception,

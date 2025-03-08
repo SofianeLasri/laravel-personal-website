@@ -69,4 +69,30 @@ class TechnologyTest extends TestCase
         $this->assertEquals('Un framework PHP', $technology->getDescription('fr'));
         $this->assertEquals('A PHP framework', $technology->getDescription('en'));
     }
+
+    #[Test]
+    public function it_can_be_featured()
+    {
+        Technology::factory()->count(2)->create(['featured' => false]);
+        Technology::factory()->create(['featured' => true]);
+
+        $featuredTechnologies = Technology::featured()->get();
+
+        $this->assertCount(1, $featuredTechnologies);
+        $this->assertTrue($featuredTechnologies->first()->featured);
+    }
+
+    #[Test]
+    public function it_casts_featured_as_boolean()
+    {
+        $technology = Technology::factory()->create(['featured' => true]);
+
+        $this->assertIsBool($technology->featured);
+        $this->assertTrue($technology->featured);
+
+        $technology->featured = false;
+        $technology->save();
+
+        $this->assertFalse($technology->fresh()->featured);
+    }
 }

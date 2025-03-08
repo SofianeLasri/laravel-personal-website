@@ -15,4 +15,19 @@ class TranslationKeyFactory extends Factory
             'key' => $this->faker->slug(),
         ];
     }
+
+    public function withTranslations(): static
+    {
+        return $this->afterCreating(function (TranslationKey $translationKey) {
+            $translationKey->translations()->create([
+                'locale' => 'en',
+                'text' => $this->faker->sentence(),
+            ]);
+
+            $translationKey->translations()->create([
+                'locale' => 'fr',
+                'text' => $this->faker->sentence(),
+            ]);
+        });
+    }
 }

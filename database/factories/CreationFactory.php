@@ -10,7 +10,6 @@ use App\Models\Picture;
 use App\Models\Screenshot;
 use App\Models\Tag;
 use App\Models\Technology;
-use App\Models\Translation;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -37,35 +36,6 @@ class CreationFactory extends Factory
             'source_code_url' => $this->faker->optional(0.5)->url(),
             'featured' => $this->faker->boolean(20), // 20% chance to be featured
         ];
-    }
-
-    public function configure(): static
-    {
-        return $this->afterCreating(function (Creation $creation) {
-            // Create translation for short description
-            Translation::createOrUpdate(
-                $creation->shortDescriptionTranslationKey->key,
-                'fr',
-                $this->faker->paragraph()
-            );
-            Translation::createOrUpdate(
-                $creation->shortDescriptionTranslationKey->key,
-                'en',
-                $this->faker->paragraph()
-            );
-
-            // Create translation for full description
-            Translation::createOrUpdate(
-                $creation->fullDescriptionTranslationKey->key,
-                'fr',
-                $this->faker->paragraphs(5, true)
-            );
-            Translation::createOrUpdate(
-                $creation->fullDescriptionTranslationKey->key,
-                'en',
-                $this->faker->paragraphs(5, true)
-            );
-        });
     }
 
     public function withFeatures(int $count = 3): static

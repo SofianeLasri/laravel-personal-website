@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Technology;
-use App\Models\Translation;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,34 +18,5 @@ class TechnologyFactory extends Factory
             'name_translation_key_id' => TranslationKey::factory(),
             'description_translation_key_id' => TranslationKey::factory(),
         ];
-    }
-
-    public function configure(): static
-    {
-        return $this->afterCreating(function (Technology $technology) {
-            // Create translations for name
-            Translation::createOrUpdate(
-                $technology->nameTranslationKey->key,
-                'fr',
-                $this->faker->word()
-            );
-            Translation::createOrUpdate(
-                $technology->nameTranslationKey->key,
-                'en',
-                $this->faker->word()
-            );
-
-            // Create translations for description
-            Translation::createOrUpdate(
-                $technology->descriptionTranslationKey->key,
-                'fr',
-                $this->faker->sentence()
-            );
-            Translation::createOrUpdate(
-                $technology->descriptionTranslationKey->key,
-                'en',
-                $this->faker->sentence()
-            );
-        });
     }
 }

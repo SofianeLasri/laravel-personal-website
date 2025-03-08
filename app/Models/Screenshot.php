@@ -33,6 +33,10 @@ class Screenshot extends Model
 
     public function getCaption(string $locale): string
     {
-        return Translation::trans($this->captionTranslationKey->key, $locale);
+        if ($this->captionTranslationKey()->exists()) {
+            return $this->captionTranslationKey->translations()->where('locale', $locale)->value('text');
+        }
+
+        return '';
     }
 }

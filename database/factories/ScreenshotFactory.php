@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Creation;
 use App\Models\Picture;
 use App\Models\Screenshot;
-use App\Models\Translation;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,24 +21,5 @@ class ScreenshotFactory extends Factory
                 ? TranslationKey::factory()
                 : null,
         ];
-    }
-
-    public function configure(): static
-    {
-        return $this->afterCreating(function (Screenshot $screenshot) {
-            if ($screenshot->caption_translation_key_id) {
-                // Create translations for caption
-                Translation::createOrUpdate(
-                    $screenshot->captionTranslationKey->key,
-                    'fr',
-                    $this->faker->sentence()
-                );
-                Translation::createOrUpdate(
-                    $screenshot->captionTranslationKey->key,
-                    'en',
-                    $this->faker->sentence()
-                );
-            }
-        });
     }
 }

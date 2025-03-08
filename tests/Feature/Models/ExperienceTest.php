@@ -4,6 +4,7 @@ namespace Tests\Feature\Models;
 
 use App\Enums\ExperienceType;
 use App\Models\Experience;
+use App\Models\Picture;
 use App\Models\Technology;
 use App\Models\Translation;
 use App\Models\TranslationKey;
@@ -121,5 +122,56 @@ class ExperienceTest extends TestCase
 
         $this->assertEquals('Développeur Full-Stack', $experience->getTitle('fr'));
         $this->assertEquals('Full-Stack Developer', $experience->getTitle('en'));
+    }
+
+    #[Test]
+    public function it_can_have_descriptions()
+    {
+        $shortDescKey = TranslationKey::create(['key' => 'experience.short_description.test']);
+        $fullDescKey = TranslationKey::create(['key' => 'experience.full_description.test']);
+
+        Translation::create([
+            'translation_key_id' => $shortDescKey->id,
+            'locale' => 'fr',
+            'text' => 'Développement d\'applications web',
+        ]);
+
+        Translation::create([
+            'translation_key_id' => $shortDescKey->id,
+            'locale' => 'en',
+            'text' => 'Web applications development',
+        ]);
+
+        Translation::create([
+            'translation_key_id' => $fullDescKey->id,
+            'locale' => 'fr',
+            'text' => 'Développement de plusieurs applications web',
+        ]);
+
+        Translation::create([
+            'translation_key_id' => $fullDescKey->id,
+            'locale' => 'en',
+            'text' => 'Development of several web applications',
+        ]);
+
+        $experience = Experience::factory()->create([
+            'short_description_translation_key_id' => $shortDescKey->id,
+            'full_description_translation_key_id' => $fullDescKey->id,
+        ]);
+
+        $this->assertEquals('Développement d\'applications web', $experience->getShortDescription('fr'));
+        $this->assertEquals('Web applications development', $experience->getShortDescription('en'));
+
+        $this->assertEquals('Développement de plusieurs applications web', $experience->getFullDescription('fr'));
+        $this->assertEquals('Development of several web applications', $experience->getFullDescription('en'));
+    }
+
+    #[Test]
+    public function it_can_have_logo()
+    {
+        $logo = Picture::factory()->create();
+        $experience = Experience::factory()->create(['logo_id' => $logo->id]);
+
+        $this->assertInstanceOf(Picture::class, $experience->logo);
     }
 }

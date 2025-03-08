@@ -133,25 +133,41 @@ class CreationTest extends TestCase
     #[Test]
     public function it_can_get_translated_descriptions()
     {
-        $translationKey = TranslationKey::factory()->create(['key' => 'description.short.test']);
+        $shortDescTransKey = TranslationKey::factory()->create(['key' => 'description.short.test']);
+        $fullDescTransKey = TranslationKey::factory()->create(['key' => 'description.full.test']);
 
         Translation::factory()->create([
-            'translation_key_id' => $translationKey->id,
+            'translation_key_id' => $shortDescTransKey->id,
             'locale' => 'fr',
-            'text' => 'Description en français',
+            'text' => 'Courte description en français',
         ]);
 
         Translation::factory()->create([
-            'translation_key_id' => $translationKey->id,
+            'translation_key_id' => $shortDescTransKey->id,
             'locale' => 'en',
-            'text' => 'Description in English',
+            'text' => 'Courte description in English',
+        ]);
+
+        Translation::factory()->create([
+            'translation_key_id' => $fullDescTransKey->id,
+            'locale' => 'fr',
+            'text' => 'Description complète en français',
+        ]);
+
+        Translation::factory()->create([
+            'translation_key_id' => $fullDescTransKey->id,
+            'locale' => 'en',
+            'text' => 'Full description in English',
         ]);
 
         $creation = Creation::factory()->create([
-            'short_description_translation_key_id' => $translationKey->id,
+            'short_description_translation_key_id' => $shortDescTransKey->id,
+            'full_description_translation_key_id' => $fullDescTransKey->id,
         ]);
 
-        $this->assertEquals('Description en français', $creation->getShortDescription('fr'));
-        $this->assertEquals('Description in English', $creation->getShortDescription('en'));
+        $this->assertEquals('Courte description en français', $creation->getShortDescription('fr'));
+        $this->assertEquals('Courte description in English', $creation->getShortDescription('en'));
+        $this->assertEquals('Description complète en français', $creation->getFullDescription('fr'));
+        $this->assertEquals('Full description in English', $creation->getFullDescription('en'));
     }
 }

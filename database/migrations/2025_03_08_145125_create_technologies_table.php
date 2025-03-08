@@ -13,7 +13,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('svg_icon');
-            $table->foreignIdFor(TranslationKey::class, 'name_translation_key_id')->constrained('translation_keys');
             $table->foreignIdFor(TranslationKey::class, 'description_translation_key_id')->constrained('translation_keys');
             $table->timestamps();
         });

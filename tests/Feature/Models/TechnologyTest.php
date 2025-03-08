@@ -19,13 +19,11 @@ class TechnologyTest extends TestCase
     #[Test]
     public function it_can_create_a_technology()
     {
-        $nameKey = TranslationKey::factory()->create();
         $descKey = TranslationKey::factory()->create();
 
         $technology = Technology::factory()->create([
             'name' => 'Laravel',
             'svg_icon' => '<svg>...</svg>',
-            'name_translation_key_id' => $nameKey->id,
             'description_translation_key_id' => $descKey->id,
         ]);
 

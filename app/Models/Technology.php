@@ -14,7 +14,6 @@ class Technology extends Model
     protected $fillable = [
         'name',
         'svg_icon',
-        'name_translation_key_id',
         'description_translation_key_id',
     ];
 
@@ -26,11 +25,6 @@ class Technology extends Model
     public function creations(): BelongsToMany
     {
         return $this->belongsToMany(Creation::class);
-    }
-
-    public function nameTranslationKey(): BelongsTo
-    {
-        return $this->belongsTo(TranslationKey::class, 'name_translation_key_id');
     }
 
     public function descriptionTranslationKey(): BelongsTo

@@ -29,4 +29,9 @@ class Person extends Model
     {
         return $this->belongsToMany(Creation::class);
     }
+
+    public function creationDrafts(): BelongsToMany
+    {
+        return $this->belongsToMany(CreationDraft::class, 'creation_draft_person', 'person_id', 'creation_draft_id');
+    }
 }

@@ -170,6 +170,26 @@ class CreationDraftTest extends TestCase
     }
 
     #[Test]
+    public function get_short_descriptions_returns_empty_string_if_not_relation()
+    {
+        $creationDraft = CreationDraft::factory()->create([
+            'short_description_translation_key_id' => null,
+        ]);
+
+        $this->assertEquals('', $creationDraft->getShortDescription('fr'));
+    }
+
+    #[Test]
+    public function get_full_descriptions_returns_empty_string_if_not_relation()
+    {
+        $creationDraft = CreationDraft::factory()->create([
+            'full_description_translation_key_id' => null,
+        ]);
+
+        $this->assertEquals('', $creationDraft->getFullDescription('fr'));
+    }
+
+    #[Test]
     public function it_can_create_a_draft_from_an_existing_creation()
     {
         $creation = $this->createFullCreation();

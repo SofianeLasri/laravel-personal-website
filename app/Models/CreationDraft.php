@@ -252,19 +252,4 @@ class CreationDraft extends Model
 
         return $creation;
     }
-
-    public function technologies2(): BelongsToMany
-    {
-        return $this->belongsToMany(Technology::class, 'creation_draft_technology', 'creation_draft_id', 'technology_id');
-    }
-
-    public function people2(): BelongsToMany
-    {
-        return $this->belongsToMany(Person::class, 'creation_draft_person', 'creation_draft_id', 'person_id');
-    }
-
-    public function tags2(): BelongsToMany
-    {
-        return $this->belongsToMany(Tag::class, 'creation_draft_tag', 'creation_draft_id', 'tag_id');
-    }
 }

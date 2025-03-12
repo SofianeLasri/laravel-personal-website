@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CreationType;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -155,17 +156,14 @@ class CreationDraft extends Model
 
     /**
      * Create a new Creation from this draft
+     *
+     * @throws \Exception
      */
     public function toCreation(): Creation
     {
-        if (! $this->short_description_translation_key_id) {
-            $shortDescKey = TranslationKey::create(['key' => 'creation.'.$this->slug.'.short_description']);
-            $this->update(['short_description_translation_key_id' => $shortDescKey->id]);
-        }
-
-        if (! $this->full_description_translation_key_id) {
-            $fullDescKey = TranslationKey::create(['key' => 'creation.'.$this->slug.'.full_description']);
-            $this->update(['full_description_translation_key_id' => $fullDescKey->id]);
+        // Must have translation keys for short and full descriptions
+        if (! $this->short_description_translation_key_id || ! $this->full_description_translation_key_id) {
+            throw new Exception('CreationDraft must have translation keys for short and full descriptions');
         }
 
         $creation = Creation::create([

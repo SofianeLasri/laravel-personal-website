@@ -14,6 +14,7 @@ use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\Translation;
 use App\Models\TranslationKey;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -60,6 +61,18 @@ class CreationDraftTest extends TestCase
 
         $this->assertNull($creationDraft->logo);
         $this->assertNull($creationDraft->coverImage);
+    }
+
+    #[Test]
+    public function it_can_have_original_creation()
+    {
+        $originalCreation = Creation::factory()->create();
+        $creationDraft = CreationDraft::factory()->create([
+            'original_creation_id' => $originalCreation->id,
+        ]);
+
+        $this->assertInstanceOf(Creation::class, $creationDraft->originalCreation);
+        $this->assertEquals($originalCreation->id, $creationDraft->originalCreation->id);
     }
 
     #[Test]
@@ -123,6 +136,40 @@ class CreationDraftTest extends TestCase
     }
 
     #[Test]
+    public function it_can_have_short_description()
+    {
+        $shortDescKey = TranslationKey::factory()->create(['key' => 'draft.test.short']);
+        Translation::create([
+            'translation_key_id' => $shortDescKey->id,
+            'locale' => 'fr',
+            'text' => 'Description courte du brouillon',
+        ]);
+
+        $creationDraft = CreationDraft::factory()->create([
+            'short_description_translation_key_id' => $shortDescKey->id,
+        ]);
+
+        $this->assertEquals('Description courte du brouillon', $creationDraft->getShortDescription('fr'));
+    }
+
+    #[Test]
+    public function it_can_have_full_description()
+    {
+        $fullDescKey = TranslationKey::factory()->create(['key' => 'draft.test.full']);
+        Translation::create([
+            'translation_key_id' => $fullDescKey->id,
+            'locale' => 'fr',
+            'text' => 'Description complète du brouillon',
+        ]);
+
+        $creationDraft = CreationDraft::factory()->create([
+            'full_description_translation_key_id' => $fullDescKey->id,
+        ]);
+
+        $this->assertEquals('Description complète du brouillon', $creationDraft->getFullDescription('fr'));
+    }
+
+    #[Test]
     public function it_can_create_a_draft_from_an_existing_creation()
     {
         $creation = $this->createFullCreation();
@@ -163,6 +210,18 @@ class CreationDraftTest extends TestCase
         $this->assertCount(3, $creation->technologies);
         $this->assertCount(2, $creation->people);
         $this->assertCount(2, $creation->tags);
+    }
+
+    #[Test]
+    public function it_cannot_create_creation_without_descriptions()
+    {
+        $draft = CreationDraft::factory()->create([
+            'short_description_translation_key_id' => null,
+            'full_description_translation_key_id' => null,
+        ]);
+
+        $this->expectException(Exception::class);
+        $draft->toCreation();
     }
 
     #[Test]

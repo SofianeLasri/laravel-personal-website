@@ -266,6 +266,29 @@ class CreationDraftTest extends TestCase
         $this->assertEquals($existingCreation->id, $updatedCreation->id);
     }
 
+    #[Test]
+    public function it_can_update_an_existing_creation_from_a_draft_with_relations()
+    {
+        $existingCreation = $this->createFullCreation();
+
+        $draft = $this->createFullDraft();
+
+        $updatedCreation = $draft->updateCreation($existingCreation);
+
+        $this->assertEquals($draft->name, $updatedCreation->name);
+        $this->assertEquals($draft->slug, $updatedCreation->slug);
+        $this->assertEquals($draft->type, $updatedCreation->type);
+        $this->assertEquals($draft->started_at->format('Y-m-d'), $updatedCreation->started_at->format('Y-m-d'));
+        $this->assertEquals($draft->external_url, $updatedCreation->external_url);
+        $this->assertEquals($draft->featured, $updatedCreation->featured);
+
+        $this->assertCount(2, $updatedCreation->features);
+        $this->assertCount(2, $updatedCreation->screenshots);
+        $this->assertCount(3, $updatedCreation->technologies);
+        $this->assertCount(2, $updatedCreation->people);
+        $this->assertCount(2, $updatedCreation->tags);
+    }
+
     /**
      * Helper pour créer une création complète avec toutes ses relations
      */

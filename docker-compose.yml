@@ -2,6 +2,7 @@ name: laravel-personal-website
 
 services:
   app:
+    container_name: laravel.test
     build:
       context: .
     restart: unless-stopped
@@ -18,6 +19,7 @@ services:
     depends_on:
       - mariadb
       - redis
+      - selenium
     networks:
       - app-network
 
@@ -38,6 +40,15 @@ services:
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
       MARIADB_DATABASE: ${DB_DATABASE}
+    networks:
+      - app-network
+
+  selenium:
+    image: selenium/standalone-chrome
+    restart: unless-stopped
+    ports:
+      - "4444:4444"
+      - "7900:7900"
     networks:
       - app-network
 

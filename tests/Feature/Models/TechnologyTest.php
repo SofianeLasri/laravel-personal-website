@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Creation;
+use App\Models\CreationDraft;
 use App\Models\Technology;
 use App\Models\Translation;
 use App\Models\TranslationKey;
@@ -43,6 +44,18 @@ class TechnologyTest extends TestCase
 
         $this->assertCount(3, $technology->creations);
         $this->assertInstanceOf(Creation::class, $technology->creations->first());
+    }
+
+    #[Test]
+    public function it_can_be_associated_with_creation_drafts()
+    {
+        $technology = Technology::factory()->create();
+        $creationDrafts = CreationDraft::factory()->count(3)->create();
+
+        $technology->creationDrafts()->attach($creationDrafts);
+
+        $this->assertCount(3, $technology->creationDrafts);
+        $this->assertInstanceOf(CreationDraft::class, $technology->creationDrafts->first());
     }
 
     #[Test]

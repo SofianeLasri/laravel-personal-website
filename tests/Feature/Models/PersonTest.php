@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Creation;
+use App\Models\CreationDraft;
 use App\Models\Person;
 use App\Models\Picture;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -51,6 +52,18 @@ class PersonTest extends TestCase
 
         $this->assertCount(3, $person->creations);
         $this->assertInstanceOf(Creation::class, $person->creations->first());
+    }
+
+    #[Test]
+    public function it_can_be_associated_with_multiple_creation_drafts()
+    {
+        $person = Person::factory()->create();
+        $creationDrafts = CreationDraft::factory()->count(3)->create();
+
+        $person->creationDrafts()->attach($creationDrafts);
+
+        $this->assertCount(3, $person->creationDrafts);
+        $this->assertInstanceOf(CreationDraft::class, $person->creationDrafts->first());
     }
 
     #[Test]

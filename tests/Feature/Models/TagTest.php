@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Creation;
+use App\Models\CreationDraft;
 use App\Models\Tag;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,6 +41,18 @@ class TagTest extends TestCase
 
         $this->assertCount(3, $tag->creations);
         $this->assertInstanceOf(Creation::class, $tag->creations->first());
+    }
+
+    #[Test]
+    public function it_can_be_associated_with_creation_drafts()
+    {
+        $tag = Tag::factory()->create();
+        $creationDrafts = CreationDraft::factory()->count(3)->create();
+
+        $tag->creationDrafts()->attach($creationDrafts);
+
+        $this->assertCount(3, $tag->creationDrafts);
+        $this->assertInstanceOf(CreationDraft::class, $tag->creationDrafts->first());
     }
 
     #[Test]

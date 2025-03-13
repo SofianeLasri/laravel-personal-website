@@ -8,3 +8,7 @@
 # Laravel Personal Website
 
 Site personnel de Sofiane Lasri, basé sur Laravel.
+
+## Note 
+
+Àjour par rapport à ce commit: [6fa726e](https://github.com/laravel/vue-starter-kit/commit/6fa726e63faabfeb4c4f144d28f87dd02cd4eb31)

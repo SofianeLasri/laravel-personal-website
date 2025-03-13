@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class CreationController extends Controller
 {
-    public function index() {}
+    public function listPage(): Response
+    {
+        return Inertia::render('dashboard/creations/List');
+    }
 }

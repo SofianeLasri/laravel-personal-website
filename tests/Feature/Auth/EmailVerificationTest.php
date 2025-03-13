@@ -64,12 +64,18 @@ class EmailVerificationTest extends TestCase
     }
 
     #[Test]
-    public function test_user_with_verified_email_is_redirected()
+    public function test_user_with_verified_email_is_redirected_intended()
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get('/verify-email');
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->email)]
+        );
 
-        $response->assertRedirect(route('dashboard.index', absolute: false));
+        $response = $this->actingAs($user)->get($verificationUrl);
+
+        $response->assertRedirect(route('dashboard.index', absolute: false).'?verified=1');
     }
 }

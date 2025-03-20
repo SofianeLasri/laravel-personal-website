@@ -35,6 +35,18 @@ class CreationDraftController extends Controller
             'original_creation_id' => $request->original_creation_id,
         ]);
 
+        if ($request->has('people')) {
+            $draft->people()->sync($request->people);
+        }
+
+        if ($request->has('technologies')) {
+            $draft->technologies()->sync($request->technologies);
+        }
+
+        if ($request->has('tags')) {
+            $draft->tags()->sync($request->tags);
+        }
+
         return response()->json([
             'draft' => $draft,
         ]);
@@ -64,6 +76,18 @@ class CreationDraftController extends Controller
             'source_code_url' => $request->source_code_url,
             'original_creation_id' => $request->original_creation_id,
         ]);
+
+        if ($request->has('people')) {
+            $creationDraft->people()->sync($request->people);
+        }
+
+        if ($request->has('technologies')) {
+            $creationDraft->technologies()->sync($request->technologies);
+        }
+
+        if ($request->has('tags')) {
+            $creationDraft->tags()->sync($request->tags);
+        }
 
         return response()->json($creationDraft);
     }

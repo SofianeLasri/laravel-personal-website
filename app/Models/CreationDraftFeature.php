@@ -11,6 +11,7 @@ class CreationDraftFeature extends Model
     use HasFactory;
 
     protected $fillable = [
+        'creation_draft_id',
         'title_translation_key_id',
         'description_translation_key_id',
         'picture_id',

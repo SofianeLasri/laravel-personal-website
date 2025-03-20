@@ -25,6 +25,12 @@ class CreationDraftRequest extends FormRequest
             'external_url' => ['nullable', 'string', 'url'],
             'source_code_url' => ['nullable', 'string', 'url'],
             'original_creation_id' => ['nullable', 'integer', 'exists:creations,id'],
+            'people' => 'nullable|array',
+            'people.*' => 'exists:people,id',
+            'technologies' => 'nullable|array',
+            'technologies.*' => 'exists:technologies,id',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
         ];
     }
 }

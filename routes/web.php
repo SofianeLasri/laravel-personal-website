@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
 use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
+use App\Http\Controllers\Admin\Api\PersonController;
+use App\Http\Controllers\Admin\Api\PictureController;
 use App\Http\Controllers\Admin\CreationPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,6 +26,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     Route::apiResource('creation-drafts', CreationDraftController::class);
     Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
     Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
+    Route::apiResource('people', PersonController::class);
+    Route::apiResource('pictures', PictureController::class);
 });
 
 require __DIR__.'/settings.php';

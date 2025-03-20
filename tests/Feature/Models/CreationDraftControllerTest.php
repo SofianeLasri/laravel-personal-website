@@ -134,6 +134,43 @@ class CreationDraftControllerTest extends TestCase
     }
 
     #[Test]
+    public function test_update_modifies_existing_relations()
+    {
+        $draft = CreationDraft::factory()
+            ->hasPeople(2)
+            ->hasTechnologies(2)
+            ->hasTags(2)
+            ->create();
+
+        $newPerson = Person::factory()->create();
+        $newTechnology = Technology::factory()->create();
+        $newTag = Tag::factory()->create();
+
+        $data = [
+            'locale' => 'en',
+            'name' => 'Updated Relations',
+            'slug' => 'updated-relations',
+            'type' => 'portfolio',
+            'started_at' => '2025-01-01',
+            'short_description_content' => 'Short',
+            'full_description_content' => 'Full',
+            'people' => [$newPerson->id],
+            'technologies' => [$newTechnology->id],
+            'tags' => [$newTag->id],
+        ];
+
+        $response = $this->putJson(route('dashboard.creation-drafts.show', ['creation_draft' => $draft]), $data);
+
+        $response->assertOk()
+            ->assertJsonPath('name', 'Updated Relations');
+
+        $draft->refresh();
+        $this->assertEquals(1, $draft->people()->count());
+        $this->assertEquals(1, $draft->technologies()->count());
+        $this->assertEquals(1, $draft->tags()->count());
+    }
+
+    #[Test]
     public function test_destroy_deletes_draft_and_relations()
     {
         $draft = CreationDraft::factory()

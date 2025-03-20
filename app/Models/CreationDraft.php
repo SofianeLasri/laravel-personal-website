@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Enums\CreationType;
-use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 
 class CreationDraft extends Model
 {
@@ -157,13 +157,20 @@ class CreationDraft extends Model
     /**
      * Create a new Creation from this draft
      *
-     * @throws \Exception
+     * @throws ValidationException
      */
     public function toCreation(): Creation
     {
         // Must have translation keys for short and full descriptions
         if (! $this->short_description_translation_key_id || ! $this->full_description_translation_key_id) {
-            throw new Exception('CreationDraft must have translation keys for short and full descriptions');
+            $validator = validator([
+                'short_description_translation_key_id' => $this->short_description_translation_key_id,
+                'full_description_translation_key_id' => $this->full_description_translation_key_id,
+            ], [
+                'short_description_translation_key_id' => 'required',
+                'full_description_translation_key_id' => 'required',
+            ]);
+            throw new ValidationException($validator);
         }
 
         $creation = Creation::create([

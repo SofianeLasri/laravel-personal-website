@@ -21,9 +21,9 @@ class Translation extends Model
         'text',
     ];
 
-    protected  $casts = [
+    protected $casts = [
         'translation_key_id' => 'integer',
-        'locale' =>  'string',
+        'locale' => 'string',
         'text' => 'string',
     ];
 
@@ -48,6 +48,7 @@ class Translation extends Model
             get: fn () => $this->translationKey->key,
             set: function (string $value) {
                 $translationKey = TranslationKey::firstOrCreate(['key' => $value]);
+
                 return ['translation_key_id' => $translationKey->id];
             }
         );
@@ -60,15 +61,15 @@ class Translation extends Model
 
     /**
      * Find a translation by key and locale.
-     * @param string $key Example: 'auth.failed'
-     * @param string $locale 'en' or 'fr'
-     * @return self|null
+     *
+     * @param  string  $key  Example: 'auth.failed'
+     * @param  string  $locale  'en' or 'fr'
      */
     public static function findByKeyAndLocale(string $key, string $locale): ?self
     {
         $translationKey = TranslationKey::findByKey($key);
 
-        if (!$translationKey) {
+        if (! $translationKey) {
             return null;
         }
 
@@ -81,24 +82,35 @@ class Translation extends Model
      * Replication of the Laravel trans helper function.
      * Returns the translation for the given key and locale.
      * If the translation does not exist, the key is returned.
-     * @param string $key Example: 'auth.failed'
-     * @param string $locale 'en' or 'fr'
-     * @return string
+     *
+     * @param  string  $key  Example: 'auth.failed'
+     * @param  string  $locale  'en' or 'fr'
      */
     public static function trans(string $key, string $locale): string
     {
         $translation = self::findByKeyAndLocale($key, $locale);
 
-        if (!$translation) {
+        if (! $translation) {
             return $key;
         }
 
         return $translation->text;
     }
 
-    public static function createOrUpdate(string $key, string $locale, string $text): self
+    /**
+     * Create or update a translation.
+     *
+     * @param  string|TranslationKey  $key  The key string or the TranslationKey instance.
+     * @param  string  $locale  'en' or 'fr'
+     * @param  string  $text  The translation text.
+     */
+    public static function createOrUpdate(string|TranslationKey $key, string $locale, string $text): self
     {
-        $translationKey = TranslationKey::findOrCreateByKey($key);
+        if (is_string($key)) {
+            $translationKey = TranslationKey::findOrCreateByKey($key);
+        } else {
+            $translationKey = $key;
+        }
 
         $translation = self::where('translation_key_id', $translationKey->id)
             ->where('locale', $locale)
@@ -107,6 +119,7 @@ class Translation extends Model
         if ($translation) {
             $translation->text = $text;
             $translation->save();
+
             return $translation;
         }
 

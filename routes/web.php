@@ -1,6 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\CreationController;
+use App\Http\Controllers\Admin\Api\CreationDraftController;
+use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
+use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
+use App\Http\Controllers\Admin\CreationPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -14,9 +17,13 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     })->name('index');
 
     Route::name('creations.')->prefix('creations')->group(function () {
-        Route::get('/', [CreationController::class, 'listPage'])
+        Route::get('/', [CreationPageController::class, 'listPage'])
             ->name('index');
     });
+
+    Route::apiResource('creation-drafts', CreationDraftController::class);
+    Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
+    Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
 });
 
 require __DIR__.'/settings.php';

@@ -24,4 +24,11 @@ class CreationDraftScreenshotFactory extends Factory
             'caption_translation_key_id' => $this->faker->optional(0.7)->randomElement([TranslationKey::factory()]),
         ];
     }
+
+    public function withCaption(): self
+    {
+        return $this->state([
+            'caption_translation_key_id' => TranslationKey::factory(),
+        ]);
+    }
 }

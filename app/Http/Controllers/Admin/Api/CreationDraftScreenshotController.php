@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreationDraftScreenshotRequest;
+use App\Http\Requests\Screenshot\CreateCreationDraftScreenshotRequest;
+use App\Http\Requests\Screenshot\UpdateCreationDraftScreenshotRequest;
 use App\Models\CreationDraft;
 use App\Models\CreationDraftScreenshot;
 use App\Models\Translation;
@@ -23,9 +24,11 @@ class CreationDraftScreenshotController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CreationDraftScreenshotRequest $request, CreationDraft $creationDraft): JsonResponse
+    public function store(CreateCreationDraftScreenshotRequest $request, CreationDraft $creationDraft): JsonResponse
     {
-        $caption = Translation::createOrUpdate(uniqid(), $request->locale, $request->caption);
+        if ($request->has('caption')) {
+            $caption = Translation::createOrUpdate(uniqid(), $request->locale, $request->caption);
+        }
         $creationDraftScreenshot = $creationDraft->screenshots()->create([
             'picture_id' => $request->picture_id,
             'caption_translation_key_id' => $caption->translation_key_id,
@@ -37,20 +40,30 @@ class CreationDraftScreenshotController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CreationDraftScreenshot $creationDraftScreenshot): JsonResponse
+    public function show(int $creationDraftScreenshotId): JsonResponse
     {
-        return response()->json($creationDraftScreenshot);
+        return response()->json(CreationDraftScreenshot::findOrFail($creationDraftScreenshotId));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(CreationDraftScreenshotRequest $request, CreationDraftScreenshot $creationDraftScreenshot): JsonResponse
+    public function update(UpdateCreationDraftScreenshotRequest $request, int $creationDraftScreenshotId): JsonResponse
     {
-        $caption = Translation::createOrUpdate(uniqid(), $request->locale, $request->caption);
+        $creationDraftScreenshot = CreationDraftScreenshot::findOrFail($creationDraftScreenshotId);
+
+        if ($request->has('caption')) {
+            $caption = Translation::createOrUpdate($creationDraftScreenshot->captionTranslationKey ? $creationDraftScreenshot->captionTranslationKey : uniqid(),
+                $request->locale,
+                $request->caption);
+
+            $creationDraftScreenshot->update([
+                'caption_translation_key_id' => $caption->translation_key_id,
+            ]);
+        }
+
         $creationDraftScreenshot->update([
             'picture_id' => $request->picture_id,
-            'caption_translation_key_id' => $caption->translation_key_id,
         ]);
 
         return response()->json($creationDraftScreenshot);
@@ -59,9 +72,9 @@ class CreationDraftScreenshotController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CreationDraftScreenshot $creationDraftScreenshot): Response
+    public function destroy(int $creationDraftScreenshotId): Response
     {
-        $creationDraftScreenshot->delete();
+        CreationDraftScreenshot::findOrFail($creationDraftScreenshotId)->delete();
 
         return response()->noContent();
     }

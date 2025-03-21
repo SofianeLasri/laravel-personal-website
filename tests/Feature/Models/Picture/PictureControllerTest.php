@@ -5,6 +5,7 @@ namespace Tests\Feature\Models\Picture;
 use App\Http\Controllers\Admin\Api\PictureController;
 use App\Models\Picture;
 use App\Services\UploadedFilesService;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Http\UploadedFile;
@@ -57,6 +58,26 @@ class PictureControllerTest extends TestCase
 
         echo $response->getContent();
         $response->assertCreated();
+    }
+
+    #[Test]
+    public function test_create_picture_but_service_throws_exception()
+    {
+        $this->instance(
+            UploadedFilesService::class,
+            Mockery::mock(UploadedFilesService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('storeAndOptimizeUploadedPicture')->andThrow(new Exception('Test exception'));
+            })
+        );
+
+        $uploadedFile = UploadedFile::fake()->image('test.jpg');
+
+        $response = $this->postJson(route('dashboard.api.pictures.store'), [
+            'picture' => $uploadedFile,
+        ]);
+
+        $response->assertStatus(500)
+            ->assertJson(['message' => 'Test exception']);
     }
 
     #[Test]

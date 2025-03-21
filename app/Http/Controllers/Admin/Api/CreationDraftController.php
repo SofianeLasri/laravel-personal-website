@@ -7,6 +7,7 @@ use App\Http\Requests\CreationDraftRequest;
 use App\Models\CreationDraft;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class CreationDraftController extends Controller
 {
@@ -92,10 +93,10 @@ class CreationDraftController extends Controller
         return response()->json($creationDraft);
     }
 
-    public function destroy(CreationDraft $creationDraft): JsonResponse
+    public function destroy(CreationDraft $creationDraft): Response
     {
         $creationDraft->delete();
 
-        return response()->json([], 204);
+        return response()->noContent();
     }
 }

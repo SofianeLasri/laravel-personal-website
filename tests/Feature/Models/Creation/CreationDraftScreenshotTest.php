@@ -1,6 +1,6 @@
 <?php
 
-namespace Models;
+namespace Models\Creation;
 
 use App\Models\CreationDraft as Creation;
 use App\Models\CreationDraftScreenshot as Screenshot;

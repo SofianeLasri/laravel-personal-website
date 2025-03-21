@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CreationType;
+use App\Services\CreationConversionService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -161,102 +162,16 @@ class CreationDraft extends Model
      */
     public function toCreation(): Creation
     {
-        // Must have translation keys for short and full descriptions
-        if (! $this->short_description_translation_key_id || ! $this->full_description_translation_key_id) {
-            $validator = validator([
-                'short_description_translation_key_id' => $this->short_description_translation_key_id,
-                'full_description_translation_key_id' => $this->full_description_translation_key_id,
-            ], [
-                'short_description_translation_key_id' => 'required',
-                'full_description_translation_key_id' => 'required',
-            ]);
-            throw new ValidationException($validator);
-        }
-
-        $creation = Creation::create([
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'logo_id' => $this->logo_id,
-            'cover_image_id' => $this->cover_image_id,
-            'type' => $this->type,
-            'started_at' => $this->started_at,
-            'ended_at' => $this->ended_at,
-            'short_description_translation_key_id' => $this->short_description_translation_key_id,
-            'full_description_translation_key_id' => $this->full_description_translation_key_id,
-            'external_url' => $this->external_url,
-            'source_code_url' => $this->source_code_url,
-            'featured' => $this->featured,
-        ]);
-
-        foreach ($this->features as $draftFeature) {
-            Feature::create([
-                'creation_id' => $creation->id,
-                'title_translation_key_id' => $draftFeature->title_translation_key_id,
-                'description_translation_key_id' => $draftFeature->description_translation_key_id,
-                'picture_id' => $draftFeature->picture_id,
-            ]);
-        }
-
-        foreach ($this->screenshots as $draftScreenshot) {
-            Screenshot::create([
-                'creation_id' => $creation->id,
-                'picture_id' => $draftScreenshot->picture_id,
-                'caption_translation_key_id' => $draftScreenshot->caption_translation_key_id,
-            ]);
-        }
-
-        $creation->technologies()->attach($this->technologies()->pluck('technologies.id'));
-        $creation->people()->attach($this->people()->pluck('people.id'));
-        $creation->tags()->attach($this->tags()->pluck('tags.id'));
-
-        return $creation;
+        return app(CreationConversionService::class)->convertDraftToCreation($this);
     }
 
     /**
      * Update an existing Creation with this draft's data
+     *
+     * @throws ValidationException
      */
     public function updateCreation(Creation $creation): Creation
     {
-        $creation->update([
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'logo_id' => $this->logo_id,
-            'cover_image_id' => $this->cover_image_id,
-            'type' => $this->type,
-            'started_at' => $this->started_at,
-            'ended_at' => $this->ended_at,
-            'short_description_translation_key_id' => $this->short_description_translation_key_id,
-            'full_description_translation_key_id' => $this->full_description_translation_key_id,
-            'external_url' => $this->external_url,
-            'source_code_url' => $this->source_code_url,
-            'featured' => $this->featured,
-        ]);
-
-        $creation->features()->delete();
-
-        foreach ($this->features as $draftFeature) {
-            Feature::create([
-                'creation_id' => $creation->id,
-                'title_translation_key_id' => $draftFeature->title_translation_key_id,
-                'description_translation_key_id' => $draftFeature->description_translation_key_id,
-                'picture_id' => $draftFeature->picture_id,
-            ]);
-        }
-
-        $creation->screenshots()->delete();
-
-        foreach ($this->screenshots as $draftScreenshot) {
-            Screenshot::create([
-                'creation_id' => $creation->id,
-                'picture_id' => $draftScreenshot->picture_id,
-                'caption_translation_key_id' => $draftScreenshot->caption_translation_key_id,
-            ]);
-        }
-
-        $creation->technologies()->sync($this->technologies()->pluck('technologies.id'));
-        $creation->people()->sync($this->people()->pluck('people.id'));
-        $creation->tags()->sync($this->tags()->pluck('tags.id'));
-
-        return $creation;
+        return app(CreationConversionService::class)->updateCreationFromDraft($this, $creation);
     }
 }

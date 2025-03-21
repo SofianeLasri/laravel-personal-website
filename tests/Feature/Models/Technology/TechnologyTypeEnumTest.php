@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Models\Technology;
 
 use App\Enums\TechnologyType;
 use App\Models\Technology;

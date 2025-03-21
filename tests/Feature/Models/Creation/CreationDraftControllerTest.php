@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Models\Creation;
 
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Models\Creation;
@@ -35,7 +35,7 @@ class CreationDraftControllerTest extends TestCase
     {
         CreationDraft::factory()->count(3)->create();
 
-        $response = $this->getJson(route('dashboard.creation-drafts.index'));
+        $response = $this->getJson(route('dashboard.api.creation-drafts.index'));
 
         $response->assertOk()
             ->assertJsonCount(3);
@@ -66,7 +66,7 @@ class CreationDraftControllerTest extends TestCase
             'source_code_url' => 'https://github.com',
         ];
 
-        $response = $this->postJson(route('dashboard.creation-drafts.store'), $data);
+        $response = $this->postJson(route('dashboard.api.creation-drafts.store'), $data);
 
         $response->assertOk()
             ->assertJsonPath('draft.name', 'New Project');
@@ -81,7 +81,7 @@ class CreationDraftControllerTest extends TestCase
     #[Test]
     public function test_store_validates_required_fields()
     {
-        $response = $this->postJson(route('dashboard.creation-drafts.store'));
+        $response = $this->postJson(route('dashboard.api.creation-drafts.store'));
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors([
@@ -96,7 +96,7 @@ class CreationDraftControllerTest extends TestCase
     {
         $draft = CreationDraft::factory()->create();
 
-        $response = $this->getJson(route('dashboard.creation-drafts.show', ['creation_draft' => $draft]));
+        $response = $this->getJson(route('dashboard.api.creation-drafts.show', ['creation_draft' => $draft]));
 
         $response->assertOk()
             ->assertJsonPath('id', $draft->id);
@@ -119,7 +119,7 @@ class CreationDraftControllerTest extends TestCase
             'people' => [$newPerson->id],
         ];
 
-        $response = $this->putJson(route('dashboard.creation-drafts.show', ['creation_draft' => $draft]), $data);
+        $response = $this->putJson(route('dashboard.api.creation-drafts.show', ['creation_draft' => $draft]), $data);
 
         $response->assertOk()
             ->assertJsonPath('name', 'Updated Name');
@@ -159,7 +159,7 @@ class CreationDraftControllerTest extends TestCase
             'tags' => [$newTag->id],
         ];
 
-        $response = $this->putJson(route('dashboard.creation-drafts.show', ['creation_draft' => $draft]), $data);
+        $response = $this->putJson(route('dashboard.api.creation-drafts.show', ['creation_draft' => $draft]), $data);
 
         $response->assertOk()
             ->assertJsonPath('name', 'Updated Relations');
@@ -178,7 +178,7 @@ class CreationDraftControllerTest extends TestCase
             ->hasScreenshots(3)
             ->create();
 
-        $response = $this->deleteJson(route('dashboard.creation-drafts.show', ['creation_draft' => $draft]));
+        $response = $this->deleteJson(route('dashboard.api.creation-drafts.show', ['creation_draft' => $draft]));
 
         $response->assertNoContent();
         $this->assertDatabaseMissing('creation_drafts', ['id' => $draft->id]);
@@ -202,7 +202,7 @@ class CreationDraftControllerTest extends TestCase
             'full_description_content' => 'Updated full text',
         ];
 
-        $this->putJson(route('dashboard.creation-drafts.show', ['creation_draft' => $draft]), $data);
+        $this->putJson(route('dashboard.api.creation-drafts.show', ['creation_draft' => $draft]), $data);
 
         $draft->refresh();
         $this->assertEquals($originalKey, $draft->short_description_translation_key_id);
@@ -221,7 +221,7 @@ class CreationDraftControllerTest extends TestCase
             'full_description_content' => 'Full',
         ];
 
-        $response = $this->postJson(route('dashboard.creation-drafts.index'), $data);
+        $response = $this->postJson(route('dashboard.api.creation-drafts.index'), $data);
 
         $response->assertOk();
         $draft = CreationDraft::first();
@@ -245,7 +245,7 @@ class CreationDraftControllerTest extends TestCase
             'tags' => [999],
         ];
 
-        $response = $this->postJson(route('dashboard.creation-drafts.index'), $data);
+        $response = $this->postJson(route('dashboard.api.creation-drafts.index'), $data);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['people.0', 'technologies.0', 'tags.0']);
@@ -266,7 +266,7 @@ class CreationDraftControllerTest extends TestCase
             'original_creation_id' => $creation->id,
         ];
 
-        $response = $this->postJson(route('dashboard.creation-drafts.index'), $data);
+        $response = $this->postJson(route('dashboard.api.creation-drafts.index'), $data);
 
         $response->assertOk();
         $this->assertEquals(
@@ -289,7 +289,7 @@ class CreationDraftControllerTest extends TestCase
             'full_description_content' => 'Full',
         ];
 
-        $this->postJson(route('dashboard.creation-drafts.index'), $data);
+        $this->postJson(route('dashboard.api.creation-drafts.index'), $data);
 
         $draft = CreationDraft::first();
         $this->assertEquals(

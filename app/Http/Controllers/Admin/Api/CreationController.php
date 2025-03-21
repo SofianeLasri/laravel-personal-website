@@ -8,6 +8,7 @@ use App\Models\CreationDraft;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 
 class CreationController extends Controller
@@ -26,10 +27,10 @@ class CreationController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'draft_id' => ['required', 'exists:creation_drafts'],
+            'draft_id' => ['required', 'exists:creation_drafts,id'],
         ]);
 
-        $creationDraft = CreationDraft::find($request->draft_id);
+        $creationDraft = app(CreationDraft::class)->find($request->draft_id);
         try {
             $creation = $creationDraft->toCreation();
 
@@ -66,8 +67,10 @@ class CreationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Creation $creation)
+    public function destroy(Creation $creation): Response
     {
         $creation->delete();
+
+        return response()->noContent();
     }
 }

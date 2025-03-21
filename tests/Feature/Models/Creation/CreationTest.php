@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Models\Creation;
 
 use App\Enums\CreationType;
 use App\Models\Creation;

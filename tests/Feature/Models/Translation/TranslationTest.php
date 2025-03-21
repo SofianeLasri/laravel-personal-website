@@ -1,12 +1,13 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Models\Translation;
 
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 #[CoversClass(Translation::class)]
@@ -14,6 +15,7 @@ class TranslationTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[Test]
     public function test_it_can_create_with_translation_key_locale_and_text()
     {
         $translationKey = TranslationKey::factory()->create();
@@ -31,6 +33,7 @@ class TranslationTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_it_can_create_with_key_locale_and_text()
     {
         $translation = Translation::factory()->create([
@@ -51,6 +54,7 @@ class TranslationTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_it_cannot_create_two_translations_with_same_key_and_locale()
     {
         $translation = Translation::factory()->create([
@@ -68,6 +72,7 @@ class TranslationTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_it_can_update_with_translation_key_locale_and_text()
     {
         $translationKey = TranslationKey::factory()->create();
@@ -90,6 +95,7 @@ class TranslationTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_it_can_update_with_key_locale_and_text()
     {
         $translation = Translation::factory()->create([
@@ -115,6 +121,7 @@ class TranslationTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_find_by_key_and_locale()
     {
         $translationKey = TranslationKey::factory()->create(['key' => 'test.key']);
@@ -129,6 +136,7 @@ class TranslationTest extends TestCase
         $this->assertEquals($translation->id, $foundTranslation->id);
     }
 
+    #[Test]
     public function test_trans_returns_text_for_key_and_locale()
     {
         $translationKey = TranslationKey::factory()->create(['key' => 'test.key']);
@@ -143,6 +151,7 @@ class TranslationTest extends TestCase
         $this->assertEquals($translation->text, $foundText);
     }
 
+    #[Test]
     public function test_trans_returns_key_for_missing_translation()
     {
         $foundText = Translation::trans('missing.key', 'en');
@@ -150,6 +159,7 @@ class TranslationTest extends TestCase
         $this->assertEquals('missing.key', $foundText);
     }
 
+    #[Test]
     public function test_create_or_update()
     {
         Translation::createOrUpdate('test.key', 'en', 'Hello, world!');
@@ -165,7 +175,8 @@ class TranslationTest extends TestCase
         ]);
     }
 
-    public function test_create_or_update_updates_existing_translation()
+    #[Test]
+    public function test_create_or_update_updates_existing_translation_with_key_string()
     {
         $translation = Translation::createOrUpdate('test.key', 'en', 'Hello, world!');
 
@@ -187,5 +198,42 @@ class TranslationTest extends TestCase
             'id' => $translation->id,
             'text' => 'Bonjour, le monde!',
         ]);
+    }
+
+    #[Test]
+    public function test_update_existing_translation_with_translation_key_instance()
+    {
+        $translationKey = TranslationKey::factory()->create(['key' => 'test.key']);
+        $translation = Translation::createOrUpdate($translationKey, 'en', 'Hello, world!');
+
+        $translation->update([
+            'text' => 'Bonjour, le monde!',
+        ]);
+
+        $updatedTranslation = Translation::createOrUpdate($translationKey, 'en', 'Hello, world!');
+
+        $this->assertEquals($translation->id, $updatedTranslation->id);
+        $this->assertEquals('Hello, world!', $updatedTranslation->text);
+
+        $this->assertDatabaseHas('translations', [
+            'id' => $translation->id,
+            'text' => 'Hello, world!',
+        ]);
+
+        $this->assertDatabaseMissing('translations', [
+            'id' => $translation->id,
+            'text' => 'Bonjour, le monde!',
+        ]);
+    }
+
+    #[Test]
+    public function test_it_can_have_translation_key()
+    {
+        $translationKey = TranslationKey::factory()->create();
+        $translation = Translation::factory()->create([
+            'translation_key_id' => $translationKey->id,
+        ]);
+
+        $this->assertEquals($translationKey->id, $translation->translationKey->id);
     }
 }

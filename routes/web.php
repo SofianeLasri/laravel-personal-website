@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Api\CreationController;
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
 use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
@@ -23,11 +24,14 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('index');
     });
 
-    Route::apiResource('creation-drafts', CreationDraftController::class);
-    Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
-    Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
-    Route::apiResource('people', PersonController::class);
-    Route::apiResource('pictures', PictureController::class);
+    Route::name('api.')->prefix('api')->group(function () {
+        Route::apiResource('creations', CreationController::class);
+        Route::apiResource('creation-drafts', CreationDraftController::class);
+        Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
+        Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
+        Route::apiResource('people', PersonController::class);
+        Route::apiResource('pictures', PictureController::class);
+    });
 });
 
 require __DIR__.'/settings.php';

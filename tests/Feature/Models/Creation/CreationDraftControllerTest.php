@@ -92,6 +92,27 @@ class CreationDraftControllerTest extends TestCase
     }
 
     #[Test]
+    public function test_store_with_missing_optional_fields()
+    {
+        $data = [
+            'locale' => 'en',
+            'name' => 'Minimal Draft',
+            'slug' => 'minimal-draft',
+            'type' => 'library',
+            'started_at' => '2025-01-01',
+            'short_description_content' => 'Short',
+            'full_description_content' => 'Full',
+        ];
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.store'), $data);
+
+        $response->assertCreated();
+        $draft = CreationDraft::first();
+        $this->assertNull($draft->ended_at);
+        $this->assertNull($draft->external_url);
+    }
+
+    #[Test]
     public function test_show_returns_specific_draft()
     {
         $draft = CreationDraft::factory()->create();

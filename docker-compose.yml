@@ -5,6 +5,8 @@ services:
     container_name: laravel.test
     build:
       context: .
+      args:
+        INSTALL_XDEBUG: "true"
     restart: unless-stopped
     working_dir: /app
     entrypoint: ["docker-init/entrypoint.sh"]

@@ -39,17 +39,17 @@ class PictureController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Picture $picture): JsonResponse
+    public function show(int $pictureId): JsonResponse
     {
-        return response()->json($picture);
+        return response()->json(Picture::findOrFail($pictureId));
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Picture $picture): Response
+    public function destroy(int $pictureId): Response
     {
-        $picture->delete();
+        Picture::findOrFail($pictureId)->delete();
 
         return response()->noContent();
     }

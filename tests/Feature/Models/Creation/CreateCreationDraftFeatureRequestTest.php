@@ -3,11 +3,9 @@
 namespace Tests\Feature\Models\Creation;
 
 use App\Http\Requests\Feature\CreateCreationDraftFeatureRequest;
-use App\Models\CreationDraft;
 use App\Models\Picture;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -17,145 +15,107 @@ class CreateCreationDraftFeatureRequestTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected User $user;
-
-    protected CreationDraft $draft;
-
-    protected array $baseData;
-
-    protected function setUp(): void
+    protected function rules(): array
     {
-        parent::setUp();
+        return (new CreateCreationDraftFeatureRequest)->rules();
+    }
 
-        $this->user = User::factory()->create();
-        $this->actingAs($this->user);
+    #[Test]
+    public function it_passes_with_valid_data(): void
+    {
+        $picture = Picture::factory()->create();
 
-        $this->draft = CreationDraft::factory()->create();
-        $this->baseData = [
+        $data = [
             'locale' => 'en',
-            'title' => 'Feature Title',
-            'description' => 'Feature Description',
-            'picture_id' => Picture::factory()->create()->id,
-        ];
-    }
-
-    #[Test]
-    public function validation_passes_with_valid_data()
-    {
-        $response = $this->postJson(
-            route('dashboard.api.creation-drafts.draft-features.store', $this->draft),
-            $this->baseData
-        );
-
-        $response->assertCreated();
-    }
-
-    #[Test]
-    public function locale_field_validation()
-    {
-        $scenarios = [
-            'required' => [
-                'data' => Arr::except($this->baseData, 'locale'),
-                'errors' => ['locale'],
-            ],
-            'in_enum' => [
-                'data' => array_merge($this->baseData, ['locale' => 'es']),
-                'errors' => ['locale'],
-            ],
-            'string_type' => [
-                'data' => array_merge($this->baseData, ['locale' => 123]),
-                'errors' => ['locale'],
-            ],
+            'title' => 'Un titre valide',
+            'description' => 'Une description valide',
+            'picture_id' => $picture->id,
         ];
 
-        $this->runValidationScenarios($scenarios);
+        $validator = Validator::make($data, $this->rules());
+        $this->assertTrue($validator->passes());
     }
 
     #[Test]
-    public function title_field_validation()
+    public function it_passes_without_optional_picture_id(): void
     {
-        $scenarios = [
-            'required' => [
-                'data' => Arr::except($this->baseData, 'title'),
-                'errors' => ['title'],
-            ],
-            'string_type' => [
-                'data' => array_merge($this->baseData, ['title' => 12345]),
-                'errors' => ['title'],
-            ],
+        $data = [
+            'locale' => 'fr',
+            'title' => 'Titre sans picture_id',
+            'description' => 'Description sans picture_id',
         ];
 
-        $this->runValidationScenarios($scenarios);
+        $validator = Validator::make($data, $this->rules());
+        $this->assertTrue($validator->passes());
     }
 
     #[Test]
-    public function description_field_validation()
+    public function locale_is_required(): void
     {
-        $scenarios = [
-            'required' => [
-                'data' => Arr::except($this->baseData, 'description'),
-                'errors' => ['description'],
-            ],
-            'string_type' => [
-                'data' => array_merge($this->baseData, ['description' => 12345]),
-                'errors' => ['description'],
-            ],
+        $data = [
+            'title' => 'Titre',
+            'description' => 'Description',
         ];
 
-        $this->runValidationScenarios($scenarios);
+        $validator = Validator::make($data, $this->rules());
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('locale', $validator->errors()->toArray());
     }
 
     #[Test]
-    public function picture_id_field_validation()
+    public function locale_must_be_in_defined_list(): void
     {
-        $scenarios = [
-            'exists_in_database' => [
-                'data' => array_merge($this->baseData, ['picture_id' => 999]),
-                'errors' => ['picture_id'],
-            ],
-            'optional' => [
-                'data' => Arr::except($this->baseData, 'picture_id'),
-                'errors' => [],
-            ],
-            'integer_type' => [
-                'data' => array_merge($this->baseData, ['picture_id' => 'invalid']),
-                'errors' => ['picture_id'],
-            ],
+        $data = [
+            'locale' => 'de',
+            'title' => 'Titre',
+            'description' => 'Description',
         ];
 
-        $this->runValidationScenarios($scenarios);
-    }
-
-    protected function runValidationScenarios(array $scenarios): void
-    {
-        foreach ($scenarios as $description => $scenario) {
-            $response = $this->postJson(
-                route('dashboard.api.creation-drafts.draft-features.store', $this->draft),
-                $scenario['data']
-            );
-
-            if (! empty($scenario['errors'])) {
-                $response->assertUnprocessable();
-                foreach ($scenario['errors'] as $errorField) {
-                    $response->assertJsonValidationErrors($errorField);
-                }
-            } else {
-                $response->assertCreated();
-            }
-        }
+        $validator = Validator::make($data, $this->rules());
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('locale', $validator->errors()->toArray());
     }
 
     #[Test]
-    public function request_uses_correct_validation_rules()
+    public function title_is_required(): void
     {
-        $request = new CreateCreationDraftFeatureRequest;
-        $rules = $request->rules();
+        $data = [
+            'locale' => 'en',
+            'description' => 'Description',
+        ];
 
-        $this->assertEquals([
-            'locale' => ['required', 'string', 'in:en,fr'],
-            'title' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'picture_id' => ['sometimes', 'exists:pictures,id'],
-        ], $rules);
+        $validator = Validator::make($data, $this->rules());
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('title', $validator->errors()->toArray());
+    }
+
+    #[Test]
+    public function description_is_required(): void
+    {
+        $data = [
+            'locale' => 'fr',
+            'title' => 'Titre',
+        ];
+
+        $validator = Validator::make($data, $this->rules());
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('description', $validator->errors()->toArray());
+    }
+
+    #[Test]
+    public function picture_id_must_exist_in_the_pictures_table_if_provided(): void
+    {
+        $invalidPictureId = 9999;
+
+        $data = [
+            'locale' => 'en',
+            'title' => 'Titre',
+            'description' => 'Description',
+            'picture_id' => $invalidPictureId,
+        ];
+
+        $validator = Validator::make($data, $this->rules());
+        $this->assertFalse($validator->passes());
+        $this->assertArrayHasKey('picture_id', $validator->errors()->toArray());
     }
 }

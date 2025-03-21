@@ -196,7 +196,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     #[Test]
     public function test_caption_translation_relationship(): void
     {
-        $screenshot = CreationDraftScreenshot::factory()->create();
+        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
         $translation = Translation::factory()->create([
             'translation_key_id' => $screenshot->caption_translation_key_id,
             'locale' => 'en',

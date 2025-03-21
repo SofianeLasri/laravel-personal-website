@@ -24,4 +24,9 @@ class Tag extends Model
     {
         return $this->belongsToMany(Creation::class);
     }
+
+    public function creationDrafts(): BelongsToMany
+    {
+        return $this->belongsToMany(CreationDraft::class, 'creation_draft_tag', 'tag_id', 'creation_draft_id');
+    }
 }

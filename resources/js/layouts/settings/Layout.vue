@@ -3,7 +3,7 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -11,16 +11,14 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/profile',
     },
     {
-        title: 'Password',
-        href: '/settings/password',
-    },
-    {
         title: 'Appearance',
         href: '/settings/appearance',
     },
 ];
 
-const currentPath = window.location.pathname;
+const page = usePage();
+
+const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.location).pathname : '';
 </script>
 
 <template>

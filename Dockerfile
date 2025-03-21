@@ -1,5 +1,6 @@
 FROM dunglas/frankenphp
 
+ARG INSTALL_XDEBUG=false
 RUN install-php-extensions \
     ftp \
     bz2 \
@@ -10,7 +11,8 @@ RUN install-php-extensions \
     opcache \
     redis \
     pcntl \
-    bcmath
+    bcmath \
+    $( [ "$INSTALL_XDEBUG" = "true" ] && echo "xdebug" )
 
 # Install Composer
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

@@ -46,4 +46,9 @@ class Technology extends Model
     {
         return self::where('featured', true);
     }
+
+    public function creationDrafts(): BelongsToMany
+    {
+        return $this->belongsToMany(CreationDraft::class, 'creation_draft_technology', 'technology_id', 'creation_draft_id');
+    }
 }

@@ -12,4 +12,4 @@ service supervisor start
 supervisorctl start all
 
 echo "Running Octane..."
-php artisan octane:frankenphp --workers=1 --max-requests=1
+php artisan octane:frankenphp --workers=1 --max-requests=1 --watch

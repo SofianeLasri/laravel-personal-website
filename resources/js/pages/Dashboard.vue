@@ -10,10 +10,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
-
-defineProps<{
-    name?: string;
-}>();
 </script>
 
 <template>

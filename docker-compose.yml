@@ -2,14 +2,16 @@ name: laravel-personal-website
 
 services:
   app:
+    container_name: laravel.test
     build:
       context: .
+      args:
+        INSTALL_XDEBUG: "true"
     restart: unless-stopped
     working_dir: /app
     entrypoint: ["docker-init/entrypoint.sh"]
     ports:
       - '80:8000'
-      - '5173:5173'
     volumes:
       - .:/app
       - /app/vendor
@@ -18,6 +20,7 @@ services:
     depends_on:
       - mariadb
       - redis
+      - selenium
     networks:
       - app-network
 
@@ -38,6 +41,15 @@ services:
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
       MARIADB_DATABASE: ${DB_DATABASE}
+    networks:
+      - app-network
+
+  selenium:
+    image: selenium/standalone-chrome
+    restart: unless-stopped
+    ports:
+      - "4444:4444"
+      - "7900:7900"
     networks:
       - app-network
 

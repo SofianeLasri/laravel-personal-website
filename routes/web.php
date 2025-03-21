@@ -25,12 +25,14 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     });
 
     Route::name('api.')->prefix('api')->group(function () {
-        Route::apiResource('creations', CreationController::class);
-        Route::apiResource('creation-drafts', CreationDraftController::class);
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
-        Route::apiResource('people', PersonController::class);
-        Route::apiResource('pictures', PictureController::class);
+        Route::apiResource('pictures', PictureController::class)->except('update');
+        Route::apiResources([
+            'creations' => CreationController::class,
+            'creation-drafts' => CreationDraftController::class,
+            'people' => PersonController::class,
+        ]);
     });
 });
 

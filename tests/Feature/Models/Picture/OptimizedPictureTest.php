@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Models\Picture;
 
 use App\Models\OptimizedPicture;
 use App\Models\Picture;

@@ -34,7 +34,7 @@ class CreationController extends Controller
         try {
             $creation = $creationDraft->toCreation();
 
-            return response()->json($creation);
+            return response()->json($creation, \Symfony\Component\HttpFoundation\Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return response()->json($e->errors(), 422);
         } catch (Exception $e) {

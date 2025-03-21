@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Models\Screenshot;
 
-use App\Models\Creation;
+use App\Models\CreationDraft as Creation;
+use App\Models\CreationDraftScreenshot as Screenshot;
 use App\Models\Picture;
-use App\Models\Screenshot;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 #[CoversClass(Screenshot::class)]
-class ScreenshotTest extends TestCase
+class CreationDraftScreenshotTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -24,13 +24,13 @@ class ScreenshotTest extends TestCase
         $picture = Picture::factory()->create();
 
         $screenshot = Screenshot::factory()->create([
-            'creation_id' => $creation->id,
+            'creation_draft_id' => $creation->id,
             'picture_id' => $picture->id,
         ]);
 
-        $this->assertDatabaseHas('screenshots', [
+        $this->assertDatabaseHas('creation_draft_screenshots', [
             'id' => $screenshot->id,
-            'creation_id' => $creation->id,
+            'creation_draft_id' => $creation->id,
             'picture_id' => $picture->id,
         ]);
     }
@@ -39,10 +39,10 @@ class ScreenshotTest extends TestCase
     public function it_belongs_to_a_creation()
     {
         $creation = Creation::factory()->create();
-        $screenshot = Screenshot::factory()->create(['creation_id' => $creation->id]);
+        $screenshot = Screenshot::factory()->create(['creation_draft_id' => $creation->id]);
 
-        $this->assertInstanceOf(Creation::class, $screenshot->creation);
-        $this->assertEquals($creation->id, $screenshot->creation->id);
+        $this->assertInstanceOf(Creation::class, $screenshot->creationDraft);
+        $this->assertEquals($creation->id, $screenshot->creationDraft->id);
     }
 
     #[Test]

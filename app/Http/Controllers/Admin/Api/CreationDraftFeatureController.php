@@ -7,6 +7,7 @@ use App\Http\Requests\CreationDraftFeatureRequest;
 use App\Models\CreationDraft;
 use App\Models\CreationDraftFeature;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class CreationDraftFeatureController extends Controller
 {
@@ -19,7 +20,7 @@ class CreationDraftFeatureController extends Controller
     {
         $creationDraftFeature = $creationDraft->features()->create($request->validated());
 
-        return response()->json($creationDraftFeature);
+        return response()->json($creationDraftFeature, Response::HTTP_CREATED);
     }
 
     public function show(CreationDraftFeature $creationDraftFeature): JsonResponse

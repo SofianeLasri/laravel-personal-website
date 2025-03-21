@@ -10,7 +10,7 @@ class PersonRequest extends FormRequest
     {
         return [
             'name' => ['required'],
-            'picture_id' => ['nullable', 'exists:pictures'],
+            'picture_id' => ['nullable', 'exists:pictures,id'],
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PersonRequest;
 use App\Models\Person;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class PersonController extends Controller
 {
@@ -24,7 +25,7 @@ class PersonController extends Controller
     {
         $person = Person::create($request->validated());
 
-        return response()->json($person);
+        return response()->json($person, Response::HTTP_CREATED);
     }
 
     /**
@@ -48,8 +49,10 @@ class PersonController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Person $person)
+    public function destroy(Person $person): Response
     {
         $person->delete();
+
+        return response()->noContent();
     }
 }

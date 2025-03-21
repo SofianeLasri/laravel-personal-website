@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Models\Person;
 
 use App\Models\Creation;
 use App\Models\CreationDraft;

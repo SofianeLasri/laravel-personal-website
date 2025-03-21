@@ -8,6 +8,7 @@ use App\Models\Picture;
 use App\Services\UploadedFilesService;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class PictureController extends Controller
 {
@@ -29,7 +30,7 @@ class PictureController extends Controller
         try {
             $picture = $this->uploadedFilesService->storeAndOptimizeUploadedPicture($request->file('picture'));
 
-            return response()->json($picture);
+            return response()->json($picture, Response::HTTP_CREATED);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -46,8 +47,10 @@ class PictureController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Picture $picture)
+    public function destroy(Picture $picture): Response
     {
         $picture->delete();
+
+        return response()->noContent();
     }
 }

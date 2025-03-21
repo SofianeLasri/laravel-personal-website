@@ -68,8 +68,8 @@ class CreationDraftControllerTest extends TestCase
 
         $response = $this->postJson(route('dashboard.api.creation-drafts.store'), $data);
 
-        $response->assertOk()
-            ->assertJsonPath('draft.name', 'New Project');
+        $response->assertCreated()
+            ->assertJsonPath('name', 'New Project');
 
         $draft = CreationDraft::first();
         $this->assertEquals(1, $draft->people()->count());
@@ -223,7 +223,7 @@ class CreationDraftControllerTest extends TestCase
 
         $response = $this->postJson(route('dashboard.api.creation-drafts.index'), $data);
 
-        $response->assertOk();
+        $response->assertCreated();
         $draft = CreationDraft::first();
         $this->assertNull($draft->ended_at);
         $this->assertNull($draft->external_url);
@@ -268,7 +268,7 @@ class CreationDraftControllerTest extends TestCase
 
         $response = $this->postJson(route('dashboard.api.creation-drafts.index'), $data);
 
-        $response->assertOk();
+        $response->assertCreated();
         $this->assertEquals(
             $creation->id,
             CreationDraft::first()->original_creation_id

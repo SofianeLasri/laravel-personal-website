@@ -8,6 +8,7 @@ use App\Models\CreationDraft;
 use App\Models\CreationDraftScreenshot;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class CreationDraftScreenshotController extends Controller
 {
@@ -30,7 +31,7 @@ class CreationDraftScreenshotController extends Controller
             'caption_translation_key_id' => $caption->translation_key_id,
         ]);
 
-        return response()->json($creationDraftScreenshot);
+        return response()->json($creationDraftScreenshot, Response::HTTP_CREATED);
     }
 
     /**
@@ -58,8 +59,10 @@ class CreationDraftScreenshotController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CreationDraftScreenshot $creationDraftScreenshot)
+    public function destroy(CreationDraftScreenshot $creationDraftScreenshot): Response
     {
         $creationDraftScreenshot->delete();
+
+        return response()->noContent();
     }
 }

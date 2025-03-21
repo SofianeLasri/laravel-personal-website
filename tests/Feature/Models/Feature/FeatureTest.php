@@ -1,9 +1,9 @@
 <?php
 
-namespace Models\Creation;
+namespace Models\Feature;
 
-use App\Models\CreationDraft as Creation;
-use App\Models\CreationDraftFeature as Feature;
+use App\Models\Creation;
+use App\Models\Feature;
 use App\Models\Picture;
 use App\Models\Translation;
 use App\Models\TranslationKey;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 #[CoversClass(Feature::class)]
-class CreationDraftFeatureTest extends TestCase
+class FeatureTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -25,14 +25,14 @@ class CreationDraftFeatureTest extends TestCase
         $descKey = TranslationKey::factory()->create();
 
         $feature = Feature::factory()->create([
-            'creation_draft_id' => $creation->id,
+            'creation_id' => $creation->id,
             'title_translation_key_id' => $titleKey->id,
             'description_translation_key_id' => $descKey->id,
         ]);
 
-        $this->assertDatabaseHas('creation_draft_features', [
+        $this->assertDatabaseHas('features', [
             'id' => $feature->id,
-            'creation_draft_id' => $creation->id,
+            'creation_id' => $creation->id,
         ]);
     }
 
@@ -40,10 +40,10 @@ class CreationDraftFeatureTest extends TestCase
     public function it_belongs_to_a_creation()
     {
         $creation = Creation::factory()->create();
-        $feature = Feature::factory()->create(['creation_draft_id' => $creation->id]);
+        $feature = Feature::factory()->create(['creation_id' => $creation->id]);
 
-        $this->assertInstanceOf(Creation::class, $feature->creationDraft);
-        $this->assertEquals($creation->id, $feature->creationDraft->id);
+        $this->assertInstanceOf(Creation::class, $feature->creation);
+        $this->assertEquals($creation->id, $feature->creation->id);
     }
 
     #[Test]

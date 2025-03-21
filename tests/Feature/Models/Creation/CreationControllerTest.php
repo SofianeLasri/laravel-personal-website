@@ -60,7 +60,7 @@ class CreationControllerTest extends TestCase
             'draft_id' => $draft->id,
         ]);
 
-        $response->assertOk()
+        $response->assertCreated()
             ->assertJsonStructure(['id', 'name']);
 
         $creation = Creation::first();

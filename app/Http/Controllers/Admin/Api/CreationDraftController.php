@@ -7,7 +7,7 @@ use App\Http\Requests\CreationDraftRequest;
 use App\Models\CreationDraft;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class CreationDraftController extends Controller
 {
@@ -48,9 +48,7 @@ class CreationDraftController extends Controller
             $draft->tags()->sync($request->tags);
         }
 
-        return response()->json([
-            'draft' => $draft,
-        ]);
+        return response()->json($draft, Response::HTTP_CREATED);
     }
 
     public function show(CreationDraft $creationDraft): JsonResponse

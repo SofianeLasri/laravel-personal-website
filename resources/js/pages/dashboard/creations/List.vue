@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/vue3';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Créations',
-        href: route('dashboard.creations.index'),
+        href: '#',
+    },
+    {
+        title: 'Liste des créations',
+        href: route('dashboard.creations.index', undefined, false),
     },
 ];
 </script>

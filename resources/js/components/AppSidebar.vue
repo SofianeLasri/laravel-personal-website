@@ -11,13 +11,27 @@ import AppLogo from './AppLogo.vue';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard.index', undefined, false),
         icon: LayoutGrid,
     },
     {
         title: 'Créations',
-        href: route('dashboard.creations.index'),
+        href: '#',
         icon: Brush,
+        items: [
+            {
+                title: 'Liste',
+                href: route('dashboard.creations.index', undefined, false),
+            },
+            {
+                title: 'Explorer',
+                href: '#',
+            },
+            {
+                title: 'Quantum',
+                href: '#',
+            },
+        ],
     },
 ];
 

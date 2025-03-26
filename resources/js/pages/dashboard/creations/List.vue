@@ -2,6 +2,7 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import Heading from '@/components/Heading.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,6 +19,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="list" />
-        test
+        <div class="px-5 py-6">
+            <Heading
+                title="Liste des créations"
+                description="Sont affichées ici uniquement les créations publiées." />
+        </div>
     </AppLayout>
 </template>

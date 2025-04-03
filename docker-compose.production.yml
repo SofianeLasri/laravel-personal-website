@@ -1,0 +1,21 @@
+name: laravel-personal-website
+
+services:
+  app:
+    restart: always
+    working_dir: /app
+    entrypoint: ["docker-init/entrypoint.sh"]
+    ports:
+      - '${DOCKER_APP_PORT}:8000'
+    volumes:
+      - .:/app
+      - /app/vendor
+      - /app/node_modules
+      - /app/public/build
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    restart: always
+    tty: true

@@ -20,7 +20,7 @@ class CreationFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->catchPhrase();
+        $name = $this->getUniqueName();
 
         return [
             'name' => $name,
@@ -36,6 +36,18 @@ class CreationFactory extends Factory
             'source_code_url' => $this->faker->optional(0.5)->url(),
             'featured' => $this->faker->boolean(20), // 20% chance to be featured
         ];
+    }
+
+    private function getUniqueName(): string
+    {
+        $name = $this->faker->catchPhrase();
+        $testName = $name;
+        $count = 0;
+        while (Creation::where('slug', Str::slug($testName))->exists()) {
+            $testName = $name.' '.++$count;
+        }
+
+        return $testName;
     }
 
     public function withFeatures(int $count = 3): static

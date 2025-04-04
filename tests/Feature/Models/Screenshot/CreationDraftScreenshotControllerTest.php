@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Screenshot;
+namespace Tests\Feature\Models\Screenshot;
 
 use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
 use App\Models\CreationDraft;

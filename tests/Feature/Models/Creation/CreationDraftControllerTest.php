@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Creation;
+namespace Tests\Feature\Models\Creation;
 
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Models\Creation;

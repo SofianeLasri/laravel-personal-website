@@ -8,6 +8,7 @@ use App\Models\Picture;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class CreationDraftFactory extends Factory
 {
@@ -15,9 +16,11 @@ class CreationDraftFactory extends Factory
 
     public function definition(): array
     {
+        $name = $this->getUniqueName();
+
         return [
-            'name' => $this->faker->words(3, true),
-            'slug' => $this->faker->slug(),
+            'name' => $name,
+            'slug' => Str::slug($name),
             'logo_id' => Picture::factory(),
             'cover_image_id' => Picture::factory(),
             'type' => $this->faker->randomElement(CreationType::values()),
@@ -33,5 +36,17 @@ class CreationDraftFactory extends Factory
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
+    }
+
+    private function getUniqueName(): string
+    {
+        $name = $this->faker->catchPhrase();
+        $testName = $name;
+        $count = 0;
+        while (CreationDraft::where('slug', Str::slug($testName))->exists()) {
+            $testName = $name.' '.++$count;
+        }
+
+        return $testName;
     }
 }

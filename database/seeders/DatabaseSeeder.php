@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Creation;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\CreationDraft;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,7 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Creation::factory()
+        $creations = Creation::factory()
             ->withPeople()
             ->withFeatures()
             ->withScreenshots()
@@ -21,5 +22,9 @@ class DatabaseSeeder extends Seeder
             ->withTechnologies()
             ->count(50)
             ->create();
+
+        $creations->random(10)->each(function ($creation) {
+            CreationDraft::fromCreation($creation)->save();
+        });
     }
 }

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, CreationType, CreationWithTranslations, TranslationKey } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -32,41 +32,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('dashboard.creations.index', undefined, false),
     },
 ];
-
-interface Translation {
-    id: number;
-    translation_key_id: number;
-    locale: string;
-    text: string;
-}
-
-interface TranslationKey {
-    id: number;
-    key: string;
-    translations: Translation[];
-}
-
-type CreationType = 'portfolio' | 'game' | 'library' | 'website' | 'tool' | 'map' | 'other';
-
-interface CreationWithTranslations {
-    id: number;
-    name: string;
-    slug: string;
-    logo_id: number;
-    cover_image_id: number;
-    type: CreationType;
-    started_at: string;
-    ended_at: string | null;
-    short_description_translation_key_id: number;
-    full_description_translation_key_id: number;
-    external_url: string | null;
-    source_code_url: string | null;
-    featured: boolean;
-    created_at: string;
-    updated_at: string;
-    short_description_translation_key: TranslationKey;
-    full_description_translation_key: TranslationKey;
-}
 
 interface Props {
     creations: CreationWithTranslations[];
@@ -263,7 +228,7 @@ const handlePageChange = (page: number) => {
                                         <DropdownMenuItem
                                             @click="
                                                 () => {
-                                                    // Rediriger vers la page de détail
+                                                    // TODO : Rediriger vers la page de détail
                                                 }
                                             "
                                         >
@@ -273,7 +238,7 @@ const handlePageChange = (page: number) => {
                                         <DropdownMenuItem
                                             @click="
                                                 () => {
-                                                    // Rediriger vers la page d'édition
+                                                    // TODO : Rediriger vers la page d'édition
                                                 }
                                             "
                                         >
@@ -284,7 +249,7 @@ const handlePageChange = (page: number) => {
                                             v-if="creation.external_url"
                                             @click="
                                                 () => {
-                                                    // Rediriger vers l'URL externe
+                                                    // TODO : Rediriger vers l'URL externe
                                                 }
                                             "
                                         >
@@ -295,7 +260,7 @@ const handlePageChange = (page: number) => {
                                             class="text-destructive"
                                             @click="
                                                 () => {
-                                                    // Action de suppression
+                                                    // TODO : Action de suppression
                                                 }
                                             "
                                         >

@@ -20,11 +20,11 @@ class CreationFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->getUniqueName();
+        $name = $this->faker->catchPhrase();
 
         return [
             'name' => $name,
-            'slug' => Str::slug($name),
+            'slug' => Str::slug($name).'-'.uniqid(),
             'logo_id' => Picture::factory(),
             'cover_image_id' => Picture::factory(),
             'type' => $this->faker->randomElement(CreationType::values()),
@@ -36,18 +36,6 @@ class CreationFactory extends Factory
             'source_code_url' => $this->faker->optional(0.5)->url(),
             'featured' => $this->faker->boolean(20), // 20% chance to be featured
         ];
-    }
-
-    private function getUniqueName(): string
-    {
-        $name = $this->faker->catchPhrase();
-        $testName = $name;
-        $count = 0;
-        while (Creation::where('slug', Str::slug($testName))->exists()) {
-            $testName = $name.' '.++$count;
-        }
-
-        return $testName;
     }
 
     public function withFeatures(int $count = 3): static

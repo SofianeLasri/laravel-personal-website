@@ -4,7 +4,12 @@ namespace Database\Factories;
 
 use App\Enums\CreationType;
 use App\Models\CreationDraft;
+use App\Models\CreationDraftFeature;
+use App\Models\CreationDraftScreenshot;
+use App\Models\Person;
 use App\Models\Picture;
+use App\Models\Tag;
+use App\Models\Technology;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
@@ -16,11 +21,11 @@ class CreationDraftFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->getUniqueName();
+        $name = $this->faker->catchPhrase();
 
         return [
             'name' => $name,
-            'slug' => Str::slug($name),
+            'slug' => Str::slug($name).'-'.uniqid(),
             'logo_id' => Picture::factory(),
             'cover_image_id' => Picture::factory(),
             'type' => $this->faker->randomElement(CreationType::values()),
@@ -38,15 +43,45 @@ class CreationDraftFactory extends Factory
         ];
     }
 
-    private function getUniqueName(): string
+    public function withFeatures(int $count = 3): static
     {
-        $name = $this->faker->catchPhrase();
-        $testName = $name;
-        $count = 0;
-        while (CreationDraft::where('slug', Str::slug($testName))->exists()) {
-            $testName = $name.' '.++$count;
-        }
+        return $this->afterCreating(function (CreationDraft $creationDraft) use ($count) {
+            $creationDraft->features()->createMany(
+                CreationDraftFeature::factory()->count($count)->make()->toArray()
+            );
+        });
+    }
 
-        return $testName;
+    public function withScreenshots(int $count = 4): static
+    {
+        return $this->afterCreating(function (CreationDraft $creationDraft) use ($count) {
+            $creationDraft->screenshots()->createMany(
+                CreationDraftScreenshot::factory()->count($count)->make()->toArray()
+            );
+        });
+    }
+
+    public function withTechnologies(int $count = 5): static
+    {
+        return $this->afterCreating(function (CreationDraft $creationDraft) use ($count) {
+            $technologies = Technology::factory()->count($count)->create();
+            $creationDraft->technologies()->attach($technologies);
+        });
+    }
+
+    public function withPeople(int $count = 2): static
+    {
+        return $this->afterCreating(function (CreationDraft $creationDraft) use ($count) {
+            $people = Person::factory()->count($count)->create();
+            $creationDraft->people()->attach($people);
+        });
+    }
+
+    public function withTags(int $count = 3): static
+    {
+        return $this->afterCreating(function (CreationDraft $creationDraft) use ($count) {
+            $tags = Tag::factory()->count($count)->create();
+            $creationDraft->tags()->attach($tags);
+        });
     }
 }

@@ -26,5 +26,14 @@ class DatabaseSeeder extends Seeder
         $creations->random(10)->each(function ($creation) {
             CreationDraft::fromCreation($creation)->save();
         });
+
+        CreationDraft::factory()
+            ->withPeople()
+            ->withFeatures()
+            ->withScreenshots()
+            ->withTags()
+            ->withTechnologies()
+            ->count(15)
+            ->create();
     }
 }

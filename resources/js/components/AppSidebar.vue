@@ -24,8 +24,8 @@ const mainNavItems: NavItem[] = [
                 href: route('dashboard.creations.index', undefined, false),
             },
             {
-                title: 'Explorer',
-                href: '#',
+                title: 'Brouillons',
+                href: route('dashboard.creations.drafts.index', undefined, false),
             },
             {
                 title: 'Quantum',

@@ -24,6 +24,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('index');
         Route::get('/drafts', [CreationPageController::class, 'listDraftPage'])
             ->name('drafts.index');
+        Route::get('/edit', [CreationPageController::class, 'editPage'])
+            ->name('edit');
     });
 
     Route::name('api.')->prefix('api')->group(function () {

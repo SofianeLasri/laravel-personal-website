@@ -27,4 +27,9 @@ class CreationPageController extends Controller
             'creationDrafts' => $creationDrafts,
         ]);
     }
+
+    public function editPage(): Response
+    {
+        return Inertia::render('dashboard/creations/EditPage');
+    }
 }

@@ -28,8 +28,8 @@ const mainNavItems: NavItem[] = [
                 href: route('dashboard.creations.drafts.index', undefined, false),
             },
             {
-                title: 'Quantum',
-                href: '#',
+                title: 'Éditeur',
+                href: route('dashboard.creations.edit', undefined, false),
             },
         ],
     },

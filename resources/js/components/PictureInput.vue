@@ -22,7 +22,7 @@ const error = ref<string | null>(null);
 
 const imageUrl = computed(() => {
     if (picture.value) {
-        return route('dashboard.api.pictures.show', { picture: picture.value.id });
+        return '/storage/' + picture.value.path_original;
     }
     return null;
 });

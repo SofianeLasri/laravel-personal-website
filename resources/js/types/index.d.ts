@@ -95,4 +95,15 @@ interface CreationDraftWithTranslations {
     original_creation_id: number | null;
 }
 
+interface Picture {
+    id: number;
+    filename: string;
+    width: number | null;
+    height: number | null;
+    size: number;
+    path_original: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;

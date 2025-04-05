@@ -11,4 +11,4 @@ Site personnel de Sofiane Lasri, basé sur Laravel.
 
 ## Note 
 
-À jour par rapport à ce commit : [5ae6361](https://github.com/laravel/vue-starter-kit/commit/5ae6361cf130fe96347e7384053c7eff192f204e)
+À jour par rapport à ce commit : [56b3d93](https://github.com/laravel/vue-starter-kit/commit/56b3d933353819f4465d12b685302e2639ffcc69)

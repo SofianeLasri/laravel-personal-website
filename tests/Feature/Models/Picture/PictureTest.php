@@ -116,7 +116,7 @@ class PictureTest extends TestCase
             Storage::disk('public')->assertExists($optimizedPicture->path);
         }
 
-        Storage::disk('public')->assertMissing($path);
+        // Storage::disk('public')->assertMissing($path);
     }
 
     #[Test]

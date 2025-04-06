@@ -23,7 +23,8 @@ import {
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, TranslationKey } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Clock, Edit, Eye, MoreHorizontal, Send, Trash2 } from 'lucide-vue-next';
@@ -167,6 +168,15 @@ const getDraftStatus = (draft: CreationDraftWithTranslations): DraftBadgeStatus 
     }
     return { label: 'Nouveau', variant: 'default' };
 };
+
+const deleteDraft = async (draftId: number) => {
+    try {
+        await axios.delete(route('dashboard.api.creation-drafts.destroy', { creation_draft: draftId }));
+        router.reload();
+    } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
+    }
+};
 </script>
 
 <template>
@@ -271,16 +281,13 @@ const getDraftStatus = (draft: CreationDraftWithTranslations): DraftBadgeStatus 
                                             <Eye class="mr-2 h-4 w-4" />
                                             <span>Voir</span>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            @click="
-                                                () => {
-                                                    // Rediriger vers la page d'édition du brouillon
-                                                }
-                                            "
-                                        >
-                                            <Edit class="mr-2 h-4 w-4" />
-                                            <span>Modifier</span>
-                                        </DropdownMenuItem>
+
+                                        <Link :href="route('dashboard.creations.edit', { 'draft-id': draft.id })">
+                                            <DropdownMenuItem>
+                                                <Edit class="mr-2 h-4 w-4" />
+                                                <span>Modifier</span>
+                                            </DropdownMenuItem>
+                                        </Link>
 
                                         <DropdownMenuSeparator />
 
@@ -297,14 +304,7 @@ const getDraftStatus = (draft: CreationDraftWithTranslations): DraftBadgeStatus 
 
                                         <DropdownMenuSeparator />
 
-                                        <DropdownMenuItem
-                                            class="text-destructive"
-                                            @click="
-                                                () => {
-                                                    // Action de suppression du brouillon
-                                                }
-                                            "
-                                        >
+                                        <DropdownMenuItem class="text-destructive" @click="deleteDraft(draft.id)">
                                             <Trash2 class="mr-2 h-4 w-4" />
                                             <span>Supprimer</span>
                                         </DropdownMenuItem>

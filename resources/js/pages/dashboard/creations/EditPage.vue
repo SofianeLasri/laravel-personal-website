@@ -54,11 +54,11 @@ const props = defineProps<Props>();
             <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <div class="flex flex-col gap-2">
                     <Label for="creationName">Nom de la création</Label>
-                    <Input id="creationName" type="text" placeholder="Nom de la création" />
+                    <Input id="creationName" type="text" placeholder="Nom de la création" :model-value="props.creationDraft?.name" />
                 </div>
                 <div class="flex flex-col gap-2">
                     <Label for="creationSlug">Slug de la création</Label>
-                    <Input id="creationSlug" type="text" placeholder="Slug de la création" />
+                    <Input id="creationSlug" type="text" placeholder="Slug de la création" :model-value="props.creationDraft?.slug" />
                 </div>
             </div>
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">

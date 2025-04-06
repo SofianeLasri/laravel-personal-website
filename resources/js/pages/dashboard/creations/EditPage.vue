@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import Heading from '@/components/Heading.vue';
+import HeadingSmall from '@/components/HeadingSmall.vue';
 import PictureInput from '@/components/PictureInput.vue';
+import { Button } from '@/components/ui/button';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, CreationDraftWithTranslations, CreationType } from '@/types';
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head } from '@inertiajs/vue3';
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import * as z from 'zod';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,69 +32,153 @@ interface Props {
 const props = defineProps<Props>();
 
 const creationTypes = Object.keys(creationTypeLabels) as CreationType[];
+
+const formSchema = toTypedSchema(
+    z.object({
+        name: z.string().min(1, 'Le nom est requis'),
+        slug: z.string().min(1, 'Le slug est requis'),
+        logo_id: z.number().nullable(),
+        cover_image_id: z.number().nullable(),
+        external_url: z.string().nullable(),
+        source_code_url: z.string().nullable(),
+        type: z.string(),
+        locale: z.enum(['fr', 'en'], {
+            errorMap: () => ({ message: 'La langue est requise' }),
+        }),
+    }),
+);
+
+const { isFieldDirty, handleSubmit } = useForm({
+    validationSchema: formSchema,
+    initialValues: {
+        name: props.creationDraft?.name ?? '',
+        slug: props.creationDraft?.slug ?? '',
+        logo_id: props.creationDraft?.logo_id ?? null,
+        cover_image_id: props.creationDraft?.cover_image_id ?? null,
+        external_url: props.creationDraft?.external_url ?? '',
+        source_code_url: props.creationDraft?.source_code_url ?? '',
+        type: props.creationDraft?.type ?? creationTypes[0],
+        locale: 'fr',
+    },
+});
+
+// Debug list all variables in the console
+const onSubmit = handleSubmit((values) => {
+    console.log('Form values:', values);
+    // Handle form submission here
+});
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Éditeur" />
-        <div class="px-5 py-6">
+        <form class="px-5 py-6" @submit="onSubmit">
             <Heading title="Éditeur" description="Créer ou modifier une création." />
+
             <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div class="flex flex-col gap-2">
-                    <Label for="creationName">Nom de la création</Label>
-                    <Input id="creationName" type="text" placeholder="Nom de la création" :model-value="props.creationDraft?.name" />
-                </div>
-                <div class="flex flex-col gap-2">
-                    <Label for="creationSlug">Slug de la création</Label>
-                    <Input id="creationSlug" type="text" placeholder="Slug de la création" :model-value="props.creationDraft?.slug" />
-                </div>
-            </div>
-            <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div class="flex flex-col gap-4">
-                    <div class="flex flex-col gap-2">
-                        <Label for="logo">Logo</Label>
-                        <PictureInput name="logo" :pictureId="props.creationDraft?.logo_id ?? undefined" />
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <Label for="cover">Image de couverture</Label>
-                        <PictureInput name="cover" :pictureId="props.creationDraft?.cover_image_id ?? undefined" />
-                    </div>
-                </div>
-                <div class="flex flex-col gap-4">
-                    <div class="flex flex-col gap-2">
-                        <Label for="external_url">URL du projet (externe & publique)</Label>
-                        <Input
-                            id="external_url"
-                            type="text"
-                            placeholder="URL du projet"
-                            :model-value="props.creationDraft?.external_url ?? undefined"
-                        />
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <Label for="source_code_url">URL du code source</Label>
-                        <Input
-                            id="source_code_url"
-                            type="text"
-                            placeholder="URL du code source"
-                            :model-value="props.creationDraft?.source_code_url ?? undefined"
-                        />
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <Label for="type">Type de création</Label>
-                        <Select :default-value="props.creationDraft?.type">
-                            <SelectTrigger>
-                                <SelectValue placeholder="Sélectionner un type de création" />
-                            </SelectTrigger>
+                <FormField v-slot="{ componentField }" name="locale">
+                    <FormItem v-bind="componentField">
+                        <FormLabel>Langue</FormLabel>
+
+                        <Select :default-value="'fr'">
+                            <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Sélectionner une langue" />
+                                </SelectTrigger>
+                            </FormControl>
                             <SelectContent>
-                                <SelectItem v-for="type in creationTypes" :key="type" :value="type">
-                                    {{ getTypeLabel(type) }}
-                                </SelectItem>
+                                <SelectItem value="fr"> Français </SelectItem>
+                                <SelectItem value="en"> Anglais </SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
+                        <FormDescription> La langue dans laquelle seront enregistrés les champs traductibles. </FormDescription>
+                    </FormItem>
+                </FormField>
+            </div>
+
+            <HeadingSmall
+                title="Informations de base"
+                description="Ces informations permettent d'identifier la création, son nom et son slug ne sont pas traductibles."
+            />
+
+            <div class="my-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <FormField v-slot="{ componentField }" name="name" :validate-on-blur="!isFieldDirty">
+                    <FormItem>
+                        <FormLabel>Nom de la création</FormLabel>
+                        <FormControl>
+                            <Input v-bind="componentField" type="text" placeholder="Nom de la création" />
+                        </FormControl>
+                    </FormItem>
+                </FormField>
+                <FormField v-slot="{ componentField }" name="slug" :validate-on-blur="!isFieldDirty">
+                    <FormItem>
+                        <FormLabel>Slug de la création</FormLabel>
+                        <FormControl>
+                            <Input v-bind="componentField" type="text" placeholder="Slug de la création" />
+                        </FormControl>
+                    </FormItem>
+                </FormField>
+            </div>
+
+            <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div class="flex flex-col gap-4">
+                    <FormField v-slot="{ componentField }" name="logo_id">
+                        <FormItem>
+                            <FormLabel>Logo</FormLabel>
+                            <FormControl>
+                                <PictureInput v-bind="componentField" :model-value="props.creationDraft?.logo_id ?? undefined" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    </FormField>
+                    <FormField v-slot="{ componentField }" name="cover_image_id">
+                        <FormItem>
+                            <FormLabel>Image de couverture</FormLabel>
+                            <FormControl>
+                                <PictureInput v-bind="componentField" :model-value="props.creationDraft?.cover_image_id ?? undefined" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    </FormField>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <FormField v-slot="{ componentField }" name="external_url" :validate-on-blur="!isFieldDirty">
+                        <FormItem>
+                            <FormLabel>URL du projet (externe & publique)</FormLabel>
+                            <FormControl>
+                                <Input v-bind="componentField" type="text" placeholder="URL du projet" />
+                            </FormControl>
+                        </FormItem>
+                    </FormField>
+                    <FormField v-slot="{ componentField }" name="type" :validate-on-blur="!isFieldDirty">
+                        <FormItem>
+                            <FormLabel>Type de création</FormLabel>
+                            <FormControl>
+                                <Select v-bind="componentField">
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Sélectionner un type de création" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem v-for="type in creationTypes" :key="type" :value="type">
+                                            {{ getTypeLabel(type) }}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                        </FormItem>
+                    </FormField>
+                    <FormField v-slot="{ componentField }" name="source_code_url">
+                        <FormItem>
+                            <FormLabel>URL du code source</FormLabel>
+                            <FormControl>
+                                <Input v-bind="componentField" type="text" placeholder="URL du code source" />
+                            </FormControl>
+                        </FormItem>
+                    </FormField>
                 </div>
             </div>
-        </div>
+            <Button type="submit"> Submit </Button>
+        </form>
     </AppLayout>
 </template>
 

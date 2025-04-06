@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Picture } from '@/types';
+import { useVModel } from '@vueuse/core';
 import axios from 'axios';
 import { Image } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
-    name: string;
-    pictureId?: number;
-    modelValue?: number | null;
+    modelValue?: number;
 }>();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: number | null): void;
 }>();
+
+const modelValue = useVModel(props, 'modelValue', emit, {
+    passive: true,
+});
 
 const picture = ref<Picture | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -93,14 +96,14 @@ const triggerFileInput = () => {
 };
 
 onMounted(() => {
-    const idToLoad = props.modelValue !== undefined ? props.modelValue : props.pictureId;
+    const idToLoad = props.modelValue;
     if (idToLoad) {
         loadPicture(idToLoad);
     }
 });
 
-watch([() => props.modelValue, () => props.pictureId], ([newModelValue, newPictureId]) => {
-    const newId = newModelValue !== undefined ? newModelValue : newPictureId;
+watch([() => props.modelValue], ([newModelValue]) => {
+    const newId = newModelValue;
 
     if (newId !== picture.value?.id) {
         if (newId) {
@@ -132,12 +135,12 @@ watch([() => props.modelValue, () => props.pictureId], ([newModelValue, newPictu
 
             <div class="flex gap-2">
                 <Button v-if="picture" variant="destructive" size="sm" @click="removePicture" :disabled="loading"> Supprimer </Button>
-                <Button v-else variant="outline" size="sm" @click="triggerFileInput" :disabled="loading"> Ajouter </Button>
+                <Button v-else variant="outline" size="sm" @click="triggerFileInput" :disabled="loading">Ajouter </Button>
             </div>
 
             <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
 
-            <input type="hidden" :id="name" :name="name" :value="picture?.id || ''" />
+            <input type="hidden" v-model="modelValue" />
 
             <p v-if="error" class="mt-1 text-xs text-destructive">{{ error }}</p>
         </div>

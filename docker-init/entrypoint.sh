@@ -4,6 +4,8 @@ echo "Installing dependencies..."
 composer install
 php artisan key:generate
 
+npm install
+
 echo "Migrating database..."
 php artisan migrate
 

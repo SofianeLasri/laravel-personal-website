@@ -15,13 +15,14 @@ import {
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { BreadcrumbItem, CreationType, CreationWithTranslations, TranslationKey } from '@/types';
+import type { BreadcrumbItem, CreationWithTranslations, TranslationKey } from '@/types';
+import { getTypeLabel } from '@/utils/creationTypes';
 import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Edit, Eye, Link as LinkIcon, MoreHorizontal, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
-import axios from 'axios';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -70,20 +71,6 @@ const formatDate = (dateString: string) => {
 const getFrenchDescription = (translationKey: TranslationKey): string => {
     const frTranslation = translationKey.translations.find((t) => t.locale === 'fr');
     return frTranslation ? frTranslation.text : '';
-};
-
-const creationTypeLabels = {
-    portfolio: 'Portfolio',
-    game: 'Jeu vidéo',
-    library: 'Bibliothèque',
-    website: 'Site web',
-    tool: 'Outil',
-    map: 'Map',
-    other: 'Autre',
-};
-
-const getTypeLabel = (type: CreationType) => {
-    return creationTypeLabels[type] || type;
 };
 
 const compareValues = (a: any, b: any, direction: SortDirection) => {

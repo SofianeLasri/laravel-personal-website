@@ -22,7 +22,8 @@ import {
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, TranslationKey } from '@/types';
+import { BreadcrumbItem, CreationDraftWithTranslations, TranslationKey } from '@/types';
+import { getTypeLabel } from '@/utils/creationTypes';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -86,20 +87,6 @@ const formatDateTime = (dateString: string) => {
 const getFrenchDescription = (translationKey: TranslationKey): string => {
     const frTranslation = translationKey.translations.find((t) => t.locale === 'fr');
     return frTranslation ? frTranslation.text : '';
-};
-
-const creationTypeLabels = {
-    portfolio: 'Portfolio',
-    game: 'Jeu',
-    library: 'Bibliothèque',
-    website: 'Site web',
-    tool: 'Outil',
-    map: 'Carte',
-    other: 'Autre',
-};
-
-const getTypeLabel = (type: CreationType) => {
-    return creationTypeLabels[type] || type;
 };
 
 const compareValues = (a: any, b: any, direction: SortDirection) => {

@@ -16,11 +16,12 @@ import {
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, CreationType, CreationWithTranslations, TranslationKey } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Edit, Eye, Link as LinkIcon, MoreHorizontal, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import axios from 'axios';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -139,6 +140,15 @@ const paginatedCreations = computed(() => {
 const handlePageChange = (page: number) => {
     currentPage.value = page;
 };
+
+const deleteCreation = async (id: number) => {
+    try {
+        await axios.delete(route('dashboard.api.creations.destroy', { creation: id }));
+        router.reload();
+    } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
+    }
+};
 </script>
 
 <template>
@@ -256,14 +266,7 @@ const handlePageChange = (page: number) => {
                                             <LinkIcon class="mr-2 h-4 w-4" />
                                             <span>Visiter</span>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            class="text-destructive"
-                                            @click="
-                                                () => {
-                                                    // TODO : Action de suppression
-                                                }
-                                            "
-                                        >
+                                        <DropdownMenuItem class="text-destructive" @click="deleteCreation(creation.id)">
                                             <Trash2 class="mr-2 h-4 w-4" />
                                             <span>Supprimer</span>
                                         </DropdownMenuItem>

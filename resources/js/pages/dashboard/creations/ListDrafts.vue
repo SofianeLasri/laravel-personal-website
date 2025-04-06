@@ -169,9 +169,9 @@ const getDraftStatus = (draft: CreationDraftWithTranslations): DraftBadgeStatus 
     return { label: 'Nouveau', variant: 'default' };
 };
 
-const deleteDraft = async (draftId: number) => {
+const deleteDraft = async (id: number) => {
     try {
-        await axios.delete(route('dashboard.api.creation-drafts.destroy', { creation_draft: draftId }));
+        await axios.delete(route('dashboard.api.creation-drafts.destroy', { creation_draft: id }));
         router.reload();
     } catch (error) {
         console.error('Erreur lors de la suppression:', error);

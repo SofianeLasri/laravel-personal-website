@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Heading from '@/components/Heading.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
+import MarkdownEditor from '@/components/MarkdownEditor.vue';
 import PictureInput from '@/components/PictureInput.vue';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -12,21 +13,6 @@ import { BreadcrumbItem, CreationDraftWithTranslations, CreationType } from '@/t
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
-import {
-    BaseKit,
-    Blockquote,
-    Bold,
-    BulletList,
-    CodeBlock,
-    EchoEditor,
-    locale as editorLocale,
-    Italic,
-    OrderedList,
-    Strike,
-    Underline,
-} from 'echo-editor';
-//import '../../../../css/echo-editor.css'
-import { Code, Table } from 'lucide';
 import { useForm } from 'vee-validate';
 import * as z from 'zod';
 
@@ -62,16 +48,23 @@ const formSchema = toTypedSchema(
             errorMap: () => ({ message: 'La langue est requise' }),
         }),
         short_description_content: z.string().max(160).nullable(),
+        full_description_content: z.string().nullable(),
     }),
 );
 
 const locale = 'fr';
 
 let shortDescriptionContent = '';
+let fullDescriptionContent = '';
 
 if (props.creationDraft?.short_description_translation_key) {
     const translations = props.creationDraft.short_description_translation_key.translations;
     shortDescriptionContent = translations.find((t) => t.locale === locale)?.text || '';
+}
+
+if (props.creationDraft?.full_description_translation_key) {
+    const translations = props.creationDraft.full_description_translation_key.translations;
+    fullDescriptionContent = translations.find((t) => t.locale === locale)?.text || '';
 }
 
 const { isFieldDirty, handleSubmit } = useForm({
@@ -86,6 +79,7 @@ const { isFieldDirty, handleSubmit } = useForm({
         type: props.creationDraft?.type ?? creationTypes[0],
         locale: locale,
         short_description_content: shortDescriptionContent,
+        full_description_content: fullDescriptionContent,
     },
 });
 
@@ -94,23 +88,6 @@ const onSubmit = handleSubmit((values) => {
     console.log('Form values:', values);
     // Handle form submission here
 });
-
-const editorExtensions = [
-    BaseKit.configure({
-        Bold,
-        Italic,
-        Underline,
-        Strike,
-        BulletList,
-        OrderedList,
-        Blockquote,
-        CodeBlock,
-        Table,
-        Code,
-    }),
-];
-
-editorLocale.setLang('en');
 </script>
 
 <template>
@@ -240,9 +217,17 @@ editorLocale.setLang('en');
                 </FormField>
             </div>
 
-            <div class="mb-4 rounded-lg border bg-card text-card-foreground shadow-sm">
-                <echo-editor :extensions="editorExtensions" output="html" min-height="512" :hide-toolbar="false" :hide-menubar="true"></echo-editor>
-            </div>
+            <FormField v-slot="{ componentField }" name="full_description_content">
+                <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                        <MarkdownEditor v-bind="componentField" placeholder="Commencez à écrire..." />
+                    </FormControl>
+                    <FormDescription>
+                        La description sera utilisée pour le référencement (SEO) ainsi que pour la présentation du projet sur le site.
+                    </FormDescription>
+                </FormItem>
+            </FormField>
 
             <Button type="submit"> Submit</Button>
         </form>

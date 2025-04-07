@@ -45,7 +45,8 @@
         "vite": "^6.2.0",
         "vue": "^3.5.13",
         "ziggy-js": "^2.4.2",
-        "zod": "^3.24.2"
+        "zod": "^3.24.2",
+        "echo-editor": "git://github.com/Seedsa/echo-editor.git#v0.4.6"
     },
     "optionalDependencies": {
         "@rollup/rollup-linux-x64-gnu": "4.9.5",

@@ -12,6 +12,21 @@ import { BreadcrumbItem, CreationDraftWithTranslations, CreationType } from '@/t
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
+import {
+    BaseKit,
+    Blockquote,
+    Bold,
+    BulletList,
+    CodeBlock,
+    EchoEditor,
+    locale as editorLocale,
+    Italic,
+    OrderedList,
+    Strike,
+    Underline,
+} from 'echo-editor';
+//import '../../../../css/echo-editor.css'
+import { Code, Table } from 'lucide';
 import { useForm } from 'vee-validate';
 import * as z from 'zod';
 
@@ -46,17 +61,17 @@ const formSchema = toTypedSchema(
         locale: z.enum(['fr', 'en'], {
             errorMap: () => ({ message: 'La langue est requise' }),
         }),
-        shortDescriptionContent: z.string().max(160).nullable(),
+        short_description_content: z.string().max(160).nullable(),
     }),
 );
 
-const locale = "fr"
+const locale = 'fr';
 
-let shortDescriptionContent = "";
+let shortDescriptionContent = '';
 
 if (props.creationDraft?.short_description_translation_key) {
     const translations = props.creationDraft.short_description_translation_key.translations;
-    shortDescriptionContent = translations.find(t => t.locale === locale)?.text || "";
+    shortDescriptionContent = translations.find((t) => t.locale === locale)?.text || '';
 }
 
 const { isFieldDirty, handleSubmit } = useForm({
@@ -79,6 +94,23 @@ const onSubmit = handleSubmit((values) => {
     console.log('Form values:', values);
     // Handle form submission here
 });
+
+const editorExtensions = [
+    BaseKit.configure({
+        Bold,
+        Italic,
+        Underline,
+        Strike,
+        BulletList,
+        OrderedList,
+        Blockquote,
+        CodeBlock,
+        Table,
+        Code,
+    }),
+];
+
+editorLocale.setLang('en');
 </script>
 
 <template>
@@ -100,8 +132,8 @@ const onSubmit = handleSubmit((values) => {
                                 </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                                <SelectItem value="fr"> Français </SelectItem>
-                                <SelectItem value="en"> Anglais </SelectItem>
+                                <SelectItem value="fr">Français</SelectItem>
+                                <SelectItem value="en">Anglais</SelectItem>
                             </SelectContent>
                         </Select>
                         <FormDescription> La langue dans laquelle seront enregistrés les champs traductibles. </FormDescription>
@@ -201,13 +233,18 @@ const onSubmit = handleSubmit((values) => {
                             <Textarea placeholder="Courte description" v-bind="componentField" />
                         </FormControl>
                         <FormDescription>
-                            La description courte sera utilisée pour le référencement (SEO) ainsi que pour la
-                            présentation du projet sur le site et dans les intégrations embeds.
+                            La description courte sera utilisée pour le référencement (SEO) ainsi que pour la présentation du projet sur le site et
+                            dans les intégrations embeds.
                         </FormDescription>
                     </FormItem>
                 </FormField>
             </div>
-            <Button type="submit"> Submit </Button>
+
+            <div class="mb-4 rounded-lg border bg-card text-card-foreground shadow-sm">
+                <echo-editor :extensions="editorExtensions" output="html" min-height="512" :hide-toolbar="false" :hide-menubar="true"></echo-editor>
+            </div>
+
+            <Button type="submit"> Submit</Button>
         </form>
     </AppLayout>
 </template>

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, CreationDraftWithTranslations, CreationType } from '@/types';
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
@@ -45,8 +46,18 @@ const formSchema = toTypedSchema(
         locale: z.enum(['fr', 'en'], {
             errorMap: () => ({ message: 'La langue est requise' }),
         }),
+        shortDescriptionContent: z.string().max(160).nullable(),
     }),
 );
+
+const locale = "fr"
+
+let shortDescriptionContent = "";
+
+if (props.creationDraft?.short_description_translation_key) {
+    const translations = props.creationDraft.short_description_translation_key.translations;
+    shortDescriptionContent = translations.find(t => t.locale === locale)?.text || "";
+}
 
 const { isFieldDirty, handleSubmit } = useForm({
     validationSchema: formSchema,
@@ -58,7 +69,8 @@ const { isFieldDirty, handleSubmit } = useForm({
         external_url: props.creationDraft?.external_url ?? '',
         source_code_url: props.creationDraft?.source_code_url ?? '',
         type: props.creationDraft?.type ?? creationTypes[0],
-        locale: 'fr',
+        locale: locale,
+        short_description_content: shortDescriptionContent,
     },
 });
 
@@ -75,7 +87,8 @@ const onSubmit = handleSubmit((values) => {
         <form class="px-5 py-6" @submit="onSubmit">
             <Heading title="Éditeur" description="Créer ou modifier une création." />
 
-            <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <!-- Locale -->
+            <div class="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <FormField v-slot="{ componentField }" name="locale">
                     <FormItem v-bind="componentField">
                         <FormLabel>Langue</FormLabel>
@@ -101,6 +114,7 @@ const onSubmit = handleSubmit((values) => {
                 description="Ces informations permettent d'identifier la création, son nom et son slug ne sont pas traductibles."
             />
 
+            <!-- Nom & slug -->
             <div class="my-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <FormField v-slot="{ componentField }" name="name" :validate-on-blur="!isFieldDirty">
                     <FormItem>
@@ -120,6 +134,7 @@ const onSubmit = handleSubmit((values) => {
                 </FormField>
             </div>
 
+            <!-- Images de couverture, Type && Url -->
             <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <div class="flex flex-col gap-4">
                     <FormField v-slot="{ componentField }" name="logo_id">
@@ -142,14 +157,6 @@ const onSubmit = handleSubmit((values) => {
                     </FormField>
                 </div>
                 <div class="flex flex-col gap-4">
-                    <FormField v-slot="{ componentField }" name="external_url" :validate-on-blur="!isFieldDirty">
-                        <FormItem>
-                            <FormLabel>URL du projet (externe & publique)</FormLabel>
-                            <FormControl>
-                                <Input v-bind="componentField" type="text" placeholder="URL du projet" />
-                            </FormControl>
-                        </FormItem>
-                    </FormField>
                     <FormField v-slot="{ componentField }" name="type" :validate-on-blur="!isFieldDirty">
                         <FormItem>
                             <FormLabel>Type de création</FormLabel>
@@ -167,6 +174,14 @@ const onSubmit = handleSubmit((values) => {
                             </FormControl>
                         </FormItem>
                     </FormField>
+                    <FormField v-slot="{ componentField }" name="external_url" :validate-on-blur="!isFieldDirty">
+                        <FormItem>
+                            <FormLabel>URL du projet (externe & publique)</FormLabel>
+                            <FormControl>
+                                <Input v-bind="componentField" type="text" placeholder="URL du projet" />
+                            </FormControl>
+                        </FormItem>
+                    </FormField>
                     <FormField v-slot="{ componentField }" name="source_code_url">
                         <FormItem>
                             <FormLabel>URL du code source</FormLabel>
@@ -176,6 +191,21 @@ const onSubmit = handleSubmit((values) => {
                         </FormItem>
                     </FormField>
                 </div>
+            </div>
+
+            <div class="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <FormField v-slot="{ componentField }" name="short_description_content">
+                    <FormItem>
+                        <FormLabel>Courte description</FormLabel>
+                        <FormControl>
+                            <Textarea placeholder="Courte description" v-bind="componentField" />
+                        </FormControl>
+                        <FormDescription>
+                            La description courte sera utilisée pour le référencement (SEO) ainsi que pour la
+                            présentation du projet sur le site et dans les intégrations embeds.
+                        </FormDescription>
+                    </FormItem>
+                </FormField>
             </div>
             <Button type="submit"> Submit </Button>
         </form>

@@ -20,10 +20,10 @@ class DatabaseSeeder extends Seeder
             ->withScreenshots()
             ->withTags()
             ->withTechnologies()
-            ->count(50)
+            ->count(15)
             ->create();
 
-        $creations->random(10)->each(function ($creation) {
+        $creations->random(5)->each(function ($creation) {
             CreationDraft::fromCreation($creation)->save();
         });
 
@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
             ->withScreenshots()
             ->withTags()
             ->withTechnologies()
-            ->count(15)
+            ->count(10)
             ->create();
     }
 }

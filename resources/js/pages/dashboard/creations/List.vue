@@ -14,6 +14,16 @@ import {
     PaginationPrev,
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, CreationWithTranslationsAndDrafts, TranslationKey } from '@/types';
 import { getTypeLabel } from '@/utils/creationTypes';
@@ -40,6 +50,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const showDraftAlert = ref(false);
+const selectedCreation = ref<CreationWithTranslationsAndDrafts | null>(null);
 
 const itemsPerPage = 25;
 const currentPage = ref(1);
@@ -135,6 +148,23 @@ const deleteCreation = async (id: number) => {
     } catch (error) {
         console.error('Erreur lors de la suppression:', error);
     }
+};
+
+const handleEditCreation = (creation: CreationWithTranslationsAndDrafts) => {
+    if (creation.drafts && creation.drafts.length > 0) {
+        selectedCreation.value = creation;
+        showDraftAlert.value = true;
+    } else {
+        router.visit(route('dashboard.creations.edit', { 'creation-id': creation.id }));
+    }
+};
+
+const navigateToDraftEdit = () => {
+    if (selectedCreation.value && selectedCreation.value.drafts.length > 0) {
+        const draftId = selectedCreation.value.drafts[0].id;
+        router.visit(route('dashboard.creations.edit', { 'draft-id': draftId }));
+    }
+    showDraftAlert.value = false;
 };
 </script>
 
@@ -232,13 +262,7 @@ const deleteCreation = async (id: number) => {
                                             <Eye class="mr-2 h-4 w-4" />
                                             <span>Voir</span>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            @click="
-                                                () => {
-                                                    // TODO : Rediriger vers la page d'édition
-                                                }
-                                            "
-                                        >
+                                        <DropdownMenuItem @click="handleEditCreation(creation)">
                                             <Edit class="mr-2 h-4 w-4" />
                                             <span>Modifier</span>
                                         </DropdownMenuItem>
@@ -302,5 +326,20 @@ const deleteCreation = async (id: number) => {
                 </div>
             </div>
         </div>
+
+        <AlertDialog :open="showDraftAlert" @update:open="showDraftAlert = $event">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Brouillon existant</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Cette création possède déjà un brouillon. Voulez-vous continuer et modifier ce brouillon existant ?
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel @click="showDraftAlert = false">Annuler</AlertDialogCancel>
+                    <AlertDialogAction @click="navigateToDraftEdit">Modifier le brouillon</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </AppLayout>
 </template>

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
+import { Bold, Code, Italic, Link as LucideLink, Strikethrough, Underline as LucideUnderline } from 'lucide-vue-next';
 import { Markdown } from 'tiptap-markdown';
 import { onBeforeUnmount, ref, watch } from 'vue';
 
@@ -104,27 +106,27 @@ const isActive = (type: string, options = {}) => {
 </script>
 
 <template>
-    <div class="markdown-editor">
-        <div class="editor-toolbar">
-            <Button size="sm" variant="ghost" @click="toggleBold" :class="{ 'is-active': isActive('bold') }" title="Gras (** texte **)">
-                <span class="font-bold">B</span>
+    <Card class="markdown-editor">
+        <div class="editor-toolbar flex flex-wrap gap-2 border-b p-1">
+            <Button size="sm" variant="outline" @click="toggleBold" :class="{ 'is-active': isActive('bold') }" title="Gras (** texte **)">
+                <Bold />
             </Button>
 
-            <Button size="sm" variant="ghost" @click="toggleItalic" :class="{ 'is-active': isActive('italic') }" title="Italique (* texte *)">
-                <span class="italic">I</span>
+            <Button size="sm" variant="outline" @click="toggleItalic" :class="{ 'is-active': isActive('italic') }" title="Italique (* texte *)">
+                <Italic />
             </Button>
 
-            <Button size="sm" variant="ghost" @click="toggleStrike" :class="{ 'is-active': isActive('strike') }" title="Barré (~~ texte ~~)">
-                <span class="line-through">S</span>
+            <Button size="sm" variant="outline" @click="toggleStrike" :class="{ 'is-active': isActive('strike') }" title="Barré (~~ texte ~~)">
+                <Strikethrough />
             </Button>
 
-            <Button size="sm" variant="ghost" @click="toggleUnderline" :class="{ 'is-active': isActive('underline') }" title="Souligné">
-                <span class="underline">U</span>
+            <Button size="sm" variant="outline" @click="toggleUnderline" :class="{ 'is-active': isActive('underline') }" title="Souligné">
+                <LucideUnderline />
             </Button>
 
             <div class="dropdown">
-                <Button size="sm" variant="ghost" title="Titres (# Titre)">Titres</Button>
-                <div class="dropdown-content">
+                <Button size="sm" variant="outline" title="Titres (# Titre)">Titres</Button>
+                <Card class="dropdown-content">
                     <Button
                         v-for="level in [1, 2, 3, 4, 5, 6]"
                         :key="level"
@@ -135,67 +137,43 @@ const isActive = (type: string, options = {}) => {
                     >
                         H{{ level }}
                     </Button>
-                </div>
+                </Card>
             </div>
 
-            <Button size="sm" variant="ghost" @click="setLink" :class="{ 'is-active': isActive('link') }" title="Lien ([texte](url))">
-                <span>🔗</span>
+            <Button size="sm" variant="outline" @click="setLink" :class="{ 'is-active': isActive('link') }" title="Lien ([texte](url))">
+                <LucideLink />
             </Button>
 
-            <Button size="sm" variant="ghost" @click="toggleCode" :class="{ 'is-active': isActive('code') }" title="Code inline (`code`)">
-                <span class="font-mono">`</span>
+            <Button size="sm" variant="outline" @click="toggleCode" :class="{ 'is-active': isActive('code') }" title="Code inline (`code`)">
+                <Code />
             </Button>
 
             <Button
                 size="sm"
-                variant="ghost"
+                variant="outline"
                 @click="toggleCodeBlock"
                 :class="{ 'is-active': isActive('codeBlock') }"
                 title="Bloc de code (```code```)"
             >
                 <span class="font-mono">```</span>
+                <Code />
             </Button>
         </div>
 
         <EditorContent :editor="editor" class="editor-content" />
-    </div>
+    </Card>
 </template>
 
 <style>
-.markdown-editor {
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    overflow: hidden;
-}
-
-.editor-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 0.5rem;
-    border-bottom: 1px solid var(--border);
-    gap: 0.25rem;
-    background-color: var(--background);
-}
-
 .editor-toolbar button.is-active {
     background-color: var(--muted);
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
 }
 
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: var(--background);
     min-width: 120px;
-    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
     z-index: 10;
-    border-radius: 0.25rem;
-    border: 1px solid var(--border);
-    padding: 0.25rem;
 }
 
 .dropdown:hover .dropdown-content {

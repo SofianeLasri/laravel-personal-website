@@ -217,17 +217,16 @@ const onSubmit = handleSubmit((values) => {
                 </FormField>
             </div>
 
-            <FormField v-slot="{ componentField }" name="full_description_content">
-                <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                        <MarkdownEditor v-bind="componentField" placeholder="Commencez à écrire..." />
-                    </FormControl>
-                    <FormDescription>
-                        La description sera utilisée pour le référencement (SEO) ainsi que pour la présentation du projet sur le site.
-                    </FormDescription>
-                </FormItem>
-            </FormField>
+            <div class="mb-4">
+                <FormField v-slot="{ componentField }" name="full_description_content">
+                    <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                            <MarkdownEditor v-bind="componentField" placeholder="Commencez à écrire..." />
+                        </FormControl>
+                    </FormItem>
+                </FormField>
+            </div>
 
             <Button type="submit"> Submit</Button>
         </form>

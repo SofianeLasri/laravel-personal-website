@@ -13,7 +13,10 @@ class CreationPageController extends Controller
 {
     public function listPage(): Response
     {
-        $creations = Creation::all()->load(['shortDescriptionTranslationKey.translations', 'fullDescriptionTranslationKey.translations']);
+        $creations = Creation::all()->load([
+            'shortDescriptionTranslationKey.translations',
+            'fullDescriptionTranslationKey.translations',
+            'drafts']);
 
         return Inertia::render('dashboard/creations/List', [
             'creations' => $creations,

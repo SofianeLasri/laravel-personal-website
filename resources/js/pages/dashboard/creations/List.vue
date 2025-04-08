@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
-import type { BreadcrumbItem, CreationWithTranslations, TranslationKey } from '@/types';
+import type { BreadcrumbItem, CreationWithTranslationsAndDrafts, TranslationKey } from '@/types';
 import { getTypeLabel } from '@/utils/creationTypes';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -36,7 +36,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface Props {
-    creations: CreationWithTranslations[];
+    creations: CreationWithTranslationsAndDrafts[];
 }
 
 const props = defineProps<Props>();

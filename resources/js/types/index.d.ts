@@ -54,7 +54,7 @@ interface TranslationKey {
 
 type CreationType = 'portfolio' | 'game' | 'library' | 'website' | 'tool' | 'map' | 'other';
 
-interface CreationWithTranslations {
+interface CreationWithTranslationsAndDrafts {
     id: number;
     name: string;
     slug: string;
@@ -72,9 +72,10 @@ interface CreationWithTranslations {
     updated_at: string;
     short_description_translation_key: TranslationKey;
     full_description_translation_key: TranslationKey;
+    drafts: CreationDraft[];
 }
 
-interface CreationDraftWithTranslations {
+interface CreationDraft {
     id: number;
     name: string;
     slug: string;
@@ -90,9 +91,12 @@ interface CreationDraftWithTranslations {
     featured: boolean;
     created_at: string;
     updated_at: string;
+    original_creation_id: number | null;
+}
+
+interface CreationDraftWithTranslations extends CreationDraft {
     short_description_translation_key: TranslationKey;
     full_description_translation_key: TranslationKey;
-    original_creation_id: number | null;
 }
 
 interface Picture {

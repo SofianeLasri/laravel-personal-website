@@ -35,9 +35,21 @@ class CreationPageController extends Controller
     public function editPage(Request $request): Response
     {
         $request->validate([
-            'draft-id' => 'sometimes|integer|exists:creation_drafts,id',
+            'draft-id' => 'sometimes|integer|exists:creation_drafts,id|prohibited_if:creation-id,*',
+            'creation-id' => 'sometimes|integer|exists:creations,id|prohibited_if:draft-id,*',
         ]);
-        $creationDraft = CreationDraft::find($request->input('draft-id'));
+
+        $creationDraft = null;
+
+        if ($request->has('draft-id')) {
+            $creationDraft = CreationDraft::find($request->input('draft-id'));
+        }
+
+        if ($request->has('creation-id')) {
+            $creation = Creation::find($request->input('creation-id'));
+            $creationDraft = CreationDraft::fromCreation($creation);
+        }
+
         $creationDraft?->load(['shortDescriptionTranslationKey.translations', 'fullDescriptionTranslationKey.translations']);
 
         return Inertia::render('dashboard/creations/EditPage', [

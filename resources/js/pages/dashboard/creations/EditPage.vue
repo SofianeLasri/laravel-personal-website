@@ -15,6 +15,7 @@ import { Head } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import * as z from 'zod';
+import { onMounted } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -87,6 +88,17 @@ const { isFieldDirty, handleSubmit } = useForm({
 const onSubmit = handleSubmit((values) => {
     console.log('Form values:', values);
     // Handle form submission here
+});
+
+onMounted(() => {
+    const url = new URL(window.location.href);
+    const creationId = url.searchParams.get('creation-id');
+
+    if (creationId && props.creationDraft) {
+        url.searchParams.delete('creation-id');
+        url.searchParams.set('draft-id', props.creationDraft.id.toString());
+        window.history.replaceState({}, '', url.toString());
+    }
 });
 </script>
 

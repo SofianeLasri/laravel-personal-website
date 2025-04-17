@@ -39,7 +39,6 @@ const props = defineProps<{
 
 const { toast } = useToast();
 
-// États généraux
 const loading = ref(false);
 const error = ref<string | null>(null);
 const searchQuery = ref('');
@@ -47,7 +46,6 @@ const modalOpen = ref(false);
 const allPeople = ref<Person[]>([]);
 const associatedPeople = ref<Person[]>([]);
 
-// États de création/édition des personnes
 const isAddPersonDialogOpen = ref(false);
 const isEditPersonDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
@@ -57,8 +55,19 @@ const editPersonId = ref<number | null>(null);
 const editPersonName = ref('');
 const editPersonPictureId = ref<number | undefined>(undefined);
 const personToDelete = ref<Person | null>(null);
+const personHasAssociations = ref(false);
+const associationsDetails = ref<{ creations_count: number; creation_drafts_count: number }>({
+    creations_count: 0,
+    creation_drafts_count: 0,
+});
 
-// Récupérer toutes les personnes
+const filteredPeople = computed(() => {
+    if (!searchQuery.value.trim()) return allPeople.value;
+
+    const query = searchQuery.value.toLowerCase();
+    return allPeople.value.filter((person) => person.name.toLowerCase().includes(query));
+});
+
 const fetchAllPeople = async () => {
     loading.value = true;
     error.value = null;
@@ -74,7 +83,6 @@ const fetchAllPeople = async () => {
     }
 };
 
-// Récupérer les personnes associées au brouillon
 const fetchAssociatedPeople = async () => {
     if (!props.creationDraftId) return;
 
@@ -97,12 +105,10 @@ const fetchAssociatedPeople = async () => {
     }
 };
 
-// Vérifier si une personne est associée à la création
 const isPersonAssociated = (personId: number): boolean => {
     return associatedPeople.value.some((p) => p.id === personId);
 };
 
-// Ajouter/associer une personne à la création
 const associatePerson = async (personId: number) => {
     if (!props.creationDraftId) return;
 
@@ -137,7 +143,6 @@ const associatePerson = async (personId: number) => {
     }
 };
 
-// Dissocier une personne de la création
 const dissociatePerson = async (personId: number) => {
     if (!props.creationDraftId) return;
 
@@ -172,7 +177,6 @@ const dissociatePerson = async (personId: number) => {
     }
 };
 
-// Créer une nouvelle personne
 const createPerson = async () => {
     if (!newPersonName.value.trim()) return;
 
@@ -185,7 +189,6 @@ const createPerson = async () => {
             picture_id: newPersonPictureId.value,
         });
 
-        // Mettre à jour la liste des personnes
         allPeople.value.push(response.data);
         resetPersonForm();
         isAddPersonDialogOpen.value = false;
@@ -195,7 +198,6 @@ const createPerson = async () => {
             description: 'Personne créée avec succès',
         });
 
-        // Associer automatiquement la personne à la création
         if (props.creationDraftId) {
             await associatePerson(response.data.id);
         }
@@ -212,7 +214,6 @@ const createPerson = async () => {
     }
 };
 
-// Mettre à jour une personne existante
 const updatePerson = async () => {
     if (!editPersonId.value || !editPersonName.value.trim()) return;
 
@@ -230,13 +231,11 @@ const updatePerson = async () => {
             },
         );
 
-        // Mettre à jour la liste des personnes
         const index = allPeople.value.findIndex((p) => p.id === editPersonId.value);
         if (index !== -1) {
             allPeople.value[index] = response.data;
         }
 
-        // Mettre à jour la liste des personnes associées si nécessaire
         const associatedIndex = associatedPeople.value.findIndex((p) => p.id === editPersonId.value);
         if (associatedIndex !== -1) {
             associatedPeople.value[associatedIndex] = response.data;
@@ -262,7 +261,6 @@ const updatePerson = async () => {
     }
 };
 
-// Supprimer une personne
 const deletePerson = async () => {
     if (!personToDelete.value) return;
 
@@ -276,10 +274,8 @@ const deletePerson = async () => {
             }),
         );
 
-        // Supprimer de la liste des personnes
         allPeople.value = allPeople.value.filter((p) => p.id !== personToDelete.value?.id);
 
-        // Supprimer de la liste des personnes associées si nécessaire
         associatedPeople.value = associatedPeople.value.filter((p) => p.id !== personToDelete.value?.id);
 
         personToDelete.value = null;
@@ -302,7 +298,26 @@ const deletePerson = async () => {
     }
 };
 
-// Ouvrir le formulaire d'édition
+const checkPersonAssociations = async (personId: number): Promise<boolean> => {
+    try {
+        const response = await axios.get(
+            route('dashboard.api.people.check-associations', {
+                person: personId,
+            }),
+        );
+
+        associationsDetails.value = {
+            creations_count: response.data.creations_count,
+            creation_drafts_count: response.data.creation_drafts_count,
+        };
+
+        return response.data.has_associations;
+    } catch (err) {
+        console.error('Erreur lors de la vérification des associations:', err);
+        return false;
+    }
+};
+
 const openEditForm = (person: Person) => {
     editPersonId.value = person.id;
     editPersonName.value = person.name;
@@ -310,52 +325,25 @@ const openEditForm = (person: Person) => {
     isEditPersonDialogOpen.value = true;
 };
 
-// Ouvrir la boîte de dialogue de suppression
-const confirmDeletePerson = (person: Person) => {
+const confirmDeletePerson = async (person: Person) => {
     personToDelete.value = person;
+
+    personHasAssociations.value = await checkPersonAssociations(person.id);
+
     isDeleteDialogOpen.value = true;
 };
 
-// Réinitialiser le formulaire d'ajout
 const resetPersonForm = () => {
     newPersonName.value = '';
     newPersonPictureId.value = undefined;
 };
 
-// Réinitialiser le formulaire d'édition
 const resetEditForm = () => {
     editPersonId.value = null;
     editPersonName.value = '';
     editPersonPictureId.value = undefined;
 };
 
-// Filtrer les personnes en fonction de la recherche
-const filteredPeople = computed(() => {
-    if (!searchQuery.value.trim()) return allPeople.value;
-
-    const query = searchQuery.value.toLowerCase();
-    return allPeople.value.filter((person) => person.name.toLowerCase().includes(query));
-});
-
-// Détecter les personnes associées à des créations
-const checkPersonAssociations = async (personId: number): Promise<boolean> => {
-    try {
-        const response = await axios.get(
-            route('dashboard.api.people.show', {
-                person: personId,
-            }),
-        );
-
-        // Vérifier si la personne est associée à des créations ou des brouillons
-        // Cette vérification dépend de la structure de votre API
-        return response.data.creations?.length > 0 || response.data.creation_drafts?.length > 0;
-    } catch (err) {
-        console.error('Erreur lors de la vérification des associations:', err);
-        return false;
-    }
-};
-
-// Initialiser le composant
 onMounted(() => {
     fetchAllPeople();
     if (props.creationDraftId) {
@@ -363,7 +351,6 @@ onMounted(() => {
     }
 });
 
-// Surveiller les changements du creationDraftId
 watch(
     () => props.creationDraftId,
     (newVal) => {
@@ -380,7 +367,6 @@ watch(
     <div class="space-y-6">
         <HeadingSmall title="Contributeurs" description="Gérez les personnes ayant contribué à cette création." />
 
-        <!-- Message d'erreur -->
         <div v-if="error" class="mb-4 rounded-md bg-destructive/10 p-4 text-sm text-destructive">
             {{ error }}
         </div>
@@ -390,7 +376,6 @@ watch(
         </div>
 
         <div v-else>
-            <!-- Liste des personnes associées -->
             <div class="mb-4">
                 <div class="mb-2 flex justify-between">
                     <h3 class="text-sm font-medium">Personnes associées</h3>
@@ -410,7 +395,7 @@ watch(
                     <div v-for="person in associatedPeople" :key="person.id" class="flex items-center rounded-md border border-border p-3">
                         <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-muted">
                             <img
-                                v-if="person.picture"
+                                v-if="person.picture?.path_original"
                                 :src="`/storage/${person.picture.path_original}`"
                                 :alt="person.name"
                                 class="h-full w-full object-cover"
@@ -437,7 +422,6 @@ watch(
                 </div>
             </div>
 
-            <!-- Modale de recherche/ajout de personnes -->
             <Dialog v-model:open="modalOpen" class="sm:max-w-[600px]">
                 <DialogContent>
                     <DialogHeader>
@@ -468,7 +452,7 @@ watch(
                                 <div v-for="person in filteredPeople" :key="person.id" class="flex items-center rounded-md border border-border p-3">
                                     <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-muted">
                                         <img
-                                            v-if="person.picture"
+                                            v-if="person.picture?.path_original"
                                             :src="`/storage/${person.picture.path_original}`"
                                             :alt="person.name"
                                             class="h-full w-full object-cover"
@@ -513,7 +497,6 @@ watch(
                 </DialogContent>
             </Dialog>
 
-            <!-- Modale d'ajout de personne -->
             <Dialog v-model:open="isAddPersonDialogOpen">
                 <DialogContent>
                     <DialogHeader>
@@ -542,7 +525,6 @@ watch(
                 </DialogContent>
             </Dialog>
 
-            <!-- Modale d'édition de personne -->
             <Dialog v-model:open="isEditPersonDialogOpen">
                 <DialogContent>
                     <DialogHeader>
@@ -571,13 +553,16 @@ watch(
                 </DialogContent>
             </Dialog>
 
-            <!-- Boîte de dialogue de confirmation de suppression -->
             <AlertDialog v-model:open="isDeleteDialogOpen">
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette personne ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Cette action est irréversible. La personne sera supprimée définitivement de la base de données.
+                            <span v-if="personHasAssociations" class="font-medium text-destructive">
+                                Attention : cette personne est associée à {{ associationsDetails.creations_count }} création(s) et
+                                {{ associationsDetails.creation_drafts_count }} brouillon(s).
+                            </span>
+                            <span v-else> Cette action est irréversible. La personne sera supprimée définitivement de la base de données. </span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

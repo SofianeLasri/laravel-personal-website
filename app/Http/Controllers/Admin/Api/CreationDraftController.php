@@ -134,6 +134,6 @@ class CreationDraftController extends Controller
 
     public function getPeople(CreationDraft $creationDraft): JsonResponse
     {
-        return response()->json($creationDraft->people);
+        return response()->json($creationDraft->people->load('picture'));
     }
 }

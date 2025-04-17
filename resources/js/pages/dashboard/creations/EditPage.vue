@@ -29,11 +29,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface Props {
+const props = defineProps<{
     creationDraft?: CreationDraftWithTranslations;
-}
-
-const props = defineProps<Props>();
+}>();
 
 const creationTypes = Object.keys(creationTypeLabels) as CreationType[];
 

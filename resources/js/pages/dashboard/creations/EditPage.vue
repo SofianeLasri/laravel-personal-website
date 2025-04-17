@@ -9,7 +9,7 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/toast';
+import { Toaster, useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, CreationDraftWithTranslations, CreationType } from '@/types';
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
@@ -186,6 +186,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <Toaster />
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Éditeur" />
         <form class="px-5 py-6" @submit="onSubmit">

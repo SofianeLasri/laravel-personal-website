@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreationDraftRequest;
 use App\Models\CreationDraft;
 use App\Models\Person;
+use App\Models\Tag;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -135,5 +136,52 @@ class CreationDraftController extends Controller
     public function getPeople(CreationDraft $creationDraft): JsonResponse
     {
         return response()->json($creationDraft->people->load('picture'));
+    }
+
+    /**
+     * Attach a tag to the creation draft.
+     */
+    public function attachTag(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'tag_id' => ['required', 'exists:tags,id'],
+        ]);
+
+        $tagId = $request->input('tag_id');
+
+        // Vérifier si le tag est déjà attaché pour éviter les doublons
+        if (! $creationDraft->tags()->where('tags.id', $tagId)->exists()) {
+            $creationDraft->tags()->attach($tagId);
+        }
+
+        return response()->json([
+            'message' => 'Tag attached successfully',
+            'tag' => Tag::find($tagId),
+        ]);
+    }
+
+    /**
+     * Detach a tag from the creation draft.
+     */
+    public function detachTag(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'tag_id' => ['required', 'exists:tags,id'],
+        ]);
+
+        $tagId = $request->input('tag_id');
+        $creationDraft->tags()->detach($tagId);
+
+        return response()->json([
+            'message' => 'Tag detached successfully',
+        ]);
+    }
+
+    /**
+     * Get all tags attached to the creation draft.
+     */
+    public function getTags(CreationDraft $creationDraft): JsonResponse
+    {
+        return response()->json($creationDraft->tags);
     }
 }

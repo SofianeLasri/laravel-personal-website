@@ -2,6 +2,7 @@
 import CreationDraftFeatures from '@/components/CreationDraftFeatures.vue';
 import CreationDraftPeople from '@/components/CreationDraftPeople.vue';
 import CreationDraftScreenshots from '@/components/CreationDraftScreenshots.vue';
+import CreationDraftTags from '@/components/CreationDraftTags.vue';
 import Heading from '@/components/Heading.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
@@ -379,8 +380,13 @@ onMounted(() => {
                 <CreationDraftFeatures :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
             </div>
 
-            <div class="border-t border-border px-5 py-6">
-                <CreationDraftPeople :creation-draft-id="currentCreationDraft.id" />
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div class="border-t border-border px-5 py-6">
+                    <CreationDraftPeople :creation-draft-id="currentCreationDraft.id" />
+                </div>
+                <div class="border-t border-border px-5 py-6">
+                    <CreationDraftTags :creation-draft-id="currentCreationDraft.id" />
+                </div>
             </div>
         </div>
     </AppLayout>

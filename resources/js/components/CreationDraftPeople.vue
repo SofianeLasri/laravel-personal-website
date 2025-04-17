@@ -391,7 +391,7 @@ watch(
                     <Button variant="outline" class="mt-4" @click="modalOpen = true"> Ajouter des contributeurs </Button>
                 </div>
 
-                <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div v-for="person in associatedPeople" :key="person.id" class="flex items-center rounded-md border border-border p-3">
                         <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-muted">
                             <img

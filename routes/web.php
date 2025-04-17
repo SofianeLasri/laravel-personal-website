@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
 use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
 use App\Http\Controllers\Admin\Api\PersonController;
 use App\Http\Controllers\Admin\Api\PictureController;
+use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\CreationPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -36,6 +37,7 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             'creations' => CreationController::class,
             'creation-drafts' => CreationDraftController::class,
             'people' => PersonController::class,
+            'tags' => TagController::class,
         ]);
 
         Route::post('creation-drafts/{creation_draft}/attach-person', [CreationDraftController::class, 'attachPerson'])
@@ -46,6 +48,15 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('creation-drafts.people');
         Route::get('people/{person}/check-associations', [PersonController::class, 'checkAssociations'])
             ->name('people.check-associations');
+
+        Route::post('creation-drafts/{creation_draft}/attach-tag', [CreationDraftController::class, 'attachTag'])
+            ->name('creation-drafts.attach-tag');
+        Route::post('creation-drafts/{creation_draft}/detach-tag', [CreationDraftController::class, 'detachTag'])
+            ->name('creation-drafts.detach-tag');
+        Route::get('creation-drafts/{creation_draft}/tags', [CreationDraftController::class, 'getTags'])
+            ->name('creation-drafts.tags');
+        Route::get('tags/{tag}/check-associations', [TagController::class, 'checkAssociations'])
+            ->name('tags.check-associations');
     });
 });
 

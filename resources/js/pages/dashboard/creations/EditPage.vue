@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CreationDraftScreenshots from '@/components/CreationDraftScreenshots.vue';
 import Heading from '@/components/Heading.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
@@ -14,9 +15,8 @@ import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import * as z from 'zod';
-import CreationDraftScreenshots from '@/components/CreationDraftScreenshots.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -54,32 +54,38 @@ const formSchema = toTypedSchema(
     }),
 );
 
+const currentCreationDraft = ref<CreationDraftWithTranslations | null>(null);
+
+if (props.creationDraft) {
+    currentCreationDraft.value = props.creationDraft;
+}
+
 const locale = 'fr';
 const localeValue = computed(() => locale);
 
 let shortDescriptionContent = '';
 let fullDescriptionContent = '';
 
-if (props.creationDraft?.short_description_translation_key) {
-    const translations = props.creationDraft.short_description_translation_key.translations;
+if (currentCreationDraft.value?.short_description_translation_key) {
+    const translations = currentCreationDraft.value.short_description_translation_key.translations;
     shortDescriptionContent = translations.find((t) => t.locale === locale)?.text || '';
 }
 
-if (props.creationDraft?.full_description_translation_key) {
-    const translations = props.creationDraft.full_description_translation_key.translations;
+if (currentCreationDraft.value?.full_description_translation_key) {
+    const translations = currentCreationDraft.value.full_description_translation_key.translations;
     fullDescriptionContent = translations.find((t) => t.locale === locale)?.text || '';
 }
 
 const { isFieldDirty, handleSubmit } = useForm({
     validationSchema: formSchema,
     initialValues: {
-        name: props.creationDraft?.name ?? '',
-        slug: props.creationDraft?.slug ?? '',
-        logo_id: props.creationDraft?.logo_id ?? null,
-        cover_image_id: props.creationDraft?.cover_image_id ?? null,
-        external_url: props.creationDraft?.external_url ?? '',
-        source_code_url: props.creationDraft?.source_code_url ?? '',
-        type: props.creationDraft?.type ?? creationTypes[0],
+        name: currentCreationDraft.value?.name ?? '',
+        slug: currentCreationDraft.value?.slug ?? '',
+        logo_id: currentCreationDraft.value?.logo_id ?? null,
+        cover_image_id: currentCreationDraft.value?.cover_image_id ?? null,
+        external_url: currentCreationDraft.value?.external_url ?? '',
+        source_code_url: currentCreationDraft.value?.source_code_url ?? '',
+        type: currentCreationDraft.value?.type ?? creationTypes[0],
         locale: locale,
         short_description_content: shortDescriptionContent,
         full_description_content: fullDescriptionContent,
@@ -96,9 +102,9 @@ onMounted(() => {
     const url = new URL(window.location.href);
     const creationId = url.searchParams.get('creation-id');
 
-    if (creationId && props.creationDraft) {
+    if (creationId && currentCreationDraft.value) {
         url.searchParams.delete('creation-id');
-        url.searchParams.set('draft-id', props.creationDraft.id.toString());
+        url.searchParams.set('draft-id', currentCreationDraft.value.id.toString());
         window.history.replaceState({}, '', url.toString());
     }
 });
@@ -164,7 +170,7 @@ onMounted(() => {
                         <FormItem>
                             <FormLabel>Logo</FormLabel>
                             <FormControl>
-                                <PictureInput v-bind="componentField" :model-value="props.creationDraft?.logo_id ?? undefined" />
+                                <PictureInput v-bind="componentField" :model-value="currentCreationDraft?.logo_id ?? undefined" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -173,7 +179,7 @@ onMounted(() => {
                         <FormItem>
                             <FormLabel>Image de couverture</FormLabel>
                             <FormControl>
-                                <PictureInput v-bind="componentField" :model-value="props.creationDraft?.cover_image_id ?? undefined" />
+                                <PictureInput v-bind="componentField" :model-value="currentCreationDraft?.cover_image_id ?? undefined" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -245,8 +251,10 @@ onMounted(() => {
             <Button type="submit"> Submit</Button>
         </form>
 
-        <div class="border-t border-border px-5 py-6">
-            <CreationDraftScreenshots :creation-draft-id="props.creationDraft?.id || null" :locale="localeValue" />
+        <div v-if="currentCreationDraft?.id" class="border-t border-border">
+            <div class="border-t border-border px-5 py-6">
+                <CreationDraftScreenshots :creation-draft-id="currentCreationDraft.id || null" :locale="localeValue" />
+            </div>
         </div>
     </AppLayout>
 </template>

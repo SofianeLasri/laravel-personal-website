@@ -70,7 +70,6 @@ const fetchScreenshots = async () => {
     }
 };
 
-// Ajouter un nouveau screenshot
 const addScreenshot = async () => {
     if (!newScreenshotPictureId.value || !props.creationDraftId) {
         return;
@@ -108,7 +107,6 @@ const addScreenshot = async () => {
     }
 };
 
-// Mettre à jour un screenshot existant
 const updateScreenshot = async () => {
     if (!selectedScreenshot.value) return;
 
@@ -136,7 +134,6 @@ const updateScreenshot = async () => {
     }
 };
 
-// Supprimer un screenshot
 const deleteScreenshot = async (screenshot: Screenshot) => {
     if (!confirm("Êtes-vous sûr de vouloir supprimer cette capture d'écran ?")) {
         return;
@@ -161,7 +158,6 @@ const deleteScreenshot = async (screenshot: Screenshot) => {
     }
 };
 
-// Ouvrir le modal d'édition pour un screenshot
 const openEditModal = (screenshot: Screenshot) => {
     selectedScreenshot.value = screenshot;
 
@@ -171,13 +167,11 @@ const openEditModal = (screenshot: Screenshot) => {
     isEditModalOpen.value = true;
 };
 
-// Réinitialiser le formulaire d'ajout de screenshot
 const resetNewScreenshotForm = () => {
     newScreenshotPictureId.value = undefined;
     newScreenshotCaption.value = '';
 };
 
-// Récupérer la description d'un screenshot pour la locale actuelle
 const getScreenshotCaption = (screenshot: Screenshot): string => {
     if (!screenshot.caption_translation_key) return '';
 
@@ -186,14 +180,12 @@ const getScreenshotCaption = (screenshot: Screenshot): string => {
     return translation?.text || '';
 };
 
-// Charger les screenshots au montage du composant
 onMounted(() => {
     if (props.creationDraftId) {
         fetchScreenshots();
     }
 });
 
-// Surveiller les changements des props pour recharger les données si nécessaire
 watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, newLocale], [oldDraftId, oldLocale]) => {
     if (newDraftId && (newDraftId !== oldDraftId || newLocale !== oldLocale)) {
         await fetchScreenshots();
@@ -205,7 +197,6 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
     <div class="space-y-6">
         <HeadingSmall title="Captures d'écran" description="Ajoutez des captures d'écran pour illustrer votre création." />
 
-        <!-- Message d'erreur -->
         <div v-if="error" class="mb-4 rounded-md bg-destructive/10 p-4 text-sm text-destructive">
             {{ error }}
         </div>
@@ -215,9 +206,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
         </div>
 
         <div v-else>
-            <!-- Grille des screenshots -->
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <!-- Carte pour ajouter un nouveau screenshot -->
                 <Card class="cursor-pointer border-dashed transition-colors hover:bg-muted/50" @click="isAddModalOpen = true">
                     <CardContent class="flex h-full min-h-[200px] flex-col items-center justify-center p-6">
                         <Plus class="mb-2 h-12 w-12 text-muted-foreground" />
@@ -225,9 +214,8 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                     </CardContent>
                 </Card>
 
-                <!-- Screenshots existants -->
                 <Card v-for="screenshot in screenshots" :key="screenshot.id" class="overflow-hidden">
-                    <div class="relative aspect-square bg-muted">
+                    <div class="relative aspect-video bg-muted">
                         <img
                             :src="`/storage/${screenshot.picture.path_original}`"
                             :alt="getScreenshotCaption(screenshot)"
@@ -255,19 +243,16 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </Card>
             </div>
 
-            <!-- État vide -->
             <div v-if="screenshots.length === 0 && !loading" class="py-8 text-center text-muted-foreground">
                 <p>Aucune capture d'écran ajoutée</p>
                 <Button variant="outline" class="mt-4" @click="isAddModalOpen = true"> Ajouter une capture d'écran </Button>
             </div>
 
-            <!-- État de chargement -->
             <div v-if="loading" class="flex justify-center py-8">
                 <Loader2 class="h-8 w-8 animate-spin text-primary" />
             </div>
         </div>
 
-        <!-- Modal d'ajout de screenshot -->
         <Dialog v-model:open="isAddModalOpen">
             <DialogContent>
                 <DialogHeader>
@@ -297,7 +282,6 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
             </DialogContent>
         </Dialog>
 
-        <!-- Modal d'édition de screenshot -->
         <Dialog v-model:open="isEditModalOpen">
             <DialogContent>
                 <DialogHeader>

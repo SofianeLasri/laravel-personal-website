@@ -15,7 +15,7 @@ class CreationDraftFeatureController extends Controller
 {
     public function index(CreationDraft $creationDraft): JsonResponse
     {
-        return response()->json($creationDraft->features);
+        return response()->json($creationDraft->features->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']));
     }
 
     public function store(CreateCreationDraftFeatureRequest $request, CreationDraft $creationDraft): JsonResponse
@@ -26,14 +26,14 @@ class CreationDraftFeatureController extends Controller
             'title_translation_key_id' => $titleTranslation->id,
             'description_translation_key_id' => $descriptionTranslation->id,
             'picture_id' => $request->picture_id,
-        ]);
+        ])->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']);
 
         return response()->json($creationDraftFeature, Response::HTTP_CREATED);
     }
 
     public function show(int $creationDraftFeatureId): JsonResponse
     {
-        return response()->json(CreationDraftFeature::findOrFail($creationDraftFeatureId));
+        return response()->json(CreationDraftFeature::findOrFail($creationDraftFeatureId)->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']));
     }
 
     public function update(UpdateCreationDraftFeatureRequest $request, int $creationDraftFeatureId): JsonResponse
@@ -48,11 +48,13 @@ class CreationDraftFeatureController extends Controller
             Translation::createOrUpdate($creationDraftFeature->descriptionTranslationKey, $request->locale, $request->description);
         }
 
-        $creationDraftFeature->update([
-            'picture_id' => $request->picture_id,
-        ]);
+        if ($request->has('picture_id')) {
+            $creationDraftFeature->update([
+                'picture_id' => $request->picture_id,
+            ]);
+        }
 
-        return response()->json($creationDraftFeature);
+        return response()->json($creationDraftFeature->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']));
     }
 
     public function destroy(int $creationDraftFeatureId): Response

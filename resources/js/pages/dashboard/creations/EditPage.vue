@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CreationDraftFeatures from '@/components/CreationDraftFeatures.vue';
 import CreationDraftScreenshots from '@/components/CreationDraftScreenshots.vue';
 import Heading from '@/components/Heading.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -371,6 +372,10 @@ onMounted(() => {
         <div v-if="currentCreationDraft?.id" class="border-t border-border">
             <div class="border-t border-border px-5 py-6">
                 <CreationDraftScreenshots :creation-draft-id="currentCreationDraft.id || null" :locale="localeValue" />
+            </div>
+
+            <div class="border-t border-border px-5 py-6">
+                <CreationDraftFeatures :creation-draft-id="currentCreationDraft.id || null" :locale="localeValue" />
             </div>
         </div>
     </AppLayout>

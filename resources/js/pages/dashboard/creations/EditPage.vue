@@ -14,8 +14,9 @@ import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
+import { computed, onMounted } from 'vue';
 import * as z from 'zod';
-import { onMounted } from 'vue';
+import CreationDraftScreenshots from '@/components/CreationDraftScreenshots.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -54,6 +55,7 @@ const formSchema = toTypedSchema(
 );
 
 const locale = 'fr';
+const localeValue = computed(() => locale);
 
 let shortDescriptionContent = '';
 let fullDescriptionContent = '';
@@ -242,6 +244,10 @@ onMounted(() => {
 
             <Button type="submit"> Submit</Button>
         </form>
+
+        <div class="border-t border-border px-5 py-6">
+            <CreationDraftScreenshots :creation-draft-id="props.creationDraft?.id || null" :locale="localeValue" />
+        </div>
     </AppLayout>
 </template>
 

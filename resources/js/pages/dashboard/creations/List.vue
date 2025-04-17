@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import Heading from '@/components/Heading.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -14,16 +24,6 @@ import {
     PaginationPrev,
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, CreationWithTranslationsAndDrafts, TranslationKey } from '@/types';
 import { getTypeLabel } from '@/utils/creationTypes';

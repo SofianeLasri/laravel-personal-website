@@ -10,7 +10,6 @@ class UpdateCreationDraftScreenshotRequest extends FormRequest
     {
         return [
             'locale' => ['required_with:caption', 'string', 'in:en,fr'],
-            'picture_id' => ['sometimes', 'exists:pictures,id'],
             'caption' => ['sometimes', 'string'],
         ];
     }

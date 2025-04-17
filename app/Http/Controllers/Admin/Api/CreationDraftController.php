@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreationDraftRequest;
 use App\Models\CreationDraft;
+use App\Models\Person;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CreationDraftController extends Controller
@@ -96,5 +98,42 @@ class CreationDraftController extends Controller
         $creationDraft->delete();
 
         return response()->noContent();
+    }
+
+    public function attachPerson(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'person_id' => ['required', 'exists:people,id'],
+        ]);
+
+        $personId = $request->input('person_id');
+
+        if (! $creationDraft->people()->where('people.id', $personId)->exists()) {
+            $creationDraft->people()->attach($personId);
+        }
+
+        return response()->json([
+            'message' => 'Person attached successfully',
+            'person' => Person::find($personId),
+        ]);
+    }
+
+    public function detachPerson(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'person_id' => ['required', 'exists:people,id'],
+        ]);
+
+        $personId = $request->input('person_id');
+        $creationDraft->people()->detach($personId);
+
+        return response()->json([
+            'message' => 'Person detached successfully',
+        ]);
+    }
+
+    public function getPeople(CreationDraft $creationDraft): JsonResponse
+    {
+        return response()->json($creationDraft->people);
     }
 }

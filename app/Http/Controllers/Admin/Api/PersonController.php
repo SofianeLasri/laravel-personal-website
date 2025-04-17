@@ -55,4 +55,16 @@ class PersonController extends Controller
 
         return response()->noContent();
     }
+
+    public function checkAssociations(Person $person): JsonResponse
+    {
+        $hasCreations = $person->creations()->exists();
+        $hasCreationDrafts = $person->creationDrafts()->exists();
+
+        return response()->json([
+            'has_associations' => $hasCreations || $hasCreationDrafts,
+            'creations_count' => $person->creations()->count(),
+            'creation_drafts_count' => $person->creationDrafts()->count(),
+        ]);
+    }
 }

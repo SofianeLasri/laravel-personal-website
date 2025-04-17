@@ -48,7 +48,6 @@ const newScreenshotPictureId = ref<number | undefined>(undefined);
 const newScreenshotCaption = ref('');
 const editScreenshotCaption = ref('');
 
-// Récupérer la liste des screenshots
 const fetchScreenshots = async () => {
     if (!props.creationDraftId) return;
 

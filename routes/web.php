@@ -37,6 +37,15 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             'creation-drafts' => CreationDraftController::class,
             'people' => PersonController::class,
         ]);
+
+        Route::post('creation-drafts/{creation_draft}/attach-person', [CreationDraftController::class, 'attachPerson'])
+            ->name('creation-drafts.attach-person');
+        Route::post('creation-drafts/{creation_draft}/detach-person', [CreationDraftController::class, 'detachPerson'])
+            ->name('creation-drafts.detach-person');
+        Route::get('creation-drafts/{creation_draft}/people', [CreationDraftController::class, 'getPeople'])
+            ->name('creation-drafts.people');
+        Route::get('people/{person}/check-associations', [PersonController::class, 'checkAssociations'])
+            ->name('people.check-associations');
     });
 });
 

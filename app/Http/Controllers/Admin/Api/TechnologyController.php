@@ -33,10 +33,8 @@ class TechnologyController extends Controller
             'description' => ['required', 'string'],
         ]);
 
-        // Créer la clé de traduction pour la description
         $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->description);
 
-        // Créer la technologie
         $technology = Technology::create([
             'name' => $request->name,
             'type' => $request->type,
@@ -62,7 +60,7 @@ class TechnologyController extends Controller
     public function update(Request $request, Technology $technology): JsonResponse
     {
         $request->validate([
-            'name' => ['sometimes', 'string', 'max:255', 'unique:technologies,name,'.$technology->id],
+            'name' => ['sometimes', 'string', 'max:255'],
             'type' => ['sometimes', 'string', 'in:framework,library,language,other'],
             'svg_icon' => ['sometimes', 'string'],
             'featured' => ['sometimes', 'boolean'],
@@ -70,12 +68,16 @@ class TechnologyController extends Controller
             'description' => ['sometimes', 'string'],
         ]);
 
-        // Mettre à jour la traduction de la description si fournie
+        if ($request->has('name') && $technology->name !== $request->name) {
+            $request->validate([
+                'name' => ['unique:technologies,name'],
+            ]);
+        }
+
         if ($request->has('description')) {
             Translation::createOrUpdate($technology->descriptionTranslationKey, $request->locale, $request->description);
         }
 
-        // Mettre à jour les autres champs
         $technology->update($request->only(['name', 'type', 'svg_icon', 'featured']));
 
         return response()->json($technology->fresh(['descriptionTranslationKey.translations']));

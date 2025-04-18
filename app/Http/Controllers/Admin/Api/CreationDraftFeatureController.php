@@ -18,13 +18,15 @@ class CreationDraftFeatureController extends Controller
         return response()->json($creationDraft->features->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']));
     }
 
-    public function store(CreateCreationDraftFeatureRequest $request, CreationDraft $creationDraft): JsonResponse
+    public function store(CreateCreationDraftFeatureRequest $request, int $creationDraftId): JsonResponse
     {
+        $creationDraft = CreationDraft::findOrFail($creationDraftId);
+
         $titleTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->title);
         $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->description);
         $creationDraftFeature = $creationDraft->features()->create([
-            'title_translation_key_id' => $titleTranslation->id,
-            'description_translation_key_id' => $descriptionTranslation->id,
+            'title_translation_key_id' => $titleTranslation->translation_key_id,
+            'description_translation_key_id' => $descriptionTranslation->translation_key_id,
             'picture_id' => $request->picture_id,
         ])->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']);
 

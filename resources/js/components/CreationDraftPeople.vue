@@ -16,22 +16,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/components/ui/toast';
+import { Person } from '@/types';
 import axios from 'axios';
 import { Loader2, Pencil, Plus, Search, Trash2, User, UserMinus, UserPlus } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
-
-interface Person {
-    id: number;
-    name: string;
-    picture_id: number | null;
-    picture?: {
-        id: number;
-        path_original: string;
-        filename: string;
-    };
-    created_at: string;
-    updated_at: string;
-}
 
 const props = defineProps<{
     creationDraftId: number | null;

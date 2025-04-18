@@ -5,33 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Screenshot } from '@/types';
 import axios from 'axios';
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
-
-interface Screenshot {
-    id: number;
-    creation_draft_id: number;
-    picture_id: number;
-    caption_translation_key_id: number | null;
-    created_at: string;
-    updated_at: string;
-    picture: {
-        id: number;
-        filename: string;
-        path_original: string;
-    };
-    caption_translation_key?: {
-        id: number;
-        key: string;
-        translations: {
-            id: number;
-            translation_key_id: number;
-            locale: string;
-            text: string;
-        }[];
-    };
-}
 
 const props = defineProps<{
     creationDraftId: number | null;

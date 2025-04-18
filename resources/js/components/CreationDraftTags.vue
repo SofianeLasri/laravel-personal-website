@@ -15,17 +15,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/components/ui/toast';
+import { Tag } from '@/types';
 import axios from 'axios';
 import { Loader2, Minus, Pencil, Plus, Search, Tag as TagIcon, Trash2 } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
-
-interface Tag {
-    id: number;
-    name: string;
-    slug: string;
-    created_at: string;
-    updated_at: string;
-}
 
 const props = defineProps<{
     creationDraftId: number | null;

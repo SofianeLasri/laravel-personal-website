@@ -110,4 +110,57 @@ interface Picture {
     updated_at: string;
 }
 
+interface Tag {
+    id: number;
+    name: string;
+    slug: string;
+    created_at: string;
+    updated_at: string;
+}
+
+interface Technology {
+    id: number;
+    name: string;
+    type: 'framework' | 'library' | 'language' | 'other';
+    featured: boolean;
+    svg_icon: string;
+    description_translation_key_id: number;
+    created_at: string;
+    updated_at: string;
+    description_translation_key?: TranslationKey;
+}
+
+interface Screenshot {
+    id: number;
+    creation_draft_id: number;
+    picture_id: number;
+    caption_translation_key_id: number | null;
+    created_at: string;
+    updated_at: string;
+    picture: Picture;
+    caption_translation_key?: TranslationKey;
+}
+
+interface Person {
+    id: number;
+    name: string;
+    picture_id: number | null;
+    picture?: Picture;
+    created_at: string;
+    updated_at: string;
+}
+
+interface Feature {
+    id: number;
+    creation_draft_id: number;
+    title_translation_key_id: number;
+    description_translation_key_id: number;
+    picture_id: number | null;
+    created_at: string;
+    updated_at: string;
+    picture?: Picture;
+    title_translation_key?: TranslationKey;
+    description_translation_key?: TranslationKey;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;

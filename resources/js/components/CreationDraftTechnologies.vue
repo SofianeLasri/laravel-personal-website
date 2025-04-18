@@ -18,34 +18,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast';
+import { Technology } from '@/types';
 import axios from 'axios';
 import { Code, Loader2, Minus, Pencil, Plus, Search, Star, Trash2 } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
-
-interface Translation {
-    id: number;
-    translation_key_id: number;
-    locale: string;
-    text: string;
-}
-
-interface TranslationKey {
-    id: number;
-    key: string;
-    translations: Translation[];
-}
-
-interface Technology {
-    id: number;
-    name: string;
-    type: 'framework' | 'library' | 'language' | 'other';
-    featured: boolean;
-    svg_icon: string;
-    description_translation_key_id: number;
-    created_at: string;
-    updated_at: string;
-    description_translation_key?: TranslationKey;
-}
 
 const props = defineProps<{
     creationDraftId: number | null;

@@ -15,17 +15,15 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/components/ui/toast';
 import { Person } from '@/types';
 import axios from 'axios';
 import { Loader2, Pencil, Plus, Search, Trash2, User, UserMinus, UserPlus } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{
     creationDraftId: number | null;
 }>();
-
-const { toast } = useToast();
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -114,18 +112,11 @@ const associatePerson = async (personId: number) => {
         );
 
         await fetchAssociatedPeople();
-        toast({
-            title: 'Succès',
-            description: 'Personne associée avec succès',
-        });
+        toast.success('Personne associée avec succès');
     } catch (err) {
         error.value = "Erreur lors de l'association de la personne";
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: "Impossible d'associer cette personne",
-            variant: 'destructive',
-        });
+        toast.error("Impossible d'associer cette personne");
     } finally {
         loading.value = false;
     }
@@ -148,18 +139,11 @@ const dissociatePerson = async (personId: number) => {
         );
 
         associatedPeople.value = associatedPeople.value.filter((p) => p.id !== personId);
-        toast({
-            title: 'Succès',
-            description: 'Personne dissociée avec succès',
-        });
+        toast.success('Personne dissociée avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la dissociation de la personne';
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: 'Impossible de dissocier cette personne',
-            variant: 'destructive',
-        });
+        toast.error('Impossible de dissocier cette personne');
     } finally {
         loading.value = false;
     }
@@ -181,10 +165,7 @@ const createPerson = async () => {
         resetPersonForm();
         isAddPersonDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Personne créée avec succès',
-        });
+        toast.success('Personne créée avec succès');
 
         if (props.creationDraftId) {
             await associatePerson(response.data.id);
@@ -192,11 +173,7 @@ const createPerson = async () => {
     } catch (err) {
         error.value = 'Erreur lors de la création de la personne';
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: 'Impossible de créer cette personne',
-            variant: 'destructive',
-        });
+        toast.error('Impossible de créer cette personne');
     } finally {
         loading.value = false;
     }
@@ -232,18 +209,11 @@ const updatePerson = async () => {
         resetEditForm();
         isEditPersonDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Personne mise à jour avec succès',
-        });
+        toast.success('Personne mise à jour avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la mise à jour de la personne';
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: 'Impossible de mettre à jour cette personne',
-            variant: 'destructive',
-        });
+        toast.error('Impossible de mettre à jour cette personne');
     } finally {
         loading.value = false;
     }
@@ -269,18 +239,11 @@ const deletePerson = async () => {
         personToDelete.value = null;
         isDeleteDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Personne supprimée avec succès',
-        });
+        toast.success('Personne supprimée avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la suppression de la personne';
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: 'Impossible de supprimer cette personne',
-            variant: 'destructive',
-        });
+        toast.error('Impossible de supprimer cette personne');
     } finally {
         loading.value = false;
     }
@@ -355,11 +318,11 @@ watch(
     <div class="space-y-6">
         <HeadingSmall title="Contributeurs" description="Gérez les personnes ayant contribué à cette création." />
 
-        <div v-if="error" class="mb-4 rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+        <div v-if="error" class="bg-destructive/10 text-destructive mb-4 rounded-md p-4 text-sm">
             {{ error }}
         </div>
 
-        <div v-if="!props.creationDraftId" class="rounded-md bg-muted p-4 text-sm text-muted-foreground">
+        <div v-if="!props.creationDraftId" class="bg-muted text-muted-foreground rounded-md p-4 text-sm">
             Veuillez d'abord enregistrer le brouillon pour pouvoir ajouter des contributeurs.
         </div>
 
@@ -373,22 +336,22 @@ watch(
                     </Button>
                 </div>
 
-                <div v-if="associatedPeople.length === 0" class="rounded-md bg-muted/30 py-8 text-center">
-                    <User class="mx-auto h-12 w-12 text-muted-foreground" />
-                    <p class="mt-2 text-sm text-muted-foreground">Aucun contributeur associé</p>
+                <div v-if="associatedPeople.length === 0" class="bg-muted/30 rounded-md py-8 text-center">
+                    <User class="text-muted-foreground mx-auto h-12 w-12" />
+                    <p class="text-muted-foreground mt-2 text-sm">Aucun contributeur associé</p>
                     <Button variant="outline" class="mt-4" @click="modalOpen = true"> Ajouter des contributeurs </Button>
                 </div>
 
                 <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div v-for="person in associatedPeople" :key="person.id" class="flex items-center rounded-md border border-border p-3">
-                        <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-muted">
+                    <div v-for="person in associatedPeople" :key="person.id" class="border-border flex items-center rounded-md border p-3">
+                        <div class="bg-muted h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
                             <img
                                 v-if="person.picture?.path_original"
                                 :src="`/storage/${person.picture.path_original}`"
                                 :alt="person.name"
                                 class="h-full w-full object-cover"
                             />
-                            <User v-else class="h-full w-full p-2 text-muted-foreground" />
+                            <User v-else class="text-muted-foreground h-full w-full p-2" />
                         </div>
 
                         <div class="ml-3 min-w-0 flex-1">
@@ -418,7 +381,7 @@ watch(
 
                     <div class="py-4">
                         <div class="relative mb-4">
-                            <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Search class="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                             <Input v-model="searchQuery" placeholder="Rechercher une personne..." class="pl-8" />
                         </div>
 
@@ -429,23 +392,23 @@ watch(
 
                         <ScrollArea class="h-[300px]">
                             <div v-if="loading" class="flex h-[200px] items-center justify-center">
-                                <Loader2 class="h-8 w-8 animate-spin text-primary" />
+                                <Loader2 class="text-primary h-8 w-8 animate-spin" />
                             </div>
 
                             <div v-else-if="filteredPeople.length === 0" class="py-8 text-center">
-                                <p class="text-sm text-muted-foreground">Aucun résultat trouvé</p>
+                                <p class="text-muted-foreground text-sm">Aucun résultat trouvé</p>
                             </div>
 
                             <div v-else class="space-y-2">
-                                <div v-for="person in filteredPeople" :key="person.id" class="flex items-center rounded-md border border-border p-3">
-                                    <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-muted">
+                                <div v-for="person in filteredPeople" :key="person.id" class="border-border flex items-center rounded-md border p-3">
+                                    <div class="bg-muted h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
                                         <img
                                             v-if="person.picture?.path_original"
                                             :src="`/storage/${person.picture.path_original}`"
                                             :alt="person.name"
                                             class="h-full w-full object-cover"
                                         />
-                                        <User v-else class="h-full w-full p-2 text-muted-foreground" />
+                                        <User v-else class="text-muted-foreground h-full w-full p-2" />
                                     </div>
 
                                     <div class="ml-3 min-w-0 flex-1">
@@ -546,7 +509,7 @@ watch(
                     <AlertDialogHeader>
                         <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette personne ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            <span v-if="personHasAssociations" class="font-medium text-destructive">
+                            <span v-if="personHasAssociations" class="text-destructive font-medium">
                                 Attention : cette personne est associée à {{ associationsDetails.creations_count }} création(s) et
                                 {{ associationsDetails.creation_drafts_count }} brouillon(s).
                             </span>

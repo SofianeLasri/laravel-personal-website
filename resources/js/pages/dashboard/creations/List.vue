@@ -15,13 +15,13 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import {
     Pagination,
+    PaginationContent,
     PaginationEllipsis,
     PaginationFirst,
+    PaginationItem,
     PaginationLast,
-    PaginationList,
-    PaginationListItem,
     PaginationNext,
-    PaginationPrev,
+    PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -299,27 +299,27 @@ const navigateToDraftEdit = () => {
                         @update:page="handlePageChange"
                         v-slot="{ page }"
                     >
-                        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+                        <PaginationContent v-slot="{ items }" class="flex items-center gap-1">
                             <PaginationFirst />
-                            <PaginationPrev />
+                            <PaginationPrevious />
 
                             <template v-for="(item, index) in items">
-                                <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
+                                <PaginationItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
                                     <Button class="h-10 w-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
                                         {{ item.value }}
                                     </Button>
-                                </PaginationListItem>
+                                </PaginationItem>
                                 <PaginationEllipsis v-else :key="item.type" :index="index" />
                             </template>
 
                             <PaginationNext />
                             <PaginationLast />
-                        </PaginationList>
+                        </PaginationContent>
                     </Pagination>
                 </div>
 
                 <!-- Information sur le nombre d'éléments -->
-                <div class="mt-2 text-center text-sm text-muted-foreground">
+                <div class="text-muted-foreground mt-2 text-center text-sm">
                     Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} à
                     {{ Math.min(currentPage * itemsPerPage, props.creations.length) }}
                     sur {{ props.creations.length }} créations

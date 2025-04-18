@@ -23,18 +23,17 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Toaster, useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, TranslationKey } from '@/types';
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import axios from 'axios';
 import { useForm } from 'vee-validate';
 import { computed, onMounted, ref } from 'vue';
+import { toast } from 'vue-sonner';
 import * as z from 'zod';
-
-const { toast } = useToast();
+import { Toaster } from '@/components/ui/sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -205,11 +204,7 @@ const onSubmit = handleSubmit(async (formValues) => {
             currentCreationDraft.value = response.data;
         }
 
-        toast({
-            title: 'Succès',
-            description: successMessage,
-            variant: 'default',
-        });
+        toast.success(successMessage);
     } catch (error) {
         console.error('Erreur lors de la soumission du formulaire:', error);
 
@@ -223,11 +218,7 @@ const onSubmit = handleSubmit(async (formValues) => {
             }
         }
 
-        toast({
-            title: 'Erreur',
-            description: errorMessage,
-            variant: 'destructive',
-        });
+        toast.error(errorMessage);
     } finally {
         isSubmitting.value = false;
     }
@@ -243,13 +234,9 @@ const publishDraft = async () => {
             draft_id: currentCreationDraft.value.id,
         });
 
-        toast({
-            title: 'Succès',
-            description: 'Votre création a été publiée avec succès',
-            variant: 'default',
-        });
+        toast.success('Votre création a été publiée avec succès');
 
-        //router.visit(route('dashboard.creations.index'));
+        router.visit(route('dashboard.creations.index'));
     } catch (error) {
         console.error('Erreur lors de la publication:', error);
 
@@ -263,11 +250,7 @@ const publishDraft = async () => {
             }
         }
 
-        toast({
-            title: 'Erreur',
-            description: errorMessage,
-            variant: 'destructive',
-        });
+        toast.error(errorMessage);
     } finally {
         isPublishing.value = false;
     }
@@ -490,25 +473,25 @@ onMounted(() => {
             </div>
         </form>
 
-        <div v-if="currentCreationDraft?.id" class="border-t border-border">
-            <div class="border-t border-border px-5 py-6">
+        <div v-if="currentCreationDraft?.id" class="border-border border-t">
+            <div class="border-border border-t px-5 py-6">
                 <CreationDraftScreenshots :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
             </div>
 
-            <div class="border-t border-border px-5 py-6">
+            <div class="border-border border-t px-5 py-6">
                 <CreationDraftFeatures :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
             </div>
 
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div class="border-t border-border px-5 py-6">
+                <div class="border-border border-t px-5 py-6">
                     <CreationDraftPeople :creation-draft-id="currentCreationDraft.id" />
                 </div>
-                <div class="border-t border-border px-5 py-6">
+                <div class="border-border border-t px-5 py-6">
                     <CreationDraftTags :creation-draft-id="currentCreationDraft.id" />
                 </div>
             </div>
 
-            <div class="border-t border-border px-5 py-6">
+            <div class="border-border border-t px-5 py-6">
                 <CreationDraftTechnologies :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
             </div>
         </div>

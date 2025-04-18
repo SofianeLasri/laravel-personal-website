@@ -184,4 +184,40 @@ class CreationConversionServiceTest extends TestCase
         $screenshot = $creation->screenshots->first();
         $this->assertNull($screenshot->caption_translation_key_id);
     }
+
+    #[Test]
+    public function test_convert_draft_to_existing_creation()
+    {
+        $originalCreation = Creation::factory()->create();
+        $draft = CreationDraft::fromCreation($originalCreation);
+
+        $draft->name = 'Updated Name';
+        $draft->slug = 'updated-slug';
+
+        $newTag = Tag::factory()->create();
+        $draft->tags()->attach([$newTag->id]);
+
+        $newTechnologies = Technology::factory()->count(3)->create();
+        $draft->technologies()->sync($newTechnologies);
+
+        $this->service->convertDraftToCreation($draft);
+
+        $updatedCreation = Creation::find($originalCreation->id);
+
+        $this->assertEquals($draft->name, $updatedCreation->name);
+        $this->assertEquals($draft->slug, $updatedCreation->slug);
+
+        $this->assertCount($draft->tags()->count(), $updatedCreation->tags);
+        $this->assertCount($draft->technologies()->count(), $updatedCreation->technologies);
+        $this->assertCount($draft->people()->count(), $updatedCreation->people);
+        $this->assertCount($draft->features()->count(), $updatedCreation->features);
+
+        foreach ($updatedCreation->tags as $tag) {
+            $this->assertTrue($draft->tags->contains($tag));
+        }
+
+        foreach ($updatedCreation->technologies as $technology) {
+            $this->assertTrue($draft->technologies->contains($technology));
+        }
+    }
 }

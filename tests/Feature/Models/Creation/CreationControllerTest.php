@@ -94,8 +94,6 @@ class CreationControllerTest extends TestCase
             'draft_id' => $draft->id,
         ]);
 
-        echo $response->getContent();
-
         $response->assertUnprocessable();
     }
 
@@ -114,7 +112,6 @@ class CreationControllerTest extends TestCase
             'draft_id' => $draft->id,
         ]);
 
-        echo $response->getContent();
         $response->assertServerError();
     }
 

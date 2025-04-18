@@ -3,11 +3,11 @@ import { cn } from '@/lib/utils';
 import { Check } from 'lucide-vue-next';
 import {
     DropdownMenuCheckboxItem,
-    DropdownMenuItemIndicator,
-    useForwardPropsEmits,
     type DropdownMenuCheckboxItemEmits,
     type DropdownMenuCheckboxItemProps,
-} from 'radix-vue';
+    DropdownMenuItemIndicator,
+    useForwardPropsEmits
+} from 'reka-ui';
 import { computed, type HTMLAttributes } from 'vue';
 
 const props = defineProps<DropdownMenuCheckboxItemProps & { class?: HTMLAttributes['class'] }>();

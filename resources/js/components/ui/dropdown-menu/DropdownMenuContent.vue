@@ -2,11 +2,11 @@
 import { cn } from '@/lib/utils';
 import {
     DropdownMenuContent,
-    DropdownMenuPortal,
-    useForwardPropsEmits,
     type DropdownMenuContentEmits,
     type DropdownMenuContentProps,
-} from 'radix-vue';
+    DropdownMenuPortal,
+    useForwardPropsEmits
+} from 'reka-ui';
 import { computed, type HTMLAttributes } from 'vue';
 
 const props = withDefaults(defineProps<DropdownMenuContentProps & { class?: HTMLAttributes['class'] }>(), {

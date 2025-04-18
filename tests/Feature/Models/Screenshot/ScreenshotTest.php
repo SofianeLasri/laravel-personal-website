@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Screenshot;
+namespace Tests\Feature\Models\Screenshot;
 
 use App\Models\Creation;
 use App\Models\Picture;

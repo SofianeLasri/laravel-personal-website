@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreationDraftRequest;
 use App\Models\CreationDraft;
+use App\Models\Person;
+use App\Models\Tag;
+use App\Models\Technology;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CreationDraftController extends Controller
@@ -96,5 +100,125 @@ class CreationDraftController extends Controller
         $creationDraft->delete();
 
         return response()->noContent();
+    }
+
+    public function attachPerson(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'person_id' => ['required', 'exists:people,id'],
+        ]);
+
+        $personId = $request->input('person_id');
+
+        if (! $creationDraft->people()->where('people.id', $personId)->exists()) {
+            $creationDraft->people()->attach($personId);
+        }
+
+        return response()->json([
+            'message' => 'Person attached successfully',
+            'person' => Person::find($personId),
+        ]);
+    }
+
+    public function detachPerson(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'person_id' => ['required', 'exists:people,id'],
+        ]);
+
+        $personId = $request->input('person_id');
+        $creationDraft->people()->detach($personId);
+
+        return response()->json([
+            'message' => 'Person detached successfully',
+        ]);
+    }
+
+    public function getPeople(CreationDraft $creationDraft): JsonResponse
+    {
+        return response()->json($creationDraft->people->load('picture'));
+    }
+
+    /**
+     * Attach a tag to the creation draft.
+     */
+    public function attachTag(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'tag_id' => ['required', 'exists:tags,id'],
+        ]);
+
+        $tagId = $request->input('tag_id');
+
+        if (! $creationDraft->tags()->where('tags.id', $tagId)->exists()) {
+            $creationDraft->tags()->attach($tagId);
+        }
+
+        return response()->json([
+            'message' => 'Tag attached successfully',
+            'tag' => Tag::find($tagId),
+        ]);
+    }
+
+    /**
+     * Detach a tag from the creation draft.
+     */
+    public function detachTag(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'tag_id' => ['required', 'exists:tags,id'],
+        ]);
+
+        $tagId = $request->input('tag_id');
+        $creationDraft->tags()->detach($tagId);
+
+        return response()->json([
+            'message' => 'Tag detached successfully',
+        ]);
+    }
+
+    /**
+     * Get all tags attached to the creation draft.
+     */
+    public function getTags(CreationDraft $creationDraft): JsonResponse
+    {
+        return response()->json($creationDraft->tags);
+    }
+
+    public function attachTechnology(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'technology_id' => ['required', 'exists:technologies,id'],
+        ]);
+
+        $technologyId = $request->input('technology_id');
+
+        if (! $creationDraft->technologies()->where('technologies.id', $technologyId)->exists()) {
+            $creationDraft->technologies()->attach($technologyId);
+        }
+
+        return response()->json([
+            'message' => 'Technology attached successfully',
+            'technology' => Technology::with(['descriptionTranslationKey.translations'])->find($technologyId),
+        ]);
+    }
+
+    public function detachTechnology(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'technology_id' => ['required', 'exists:technologies,id'],
+        ]);
+
+        $technologyId = $request->input('technology_id');
+        $creationDraft->technologies()->detach($technologyId);
+
+        return response()->json([
+            'message' => 'Technology detached successfully',
+        ]);
+    }
+
+    public function getTechnologies(CreationDraft $creationDraft): JsonResponse
+    {
+        return response()->json($creationDraft->technologies()->with(['descriptionTranslationKey.translations'])->get());
     }
 }

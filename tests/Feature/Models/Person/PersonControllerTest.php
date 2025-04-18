@@ -3,6 +3,8 @@
 namespace Tests\Feature\Models\Person;
 
 use App\Http\Controllers\Admin\Api\PersonController;
+use App\Models\Creation;
+use App\Models\CreationDraft;
 use App\Models\Person;
 use App\Models\Picture;
 use App\Models\User;
@@ -149,5 +151,25 @@ class PersonControllerTest extends TestCase
         $response = $this->deleteJson(route('dashboard.api.people.destroy', 999));
 
         $response->assertNotFound();
+    }
+
+    #[Test]
+    public function test_check_associations()
+    {
+        $person = Person::factory()->create();
+        $creation = Creation::factory()->create();
+        $draft = CreationDraft::factory()->create();
+
+        $person->creations()->attach($creation);
+        $person->creationDrafts()->attach($draft);
+
+        $response = $this->getJson(route('dashboard.api.people.check-associations', $person));
+
+        $response->assertOk()
+            ->assertJson([
+                'has_associations' => true,
+                'creations_count' => 1,
+                'creation_drafts_count' => 1,
+            ]);
     }
 }

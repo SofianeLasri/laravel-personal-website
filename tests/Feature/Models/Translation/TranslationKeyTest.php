@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Translation;
+namespace Tests\Feature\Models\Translation;
 
 use App\Models\Translation;
 use App\Models\TranslationKey;

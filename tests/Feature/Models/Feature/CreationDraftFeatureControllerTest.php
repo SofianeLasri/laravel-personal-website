@@ -51,7 +51,7 @@ class CreationDraftFeatureControllerTest extends TestCase
     public function test_store_creates_new_feature()
     {
         $response = $this->postJson(
-            route('dashboard.api.creation-drafts.draft-features.store', $this->draft),
+            route('dashboard.api.creation-drafts.draft-features.store', $this->draft->id),
             [
                 'locale' => 'en',
                 'title' => 'Feature title',

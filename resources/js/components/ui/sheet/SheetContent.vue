@@ -4,12 +4,12 @@ import { X } from 'lucide-vue-next';
 import {
     DialogClose,
     DialogContent,
-    DialogOverlay,
-    DialogPortal,
-    useForwardPropsEmits,
     type DialogContentEmits,
     type DialogContentProps,
-} from 'radix-vue';
+    DialogOverlay,
+    DialogPortal,
+    useForwardPropsEmits
+} from 'reka-ui';
 import { computed, type HTMLAttributes } from 'vue';
 import { sheetVariants, type SheetVariants } from '.';
 

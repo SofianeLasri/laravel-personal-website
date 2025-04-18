@@ -16,8 +16,8 @@ class FeatureFactory extends Factory
     {
         return [
             'creation_id' => Creation::factory(),
-            'title_translation_key_id' => TranslationKey::factory(),
-            'description_translation_key_id' => TranslationKey::factory(),
+            'title_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
+            'description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'picture_id' => $this->faker->boolean(70) ? Picture::factory() : null,
         ];
     }

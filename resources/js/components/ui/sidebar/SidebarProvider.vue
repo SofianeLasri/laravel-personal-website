@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
 import { useEventListener, useMediaQuery, useVModel } from '@vueuse/core';
-import { TooltipProvider } from 'radix-vue';
-import { computed, ref, type HTMLAttributes, type Ref } from 'vue';
+import { TooltipProvider } from 'reka-ui';
+import { computed, type HTMLAttributes, ref, type Ref } from 'vue';
 import {
+    provideSidebarContext,
     SIDEBAR_COOKIE_MAX_AGE,
     SIDEBAR_COOKIE_NAME,
     SIDEBAR_KEYBOARD_SHORTCUT,
     SIDEBAR_WIDTH,
-    SIDEBAR_WIDTH_ICON,
-    provideSidebarContext,
+    SIDEBAR_WIDTH_ICON
 } from './utils';
 
 const props = withDefaults(
@@ -81,7 +81,8 @@ provideSidebarContext({
                 '--sidebar-width': SIDEBAR_WIDTH,
                 '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
             }"
-            :class="cn('group/sidebar-wrapper flex min-h-svh w-full text-sidebar-foreground has-[[data-variant=inset]]:bg-sidebar', props.class)"
+            :class="cn('group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar', props.class)"
+            v-bind="$attrs"
         >
             <slot />
         </div>

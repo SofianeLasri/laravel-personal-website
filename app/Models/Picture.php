@@ -96,7 +96,7 @@ class Picture extends Model
             'height' => $dimensions['height'],
         ]);
 
-        $this->deleteOriginal();
+        // $this->deleteOriginal();
     }
 
     private function transcodeIfItIsWorthIt($imageTranscodingService, $previousImage, $optimizedDimension, $highestDimension, $format): ?string

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
-import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue';
-import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue';
-import { computed, type Component } from 'vue';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { type Component, computed } from 'vue';
 import SidebarMenuButtonChild, { type SidebarMenuButtonProps } from './SidebarMenuButtonChild.vue';
 import { useSidebar } from './utils';
 

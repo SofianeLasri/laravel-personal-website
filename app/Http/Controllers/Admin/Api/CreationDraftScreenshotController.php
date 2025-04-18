@@ -18,7 +18,7 @@ class CreationDraftScreenshotController extends Controller
      */
     public function index(CreationDraft $creationDraft): JsonResponse
     {
-        return response()->json($creationDraft->screenshots);
+        return response()->json($creationDraft->screenshots->load(['picture', 'captionTranslationKey.translations']));
     }
 
     /**
@@ -32,7 +32,7 @@ class CreationDraftScreenshotController extends Controller
         $creationDraftScreenshot = $creationDraft->screenshots()->create([
             'picture_id' => $request->picture_id,
             'caption_translation_key_id' => $caption->translation_key_id,
-        ]);
+        ])->load(['picture', 'captionTranslationKey.translations']);
 
         return response()->json($creationDraftScreenshot, Response::HTTP_CREATED);
     }
@@ -42,7 +42,7 @@ class CreationDraftScreenshotController extends Controller
      */
     public function show(int $creationDraftScreenshotId): JsonResponse
     {
-        return response()->json(CreationDraftScreenshot::findOrFail($creationDraftScreenshotId));
+        return response()->json(CreationDraftScreenshot::findOrFail($creationDraftScreenshotId)->load(['picture', 'captionTranslationKey.translations']));
     }
 
     /**
@@ -62,11 +62,7 @@ class CreationDraftScreenshotController extends Controller
             ]);
         }
 
-        $creationDraftScreenshot->update([
-            'picture_id' => $request->picture_id,
-        ]);
-
-        return response()->json($creationDraftScreenshot);
+        return response()->json($creationDraftScreenshot->load(['picture', 'captionTranslationKey.translations']));
     }
 
     /**

@@ -15,25 +15,27 @@ class CreationDraftFeatureController extends Controller
 {
     public function index(CreationDraft $creationDraft): JsonResponse
     {
-        return response()->json($creationDraft->features);
+        return response()->json($creationDraft->features->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']));
     }
 
-    public function store(CreateCreationDraftFeatureRequest $request, CreationDraft $creationDraft): JsonResponse
+    public function store(CreateCreationDraftFeatureRequest $request, int $creationDraftId): JsonResponse
     {
+        $creationDraft = CreationDraft::findOrFail($creationDraftId);
+
         $titleTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->title);
         $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->description);
         $creationDraftFeature = $creationDraft->features()->create([
-            'title_translation_key_id' => $titleTranslation->id,
-            'description_translation_key_id' => $descriptionTranslation->id,
+            'title_translation_key_id' => $titleTranslation->translation_key_id,
+            'description_translation_key_id' => $descriptionTranslation->translation_key_id,
             'picture_id' => $request->picture_id,
-        ]);
+        ])->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']);
 
         return response()->json($creationDraftFeature, Response::HTTP_CREATED);
     }
 
     public function show(int $creationDraftFeatureId): JsonResponse
     {
-        return response()->json(CreationDraftFeature::findOrFail($creationDraftFeatureId));
+        return response()->json(CreationDraftFeature::findOrFail($creationDraftFeatureId)->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']));
     }
 
     public function update(UpdateCreationDraftFeatureRequest $request, int $creationDraftFeatureId): JsonResponse
@@ -48,11 +50,13 @@ class CreationDraftFeatureController extends Controller
             Translation::createOrUpdate($creationDraftFeature->descriptionTranslationKey, $request->locale, $request->description);
         }
 
-        $creationDraftFeature->update([
-            'picture_id' => $request->picture_id,
-        ]);
+        if ($request->has('picture_id')) {
+            $creationDraftFeature->update([
+                'picture_id' => $request->picture_id,
+            ]);
+        }
 
-        return response()->json($creationDraftFeature);
+        return response()->json($creationDraftFeature->load(['picture', 'titleTranslationKey.translations', 'descriptionTranslationKey.translations']));
     }
 
     public function destroy(int $creationDraftFeatureId): Response

@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Feature;
+namespace Tests\Feature\Models\Feature;
 
 use App\Models\CreationDraft as Creation;
 use App\Models\CreationDraftFeature as Feature;

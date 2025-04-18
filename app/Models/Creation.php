@@ -84,6 +84,11 @@ class Creation extends Model
         return $this->belongsToMany(Tag::class);
     }
 
+    public function drafts(): HasMany
+    {
+        return $this->hasMany(CreationDraft::class, 'original_creation_id', 'id');
+    }
+
     public function getShortDescription(string $locale): string
     {
         return Translation::trans($this->shortDescriptionTranslationKey->key, $locale);

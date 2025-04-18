@@ -4,10 +4,10 @@ import { Circle } from 'lucide-vue-next';
 import {
     DropdownMenuItemIndicator,
     DropdownMenuRadioItem,
-    useForwardPropsEmits,
     type DropdownMenuRadioItemEmits,
     type DropdownMenuRadioItemProps,
-} from 'radix-vue';
+    useForwardPropsEmits
+} from 'reka-ui';
 import { computed, type HTMLAttributes } from 'vue';
 
 const props = defineProps<DropdownMenuRadioItemProps & { class?: HTMLAttributes['class'] }>();

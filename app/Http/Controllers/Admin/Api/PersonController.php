@@ -15,7 +15,7 @@ class PersonController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Person::all());
+        return response()->json(Person::all()->load('picture'));
     }
 
     /**
@@ -23,7 +23,7 @@ class PersonController extends Controller
      */
     public function store(PersonRequest $request): JsonResponse
     {
-        $person = Person::create($request->validated());
+        $person = Person::create($request->validated())->load('picture');
 
         return response()->json($person, Response::HTTP_CREATED);
     }
@@ -33,7 +33,7 @@ class PersonController extends Controller
      */
     public function show(Person $person): JsonResponse
     {
-        return response()->json($person);
+        return response()->json($person->load('picture'));
     }
 
     /**
@@ -43,7 +43,7 @@ class PersonController extends Controller
     {
         $person->update($request->validated());
 
-        return response()->json($person);
+        return response()->json($person->load('picture'));
     }
 
     /**
@@ -54,5 +54,17 @@ class PersonController extends Controller
         $person->delete();
 
         return response()->noContent();
+    }
+
+    public function checkAssociations(Person $person): JsonResponse
+    {
+        $hasCreations = $person->creations()->exists();
+        $hasCreationDrafts = $person->creationDrafts()->exists();
+
+        return response()->json([
+            'has_associations' => $hasCreations || $hasCreationDrafts,
+            'creations_count' => $person->creations()->count(),
+            'creation_drafts_count' => $person->creationDrafts()->count(),
+        ]);
     }
 }

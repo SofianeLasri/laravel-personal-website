@@ -4,6 +4,7 @@ namespace Tests\Feature\Models\Creation;
 
 use App\Enums\CreationType;
 use App\Models\Creation;
+use App\Models\CreationDraft;
 use App\Models\Feature;
 use App\Models\Person;
 use App\Models\Picture;
@@ -128,6 +129,18 @@ class CreationTest extends TestCase
 
         $this->assertCount(3, $creation->tags);
         $this->assertInstanceOf(Tag::class, $creation->tags->first());
+    }
+
+    #[Test]
+    public function it_can_have_drafts()
+    {
+        $creation = Creation::factory()->create();
+        CreationDraft::factory()->count(2)->create([
+            'original_creation_id' => $creation->id,
+        ]);
+
+        $this->assertCount(2, $creation->drafts);
+        $this->assertInstanceOf(CreationDraft::class, $creation->drafts->first());
     }
 
     #[Test]

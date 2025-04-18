@@ -8,6 +8,16 @@ import Heading from '@/components/Heading.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 import PictureInput from '@/components/PictureInput.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -15,7 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Toaster, useToast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem, CreationDraftWithTranslations, CreationType } from '@/types';
+import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, TranslationKey } from '@/types';
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -49,8 +59,11 @@ if (props.creationDraft) {
     currentCreationDraft.value = props.creationDraft;
 }
 
-const locale = 'fr';
-const localeValue = computed(() => locale);
+const locale = ref<'fr' | 'en'>('fr');
+const localeValue = computed(() => locale.value);
+
+const showLocaleChangeDialog = ref(false);
+const pendingLocale = ref<string | null>(null);
 
 const getOriginalCreationId = (): number | null => {
     const url = new URL(window.location.href);
@@ -71,9 +84,7 @@ const formSchema = toTypedSchema(
         external_url: z.string().nullable(),
         source_code_url: z.string().nullable(),
         type: z.string(),
-        locale: z.enum(['fr', 'en'], {
-            errorMap: () => ({ message: 'La langue est requise' }),
-        }),
+        locale: z.enum(['fr', 'en']).default('fr'),
         short_description_content: z
             .string()
             .max(160, 'La description courte ne doit pas dépasser 160 caractères')
@@ -84,20 +95,24 @@ const formSchema = toTypedSchema(
     }),
 );
 
+const getContentForLocale = (translationKey: TranslationKey | undefined, targetLocale: string) => {
+    if (!translationKey) return '';
+    const translations = translationKey.translations;
+    return translations.find((t) => t.locale === targetLocale)?.text || '';
+};
+
 let shortDescriptionContent = '';
 let fullDescriptionContent = '';
 
 if (currentCreationDraft.value?.short_description_translation_key) {
-    const translations = currentCreationDraft.value.short_description_translation_key.translations;
-    shortDescriptionContent = translations.find((t) => t.locale === locale)?.text || '';
+    shortDescriptionContent = getContentForLocale(currentCreationDraft.value.short_description_translation_key, locale.value);
 }
 
 if (currentCreationDraft.value?.full_description_translation_key) {
-    const translations = currentCreationDraft.value.full_description_translation_key.translations;
-    fullDescriptionContent = translations.find((t) => t.locale === locale)?.text || '';
+    fullDescriptionContent = getContentForLocale(currentCreationDraft.value.full_description_translation_key, locale.value);
 }
 
-const { isFieldDirty, handleSubmit } = useForm({
+const { isFieldDirty, handleSubmit, setFieldValue, meta } = useForm({
     validationSchema: formSchema,
     initialValues: {
         name: currentCreationDraft.value?.name ?? '',
@@ -107,13 +122,53 @@ const { isFieldDirty, handleSubmit } = useForm({
         external_url: currentCreationDraft.value?.external_url ?? '',
         source_code_url: currentCreationDraft.value?.source_code_url ?? '',
         type: currentCreationDraft.value?.type ?? creationTypes[0],
-        locale: locale,
+        locale: locale.value,
         short_description_content: shortDescriptionContent,
         full_description_content: fullDescriptionContent,
         started_at: currentCreationDraft.value?.started_at ?? today,
         ended_at: currentCreationDraft.value?.ended_at ?? null,
     },
 });
+
+const hasUnsavedChanges = computed(() => {
+    return meta.value.dirty;
+});
+
+const updateContentForLocale = (newLocale: any) => {
+    if (currentCreationDraft.value) {
+        const newShortDesc = getContentForLocale(currentCreationDraft.value.short_description_translation_key, newLocale);
+
+        const newFullDesc = getContentForLocale(currentCreationDraft.value.full_description_translation_key, newLocale);
+
+        setFieldValue('short_description_content', newShortDesc);
+        setFieldValue('full_description_content', newFullDesc);
+    }
+
+    setFieldValue('locale', newLocale);
+    locale.value = newLocale;
+};
+
+const handleLocaleChange = (newLocale: any) => {
+    if (hasUnsavedChanges.value) {
+        pendingLocale.value = newLocale;
+        showLocaleChangeDialog.value = true;
+    } else {
+        updateContentForLocale(newLocale);
+    }
+};
+
+const confirmLocaleChange = () => {
+    if (pendingLocale.value) {
+        updateContentForLocale(pendingLocale.value);
+        pendingLocale.value = null;
+    }
+    showLocaleChangeDialog.value = false;
+};
+
+const cancelLocaleChange = () => {
+    pendingLocale.value = null;
+    showLocaleChangeDialog.value = false;
+};
 
 const onSubmit = handleSubmit(async (formValues) => {
     isSubmitting.value = true;
@@ -202,7 +257,7 @@ onMounted(() => {
                     <FormItem v-bind="componentField">
                         <FormLabel>Langue</FormLabel>
 
-                        <Select :default-value="'fr'">
+                        <Select v-model="locale" @update:modelValue="handleLocaleChange">
                             <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sélectionner une langue" />
@@ -394,5 +449,22 @@ onMounted(() => {
                 <CreationDraftTechnologies :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
             </div>
         </div>
+
+        <!-- Dialog de confirmation pour changement de langue -->
+        <AlertDialog :open="showLocaleChangeDialog" @update:open="showLocaleChangeDialog = $event">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Modifications non enregistrées</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Vous avez des modifications non enregistrées. Si vous changez de langue, ces modifications seront perdues. Souhaitez-vous
+                        continuer ?
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel @click="cancelLocaleChange">Annuler</AlertDialogCancel>
+                    <AlertDialogAction @click="confirmLocaleChange">Continuer</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </AppLayout>
 </template>

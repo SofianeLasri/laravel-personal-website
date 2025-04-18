@@ -414,6 +414,20 @@ class CreationDraftControllerTest extends TestCase
     }
 
     #[Test]
+    public function test_get_tags()
+    {
+        $draft = CreationDraft::factory()->create();
+        $tags = Tag::factory()->count(3)->create();
+        $draft->tags()->attach($tags);
+
+        $response = $this->getJson(route('dashboard.api.creation-drafts.tags', ['creation_draft' => $draft]));
+
+        $response->assertOk()
+            ->assertJsonCount(3)
+            ->assertJsonPath('0.id', $tags[0]->id);
+    }
+
+    #[Test]
     public function test_attach_technology()
     {
         $draft = CreationDraft::factory()->create();

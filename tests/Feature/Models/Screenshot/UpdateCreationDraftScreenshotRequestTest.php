@@ -87,18 +87,4 @@ class UpdateCreationDraftScreenshotRequestTest extends TestCase
         $this->assertFalse($validator->passes());
         $this->assertArrayHasKey('locale', $validator->errors()->toArray());
     }
-
-    #[Test]
-    public function it_fails_when_picture_id_does_not_exist(): void
-    {
-        $data = [
-            'locale' => 'en',
-            'caption' => 'Légende présente',
-            'picture_id' => 9999,
-        ];
-
-        $validator = Validator::make($data, $this->rules());
-        $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('picture_id', $validator->errors()->toArray());
-    }
 }

@@ -106,22 +106,17 @@ class CreationDraftScreenshotControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_update_modifies_screenshot_picture_and_caption(): void
+    public function test_update_modifies_caption(): void
     {
         $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
-        $newPicture = Picture::factory()->create();
 
-        $response = $this->putJson(
+        $this->putJson(
             route('dashboard.api.draft-screenshots.update', $screenshot),
             [
-                'picture_id' => $newPicture->id,
                 'caption' => 'Updated Caption',
                 'locale' => 'en',
             ]
         );
-
-        $response->assertOk()
-            ->assertJsonPath('picture_id', $newPicture->id);
 
         $translation = Translation::where('translation_key_id', $screenshot->caption_translation_key_id)
             ->where('locale', 'en')

@@ -7,6 +7,7 @@ use App\Http\Requests\CreationDraftRequest;
 use App\Models\CreationDraft;
 use App\Models\Person;
 use App\Models\Tag;
+use App\Models\Technology;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -183,5 +184,42 @@ class CreationDraftController extends Controller
     public function getTags(CreationDraft $creationDraft): JsonResponse
     {
         return response()->json($creationDraft->tags);
+    }
+
+    public function attachTechnology(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'technology_id' => ['required', 'exists:technologies,id'],
+        ]);
+
+        $technologyId = $request->input('technology_id');
+
+        if (! $creationDraft->technologies()->where('technologies.id', $technologyId)->exists()) {
+            $creationDraft->technologies()->attach($technologyId);
+        }
+
+        return response()->json([
+            'message' => 'Technology attached successfully',
+            'technology' => Technology::with(['descriptionTranslationKey.translations'])->find($technologyId),
+        ]);
+    }
+
+    public function detachTechnology(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'technology_id' => ['required', 'exists:technologies,id'],
+        ]);
+
+        $technologyId = $request->input('technology_id');
+        $creationDraft->technologies()->detach($technologyId);
+
+        return response()->json([
+            'message' => 'Technology detached successfully',
+        ]);
+    }
+
+    public function getTechnologies(CreationDraft $creationDraft): JsonResponse
+    {
+        return response()->json($creationDraft->technologies()->with(['descriptionTranslationKey.translations'])->get());
     }
 }

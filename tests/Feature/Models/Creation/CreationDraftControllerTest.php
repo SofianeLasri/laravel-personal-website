@@ -322,4 +322,146 @@ class CreationDraftControllerTest extends TestCase
             $draft->ended_at->toDateString()
         );
     }
+
+    #[Test]
+    public function test_attach_person()
+    {
+        $draft = CreationDraft::factory()->create();
+        $person = Person::factory()->create();
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.attach-person', ['creation_draft' => $draft]), [
+            'person_id' => $person->id,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('person.id', $person->id);
+
+        $this->assertDatabaseHas('creation_draft_person', [
+            'creation_draft_id' => $draft->id,
+            'person_id' => $person->id,
+        ]);
+    }
+
+    #[Test]
+    public function test_detach_person()
+    {
+        $draft = CreationDraft::factory()->create();
+        $person = Person::factory()->create();
+        $draft->people()->attach($person);
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.detach-person', ['creation_draft' => $draft]), [
+            'person_id' => $person->id,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseMissing('creation_draft_person', [
+            'creation_draft_id' => $draft->id,
+            'person_id' => $person->id,
+        ]);
+    }
+
+    #[Test]
+    public function test_get_people()
+    {
+        $draft = CreationDraft::factory()->create();
+        $people = Person::factory()->count(3)->create();
+        $draft->people()->attach($people);
+
+        $response = $this->getJson(route('dashboard.api.creation-drafts.people', ['creation_draft' => $draft]));
+
+        $response->assertOk()
+            ->assertJsonCount(3)
+            ->assertJsonPath('0.id', $people[0]->id);
+    }
+
+    #[Test]
+    public function test_attach_tag()
+    {
+        $draft = CreationDraft::factory()->create();
+        $tag = Tag::factory()->create();
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.attach-tag', ['creation_draft' => $draft]), [
+            'tag_id' => $tag->id,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('tag.id', $tag->id);
+
+        $this->assertDatabaseHas('creation_draft_tag', [
+            'creation_draft_id' => $draft->id,
+            'tag_id' => $tag->id,
+        ]);
+    }
+
+    #[Test]
+    public function test_detach_tag()
+    {
+        $draft = CreationDraft::factory()->create();
+        $tag = Tag::factory()->create();
+        $draft->tags()->attach($tag);
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.detach-tag', ['creation_draft' => $draft]), [
+            'tag_id' => $tag->id,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseMissing('creation_draft_tag', [
+            'creation_draft_id' => $draft->id,
+            'tag_id' => $tag->id,
+        ]);
+    }
+
+    #[Test]
+    public function test_attach_technology()
+    {
+        $draft = CreationDraft::factory()->create();
+        $technology = Technology::factory()->create();
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.attach-technology', ['creation_draft' => $draft]), [
+            'technology_id' => $technology->id,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('technology.id', $technology->id);
+
+        $this->assertDatabaseHas('creation_draft_technology', [
+            'creation_draft_id' => $draft->id,
+            'technology_id' => $technology->id,
+        ]);
+    }
+
+    #[Test]
+    public function test_detach_technology()
+    {
+        $draft = CreationDraft::factory()->create();
+        $technology = Technology::factory()->create();
+        $draft->technologies()->attach($technology);
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.detach-technology', ['creation_draft' => $draft]), [
+            'technology_id' => $technology->id,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseMissing('creation_draft_technology', [
+            'creation_draft_id' => $draft->id,
+            'technology_id' => $technology->id,
+        ]);
+    }
+
+    #[Test]
+    public function test_get_technologies()
+    {
+        $draft = CreationDraft::factory()->create();
+        $technologies = Technology::factory()->count(3)->create();
+        $draft->technologies()->attach($technologies);
+
+        $response = $this->getJson(route('dashboard.api.creation-drafts.technologies', ['creation_draft' => $draft]));
+
+        $response->assertOk()
+            ->assertJsonCount(3)
+            ->assertJsonPath('0.id', $technologies[0]->id);
+    }
 }

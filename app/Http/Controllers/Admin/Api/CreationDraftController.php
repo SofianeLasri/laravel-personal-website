@@ -150,7 +150,6 @@ class CreationDraftController extends Controller
 
         $tagId = $request->input('tag_id');
 
-        // Vérifier si le tag est déjà attaché pour éviter les doublons
         if (! $creationDraft->tags()->where('tags.id', $tagId)->exists()) {
             $creationDraft->tags()->attach($tagId);
         }

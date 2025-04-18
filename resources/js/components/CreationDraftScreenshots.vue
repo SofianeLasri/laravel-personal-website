@@ -190,7 +190,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                     </CardContent>
                 </Card>
 
-                <Card v-for="screenshot in screenshots" :key="screenshot.id" class="overflow-hidden">
+                <Card v-for="screenshot in screenshots" :key="screenshot.id" class="gap-0 overflow-hidden py-0">
                     <div class="bg-muted relative aspect-video">
                         <img
                             :src="`/storage/${screenshot.picture.path_original}`"

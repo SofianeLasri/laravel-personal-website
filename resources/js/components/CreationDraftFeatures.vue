@@ -205,7 +205,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                     </CardContent>
                 </Card>
 
-                <Card v-for="feature in features" :key="feature.id" class="overflow-hidden">
+                <Card v-for="feature in features" :key="feature.id" class="gap-0 overflow-hidden py-0">
                     <div v-if="feature.picture" class="bg-muted relative aspect-video">
                         <img :src="`/storage/${feature.picture.path_original}`" :alt="getFeatureTitle(feature)" class="h-full w-full object-cover" />
                     </div>

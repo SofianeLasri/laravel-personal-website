@@ -56,7 +56,6 @@ class PictureControllerTest extends TestCase
             'picture' => $uploadedFile,
         ]);
 
-        echo $response->getContent();
         $response->assertCreated();
     }
 

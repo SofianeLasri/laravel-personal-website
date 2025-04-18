@@ -18,11 +18,18 @@ class CreationConversionService
     {
         $this->validateDraft($draft);
 
-        $creation = Creation::create($this->mapDraftAttributes($draft));
+        if ($draft->originalCreation()->exists()) {
+            $creation = $draft->originalCreation;
+            $creation->update($this->mapDraftAttributes($draft));
 
+            $this->recreateFeatures($draft, $creation);
+            $this->recreateScreenshots($draft, $creation);
+        } else {
+            $creation = Creation::create($this->mapDraftAttributes($draft));
+            $this->createFeatures($draft, $creation);
+            $this->createScreenshots($draft, $creation);
+        }
         $this->syncRelationships($draft, $creation);
-        $this->createFeatures($draft, $creation);
-        $this->createScreenshots($draft, $creation);
 
         return $creation;
     }

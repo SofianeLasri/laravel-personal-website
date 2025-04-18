@@ -53,6 +53,7 @@ const props = defineProps<{
 
 const creationTypes = Object.keys(creationTypeLabels) as CreationType[];
 const isSubmitting = ref(false);
+const isPublishing = ref(false);
 const currentCreationDraft = ref<CreationDraftWithTranslations | null>(null);
 
 if (props.creationDraft) {
@@ -231,6 +232,46 @@ const onSubmit = handleSubmit(async (formValues) => {
         isSubmitting.value = false;
     }
 });
+
+const publishDraft = async () => {
+    if (!currentCreationDraft.value?.id) return;
+
+    isPublishing.value = true;
+
+    try {
+        await axios.post(route('dashboard.api.creations.store'), {
+            draft_id: currentCreationDraft.value.id,
+        });
+
+        toast({
+            title: 'Succès',
+            description: 'Votre création a été publiée avec succès',
+            variant: 'default',
+        });
+
+        //router.visit(route('dashboard.creations.index'));
+    } catch (error) {
+        console.error('Erreur lors de la publication:', error);
+
+        let errorMessage = 'Une erreur est survenue lors de la publication';
+
+        if (axios.isAxiosError(error) && error.response) {
+            if (error.response.status === 422) {
+                errorMessage = 'Le brouillon contient des erreurs qui empêchent sa publication';
+            } else {
+                errorMessage = `Erreur ${error.response.status}: ${error.response.statusText}`;
+            }
+        }
+
+        toast({
+            title: 'Erreur',
+            description: errorMessage,
+            variant: 'destructive',
+        });
+    } finally {
+        isPublishing.value = false;
+    }
+};
 
 onMounted(() => {
     const url = new URL(window.location.href);
@@ -412,19 +453,41 @@ onMounted(() => {
                 </FormField>
             </div>
 
-            <Button type="submit" :disabled="isSubmitting">
-                <span v-if="isSubmitting" class="mr-2">
-                    <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path
-                            class="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                    </svg>
-                </span>
-                {{ currentCreationDraft?.id ? 'Mettre à jour' : 'Créer' }}
-            </Button>
+            <div class="flex space-x-4">
+                <Button type="submit" :disabled="isSubmitting">
+                    <span v-if="isSubmitting" class="mr-2">
+                        <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                        </svg>
+                    </span>
+                    {{ currentCreationDraft?.id ? 'Mettre à jour' : 'Créer' }}
+                </Button>
+
+                <Button
+                    v-if="currentCreationDraft?.id"
+                    type="button"
+                    variant="default"
+                    :disabled="isPublishing || isSubmitting"
+                    @click="publishDraft"
+                >
+                    <span v-if="isPublishing" class="mr-2">
+                        <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                        </svg>
+                    </span>
+                    Publier
+                </Button>
+            </div>
         </form>
 
         <div v-if="currentCreationDraft?.id" class="border-t border-border">

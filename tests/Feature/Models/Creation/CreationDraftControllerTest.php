@@ -57,6 +57,7 @@ class CreationDraftControllerTest extends TestCase
             'started_at' => '2025-01-01',
             'short_description_content' => 'Short desc',
             'full_description_content' => 'Full desc',
+            'featured' => true,
             'people' => [$person->id],
             'technologies' => [$technology->id],
             'tags' => [$tag->id],

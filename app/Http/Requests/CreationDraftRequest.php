@@ -22,6 +22,7 @@ class CreationDraftRequest extends FormRequest
             'ended_at' => ['nullable', 'date'],
             'short_description_content' => ['required', 'string'],
             'full_description_content' => ['required', 'string'],
+            'featured' => ['sometimes', 'boolean'],
             'external_url' => ['nullable', 'string', 'url'],
             'source_code_url' => ['nullable', 'string', 'url'],
             'original_creation_id' => ['nullable', 'integer', 'exists:creations,id'],

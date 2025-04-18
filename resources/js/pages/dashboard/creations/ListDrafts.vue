@@ -30,6 +30,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Clock, Edit, Eye, MoreHorizontal, Send, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import { toast } from 'vue-sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -164,6 +165,30 @@ const deleteDraft = async (id: number) => {
         console.error('Erreur lors de la suppression:', error);
     }
 };
+
+const publishDraft = async (id: number) => {
+    try {
+        await axios.post(route('dashboard.api.creations.store'), {
+            draft_id: id,
+        });
+
+        toast.success('Votre création a été publiée avec succès');
+    } catch (error) {
+        console.error('Erreur lors de la publication:', error);
+
+        let errorMessage = 'Une erreur est survenue lors de la publication';
+
+        if (axios.isAxiosError(error) && error.response) {
+            if (error.response.status === 422) {
+                errorMessage = 'Le brouillon contient des erreurs qui empêchent sa publication';
+            } else {
+                errorMessage = `Erreur ${error.response.status}: ${error.response.statusText}`;
+            }
+        }
+
+        toast.error(errorMessage);
+    }
+};
 </script>
 
 <template>
@@ -278,13 +303,7 @@ const deleteDraft = async (id: number) => {
 
                                         <DropdownMenuSeparator />
 
-                                        <DropdownMenuItem
-                                            @click="
-                                                () => {
-                                                    // Action pour publier le brouillon
-                                                }
-                                            "
-                                        >
+                                        <DropdownMenuItem @click="() => publishDraft(draft.id)">
                                             <Send class="mr-2 h-4 w-4" />
                                             <span>Publier</span>
                                         </DropdownMenuItem>

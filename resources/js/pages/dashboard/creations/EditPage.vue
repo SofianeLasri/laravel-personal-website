@@ -33,7 +33,7 @@ import { useForm } from 'vee-validate';
 import { computed, onMounted, ref } from 'vue';
 import { toast } from 'vue-sonner';
 import * as z from 'zod';
-import { Toaster } from '@/components/ui/sonner';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -90,6 +90,7 @@ const formSchema = toTypedSchema(
             .max(160, 'La description courte ne doit pas dépasser 160 caractères')
             .min(1, 'La description courte est requise'),
         full_description_content: z.string().min(1, 'La description complète est requise'),
+        featured: z.boolean().default(false),
         started_at: z.string().min(1, 'La date de début est requise'),
         ended_at: z.string().nullable(),
     }),
@@ -125,6 +126,7 @@ const { isFieldDirty, handleSubmit, setFieldValue, meta } = useForm({
         locale: locale.value,
         short_description_content: shortDescriptionContent,
         full_description_content: fullDescriptionContent,
+        featured: currentCreationDraft.value?.featured ?? false,
         started_at: currentCreationDraft.value?.started_at ?? today,
         ended_at: currentCreationDraft.value?.ended_at ?? null,
     },
@@ -269,7 +271,6 @@ onMounted(() => {
 </script>
 
 <template>
-    <Toaster />
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Éditeur" />
         <form class="px-5 py-6" @submit="onSubmit">
@@ -403,6 +404,18 @@ onMounted(() => {
                                 <Input v-bind="componentField" type="text" placeholder="URL du code source" />
                             </FormControl>
                             <FormMessage />
+                        </FormItem>
+                    </FormField>
+                    <FormField v-slot="{ componentField }" type="checkbox" name="featured">
+                        <FormItem class="flex flex-row items-start space-y-0 gap-x-3">
+                            <FormControl>
+                                <Checkbox v-bind="componentField" />
+                            </FormControl>
+                            <div class="space-y-1 leading-none">
+                                <FormLabel>Création mise en avant</FormLabel>
+                                <FormDescription> Si cette case est cochée, la création sera mise en avant sur la page d'accueil. </FormDescription>
+                                <FormMessage />
+                            </div>
                         </FormItem>
                     </FormField>
                 </div>

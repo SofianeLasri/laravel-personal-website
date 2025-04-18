@@ -5,7 +5,7 @@ import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
-import { Bold, Code, Italic, Link as LucideLink, Underline as LucideUnderline, Strikethrough } from 'lucide-vue-next';
+import { Bold, Code, Italic, Link as LucideLink, Strikethrough, Underline as LucideUnderline } from 'lucide-vue-next';
 import { Markdown } from 'tiptap-markdown';
 import { onBeforeUnmount, ref, watch } from 'vue';
 
@@ -106,7 +106,7 @@ const isActive = (type: string, options = {}) => {
 </script>
 
 <template>
-    <Card class="markdown-editor">
+    <Card class="markdown-editor gap-0 py-0">
         <div class="editor-toolbar flex flex-wrap gap-2 border-b p-1">
             <Button size="sm" variant="outline" @click="toggleBold" :class="{ 'is-active': isActive('bold') }" title="Gras (** texte **)">
                 <Bold />

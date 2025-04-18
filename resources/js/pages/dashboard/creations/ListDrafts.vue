@@ -12,13 +12,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
     Pagination,
+    PaginationContent,
     PaginationEllipsis,
     PaginationFirst,
+    PaginationItem,
     PaginationLast,
-    PaginationList,
-    PaginationListItem,
     PaginationNext,
-    PaginationPrev,
+    PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -236,7 +236,7 @@ const deleteDraft = async (id: number) => {
                             </TableCell>
                             <TableCell class="whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <Clock class="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
+                                    <Clock class="text-muted-foreground mr-1.5 h-3.5 w-3.5" />
                                     {{ formatDateTime(draft.updated_at) }}
                                 </div>
                             </TableCell>
@@ -244,7 +244,7 @@ const deleteDraft = async (id: number) => {
                                 <Badge :variant="getDraftStatus(draft).variant">
                                     {{ getDraftStatus(draft).label }}
                                 </Badge>
-                                <span v-if="draft.original_creation_id" class="ml-1 text-xs text-muted-foreground">
+                                <span v-if="draft.original_creation_id" class="text-muted-foreground ml-1 text-xs">
                                     (ID: {{ draft.original_creation_id }})
                                 </span>
                             </TableCell>
@@ -314,33 +314,33 @@ const deleteDraft = async (id: number) => {
                         @update:page="handlePageChange"
                         v-slot="{ page }"
                     >
-                        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+                        <PaginationContent v-slot="{ items }" class="flex items-center gap-1">
                             <PaginationFirst />
-                            <PaginationPrev />
+                            <PaginationPrevious />
 
                             <template v-for="(item, index) in items">
-                                <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
+                                <PaginationItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
                                     <Button class="h-10 w-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
                                         {{ item.value }}
                                     </Button>
-                                </PaginationListItem>
+                                </PaginationItem>
                                 <PaginationEllipsis v-else :key="item.type" :index="index" />
                             </template>
 
                             <PaginationNext />
                             <PaginationLast />
-                        </PaginationList>
+                        </PaginationContent>
                     </Pagination>
                 </div>
 
                 <!-- Information sur le nombre d'éléments -->
-                <div v-if="props.creationDrafts.length > 0" class="mt-2 text-center text-sm text-muted-foreground">
+                <div v-if="props.creationDrafts.length > 0" class="text-muted-foreground mt-2 text-center text-sm">
                     Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} à
                     {{ Math.min(currentPage * itemsPerPage, props.creationDrafts.length) }}
                     sur {{ props.creationDrafts.length }} brouillons
                 </div>
 
-                <div v-else class="py-10 text-center text-muted-foreground">Aucun brouillon de création pour le moment.</div>
+                <div v-else class="text-muted-foreground py-10 text-center">Aucun brouillon de création pour le moment.</div>
             </div>
         </div>
     </AppLayout>

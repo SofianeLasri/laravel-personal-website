@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\Tag;
+namespace Tests\Feature\Models\Tag;
 
 use App\Models\Creation;
 use App\Models\CreationDraft;

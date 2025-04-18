@@ -118,11 +118,11 @@ watch([() => props.modelValue], ([newModelValue]) => {
 <template>
     <div class="flex items-center gap-4">
         <!-- Prévisualisation de l'image -->
-        <div class="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-md border border-input bg-muted">
+        <div class="border-input bg-muted relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-md border">
             <img v-if="imageUrl" :src="imageUrl" :alt="picture?.filename || 'Image'" class="h-full w-full object-cover" />
-            <Image v-else class="h-8 w-8 text-muted-foreground" />
-            <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-muted/75">
-                <div class="h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
+            <Image v-else class="text-muted-foreground h-8 w-8" />
+            <div v-if="loading" class="bg-muted/75 absolute inset-0 flex items-center justify-center">
+                <div class="border-primary h-6 w-6 animate-spin rounded-full border-b-2"></div>
             </div>
         </div>
 
@@ -142,7 +142,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
 
             <input type="hidden" v-model="modelValue" />
 
-            <p v-if="error" class="mt-1 text-xs text-destructive">{{ error }}</p>
+            <p v-if="error" class="text-destructive mt-1 text-xs">{{ error }}</p>
         </div>
     </div>
 </template>

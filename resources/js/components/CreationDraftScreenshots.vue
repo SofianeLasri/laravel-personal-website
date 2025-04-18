@@ -173,25 +173,25 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
     <div class="space-y-6">
         <HeadingSmall title="Captures d'écran" description="Ajoutez des captures d'écran pour illustrer votre création." />
 
-        <div v-if="error" class="mb-4 rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+        <div v-if="error" class="bg-destructive/10 text-destructive mb-4 rounded-md p-4 text-sm">
             {{ error }}
         </div>
 
-        <div v-if="!props.creationDraftId" class="rounded-md bg-muted p-4 text-sm text-muted-foreground">
+        <div v-if="!props.creationDraftId" class="bg-muted text-muted-foreground rounded-md p-4 text-sm">
             Veuillez d'abord enregistrer le brouillon pour pouvoir ajouter des captures d'écran.
         </div>
 
         <div v-else>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card class="cursor-pointer border-dashed transition-colors hover:bg-muted/50" @click="isAddModalOpen = true">
+                <Card class="hover:bg-muted/50 cursor-pointer border-dashed transition-colors" @click="isAddModalOpen = true">
                     <CardContent class="flex h-full min-h-[200px] flex-col items-center justify-center p-6">
-                        <Plus class="mb-2 h-12 w-12 text-muted-foreground" />
-                        <p class="text-sm text-muted-foreground">Ajouter une capture d'écran</p>
+                        <Plus class="text-muted-foreground mb-2 h-12 w-12" />
+                        <p class="text-muted-foreground text-sm">Ajouter une capture d'écran</p>
                     </CardContent>
                 </Card>
 
                 <Card v-for="screenshot in screenshots" :key="screenshot.id" class="overflow-hidden">
-                    <div class="relative aspect-video bg-muted">
+                    <div class="bg-muted relative aspect-video">
                         <img
                             :src="`/storage/${screenshot.picture.path_original}`"
                             :alt="getScreenshotCaption(screenshot)"
@@ -202,7 +202,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                         <div class="flex items-start justify-between">
                             <div class="min-w-0 flex-1">
                                 <h3 class="truncate text-sm font-medium">{{ screenshot.picture.filename }}</h3>
-                                <p class="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                                <p class="text-muted-foreground mt-1 line-clamp-2 text-xs">
                                     {{ getScreenshotCaption(screenshot) || 'Aucune description' }}
                                 </p>
                             </div>
@@ -219,13 +219,13 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </Card>
             </div>
 
-            <div v-if="screenshots.length === 0 && !loading" class="py-8 text-center text-muted-foreground">
+            <div v-if="screenshots.length === 0 && !loading" class="text-muted-foreground py-8 text-center">
                 <p>Aucune capture d'écran ajoutée</p>
                 <Button variant="outline" class="mt-4" @click="isAddModalOpen = true"> Ajouter une capture d'écran </Button>
             </div>
 
             <div v-if="loading" class="flex justify-center py-8">
-                <Loader2 class="h-8 w-8 animate-spin text-primary" />
+                <Loader2 class="text-primary h-8 w-8 animate-spin" />
             </div>
         </div>
 
@@ -244,7 +244,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Description ({{ props.locale }})</label>
                         <Input v-model="newScreenshotCaption" placeholder="Description de la capture d'écran" />
-                        <p class="text-xs text-muted-foreground">La description peut être laissée vide. Elle pourra être ajoutée ultérieurement.</p>
+                        <p class="text-muted-foreground text-xs">La description peut être laissée vide. Elle pourra être ajoutée ultérieurement.</p>
                     </div>
                 </div>
 
@@ -265,7 +265,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </DialogHeader>
 
                 <div class="space-y-4 py-4">
-                    <div v-if="selectedScreenshot" class="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
+                    <div v-if="selectedScreenshot" class="bg-muted relative aspect-video w-full overflow-hidden rounded-lg">
                         <img
                             :src="`/storage/${selectedScreenshot.picture.path_original}`"
                             :alt="selectedScreenshot.picture.filename"

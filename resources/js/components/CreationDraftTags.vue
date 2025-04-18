@@ -14,17 +14,15 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/components/ui/toast';
 import { Tag } from '@/types';
 import axios from 'axios';
 import { Loader2, Minus, Pencil, Plus, Search, Tag as TagIcon, Trash2 } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{
     creationDraftId: number | null;
 }>();
-
-const { toast } = useToast();
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -111,18 +109,11 @@ const associateTag = async (tagId: number) => {
         );
 
         await fetchAssociatedTags();
-        toast({
-            title: 'Succès',
-            description: 'Tag associé avec succès',
-        });
+        toast.success('Tag associé avec succès');
     } catch (err) {
         error.value = "Erreur lors de l'association du tag";
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: "Impossible d'associer ce tag",
-            variant: 'destructive',
-        });
+        toast.error("Impossible d'associer ce tag");
     } finally {
         loading.value = false;
     }
@@ -145,18 +136,11 @@ const dissociateTag = async (tagId: number) => {
         );
 
         associatedTags.value = associatedTags.value.filter((t) => t.id !== tagId);
-        toast({
-            title: 'Succès',
-            description: 'Tag dissocié avec succès',
-        });
+        toast.success('Tag dissocié avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la dissociation du tag';
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: 'Impossible de dissocier ce tag',
-            variant: 'destructive',
-        });
+        toast.error('Impossible de dissocier ce tag');
     } finally {
         loading.value = false;
     }
@@ -177,10 +161,7 @@ const createTag = async () => {
         resetTagForm();
         isAddTagDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Tag créé avec succès',
-        });
+        toast.success('Tag créé avec succès');
 
         if (props.creationDraftId) {
             await associateTag(response.data.id);
@@ -194,11 +175,7 @@ const createTag = async () => {
             errorMessage = err.response.data.errors.name[0];
         }
 
-        toast({
-            title: 'Erreur',
-            description: errorMessage,
-            variant: 'destructive',
-        });
+        toast.error(errorMessage);
     } finally {
         loading.value = false;
     }
@@ -233,10 +210,7 @@ const updateTag = async () => {
         resetEditForm();
         isEditTagDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Tag mis à jour avec succès',
-        });
+        toast.success('Tag mis à jour avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la mise à jour du tag';
         console.error(err);
@@ -246,11 +220,7 @@ const updateTag = async () => {
             errorMessage = err.response.data.errors.name[0];
         }
 
-        toast({
-            title: 'Erreur',
-            description: errorMessage,
-            variant: 'destructive',
-        });
+        toast.error(errorMessage);
     } finally {
         loading.value = false;
     }
@@ -276,18 +246,11 @@ const deleteTag = async () => {
         tagToDelete.value = null;
         isDeleteDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Tag supprimé avec succès',
-        });
+        toast.success('Tag supprimé avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la suppression du tag';
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: 'Impossible de supprimer ce tag',
-            variant: 'destructive',
-        });
+        toast.error('Impossible de supprimer ce tag');
     } finally {
         loading.value = false;
     }
@@ -360,11 +323,11 @@ watch(
     <div class="space-y-6">
         <HeadingSmall title="Tags" description="Gérez les tags associés à cette création pour améliorer sa recherche." />
 
-        <div v-if="error" class="mb-4 rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+        <div v-if="error" class="bg-destructive/10 text-destructive mb-4 rounded-md p-4 text-sm">
             {{ error }}
         </div>
 
-        <div v-if="!props.creationDraftId" class="rounded-md bg-muted p-4 text-sm text-muted-foreground">
+        <div v-if="!props.creationDraftId" class="bg-muted text-muted-foreground rounded-md p-4 text-sm">
             Veuillez d'abord enregistrer le brouillon pour pouvoir ajouter des tags.
         </div>
 
@@ -378,15 +341,15 @@ watch(
                     </Button>
                 </div>
 
-                <div v-if="associatedTags.length === 0" class="rounded-md bg-muted/30 py-8 text-center">
-                    <TagIcon class="mx-auto h-12 w-12 text-muted-foreground" />
-                    <p class="mt-2 text-sm text-muted-foreground">Aucun tag associé</p>
+                <div v-if="associatedTags.length === 0" class="bg-muted/30 rounded-md py-8 text-center">
+                    <TagIcon class="text-muted-foreground mx-auto h-12 w-12" />
+                    <p class="text-muted-foreground mt-2 text-sm">Aucun tag associé</p>
                     <Button variant="outline" class="mt-4" @click="modalOpen = true"> Ajouter des tags </Button>
                 </div>
 
                 <div v-else class="flex flex-wrap gap-2">
-                    <div v-for="tag in associatedTags" :key="tag.id" class="flex items-center space-x-1 rounded-full bg-muted px-2 py-1 text-sm">
-                        <TagIcon class="h-3 w-3 text-muted-foreground" />
+                    <div v-for="tag in associatedTags" :key="tag.id" class="bg-muted flex items-center space-x-1 rounded-full px-2 py-1 text-sm">
+                        <TagIcon class="text-muted-foreground h-3 w-3" />
                         <span>{{ tag.name }}</span>
                         <Button variant="ghost" size="icon" class="h-5 w-5 rounded-full" @click="dissociateTag(tag.id)" title="Dissocier">
                             <Minus class="h-3 w-3" />
@@ -403,7 +366,7 @@ watch(
 
                     <div class="py-4">
                         <div class="relative mb-4">
-                            <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Search class="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                             <Input v-model="searchQuery" placeholder="Rechercher un tag..." class="pl-8" />
                         </div>
 
@@ -414,24 +377,24 @@ watch(
 
                         <ScrollArea class="h-[300px]">
                             <div v-if="loading" class="flex h-[200px] items-center justify-center">
-                                <Loader2 class="h-8 w-8 animate-spin text-primary" />
+                                <Loader2 class="text-primary h-8 w-8 animate-spin" />
                             </div>
 
                             <div v-else-if="filteredTags.length === 0" class="py-8 text-center">
-                                <p class="text-sm text-muted-foreground">Aucun résultat trouvé</p>
+                                <p class="text-muted-foreground text-sm">Aucun résultat trouvé</p>
                             </div>
 
                             <div v-else class="space-y-2">
                                 <div
                                     v-for="tag in filteredTags"
                                     :key="tag.id"
-                                    class="flex items-center justify-between rounded-md p-2 hover:bg-muted"
+                                    class="hover:bg-muted flex items-center justify-between rounded-md p-2"
                                 >
                                     <div class="flex items-center space-x-2">
-                                        <TagIcon class="h-4 w-4 text-muted-foreground" />
+                                        <TagIcon class="text-muted-foreground h-4 w-4" />
                                         <div class="min-w-0 flex-1">
                                             <p class="text-sm font-medium">{{ tag.name }}</p>
-                                            <p class="truncate text-xs text-muted-foreground">{{ tag.slug }}</p>
+                                            <p class="text-muted-foreground truncate text-xs">{{ tag.slug }}</p>
                                         </div>
                                     </div>
 
@@ -476,7 +439,7 @@ watch(
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Nom</label>
                             <Input v-model="newTagName" placeholder="Nom du tag" />
-                            <p class="text-xs text-muted-foreground">Le slug sera généré automatiquement.</p>
+                            <p class="text-muted-foreground text-xs">Le slug sera généré automatiquement.</p>
                         </div>
                     </div>
 
@@ -500,7 +463,7 @@ watch(
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Nom</label>
                             <Input v-model="editTagName" placeholder="Nom du tag" />
-                            <p class="text-xs text-muted-foreground">Le slug sera mis à jour automatiquement.</p>
+                            <p class="text-muted-foreground text-xs">Le slug sera mis à jour automatiquement.</p>
                         </div>
                     </div>
 
@@ -519,7 +482,7 @@ watch(
                     <AlertDialogHeader>
                         <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce tag ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            <span v-if="tagHasAssociations" class="font-medium text-destructive">
+                            <span v-if="tagHasAssociations" class="text-destructive font-medium">
                                 Attention : ce tag est associé à {{ associationsDetails.creations_count }} création(s) et
                                 {{ associationsDetails.creation_drafts_count }} brouillon(s).
                             </span>

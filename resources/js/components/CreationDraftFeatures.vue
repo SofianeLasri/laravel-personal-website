@@ -188,32 +188,32 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
     <div class="space-y-6">
         <HeadingSmall title="Fonctionnalités clés" description="Ajoutez les fonctionnalités principales de votre création." />
 
-        <div v-if="error" class="mb-4 rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+        <div v-if="error" class="bg-destructive/10 text-destructive mb-4 rounded-md p-4 text-sm">
             {{ error }}
         </div>
 
-        <div v-if="!props.creationDraftId" class="rounded-md bg-muted p-4 text-sm text-muted-foreground">
+        <div v-if="!props.creationDraftId" class="bg-muted text-muted-foreground rounded-md p-4 text-sm">
             Veuillez d'abord enregistrer le brouillon pour pouvoir ajouter des fonctionnalités clés.
         </div>
 
         <div v-else>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card class="cursor-pointer border-dashed transition-colors hover:bg-muted/50" @click="isAddModalOpen = true">
+                <Card class="hover:bg-muted/50 cursor-pointer border-dashed transition-colors" @click="isAddModalOpen = true">
                     <CardContent class="flex h-full min-h-[200px] flex-col items-center justify-center p-6">
-                        <Plus class="mb-2 h-12 w-12 text-muted-foreground" />
-                        <p class="text-sm text-muted-foreground">Ajouter une fonctionnalité clé</p>
+                        <Plus class="text-muted-foreground mb-2 h-12 w-12" />
+                        <p class="text-muted-foreground text-sm">Ajouter une fonctionnalité clé</p>
                     </CardContent>
                 </Card>
 
                 <Card v-for="feature in features" :key="feature.id" class="overflow-hidden">
-                    <div v-if="feature.picture" class="relative aspect-video bg-muted">
+                    <div v-if="feature.picture" class="bg-muted relative aspect-video">
                         <img :src="`/storage/${feature.picture.path_original}`" :alt="getFeatureTitle(feature)" class="h-full w-full object-cover" />
                     </div>
                     <CardContent class="p-4">
                         <div class="flex items-start justify-between">
                             <div class="min-w-0 flex-1">
                                 <h3 class="truncate text-sm font-medium">{{ getFeatureTitle(feature) }}</h3>
-                                <p class="mt-1 line-clamp-3 text-xs text-muted-foreground">
+                                <p class="text-muted-foreground mt-1 line-clamp-3 text-xs">
                                     {{ getFeatureDescription(feature) }}
                                 </p>
                             </div>
@@ -230,13 +230,13 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </Card>
             </div>
 
-            <div v-if="features.length === 0 && !loading" class="py-8 text-center text-muted-foreground">
+            <div v-if="features.length === 0 && !loading" class="text-muted-foreground py-8 text-center">
                 <p>Aucune fonctionnalité clé ajoutée</p>
                 <Button variant="outline" class="mt-4" @click="isAddModalOpen = true"> Ajouter une fonctionnalité </Button>
             </div>
 
             <div v-if="loading" class="flex justify-center py-8">
-                <Loader2 class="h-8 w-8 animate-spin text-primary" />
+                <Loader2 class="text-primary h-8 w-8 animate-spin" />
             </div>
         </div>
 
@@ -280,7 +280,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </DialogHeader>
 
                 <div class="space-y-4 py-4">
-                    <div v-if="selectedFeature && selectedFeature.picture" class="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
+                    <div v-if="selectedFeature && selectedFeature.picture" class="bg-muted relative aspect-video w-full overflow-hidden rounded-lg">
                         <img
                             :src="`/storage/${selectedFeature.picture.path_original}`"
                             :alt="editFeatureTitle"

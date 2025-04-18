@@ -17,18 +17,16 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/toast';
 import { Technology } from '@/types';
 import axios from 'axios';
 import { Code, Loader2, Minus, Pencil, Plus, Search, Star, Trash2 } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{
     creationDraftId: number | null;
     locale: string;
 }>();
-
-const { toast } = useToast();
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -130,18 +128,11 @@ const associateTechnology = async (technologyId: number) => {
         );
 
         await fetchAssociatedTechnologies();
-        toast({
-            title: 'Succès',
-            description: 'Technologie associée avec succès',
-        });
+        toast.success('Technologie associée avec succès');
     } catch (err) {
         error.value = "Erreur lors de l'association de la technologie";
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: "Impossible d'associer cette technologie",
-            variant: 'destructive',
-        });
+        toast.error("Impossible d'associer cette technologie");
     } finally {
         loading.value = false;
     }
@@ -164,18 +155,11 @@ const dissociateTechnology = async (technologyId: number) => {
         );
 
         associatedTechnologies.value = associatedTechnologies.value.filter((t) => t.id !== technologyId);
-        toast({
-            title: 'Succès',
-            description: 'Technologie dissociée avec succès',
-        });
+        toast.success('Technologie dissociée avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la dissociation de la technologie';
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: 'Impossible de dissocier cette technologie',
-            variant: 'destructive',
-        });
+        toast.error('Impossible de dissocier cette technologie');
     } finally {
         loading.value = false;
     }
@@ -201,10 +185,7 @@ const createTechnology = async () => {
         resetTechnologyForm();
         isAddTechnologyDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Technologie créée avec succès',
-        });
+        toast.success('Technologie créée avec succès');
 
         if (props.creationDraftId) {
             await associateTechnology(response.data.id);
@@ -222,11 +203,7 @@ const createTechnology = async () => {
             }
         }
 
-        toast({
-            title: 'Erreur',
-            description: errorMessage,
-            variant: 'destructive',
-        });
+        toast.error(errorMessage);
     } finally {
         loading.value = false;
     }
@@ -267,10 +244,7 @@ const updateTechnology = async () => {
         resetEditForm();
         isEditTechnologyDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Technologie mise à jour avec succès',
-        });
+        toast.success('Technologie mise à jour avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la mise à jour de la technologie';
         console.error(err);
@@ -284,11 +258,7 @@ const updateTechnology = async () => {
             }
         }
 
-        toast({
-            title: 'Erreur',
-            description: errorMessage,
-            variant: 'destructive',
-        });
+        toast.error(errorMessage);
     } finally {
         loading.value = false;
     }
@@ -314,18 +284,11 @@ const deleteTechnology = async () => {
         technologyToDelete.value = null;
         isDeleteDialogOpen.value = false;
 
-        toast({
-            title: 'Succès',
-            description: 'Technologie supprimée avec succès',
-        });
+        toast.success('Technologie supprimée avec succès');
     } catch (err) {
         error.value = 'Erreur lors de la suppression de la technologie';
         console.error(err);
-        toast({
-            title: 'Erreur',
-            description: 'Impossible de supprimer cette technologie',
-            variant: 'destructive',
-        });
+        toast.error('Impossible de supprimer cette technologie');
     } finally {
         loading.value = false;
     }
@@ -422,11 +385,11 @@ watch(
     <div class="space-y-6">
         <HeadingSmall title="Technologies" description="Gérez les technologies utilisées dans cette création." />
 
-        <div v-if="error" class="mb-4 rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+        <div v-if="error" class="bg-destructive/10 text-destructive mb-4 rounded-md p-4 text-sm">
             {{ error }}
         </div>
 
-        <div v-if="!props.creationDraftId" class="rounded-md bg-muted p-4 text-sm text-muted-foreground">
+        <div v-if="!props.creationDraftId" class="bg-muted text-muted-foreground rounded-md p-4 text-sm">
             Veuillez d'abord enregistrer le brouillon pour pouvoir ajouter des technologies.
         </div>
 
@@ -440,9 +403,9 @@ watch(
                     </Button>
                 </div>
 
-                <div v-if="associatedTechnologies.length === 0" class="rounded-md bg-muted/30 py-8 text-center">
-                    <Code class="mx-auto h-12 w-12 text-muted-foreground" />
-                    <p class="mt-2 text-sm text-muted-foreground">Aucune technologie associée</p>
+                <div v-if="associatedTechnologies.length === 0" class="bg-muted/30 rounded-md py-8 text-center">
+                    <Code class="text-muted-foreground mx-auto h-12 w-12" />
+                    <p class="text-muted-foreground mt-2 text-sm">Aucune technologie associée</p>
                     <Button variant="outline" class="mt-4" @click="modalOpen = true"> Ajouter des technologies </Button>
                 </div>
 
@@ -450,7 +413,7 @@ watch(
                     <div
                         v-for="technology in associatedTechnologies"
                         :key="technology.id"
-                        class="flex items-center rounded-md border border-border p-3"
+                        class="border-border flex items-center rounded-md border p-3"
                     >
                         <div class="mr-3 h-8 w-8 flex-shrink-0" v-html="technology.svg_icon"></div>
 
@@ -459,7 +422,7 @@ watch(
                                 <p class="truncate text-sm font-medium">{{ technology.name }}</p>
                                 <Star v-if="technology.featured" class="ml-1 h-3 w-3 text-amber-500" />
                             </div>
-                            <p class="text-xs text-muted-foreground">{{ getTechnologyTypeLabel(technology.type) }}</p>
+                            <p class="text-muted-foreground text-xs">{{ getTechnologyTypeLabel(technology.type) }}</p>
                         </div>
 
                         <Button variant="ghost" size="icon" @click="dissociateTechnology(technology.id)" title="Dissocier">
@@ -477,7 +440,7 @@ watch(
 
                     <div class="py-4">
                         <div class="relative mb-4">
-                            <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Search class="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                             <Input v-model="searchQuery" placeholder="Rechercher une technologie..." class="pl-8" />
                         </div>
 
@@ -488,18 +451,18 @@ watch(
 
                         <ScrollArea class="h-[300px]">
                             <div v-if="loading" class="flex h-[200px] items-center justify-center">
-                                <Loader2 class="h-8 w-8 animate-spin text-primary" />
+                                <Loader2 class="text-primary h-8 w-8 animate-spin" />
                             </div>
 
                             <div v-else-if="filteredTechnologies.length === 0" class="py-8 text-center">
-                                <p class="text-sm text-muted-foreground">Aucun résultat trouvé</p>
+                                <p class="text-muted-foreground text-sm">Aucun résultat trouvé</p>
                             </div>
 
                             <div v-else class="space-y-2">
                                 <div
                                     v-for="technology in filteredTechnologies"
                                     :key="technology.id"
-                                    class="flex items-center rounded-md p-3 hover:bg-muted"
+                                    class="hover:bg-muted flex items-center rounded-md p-3"
                                 >
                                     <div class="mr-3 h-8 w-8 flex-shrink-0" v-html="technology.svg_icon"></div>
 
@@ -508,7 +471,7 @@ watch(
                                             <p class="truncate text-sm font-medium">{{ technology.name }}</p>
                                             <Star v-if="technology.featured" class="ml-1 h-3 w-3 text-amber-500" />
                                         </div>
-                                        <p class="text-xs text-muted-foreground">{{ getTechnologyTypeLabel(technology.type) }}</p>
+                                        <p class="text-muted-foreground text-xs">{{ getTechnologyTypeLabel(technology.type) }}</p>
                                     </div>
 
                                     <div class="flex space-x-1">
@@ -662,7 +625,7 @@ watch(
                     <AlertDialogHeader>
                         <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette technologie ?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            <span v-if="technologyHasAssociations" class="font-medium text-destructive">
+                            <span v-if="technologyHasAssociations" class="text-destructive font-medium">
                                 Attention : cette technologie est associée à {{ associationsDetails.creations_count }} création(s) et
                                 {{ associationsDetails.creation_drafts_count }} brouillon(s).
                             </span>

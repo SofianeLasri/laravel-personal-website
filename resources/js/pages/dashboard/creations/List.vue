@@ -31,7 +31,7 @@ import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ArrowDown, ArrowUp, Edit, Eye, Link as LinkIcon, MoreHorizontal, Trash2 } from 'lucide-vue-next';
+import { ArrowDown, ArrowUp, Edit, Link as LinkIcon, MoreHorizontal, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -252,16 +252,6 @@ const navigateToDraftEdit = () => {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                        <DropdownMenuItem
-                                            @click="
-                                                () => {
-                                                    // TODO : Rediriger vers la page de détail
-                                                }
-                                            "
-                                        >
-                                            <Eye class="mr-2 h-4 w-4" />
-                                            <span>Voir</span>
-                                        </DropdownMenuItem>
                                         <DropdownMenuItem @click="handleEditCreation(creation)">
                                             <Edit class="mr-2 h-4 w-4" />
                                             <span>Modifier</span>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\CreationPageController;
+use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -35,6 +36,16 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
 
     Route::get('/technology-experiences', TechnologyExperiencePageController::class)
         ->name('technology-experiences.index');
+
+    Route::name('experiences.')->prefix('experiences')->group(function () {
+        Route::get('/', [ExperiencePageController::class, 'listPage'])
+            ->name('index');
+        Route::get('/create', [ExperiencePageController::class, 'editPage'])
+            ->name('create');
+        Route::get('/{id}/edit', [ExperiencePageController::class, 'editPage'])
+            ->whereNumber('id')
+            ->name('edit');
+    });
 
     Route::name('api.')->prefix('api')->group(function () {
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
@@ -76,6 +87,13 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('creation-drafts.technologies');
         Route::get('technologies/{technology}/check-associations', [TechnologyController::class, 'checkAssociations'])
             ->name('technologies.check-associations');
+
+        Route::post('experiences/{experience}/attach-technology', [ExperienceController::class, 'attachTechnology'])
+            ->name('experiences.attach-technology');
+        Route::post('experiences/{experience}/detach-technology', [ExperienceController::class, 'detachTechnology'])
+            ->name('experiences.detach-technology');
+        Route::get('experiences/{experience}/technologies', [ExperienceController::class, 'getTechnologies'])
+            ->name('experiences.technologies');
     });
 });
 

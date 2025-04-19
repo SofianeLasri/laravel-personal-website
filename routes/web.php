@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\CreationPageController;
+use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -30,6 +31,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::get('/edit', [CreationPageController::class, 'editPage'])
             ->name('edit');
     });
+
+    Route::get('/technology-experiences', TechnologyExperiencePageController::class)
+        ->name('technology-experiences.index');
 
     Route::name('api.')->prefix('api')->group(function () {
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();

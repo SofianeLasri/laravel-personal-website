@@ -129,6 +129,18 @@ interface Technology {
     description_translation_key?: TranslationKey;
 }
 
+interface TechnologyWithCreationsCount extends Technology {
+    creations_count: number;
+}
+
+interface TechnologyExperience {
+    id: number;
+    technology_id: number;
+    technology?: TechnologyWithCreationsCount;
+    description_translation_key_id: number;
+    description_translation_key: TranslationKey;
+}
+
 interface Screenshot {
     id: number;
     creation_draft_id: number;

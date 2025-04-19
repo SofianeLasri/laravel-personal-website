@@ -11,19 +11,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\ActsAsUser;
 
 #[CoversClass(TagController::class)]
 class TagControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActsAsUser, RefreshDatabase;
 
     protected User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
-        $this->actingAs($this->user);
+        $this->loginAsAdmin();
     }
 
     #[Test]

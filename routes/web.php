@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\Api\PersonController;
 use App\Http\Controllers\Admin\Api\PictureController;
 use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
+use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\CreationPageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,6 +41,7 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             'people' => PersonController::class,
             'tags' => TagController::class,
             'technologies' => TechnologyController::class,
+            'technology-experiences' => TechnologyExperienceController::class,
         ]);
 
         Route::post('creation-drafts/{creation_draft}/attach-person', [CreationDraftController::class, 'attachPerson'])

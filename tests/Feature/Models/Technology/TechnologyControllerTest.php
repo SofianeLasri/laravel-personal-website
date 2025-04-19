@@ -55,7 +55,6 @@ class TechnologyControllerTest extends TestCase
         $this->assertDatabaseHas('technologies', [
             'name' => 'Test Technology',
             'type' => 'framework',
-            'featured' => true,
         ]);
     }
 
@@ -93,7 +92,6 @@ class TechnologyControllerTest extends TestCase
             'id' => $technology->id,
             'name' => 'Updated Technology',
             'type' => 'library',
-            'featured' => false,
         ]);
     }
 

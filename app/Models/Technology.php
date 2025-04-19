@@ -15,7 +15,6 @@ class Technology extends Model
     protected $fillable = [
         'name',
         'type',
-        'featured',
         'svg_icon',
         'description_translation_key_id',
     ];
@@ -24,7 +23,6 @@ class Technology extends Model
         'name' => 'string',
         'svg_icon' => 'string',
         'type' => TechnologyType::class,
-        'featured' => 'boolean',
     ];
 
     public function creations(): BelongsToMany
@@ -40,11 +38,6 @@ class Technology extends Model
     public function getDescription(string $locale): string
     {
         return Translation::trans($this->descriptionTranslationKey->key, $locale);
-    }
-
-    public static function featured()
-    {
-        return self::where('featured', true);
     }
 
     public function creationDrafts(): BelongsToMany

@@ -122,7 +122,6 @@ interface Technology {
     id: number;
     name: string;
     type: 'framework' | 'library' | 'language' | 'other';
-    featured: boolean;
     svg_icon: string;
     description_translation_key_id: number;
     created_at: string;

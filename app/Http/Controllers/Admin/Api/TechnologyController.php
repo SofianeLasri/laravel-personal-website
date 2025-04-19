@@ -28,7 +28,6 @@ class TechnologyController extends Controller
             'name' => ['required', 'string', 'max:255', 'unique:technologies,name'],
             'type' => ['required', 'string', 'in:framework,library,language,other'],
             'svg_icon' => ['required', 'string'],
-            'featured' => ['boolean'],
             'locale' => ['required', 'string', 'in:en,fr'],
             'description' => ['required', 'string'],
         ]);
@@ -39,7 +38,6 @@ class TechnologyController extends Controller
             'name' => $request->name,
             'type' => $request->type,
             'svg_icon' => $request->svg_icon,
-            'featured' => $request->featured ?? false,
             'description_translation_key_id' => $descriptionTranslation->id,
         ]);
 
@@ -63,7 +61,6 @@ class TechnologyController extends Controller
             'name' => ['sometimes', 'string', 'max:255'],
             'type' => ['sometimes', 'string', 'in:framework,library,language,other'],
             'svg_icon' => ['sometimes', 'string'],
-            'featured' => ['sometimes', 'boolean'],
             'locale' => ['required_with:description', 'string', 'in:en,fr'],
             'description' => ['sometimes', 'string'],
         ]);
@@ -78,7 +75,7 @@ class TechnologyController extends Controller
             Translation::createOrUpdate($technology->descriptionTranslationKey, $request->locale, $request->description);
         }
 
-        $technology->update($request->only(['name', 'type', 'svg_icon', 'featured']));
+        $technology->update($request->only(['name', 'type', 'svg_icon']));
 
         return response()->json($technology->fresh(['descriptionTranslationKey.translations']));
     }

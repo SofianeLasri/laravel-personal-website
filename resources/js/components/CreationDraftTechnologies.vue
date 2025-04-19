@@ -15,11 +15,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Technology } from '@/types';
 import axios from 'axios';
-import { Code, Loader2, Minus, Pencil, Plus, Search, Star, Trash2 } from 'lucide-vue-next';
+import { Code, Loader2, Minus, Pencil, Plus, Search, Trash2 } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -48,13 +47,11 @@ const isDeleteDialogOpen = ref(false);
 const newTechnologyName = ref('');
 const newTechnologyType = ref('framework');
 const newTechnologySvg = ref('');
-const newTechnologyFeatured = ref(false);
 const newTechnologyDescription = ref('');
 const editTechnologyId = ref<number | null>(null);
 const editTechnologyName = ref('');
 const editTechnologyType = ref('');
 const editTechnologySvg = ref('');
-const editTechnologyFeatured = ref(false);
 const editTechnologyDescription = ref('');
 const technologyToDelete = ref<Technology | null>(null);
 const technologyHasAssociations = ref(false);
@@ -176,7 +173,6 @@ const createTechnology = async () => {
             name: newTechnologyName.value.trim(),
             type: newTechnologyType.value,
             svg_icon: newTechnologySvg.value.trim(),
-            featured: newTechnologyFeatured.value,
             locale: props.locale,
             description: newTechnologyDescription.value.trim(),
         });
@@ -225,7 +221,6 @@ const updateTechnology = async () => {
                 name: editTechnologyName.value.trim(),
                 type: editTechnologyType.value,
                 svg_icon: editTechnologySvg.value.trim(),
-                featured: editTechnologyFeatured.value,
                 locale: props.locale,
                 description: editTechnologyDescription.value.trim(),
             },
@@ -332,7 +327,6 @@ const openEditForm = (technology: Technology) => {
     editTechnologyName.value = technology.name;
     editTechnologyType.value = technology.type;
     editTechnologySvg.value = technology.svg_icon;
-    editTechnologyFeatured.value = technology.featured;
     editTechnologyDescription.value = getTechnologyDescription(technology);
     isEditTechnologyDialogOpen.value = true;
 };
@@ -349,7 +343,6 @@ const resetTechnologyForm = () => {
     newTechnologyName.value = '';
     newTechnologyType.value = 'framework';
     newTechnologySvg.value = '';
-    newTechnologyFeatured.value = false;
     newTechnologyDescription.value = '';
 };
 
@@ -358,7 +351,6 @@ const resetEditForm = () => {
     editTechnologyName.value = '';
     editTechnologyType.value = '';
     editTechnologySvg.value = '';
-    editTechnologyFeatured.value = false;
     editTechnologyDescription.value = '';
 };
 
@@ -418,10 +410,7 @@ watch(
                         <div class="mr-3 h-8 w-8 flex-shrink-0" v-html="technology.svg_icon"></div>
 
                         <div class="min-w-0 flex-1">
-                            <div class="flex items-center">
-                                <p class="truncate text-sm font-medium">{{ technology.name }}</p>
-                                <Star v-if="technology.featured" class="ml-1 h-3 w-3 text-amber-500" />
-                            </div>
+                            <p class="truncate text-sm font-medium">{{ technology.name }}</p>
                             <p class="text-muted-foreground text-xs">{{ getTechnologyTypeLabel(technology.type) }}</p>
                         </div>
 
@@ -467,10 +456,7 @@ watch(
                                     <div class="mr-3 h-8 w-8 flex-shrink-0" v-html="technology.svg_icon"></div>
 
                                     <div class="min-w-0 flex-1">
-                                        <div class="flex items-center">
-                                            <p class="truncate text-sm font-medium">{{ technology.name }}</p>
-                                            <Star v-if="technology.featured" class="ml-1 h-3 w-3 text-amber-500" />
-                                        </div>
+                                        <p class="truncate text-sm font-medium">{{ technology.name }}</p>
                                         <p class="text-muted-foreground text-xs">{{ getTechnologyTypeLabel(technology.type) }}</p>
                                     </div>
 
@@ -545,11 +531,6 @@ watch(
                             <label class="text-sm font-medium">Description ({{ props.locale }})</label>
                             <Textarea v-model="newTechnologyDescription" placeholder="Description de la technologie" rows="3" />
                         </div>
-
-                        <div class="flex items-center space-x-2">
-                            <Switch v-model="newTechnologyFeatured" id="new-tech-featured" />
-                            <label for="new-tech-featured" class="text-sm font-medium">Mettre en avant cette technologie</label>
-                        </div>
                     </div>
 
                     <DialogFooter>
@@ -599,11 +580,6 @@ watch(
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Description ({{ props.locale }})</label>
                             <Textarea v-model="editTechnologyDescription" placeholder="Description de la technologie" rows="3" />
-                        </div>
-
-                        <div class="flex items-center space-x-2">
-                            <Switch v-model="editTechnologyFeatured" id="edit-tech-featured" />
-                            <label for="edit-tech-featured" class="text-sm font-medium">Mettre en avant cette technologie</label>
                         </div>
                     </div>
 

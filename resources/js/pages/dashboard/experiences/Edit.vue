@@ -430,7 +430,7 @@ const onSubmit = handleSubmit(async (formValues) => {
             <div class="my-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h3 class="text-sm font-medium">Technologies utilisées</h3>
-                    <Button variant="outline" size="sm" @click="modalTechOpen = true">
+                    <Button variant="outline" size="sm" type="button" @click="modalTechOpen = true">
                         <Plus class="mr-2 h-4 w-4" />
                         Gérer les technologies
                     </Button>
@@ -438,7 +438,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
                 <div v-if="selectedTechnologies.length === 0" class="border-border rounded-lg border p-8 text-center">
                     <p class="text-muted-foreground mb-2">Aucune technologie sélectionnée</p>
-                    <Button variant="outline" @click="modalTechOpen = true">
+                    <Button variant="outline" type="button" @click="modalTechOpen = true">
                         <Plus class="mr-2 h-4 w-4" />
                         Ajouter des technologies
                     </Button>

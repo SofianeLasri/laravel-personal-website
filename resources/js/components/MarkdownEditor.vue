@@ -108,30 +108,59 @@ const isActive = (type: string, options = {}) => {
 <template>
     <Card class="markdown-editor gap-0 py-0">
         <div class="editor-toolbar flex flex-wrap gap-2 border-b p-1">
-            <Button size="sm" variant="outline" @click="toggleBold" :class="{ 'is-active': isActive('bold') }" title="Gras (** texte **)">
+            <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                @click="toggleBold"
+                :class="{ 'is-active': isActive('bold') }"
+                title="Gras (** texte **)"
+            >
                 <Bold />
             </Button>
 
-            <Button size="sm" variant="outline" @click="toggleItalic" :class="{ 'is-active': isActive('italic') }" title="Italique (* texte *)">
+            <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                @click="toggleItalic"
+                :class="{ 'is-active': isActive('italic') }"
+                title="Italique (* texte *)"
+            >
                 <Italic />
             </Button>
 
-            <Button size="sm" variant="outline" @click="toggleStrike" :class="{ 'is-active': isActive('strike') }" title="Barré (~~ texte ~~)">
+            <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                @click="toggleStrike"
+                :class="{ 'is-active': isActive('strike') }"
+                title="Barré (~~ texte ~~)"
+            >
                 <Strikethrough />
             </Button>
 
-            <Button size="sm" variant="outline" @click="toggleUnderline" :class="{ 'is-active': isActive('underline') }" title="Souligné">
+            <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                @click="toggleUnderline"
+                :class="{ 'is-active': isActive('underline') }"
+                title="Souligné"
+            >
                 <LucideUnderline />
             </Button>
 
             <div class="dropdown">
-                <Button size="sm" variant="outline" title="Titres (# Titre)">Titres</Button>
+                <Button size="sm" variant="outline" type="button" title="Titres (# Titre)">Titres</Button>
                 <Card class="dropdown-content">
                     <Button
                         v-for="level in [1, 2, 3, 4, 5, 6]"
                         :key="level"
                         size="sm"
                         variant="ghost"
+                        type="button"
                         @click="toggleHeading(level as 1 | 2 | 3 | 4 | 5 | 6)"
                         :class="{ 'is-active': isActive('heading', { level }) }"
                     >
@@ -140,17 +169,25 @@ const isActive = (type: string, options = {}) => {
                 </Card>
             </div>
 
-            <Button size="sm" variant="outline" @click="setLink" :class="{ 'is-active': isActive('link') }" title="Lien ([texte](url))">
+            <Button size="sm" variant="outline" type="button" @click="setLink" :class="{ 'is-active': isActive('link') }" title="Lien ([texte](url))">
                 <LucideLink />
             </Button>
 
-            <Button size="sm" variant="outline" @click="toggleCode" :class="{ 'is-active': isActive('code') }" title="Code inline (`code`)">
+            <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                @click="toggleCode"
+                :class="{ 'is-active': isActive('code') }"
+                title="Code inline (`code`)"
+            >
                 <Code />
             </Button>
 
             <Button
                 size="sm"
                 variant="outline"
+                type="button"
                 @click="toggleCodeBlock"
                 :class="{ 'is-active': isActive('codeBlock') }"
                 title="Bloc de code (```code```)"

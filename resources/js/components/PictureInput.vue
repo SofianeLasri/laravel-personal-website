@@ -134,8 +134,8 @@ watch([() => props.modelValue], ([newModelValue]) => {
             </p>
 
             <div class="flex gap-2">
-                <Button v-if="picture" variant="destructive" size="sm" @click="removePicture" :disabled="loading"> Supprimer </Button>
-                <Button v-else variant="outline" size="sm" @click="triggerFileInput" :disabled="loading">Ajouter </Button>
+                <Button v-if="picture" variant="destructive" size="sm" type="button" @click="removePicture" :disabled="loading">Supprimer</Button>
+                <Button v-else variant="outline" size="sm" type="button" @click="triggerFileInput" :disabled="loading">Ajouter</Button>
             </div>
 
             <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />

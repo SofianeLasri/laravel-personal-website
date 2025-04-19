@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Api\CreationController;
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
 use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
+use App\Http\Controllers\Admin\Api\ExperienceController;
 use App\Http\Controllers\Admin\Api\PersonController;
 use App\Http\Controllers\Admin\Api\PictureController;
 use App\Http\Controllers\Admin\Api\TagController;
@@ -42,6 +43,7 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::apiResources([
             'creations' => CreationController::class,
             'creation-drafts' => CreationDraftController::class,
+            'experiences' => ExperienceController::class,
             'people' => PersonController::class,
             'tags' => TagController::class,
             'technologies' => TechnologyController::class,

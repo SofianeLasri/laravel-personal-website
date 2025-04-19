@@ -6,12 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TechnologyExperienceRequest;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TechnologyExperienceController extends Controller
 {
-    use AuthorizesRequests;
-
     public function index()
     {
         return TechnologyExperience::all();

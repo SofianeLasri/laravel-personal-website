@@ -1,0 +1,29 @@
+<?php
+
+namespace Tests\Feature\Models\Technology;
+
+use App\Http\Controllers\Admin\TechnologyExperiencePageController;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+
+#[CoversClass(TechnologyExperiencePageController::class)]
+class TechnologyExperiencePageControllerTest extends TestCase
+{
+    use RefreshDatabase, WithoutMiddleware;
+
+    #[Test]
+    public function test_basic()
+    {
+        $response = $this->get(route('dashboard.technology-experiences.index'));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('dashboard/technology-experiences/List')
+            ->has('technologies')
+            ->has('technologyExperiences')
+        );
+    }
+}

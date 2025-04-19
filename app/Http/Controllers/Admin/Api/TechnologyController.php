@@ -38,7 +38,7 @@ class TechnologyController extends Controller
             'name' => $request->name,
             'type' => $request->type,
             'svg_icon' => $request->svg_icon,
-            'description_translation_key_id' => $descriptionTranslation->id,
+            'description_translation_key_id' => $descriptionTranslation->translation_key_id,
         ]);
 
         return response()->json($technology->load('descriptionTranslationKey.translations'), Response::HTTP_CREATED);

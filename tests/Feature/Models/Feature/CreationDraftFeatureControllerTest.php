@@ -13,11 +13,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\ActsAsUser;
 
 #[CoversClass(CreationDraftFeatureController::class)]
 class CreationDraftFeatureControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActsAsUser, RefreshDatabase;
 
     protected User $user;
 
@@ -26,8 +27,7 @@ class CreationDraftFeatureControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
-        $this->actingAs($this->user);
+        $this->loginAsAdmin();
         $this->draft = CreationDraft::factory()->create();
     }
 

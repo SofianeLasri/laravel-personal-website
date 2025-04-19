@@ -12,22 +12,21 @@ use App\Models\Picture;
 use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\Translation;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\ActsAsUser;
 
 #[CoversClass(CreationDraftController::class)]
 class CreationDraftControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActsAsUser, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->loginAsAdmin();
     }
 
     #[Test]

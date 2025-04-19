@@ -14,9 +14,4 @@ class TechnologyExperienceRequest extends FormRequest
             'description' => ['required', 'string'],
         ];
     }
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 }

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('social_media_links', function (Blueprint $table) {
             $table->id();
-            $table->string('icon_svg');
+            $table->text('icon_svg');
             $table->string('name');
             $table->string('url');
         });

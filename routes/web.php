@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\ExperiencePageController;
+use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -47,6 +48,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->whereNumber('id')
             ->name('edit');
     });
+
+    Route::get('/social-media-links', SocialMediaLinkPageController::class)
+        ->name('social-media-links.index');
 
     Route::name('api.')->prefix('api')->group(function () {
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();

@@ -14,9 +14,4 @@ class SocialMediaLinkRequest extends FormRequest
             'url' => ['required', 'string'],
         ];
     }
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 }

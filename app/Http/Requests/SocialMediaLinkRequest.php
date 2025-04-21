@@ -9,9 +9,9 @@ class SocialMediaLinkRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'icon_svg' => ['required'],
-            'name' => ['required'],
-            'url' => ['required'],
+            'icon_svg' => ['required', 'string'],
+            'name' => ['required', 'string'],
+            'url' => ['required', 'string'],
         ];
     }
 

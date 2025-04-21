@@ -18,22 +18,26 @@ class SocialMediaLinkController extends Controller
         return SocialMediaLink::create($request->validated());
     }
 
-    public function show(SocialMediaLink $socialMediaLink)
+    public function show(int $id)
     {
+        $socialMediaLink = SocialMediaLink::findOrFail($id);
+
         return $socialMediaLink;
     }
 
-    public function update(SocialMediaLinkRequest $request, SocialMediaLink $socialMediaLink)
+    public function update(SocialMediaLinkRequest $request, int $id)
     {
+        $socialMediaLink = SocialMediaLink::findOrFail($id);
         $socialMediaLink->update($request->validated());
 
         return $socialMediaLink;
     }
 
-    public function destroy(SocialMediaLink $socialMediaLink)
+    public function destroy(int $id)
     {
+        $socialMediaLink = SocialMediaLink::findOrFail($id);
         $socialMediaLink->delete();
 
-        return response()->json();
+        return response()->noContent();
     }
 }

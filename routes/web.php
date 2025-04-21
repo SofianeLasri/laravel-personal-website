@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
 use App\Http\Controllers\Admin\Api\ExperienceController;
 use App\Http\Controllers\Admin\Api\PersonController;
 use App\Http\Controllers\Admin\Api\PictureController;
+use App\Http\Controllers\Admin\Api\SocialMediaLinkController;
 use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
@@ -56,6 +57,7 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             'creation-drafts' => CreationDraftController::class,
             'experiences' => ExperienceController::class,
             'people' => PersonController::class,
+            'social-media-links' => SocialMediaLinkController::class,
             'tags' => TagController::class,
             'technologies' => TechnologyController::class,
             'technology-experiences' => TechnologyExperienceController::class,

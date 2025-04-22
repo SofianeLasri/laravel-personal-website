@@ -7,6 +7,50 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+    --color-gray-990: rgba(19, 20, 21, 1);
+    --color-gray-975: rgba(39, 41, 43, 1);
+    --color-gray-950: rgba(49, 51, 54, 1);
+    --color-gray-900: rgba(68, 72, 75, 1);
+    --color-gray-800: rgba(87, 92, 96, 1);
+    --color-gray-700: rgba(107, 113, 117, 1);
+    --color-gray-600: rgba(121, 128, 134, 1);
+    --color-gray-500: rgba(148, 153, 157, 1);
+    --color-gray-400: rgba(169, 174, 177, 1);
+    --color-gray-300: rgba(192, 194, 197, 1);
+    --color-gray-200: rgba(223, 225, 226, 1);
+    --color-gray-100: rgba(244, 245, 245, 1);
+    --color-gray-0: rgba(255, 255, 255, 1);
+
+    --color-design-system-border: var(--color-gray-300);
+    --color-design-system-primary: var(--color-atomic-tangerine-400);
+    --color-design-system-title-color: var(--color-gray-990);
+    --color-design-system-paragraph-color: var(--color-gray-800);
+    --color-design-system-border-width: .0625rem;
+    --color-design-system-border-radius: .5rem;
+    --color-atomic-tangerine-50: rgba(254, 242, 236, 1);
+    --color-atomic-tangerine-100: rgba(252, 216, 198, 1);
+    --color-atomic-tangerine-200: rgba(250, 190, 158, 1);
+    --color-atomic-tangerine-300: rgba(249, 177, 138, 1);
+    --color-atomic-tangerine-400: rgba(247, 142, 87, 1);
+    --color-atomic-tangerine-500: rgba(246, 124, 61, 1);
+    --color-atomic-tangerine-600: rgba(244, 99, 22, 1);
+    --color-atomic-tangerine-700: rgba(215, 82, 9, 1);
+    --color-atomic-tangerine-800: rgba(175, 67, 8, 1);
+    --color-atomic-tangerine-900: rgba(135, 52, 7, 1);
+    --color-atomic-tangerine-950: rgba(117, 43, 5, 1);
+    --color-atomic-tangerine-990: rgba(77, 29, 3, 1);
+
+    --color-action-container-inter-border-radius: var(--color-design-system-border-radius);
+    --color-action-container-outer-border-radius: 1rem;
+    --color-action-container-outer-color: rgba(244, 245, 245, 0.5);
+    --color-action-container-shadow-y: .5rem;
+    --color-action-container-shadow-blur: 1rem;
+    --color-action-container-inter-padding: var(--color-action-container-inter-border-radius);
+    --color-action-container-shadow-color: rgba(0, 0, 0, 0.20000000298023224);
+    --color-action-container-background-blur: .0625rem;
+}
+
 @theme inline {
     --font-sans: Instrument Sans, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 

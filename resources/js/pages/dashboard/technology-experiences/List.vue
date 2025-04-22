@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Heading from '@/components/Heading.vue';
+import Heading from '@/components/dashboard/Heading.vue';
 import {
     AlertDialog,
     AlertDialogAction,

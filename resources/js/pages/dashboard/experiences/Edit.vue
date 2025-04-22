@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Heading from '@/components/Heading.vue';
-import HeadingSmall from '@/components/HeadingSmall.vue';
-import MarkdownEditor from '@/components/MarkdownEditor.vue';
-import PictureInput from '@/components/PictureInput.vue';
+import Heading from '@/components/dashboard/Heading.vue';
+import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
+import MarkdownEditor from '@/components/dashboard/MarkdownEditor.vue';
+import PictureInput from '@/components/dashboard/PictureInput.vue';
 import {
     AlertDialog,
     AlertDialogAction,

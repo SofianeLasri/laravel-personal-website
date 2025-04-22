@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import CreationDraftFeatures from '@/components/CreationDraftFeatures.vue';
-import CreationDraftPeople from '@/components/CreationDraftPeople.vue';
-import CreationDraftScreenshots from '@/components/CreationDraftScreenshots.vue';
-import CreationDraftTags from '@/components/CreationDraftTags.vue';
-import CreationDraftTechnologies from '@/components/CreationDraftTechnologies.vue';
-import Heading from '@/components/Heading.vue';
-import HeadingSmall from '@/components/HeadingSmall.vue';
-import MarkdownEditor from '@/components/MarkdownEditor.vue';
-import PictureInput from '@/components/PictureInput.vue';
+import CreationDraftFeatures from '@/components/dashboard/CreationDraftFeatures.vue';
+import CreationDraftPeople from '@/components/dashboard/CreationDraftPeople.vue';
+import CreationDraftScreenshots from '@/components/dashboard/CreationDraftScreenshots.vue';
+import CreationDraftTags from '@/components/dashboard/CreationDraftTags.vue';
+import CreationDraftTechnologies from '@/components/dashboard/CreationDraftTechnologies.vue';
+import Heading from '@/components/dashboard/Heading.vue';
+import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
+import MarkdownEditor from '@/components/dashboard/MarkdownEditor.vue';
+import PictureInput from '@/components/dashboard/PictureInput.vue';
 import {
     AlertDialog,
     AlertDialogAction,

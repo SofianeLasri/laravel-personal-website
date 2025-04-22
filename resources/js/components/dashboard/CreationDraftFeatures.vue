@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import HeadingSmall from '@/components/HeadingSmall.vue';
-import PictureInput from '@/components/PictureInput.vue';
+import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
+import PictureInput from '@/components/dashboard/PictureInput.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
 import Background from '@/components/public/Background.vue';
 import Logo from '@/components/public/Logo.vue';
+import { Head } from '@inertiajs/vue3';
 </script>
 
 <template>

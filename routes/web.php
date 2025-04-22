@@ -101,8 +101,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::get('experiences/{experience}/technologies', [ExperienceController::class, 'getTechnologies'])
             ->name('experiences.technologies');
     });
+
+    require __DIR__.'/settings.php';
 });
 
-require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/api.php';

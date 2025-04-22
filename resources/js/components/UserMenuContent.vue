@@ -21,7 +21,7 @@ defineProps<Props>();
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full" :href="route('profile.edit')" as="button">
+            <Link class="block w-full" :href="route('dashboard.profile.edit')" as="button">
                 <Settings class="mr-2 h-4 w-4" />
                 Settings
             </Link>

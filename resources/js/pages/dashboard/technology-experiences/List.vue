@@ -377,14 +377,14 @@ const breadcrumbs: BreadcrumbItem[] = [
         <div class="px-5 py-6">
             <Heading title="Expériences technologiques" description="Gérez vos expériences avec différentes technologies et frameworks." />
 
-            <div class="my-6 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-                    <div class="relative w-full sm:w-64">
+            <div class="my-6 flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+                <div class="flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-2">
+                    <div class="relative w-full lg:w-64">
                         <Search class="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                         <Input v-model="searchQuery" placeholder="Rechercher une technologie..." class="pl-8" />
                     </div>
                     <Select v-model="locale">
-                        <SelectTrigger class="w-full sm:w-32">
+                        <SelectTrigger class="w-full lg:w-32">
                             <SelectValue placeholder="Langue" />
                         </SelectTrigger>
                         <SelectContent>
@@ -411,7 +411,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <p class="text-muted-foreground mt-2">Aucune technologie trouvée</p>
             </div>
 
-            <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 <div
                     v-for="technology in filteredTechnologies"
                     :key="technology.id"

@@ -26,8 +26,8 @@
     --color-design-system-primary: var(--color-atomic-tangerine-400);
     --color-design-system-title-color: var(--color-gray-990);
     --color-design-system-paragraph-color: var(--color-gray-800);
-    --color-design-system-border-width: .0625rem;
-    --color-design-system-border-radius: .5rem;
+    --color-design-system-border-width: 0.0625rem;
+    --color-design-system-border-radius: 0.5rem;
     --color-atomic-tangerine-50: rgb(254, 242, 236);
     --color-atomic-tangerine-100: rgb(252, 216, 198);
     --color-atomic-tangerine-200: rgb(250, 190, 158);
@@ -44,11 +44,11 @@
     --color-action-container-inter-border-radius: var(--color-design-system-border-radius);
     --color-action-container-outer-border-radius: 1rem;
     --color-action-container-outer-color: rgba(244, 245, 245, 0.5);
-    --color-action-container-shadow-y: .5rem;
+    --color-action-container-shadow-y: 0.5rem;
     --color-action-container-shadow-blur: 1rem;
     --color-action-container-inter-padding: var(--color-action-container-inter-border-radius);
     --color-action-container-shadow-color: rgba(0, 0, 0, 0.20000000298023224);
-    --color-action-container-background-blur: .0625rem;
+    --color-action-container-background-blur: 0.0625rem;
 }
 
 @theme inline {

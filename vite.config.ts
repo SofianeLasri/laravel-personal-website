@@ -1,8 +1,8 @@
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
+import * as path from 'node:path';
 import { resolve } from 'node:path';
-import path from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({

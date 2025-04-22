@@ -17,7 +17,7 @@ export default defineConfig({
     },
     plugins: [
         laravel({
-            input: ['resources/js/app.ts'],
+            input: ['resources/js/dashboard-app.ts', 'resources/js/public-app.ts'],
             ssr: 'resources/js/ssr.ts',
             refresh: true,
         }),

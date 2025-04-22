@@ -24,7 +24,7 @@ Route::get('/', function () {
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', function () {
-        return Inertia::render('Dashboard');
+        return Inertia::render('dashboard/Dashboard');
     })->name('index');
 
     Route::name('creations.')->prefix('creations')->group(function () {

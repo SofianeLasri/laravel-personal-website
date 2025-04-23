@@ -11,6 +11,9 @@ import { Head } from '@inertiajs/vue3';
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];
+    yearsOfExperience: number;
+    developmentCreationsCount: number;
+    technologiesCount: number;
 }>();
 </script>
 
@@ -41,7 +44,9 @@ defineProps<{
                     <div class="flex flex-wrap items-center justify-start gap-4 self-stretch">
                         <div class="size- flex items-start justify-start gap-4">
                             <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
-                                <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">2</div>
+                                <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
+                                    {{ yearsOfExperience }}
+                                </div>
                                 <div class="text-design-system-paragraph justify-start self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                     Années d’expériences
                                 </div>
@@ -51,7 +56,9 @@ defineProps<{
                                 <div class="bg-border w-px self-stretch" />
                             </div>
                             <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
-                                <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">10</div>
+                                <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
+                                    {{ developmentCreationsCount }}
+                                </div>
                                 <div class="text-design-system-paragraph justify-start self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                     Projets réalisés
                                 </div>
@@ -61,7 +68,9 @@ defineProps<{
                                 <div class="bg-border w-px self-stretch" />
                             </div>
                             <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
-                                <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">5</div>
+                                <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
+                                    {{ technologiesCount }}
+                                </div>
                                 <div class="text-design-system-paragraph justify-start self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                     Frameworks maîtrisés
                                 </div>

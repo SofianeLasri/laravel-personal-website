@@ -2,43 +2,36 @@
 import BarStaggeredRegular from '@/components/font-awesome/BarStaggeredRegular.vue';
 import BlackButton from '@/components/public/BlackButton.vue';
 import NavBrand from '@/components/public/NavBrand.vue';
+import NavMenuItem from '@/components/public/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/NavSearchBar.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
-import NavMenuItem from '@/components/public/NavMenuItem.vue';
 
-// État pour gérer l'ouverture/fermeture du menu
 const isMenuOpen = ref(false);
 
-// Fonction pour basculer l'état du menu
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value;
 };
 
-// Fermer le menu
 const closeMenu = () => {
     isMenuOpen.value = false;
 };
 
-// Gestion de la touche Escape pour fermer le menu
 const handleEscKey = (event: KeyboardEvent) => {
     if (event.key === 'Escape' && isMenuOpen.value) {
         closeMenu();
     }
 };
 
-// Bloquer le scroll quand le menu est ouvert
 watch(isMenuOpen, (value) => {
     document.body.style.overflow = value ? 'hidden' : '';
 });
 
-// Mise en place des écouteurs d'événements
 onMounted(() => {
     document.addEventListener('keydown', handleEscKey);
 });
 
 onUnmounted(() => {
     document.removeEventListener('keydown', handleEscKey);
-    // Réinitialiser le scroll à la destruction du composant
     document.body.style.overflow = '';
 });
 </script>
@@ -66,7 +59,7 @@ onUnmounted(() => {
             aria-label="Menu principal"
         >
             <div class="flex-grow-1 cursor-pointer" @click="closeMenu"></div>
-            <div class="bg-background flex w-full max-w-lg flex-shrink-0 flex-col items-start border-l py-16 pr-8">
+            <div class="bg-background motion-preset-slide-left flex w-full max-w-lg flex-shrink-0 flex-col items-start border-l py-16 pr-8">
                 <div class="flex w-full flex-col gap-12">
                     <BlackButton
                         class="self-end"
@@ -95,5 +88,3 @@ onUnmounted(() => {
         </div>
     </Transition>
 </template>
-
-<style scoped></style>

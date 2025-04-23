@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@plugin "tailwindcss-motion";
+
 @theme {
     --color-gray-990: rgb(19, 20, 21);
     --color-gray-975: rgb(39, 41, 43);

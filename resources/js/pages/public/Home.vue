@@ -3,6 +3,7 @@ import Plus from '@/components/font-awesome/Plus.vue';
 import Background from '@/components/public/Background.vue';
 import BlackLinkButton from '@/components/public/BlackLinkButton.vue';
 import LightLinkButton from '@/components/public/LightLinkButton.vue';
+import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
@@ -23,6 +24,7 @@ defineProps<{
         <Background />
         <Navbar />
 
+        <LightShape class="absolute top-0 left-[-27rem] z-0 xl:left-[-15rem]" />
         <div class="container inline-flex items-center justify-start py-16">
             <div class="relative inline-flex flex-1 flex-col items-start justify-start self-stretch">
                 <div class="flex flex-1 flex-col items-start justify-center self-stretch sm:gap-1">

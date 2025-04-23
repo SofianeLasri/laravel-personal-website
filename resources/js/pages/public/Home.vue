@@ -56,7 +56,7 @@ import { Head } from '@inertiajs/vue3';
                             </div>
                             <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
                                 <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">10</div>
-                                <div class="text-design-system-paragraph sm:leading justify-start self-stretch text-sm font-normal sm:text-base">
+                                <div class="text-design-system-paragraph justify-start self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                     Projets réalisés
                                 </div>
                                 <Plus class="fill-design-system-title absolute top-0 left-0 size-4" />
@@ -66,7 +66,7 @@ import { Head } from '@inertiajs/vue3';
                             </div>
                             <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
                                 <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">5</div>
-                                <div class="text-design-system-paragraph sm:leading justify-start self-stretch text-sm font-normal sm:text-base">
+                                <div class="text-design-system-paragraph justify-start self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                     Frameworks maîtrisés
                                 </div>
                                 <Plus class="fill-design-system-title absolute top-0 left-0 size-4" />

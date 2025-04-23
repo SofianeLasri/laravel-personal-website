@@ -174,4 +174,11 @@ interface Feature {
     description_translation_key?: TranslationKey;
 }
 
+interface SocialMediaLink {
+    id: number;
+    icon_svg: string;
+    name: string;
+    url: string;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;

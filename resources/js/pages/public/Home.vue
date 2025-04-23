@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import Dribble from '@/components/font-awesome/Dribble.vue';
-import GitHub from '@/components/font-awesome/GitHub.vue';
-import LinkedIn from '@/components/font-awesome/LinkedIn.vue';
 import Plus from '@/components/font-awesome/Plus.vue';
 import Background from '@/components/public/Background.vue';
-import BlackButton from '@/components/public/BlackButton.vue';
-import LightButton from '@/components/public/LightButton.vue';
+import BlackLinkButton from '@/components/public/BlackLinkButton.vue';
+import LightLinkButton from '@/components/public/LightLinkButton.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
+import { SocialMediaLink } from '@/types';
 import { Head } from '@inertiajs/vue3';
+
+defineProps<{
+    socialMediaLinks: SocialMediaLink[];
+}>();
 </script>
 
 <template>
@@ -31,16 +33,10 @@ import { Head } from '@inertiajs/vue3';
                 </div>
                 <div class="flex flex-col items-start justify-start gap-8 self-stretch">
                     <div class="inline-flex items-center justify-start gap-2 py-12 xl:py-0">
-                        <BlackButton>Télécharger mon CV</BlackButton>
-                        <LightButton>
-                            <LinkedIn class="absolute h-4 fill-black" />
-                        </LightButton>
-                        <LightButton>
-                            <GitHub class="absolute h-4 fill-black" />
-                        </LightButton>
-                        <LightButton>
-                            <Dribble class="absolute h-4 fill-black" />
-                        </LightButton>
+                        <BlackLinkButton :href="route('cv')" target="_blank"> Télécharger mon CV </BlackLinkButton>
+                        <LightLinkButton v-for="link in socialMediaLinks" :key="link.name" :href="link.url" target="_blank">
+                            <div class="absolute flex h-4 fill-black" v-html="link.icon_svg"></div>
+                        </LightLinkButton>
                     </div>
                     <div class="flex flex-wrap items-center justify-start gap-4 self-stretch">
                         <div class="size- flex items-start justify-start gap-4">
@@ -80,7 +76,7 @@ import { Head } from '@inertiajs/vue3';
                 <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[300px] left-[-80px] h-10" />
             </div>
             <div class="bg-primary z-1 hidden size-[35rem] flex-shrink-0 items-end justify-end overflow-hidden rounded-2xl xl:flex">
-                <img class="h-full" src="/resources/images/public/big-head-transparent.png" alt="Photo de Sofiane Lasri" />
+                <img class="h-full" src="/resources/images/public/big-head-transparent.avif" alt="Photo de Sofiane Lasri" />
             </div>
         </div>
     </div>

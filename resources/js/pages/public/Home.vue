@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import BarStaggeredRegular from '@/components/font-awesome/BarStaggeredRegular.vue';
 import Background from '@/components/public/Background.vue';
-import Logo from '@/components/public/Logo.vue';
+import BlackButton from '@/components/public/BlackButton.vue';
+import NavBrand from '@/components/public/NavBrand.vue';
+import NavSearchBar from '@/components/public/NavSearchBar.vue';
 import { Head } from '@inertiajs/vue3';
 </script>
 
@@ -9,12 +12,13 @@ import { Head } from '@inertiajs/vue3';
     <div class="flex min-h-screen flex-col bg-gray-100">
         <Background />
         <div class="navbar z-1 flex content-center justify-between py-16">
-            <div class="flex items-center gap-4">
-                <Logo />
-                <div class="flex flex-col">
-                    <div class="text-xl leading-5 font-bold">Sofiane Lasri.</div>
-                    <div class="text-design-system-paragraph-color text-sm leading-3.5">Développeur Full-Stack</div>
-                </div>
+            <NavBrand />
+            <div class="flex flex-nowrap items-center justify-center gap-4">
+                <NavSearchBar />
+                <BlackButton>
+                    <span>Menu</span>
+                    <BarStaggeredRegular class="h-4 fill-white" />
+                </BlackButton>
             </div>
         </div>
     </div>

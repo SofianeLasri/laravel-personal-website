@@ -43,3 +43,9 @@
     --color-action-container-shadow-color: rgba(0, 0, 0, 0.20000000298023224);
     --color-action-container-background-blur: 0.0625rem;
 }
+
+@theme inline {
+    --font-sans: 'Inter', sans-serif;
+    --color-border: var(--color-design-system-border);
+    --color-black: var(--color-gray-990);
+}

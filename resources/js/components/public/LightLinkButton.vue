@@ -17,6 +17,10 @@ defineProps({
         default: '_self',
         validator: (value: string) => ['_self', '_blank', '_parent', '_top'].includes(value),
     },
+    title: {
+        type: String,
+        default: '',
+    },
 });
 
 defineOptions({
@@ -36,6 +40,7 @@ defineOptions({
             'cursor-not-allowed opacity-70': disabled || loading,
         }"
         role="button"
+        :title="title"
         v-bind="$attrs"
         @click="disabled || loading ? $event.preventDefault() : null"
     >

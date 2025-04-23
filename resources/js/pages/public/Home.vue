@@ -36,8 +36,8 @@ defineProps<{
                 </div>
                 <div class="flex flex-col items-start justify-start gap-8 self-stretch">
                     <div class="inline-flex items-center justify-start gap-2 py-12 xl:py-0">
-                        <BlackLinkButton :href="route('cv')" target="_blank"> Télécharger mon CV </BlackLinkButton>
-                        <LightLinkButton v-for="link in socialMediaLinks" :key="link.name" :href="link.url" target="_blank">
+                        <BlackLinkButton :href="route('cv')" title="CV" target="_blank"> Télécharger mon CV </BlackLinkButton>
+                        <LightLinkButton v-for="link in socialMediaLinks" :key="link.name" :href="link.url" :title="link.name" target="_blank">
                             <div class="absolute flex h-4 fill-black" v-html="link.icon_svg"></div>
                         </LightLinkButton>
                     </div>

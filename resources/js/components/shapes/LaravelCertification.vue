@@ -4,8 +4,9 @@
         target="_blank"
         title="Laravel certification"
         hreflang="en"
+        class="flex"
     >
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="165" height="192" viewBox="0 0 165 192" fill="none">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 165 192" fill="none">
             <g filter="url(#filter0_d_160_455)">
                 <path d="M157 129L82.5 172L8 129.5V43L82.5 0L113.5 18L118.5 14L137 24.5V31.5L157 43V129Z" fill="url(#paint0_linear_160_455)" />
                 <path d="M157 129L82.5 172L8 129.5V43L82.5 0L113.5 18L118.5 14L137 24.5V31.5L157 43V129Z" fill="url(#pattern0_160_455)" />

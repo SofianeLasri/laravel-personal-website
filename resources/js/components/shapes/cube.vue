@@ -1,5 +1,5 @@
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" width="46" height="53" viewBox="0 0 46 53" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" width="46" height="53" viewBox="0 0 46 53" fill="none" class="z-0 h-12">
         <g clip-path="url(#clip0_160_456)">
             <path d="M45.202 39.108V13.704L23.102 1L1.00098 13.704V39.108" stroke="#F78E57" stroke-width="1.435" stroke-linejoin="bevel" />
             <path d="M45.202 39.105L23.102 51.807L1 39.105" stroke="#F78E57" stroke-width="1.435" stroke-linejoin="bevel" />

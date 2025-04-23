@@ -40,7 +40,7 @@ onUnmounted(() => {
     <div class="navbar z-10 container flex content-center justify-between py-16">
         <NavBrand />
         <div class="flex flex-nowrap items-center justify-center gap-4">
-            <NavSearchBar />
+            <NavSearchBar class="hidden md:flex" />
             <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu">
                 <span>Menu</span>
                 <BarStaggeredRegular class="h-4 fill-white" />

@@ -6,7 +6,7 @@ import { Head } from '@inertiajs/vue3';
 
 <template>
     <Head title="Accueil" />
-    <div class="flex min-h-screen flex-col items-center bg-gray-100 px-2">
+    <div class="flex min-h-screen flex-col items-center px-2">
         <Background />
         <Navbar />
     </div>

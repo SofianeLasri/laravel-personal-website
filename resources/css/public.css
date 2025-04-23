@@ -49,4 +49,15 @@
     --color-border: var(--color-design-system-border);
     --color-black: var(--color-gray-990);
     --color-primary: var(--color-design-system-primary);
+    --color-background: var(--color-gray-100);
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background;
+    }
 }

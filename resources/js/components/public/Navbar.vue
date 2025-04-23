@@ -66,7 +66,7 @@ onUnmounted(() => {
             aria-label="Menu principal"
         >
             <div class="flex-grow-1 cursor-pointer" @click="closeMenu"></div>
-            <div class="flex w-full max-w-lg flex-shrink-0 flex-col items-start bg-gray-100 py-16 pr-8">
+            <div class="bg-background flex w-full max-w-lg flex-shrink-0 flex-col items-start border-l py-16 pr-8">
                 <div class="flex w-full flex-col gap-12">
                     <BlackButton
                         class="self-end"

@@ -48,4 +48,5 @@
     --font-sans: 'Inter', sans-serif;
     --color-border: var(--color-design-system-border);
     --color-black: var(--color-gray-990);
+    --color-primary: var(--color-design-system-primary);
 }

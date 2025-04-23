@@ -4,6 +4,7 @@ import BlackButton from '@/components/public/BlackButton.vue';
 import NavBrand from '@/components/public/NavBrand.vue';
 import NavSearchBar from '@/components/public/NavSearchBar.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
+import NavMenuItem from '@/components/public/NavMenuItem.vue';
 
 // État pour gérer l'ouverture/fermeture du menu
 const isMenuOpen = ref(false);
@@ -64,8 +65,8 @@ onUnmounted(() => {
             aria-modal="true"
             aria-label="Menu principal"
         >
-            <div class="click-zone-to-close-menu flex-grow-1"></div>
-            <div class="flex w-full max-w-md flex-shrink-0 flex-col items-start bg-gray-100 py-16 pr-8">
+            <div class="flex-grow-1 cursor-pointer" @click="closeMenu"></div>
+            <div class="flex w-full max-w-lg flex-shrink-0 flex-col items-start bg-gray-100 py-16 pr-8">
                 <div class="flex w-full flex-col gap-12">
                     <BlackButton
                         class="self-end"
@@ -80,21 +81,13 @@ onUnmounted(() => {
 
                     <div class="flex flex-col gap-8">
                         <div class="pl-12">
-                            <h2 class="text-4xl font-bold">test</h2>
+                            <h2 class="text-4xl font-bold">Portfolio.</h2>
                         </div>
                         <div class="flex flex-col gap-3">
-                            <div class="flex gap-12">
-                                <div class="bg-primary w-1"></div>
-                                <div class="text-2xl">Accueil</div>
-                            </div>
-                            <div class="flex gap-12">
-                                <div class="bg-border w-1"></div>
-                                <div class="text-2xl">Projets</div>
-                            </div>
-                            <div class="flex gap-12">
-                                <div class="w-1 bg-transparent"></div>
-                                <div class="text-2xl">Prout</div>
-                            </div>
+                            <NavMenuItem text="Accueil" :active="true" />
+                            <NavMenuItem text="Projets" :active="false" />
+                            <NavMenuItem text="Parcours professionnel & scolaire" :active="false" />
+                            <NavMenuItem text="À propos" :active="false" />
                         </div>
                     </div>
                 </div>

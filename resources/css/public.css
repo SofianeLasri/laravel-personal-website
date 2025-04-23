@@ -19,8 +19,8 @@
 
     --color-design-system-border: var(--color-gray-300);
     --color-design-system-primary: var(--color-atomic-tangerine-400);
-    --color-design-system-title-color: var(--color-gray-990);
-    --color-design-system-paragraph-color: var(--color-gray-800);
+    --color-design-system-title: var(--color-gray-990);
+    --color-design-system-paragraph: var(--color-gray-800);
     --color-design-system-border-width: 0.0625rem;
     --color-design-system-border-radius: 0.5rem;
     --color-atomic-tangerine-50: rgb(254, 242, 236);

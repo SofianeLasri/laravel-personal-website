@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import Plus from '@/components/font-awesome/Plus.vue';
+import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
+import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
+import BlackButton from '@/components/public/BlackButton.vue';
 import BlackLinkButton from '@/components/public/BlackLinkButton.vue';
 import LightLinkButton from '@/components/public/LightLinkButton.vue';
 import LightShape from '@/components/public/LightShape.vue';
@@ -28,15 +30,15 @@ defineProps<{
         <LightShape class="absolute top-0 left-[-27rem] z-0 xl:left-[-15rem]" />
         <div class="container inline-flex items-center py-16">
             <div class="relative inline-flex flex-1 flex-col items-start self-stretch">
-                <div class="flex flex-1 flex-col items-start justify-center self-stretch sm:gap-1">
-                    <div class="text-design-system-paragraph justify-center self-stretch text-xl font-medium sm:text-2xl sm:leading-6">
+                <h1 class="flex flex-1 flex-col items-start justify-center self-stretch sm:gap-1">
+                    <span class="text-design-system-paragraph justify-center self-stretch text-xl font-medium sm:text-2xl sm:leading-6">
                         Hello, je suis
-                    </div>
-                    <div class="text-design-system-title justify-center self-stretch text-3xl font-semibold sm:text-5xl sm:leading-12">
+                    </span>
+                    <span class="text-design-system-title justify-center self-stretch text-3xl font-semibold sm:text-5xl sm:leading-12">
                         Développeur
-                    </div>
-                    <div class="text-primary justify-center self-stretch text-6xl font-bold sm:text-8xl sm:leading-24">Full-Stack.</div>
-                </div>
+                    </span>
+                    <span class="text-primary justify-center self-stretch text-6xl font-bold sm:text-8xl sm:leading-24">Full-Stack.</span>
+                </h1>
                 <div class="flex flex-col items-start gap-8 self-stretch">
                     <div class="inline-flex items-center gap-2 py-12 xl:py-0">
                         <BlackLinkButton :href="route('cv')" title="CV" target="_blank"> Télécharger mon CV </BlackLinkButton>
@@ -53,7 +55,7 @@ defineProps<{
                                 <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                     Années d’expériences
                                 </div>
-                                <Plus class="fill-design-system-title absolute top-0 left-0 size-4" />
+                                <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                             </div>
                             <div class="flex items-center self-stretch py-8">
                                 <div class="bg-border w-px self-stretch" />
@@ -65,7 +67,7 @@ defineProps<{
                                 <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                     Projets réalisés
                                 </div>
-                                <Plus class="fill-design-system-title absolute top-0 left-0 size-4" />
+                                <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                             </div>
                             <div class="flex items-center self-stretch py-8">
                                 <div class="bg-border w-px self-stretch" />
@@ -77,7 +79,7 @@ defineProps<{
                                 <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                     Frameworks maîtrisés
                                 </div>
-                                <Plus class="fill-design-system-title absolute top-0 left-0 size-4" />
+                                <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                             </div>
                         </div>
                         <LaravelCertification class="h-40" />
@@ -96,14 +98,14 @@ defineProps<{
 
         <div class="container mt-16 flex flex-col gap-32">
             <section class="flex">
-                <div class="relative hidden flex-1 items-center justify-center xl:flex">
-                    <div class="relative h-64 w-60 overflow-hidden">
+                <div class="hidden flex-1 items-center justify-center xl:flex">
+                    <div class="h-64 w-60 overflow-hidden">
                         <LaravelLogo class="size-60" />
                     </div>
                     <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[-27px] left-[61px]" />
                     <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[341px] left-[586px]" />
                 </div>
-                <div class="flex flex-1 flex-col items-start gap-8">
+                <div class="flex flex-1 flex-col gap-8">
                     <div class="flex items-center gap-4">
                         <LaravelLogo class="size-12 xl:hidden" />
                         <SectionTitle>
@@ -126,6 +128,28 @@ defineProps<{
                             Laravel, je pense pouvoir légitimement dire être spécialisé sur ces deux technos.
                         </Paragraph>
                     </div>
+                </div>
+            </section>
+
+            <section class="flex flex-col gap-16">
+                <div class="flex">
+                    <div class="flex flex-1 flex-col gap-8">
+                        <SectionTitle> Avec de nombreux projets à mon actif.</SectionTitle>
+                        <Paragraph>
+                            Sans avoir le niveau d’un développeur senior comme le prétend ma certification Laravel, je maitrise assez bien le
+                            framework. Je vous invite à regarder les différents projets que j’ai réalisé avec, ils ont tous leur petite spécificité.
+                            :)
+                        </Paragraph>
+                    </div>
+                    <div class="hidden flex-1 xl:block"></div>
+                </div>
+
+                <div class="flex-col gap-8">
+                    <div class="relative flex items-center gap-8 overflow-hidden py-3 pl-2"></div>
+                    <BlackButton>
+                        <span>Voir mes autres projets</span>
+                        <ArrowUpRightRegular class="h-4 fill-white" />
+                    </BlackButton>
                 </div>
             </section>
         </div>

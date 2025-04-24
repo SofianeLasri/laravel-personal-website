@@ -99,6 +99,21 @@ interface CreationDraftWithTranslations extends CreationDraft {
     full_description_translation_key: TranslationKey;
 }
 
+interface FormattedCreation {
+    name: string;
+    slug: string;
+    logo: string;
+    coverImage: string;
+    startedAt: string;
+    endedAt: string;
+    type: string;
+    shortDescription: string;
+    technologies: {
+        name: string;
+        svgIcon: string;
+    }[];
+}
+
 interface Picture {
     id: number;
     filename: string;

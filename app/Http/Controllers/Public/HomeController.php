@@ -42,6 +42,7 @@ class HomeController extends Controller
                 'coverImage' => $creation->coverImage->getUrl('medium', 'avif'),
                 'startedAt' => $creation->started_at,
                 'endedAt' => $creation->ended_at,
+                'type' => $creation->type->label(),
                 'shortDescription' => Translation::findByKeyAndLocale($creation->shortDescriptionTranslationKey->key, app()->getLocale())->text,
                 'technologies' => $creation->technologies->map(function (Technology $technology) {
                     return [

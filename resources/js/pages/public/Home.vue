@@ -7,11 +7,12 @@ import LightLinkButton from '@/components/public/LightLinkButton.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import Paragraph from '@/components/public/Paragraph.vue';
+import ProjectCard from '@/components/public/ProjectCard.vue';
 import SectionTitle from '@/components/public/SectionTitle.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import Cube from '@/components/shapes/cube.vue';
-import { SocialMediaLink } from '@/types';
+import { FormattedCreation, SocialMediaLink } from '@/types';
 import { Head } from '@inertiajs/vue3';
 
 defineProps<{
@@ -19,6 +20,7 @@ defineProps<{
     yearsOfExperience: number;
     developmentCreationsCount: number;
     technologiesCount: number;
+    laravelCreations: FormattedCreation[];
 }>();
 </script>
 
@@ -144,12 +146,16 @@ defineProps<{
                     <div class="hidden flex-1 xl:block"></div>
                 </div>
 
-                <div class="flex-col gap-8">
-                    <div class="relative flex items-center gap-8 overflow-hidden py-3 pl-2"></div>
-                    <BlackButton>
-                        <span>Voir mes autres projets</span>
-                        <ArrowUpRightRegular class="h-4 fill-white" />
-                    </BlackButton>
+                <div class="flex flex-col gap-8">
+                    <div class="relative flex items-center gap-8 overflow-hidden py-3 pl-2">
+                        <ProjectCard v-for="creation in laravelCreations" :key="creation.slug" :creation="creation" />
+                    </div>
+                    <div>
+                        <BlackButton>
+                            <span>Voir mes autres projets</span>
+                            <ArrowUpRightRegular class="h-4 fill-white" />
+                        </BlackButton>
+                    </div>
                 </div>
             </section>
         </div>

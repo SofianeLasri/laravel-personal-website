@@ -147,7 +147,7 @@ defineProps<{
                 </div>
 
                 <div class="flex flex-col gap-8">
-                    <div class="relative flex items-center gap-8 overflow-hidden py-3 pl-2">
+                    <div class="relative flex gap-8 overflow-hidden py-3 pl-2">
                         <ProjectCard v-for="creation in laravelCreations" :key="creation.slug" :creation="creation" />
                     </div>
                     <div>

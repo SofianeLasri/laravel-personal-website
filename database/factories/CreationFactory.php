@@ -25,8 +25,8 @@ class CreationFactory extends Factory
         return [
             'name' => $name,
             'slug' => Str::slug($name).'-'.uniqid(),
-            'logo_id' => Picture::factory()->withOptimizedPictures()->create(),
-            'cover_image_id' => Picture::factory()->withOptimizedPictures()->create(),
+            'logo_id' => Picture::factory(),
+            'cover_image_id' => Picture::factory(),
             'type' => $this->faker->randomElement(CreationType::values()),
             'started_at' => $this->faker->dateTimeBetween('-5 years', '-6 months'),
             'ended_at' => $this->faker->optional(0.8)->dateTimeBetween('-5 months', 'now'),

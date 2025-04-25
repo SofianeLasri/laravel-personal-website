@@ -16,7 +16,7 @@ class ScreenshotFactory extends Factory
     {
         return [
             'creation_id' => Creation::factory(),
-            'picture_id' => Picture::factory()->withOptimizedPictures()->create(),
+            'picture_id' => Picture::factory(),
             'caption_translation_key_id' => $this->faker->boolean(80)
                 ? TranslationKey::factory()
                 : null,

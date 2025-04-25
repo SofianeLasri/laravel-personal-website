@@ -8,6 +8,7 @@ import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import Paragraph from '@/components/public/Paragraph.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
+import ProjectSlider from '@/components/public/ProjectSlider.vue';
 import SectionTitle from '@/components/public/SectionTitle.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
@@ -147,9 +148,9 @@ defineProps<{
                 </div>
 
                 <div class="flex flex-col gap-8">
-                    <div class="relative flex gap-8 overflow-hidden py-3 pl-2">
+                    <ProjectSlider :items="laravelCreations">
                         <ProjectCard v-for="creation in laravelCreations" :key="creation.slug" :creation="creation" />
-                    </div>
+                    </ProjectSlider>
                     <div>
                         <BlackButton>
                             <span>Voir mes autres projets</span>

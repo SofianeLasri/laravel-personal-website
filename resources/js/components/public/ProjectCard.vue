@@ -21,15 +21,15 @@ console.log(props.creation.coverImage);
 </script>
 
 <template>
-    <div class="flex w-full flex-col gap-4 md:w-[40rem]">
+    <div class="flex w-full flex-shrink-0 flex-col gap-4 select-none md:w-[40rem]">
         <div class="flex aspect-video flex-col gap-2.5 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
-            <img class="h-full w-full object-cover" alt="Project Image" :src="creation.coverImage" />
+            <img class="h-full w-full object-cover" alt="Project Image" :src="creation.coverImage" draggable="false" />
         </div>
         <div class="flex gap-4 rounded-2xl">
             <div
                 class="outline-border flex size-20 items-center justify-center gap-2.5 rounded-lg bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] outline"
             >
-                <img class="flex-1" :src="creation.logo" alt="Logo of the project" />
+                <img class="flex-1" :src="creation.logo" alt="Logo of the project" draggable="false" />
             </div>
             <div class="flex flex-1 flex-col gap-4">
                 <div class="flex flex-col gap-px">

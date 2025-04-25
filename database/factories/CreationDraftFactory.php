@@ -26,8 +26,8 @@ class CreationDraftFactory extends Factory
         return [
             'name' => $name,
             'slug' => Str::slug($name).'-'.uniqid(),
-            'logo_id' => Picture::factory(),
-            'cover_image_id' => Picture::factory(),
+            'logo_id' => Picture::factory()->withOptimizedPictures()->create(),
+            'cover_image_id' => Picture::factory()->withOptimizedPictures()->create(),
             'type' => $this->faker->randomElement(CreationType::values()),
             'started_at' => $this->faker->date(),
             'ended_at' => $this->faker->optional(0.7)->date(),

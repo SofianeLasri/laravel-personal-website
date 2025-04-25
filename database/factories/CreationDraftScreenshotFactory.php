@@ -20,7 +20,7 @@ class CreationDraftScreenshotFactory extends Factory
             'updated_at' => Carbon::now(),
 
             'creation_draft_id' => CreationDraft::factory(),
-            'picture_id' => Picture::factory(),
+            'picture_id' => Picture::factory()->withOptimizedPictures()->create(),
             'caption_translation_key_id' => $this->faker->optional(0.7)->randomElement([TranslationKey::factory()]),
         ];
     }

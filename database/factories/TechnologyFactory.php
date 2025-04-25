@@ -23,21 +23,68 @@ class TechnologyFactory extends Factory
 
     public function framework(): static
     {
+        $names = [
+            "Laravel",
+            "Symfony",
+            "Django",
+            "Flask",
+            "Ruby on Rails",
+            "Express.js",
+            "Spring",
+            "Angular",
+            "React",
+            "Vue.js",
+            "NestJS",
+        ];
+
         return $this->state([
+            'name' => $this->faker->unique()->randomElement($names),
             'type' => TechnologyType::FRAMEWORK,
         ]);
     }
 
     public function library(): static
     {
+        $names = [
+            "jQuery",
+            "Bootstrap",
+            "Tailwind CSS",
+            "Lodash",
+            "Moment.js",
+            "Axios",
+            "Chart.js",
+            "Three.js",
+            "Socket.IO",
+            "Redux",
+            "Vuex",
+            "RxJS",
+        ];
+
         return $this->state([
+            'name' => $this->faker->unique()->randomElement($names),
             'type' => TechnologyType::LIBRARY,
         ]);
     }
 
     public function language(): static
     {
+        $names = [
+            "JavaScript",
+            "Python",
+            "Java",
+            "C#",
+            "PHP",
+            "Ruby",
+            "Go",
+            "Swift",
+            "Kotlin",
+            "TypeScript",
+            "Rust",
+            "C++",
+        ];
+
         return $this->state([
+            'name' => $this->faker->unique()->randomElement($names),
             'type' => TechnologyType::LANGUAGE,
         ]);
     }

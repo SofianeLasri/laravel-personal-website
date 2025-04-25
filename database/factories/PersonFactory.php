@@ -14,7 +14,7 @@ class PersonFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'picture_id' => Picture::factory(),
+            'picture_id' => Picture::factory()->withOptimizedPictures()->create(),
         ];
     }
 }

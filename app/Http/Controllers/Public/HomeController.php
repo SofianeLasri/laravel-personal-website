@@ -53,6 +53,10 @@ class HomeController extends Controller
             ];
         });
 
+        $laravelCreationsJson = $laravelCreationsJson->sortByDesc(function ($creation) {
+            return $creation['endedAt'] ?? now();
+        })->values();
+
         return Inertia::render('public/Home', [
             'socialMediaLinks' => $socialMediaLinks,
             'yearsOfExperience' => $yearsOfExperience,

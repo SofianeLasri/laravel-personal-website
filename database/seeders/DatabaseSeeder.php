@@ -7,6 +7,7 @@ use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\Technology;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -102,5 +103,8 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         $drafts->each($attachRandomTechnologies);
+
+        $this->command->info('Optimizing pictures...');
+        Artisan::call('optimize:pictures', [], $this->command->getOutput());
     }
 }

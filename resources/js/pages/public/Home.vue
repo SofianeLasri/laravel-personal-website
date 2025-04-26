@@ -5,18 +5,17 @@ import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
-import TechnologyExperienceCard from '@/components/public/TechnologyExperienceCard.vue';
 import BlackButton from '@/components/public/ui/BlackButton.vue';
 import BlackLinkButton from '@/components/public/ui/BlackLinkButton.vue';
 import LightLinkButton from '@/components/public/ui/LightLinkButton.vue';
 import SectionParagraph from '@/components/public/ui/SectionParagraph.vue';
 import SectionTitle from '@/components/public/ui/SectionTitle.vue';
-import WhiteButton from '@/components/public/ui/WhiteButton.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import Cube from '@/components/shapes/cube.vue';
 import { SocialMediaLink, SSRCreation, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import TechnologyExperiencesContainer from '@/components/public/TechnologyExperiencesContainer.vue';
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -170,22 +169,7 @@ defineProps<{
                         De manière générale, j’aime toucher à tout. Il est très important pour moi de savoir être autonome, quel que soit le domaine.
                     </SectionParagraph>
                 </div>
-                <div class="flex gap-16 self-stretch">
-                    <div class="flex w-72 shrink-0 flex-col gap-4">
-                        <BlackButton>Framework & Librairies</BlackButton>
-                        <WhiteButton>Langages de programmation</WhiteButton>
-                        <WhiteButton>Annexes</WhiteButton>
-                    </div>
-                    <div class="grid grow grid-cols-1 gap-8 lg:grid-cols-2">
-                        <!-- Card -->
-                        <TechnologyExperienceCard
-                            v-for="technologyExperience in technologyExperiences"
-                            :key="technologyExperience.id"
-                            :experience="technologyExperience"
-                        />
-                        <!-- Card -->
-                    </div>
-                </div>
+                <TechnologyExperiencesContainer :experiences="technologyExperiences" />
             </section>
         </div>
     </div>

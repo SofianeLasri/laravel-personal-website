@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
 import BlackLinkButton from '@/components/public/ui/BlackLinkButton.vue';
 import LightLinkButton from '@/components/public/ui/LightLinkButton.vue';
 import { SocialMediaLink } from '@/types';
@@ -6,12 +7,50 @@ import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
 
-defineProps<{
+const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
     yearsOfExperience: number;
     developmentCreationsCount: number;
     technologiesCount: number;
 }>();
+
+// Valeurs réactives pour l'animation des compteurs
+const animatedYearsOfExperience = ref(0);
+const animatedDevelopmentCreationsCount = ref(0);
+const animatedTechnologiesCount = ref(0);
+
+const animateCounter = (startValue: number, endValue: number, duration: number, updateFn: (value: number) => void) => {
+    const startTime = performance.now();
+    const updateCounter = (currentTime: number) => {
+        const elapsedTime = currentTime - startTime;
+        const progress = Math.min(elapsedTime / duration, 1);
+
+        const easeProgress = 1 - (1 - progress) * (1 - progress);
+
+        const currentValue = Math.floor(startValue + (endValue - startValue) * easeProgress);
+        updateFn(currentValue);
+
+        if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+        }
+    };
+
+    requestAnimationFrame(updateCounter);
+};
+
+onMounted(() => {
+    animateCounter(0, props.yearsOfExperience, 1500, (value) => {
+        animatedYearsOfExperience.value = value;
+    });
+
+    animateCounter(0, props.developmentCreationsCount, 2000, (value) => {
+        animatedDevelopmentCreationsCount.value = value;
+    });
+
+    animateCounter(0, props.technologiesCount, 2500, (value) => {
+        animatedTechnologiesCount.value = value;
+    });
+});
 </script>
 <template>
     <div class="container inline-flex items-center py-16">
@@ -38,10 +77,10 @@ defineProps<{
                     <div class="size- flex items-start gap-4">
                         <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
                             <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
-                                {{ yearsOfExperience }}
+                                {{ animatedYearsOfExperience }}
                             </div>
                             <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
-                                Années d’expériences
+                                Années d'expériences
                             </div>
                             <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                         </div>
@@ -50,7 +89,7 @@ defineProps<{
                         </div>
                         <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
                             <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
-                                {{ developmentCreationsCount }}
+                                {{ animatedDevelopmentCreationsCount }}
                             </div>
                             <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                 Projets réalisés
@@ -62,7 +101,7 @@ defineProps<{
                         </div>
                         <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
                             <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
-                                {{ technologiesCount }}
+                                {{ animatedTechnologiesCount }}
                             </div>
                             <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
                                 Frameworks maîtrisés

@@ -5,6 +5,7 @@ import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
+import TechnologyExperiencesContainer from '@/components/public/TechnologyExperiencesContainer.vue';
 import BlackButton from '@/components/public/ui/BlackButton.vue';
 import BlackLinkButton from '@/components/public/ui/BlackLinkButton.vue';
 import LightLinkButton from '@/components/public/ui/LightLinkButton.vue';
@@ -15,7 +16,6 @@ import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import Cube from '@/components/shapes/cube.vue';
 import { SocialMediaLink, SSRCreation, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import TechnologyExperiencesContainer from '@/components/public/TechnologyExperiencesContainer.vue';
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];

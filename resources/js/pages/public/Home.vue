@@ -198,7 +198,7 @@ defineProps<{
                                         Ce que j’aime chez Vue c’est son approche du DOM virtuel.<br />Contrairement à React que je trouve beaucoup
                                         moins ordonné (je le compare souvent à du “PHP fait à l’ancienne”), Vue propose une méthodologie simple et
                                         efficace.
-                                    </div class="text-design-system-paragraph">
+                                    </div>
                                 </div>
                                 <BlackButtonSm>
                                     <span>Voir les projets</span>

@@ -3,10 +3,10 @@ import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.v
 import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
-import Paragraph from '@/components/public/Paragraph.vue';
+import SectionParagraph from '@/components/public/ui/SectionParagraph.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
-import SectionTitle from '@/components/public/SectionTitle.vue';
+import SectionTitle from '@/components/public/ui/SectionTitle.vue';
 import BlackButton from '@/components/public/ui/BlackButton.vue';
 import BlackButtonSm from '@/components/public/ui/BlackButtonSm.vue';
 import BlackLinkButton from '@/components/public/ui/BlackLinkButton.vue';
@@ -120,18 +120,18 @@ defineProps<{
                     </div>
 
                     <div>
-                        <Paragraph>
+                        <SectionParagraph>
                             Développant des projets en PHP depuis 2019, s’il y a un bien un domaine dans lequel j’excelle c’est bien celui du
                             développement d’application back-end (en PHP).
-                        </Paragraph>
-                        <Paragraph>
+                        </SectionParagraph>
+                        <SectionParagraph>
                             Cela ne signifie pas pour autant que je suis mauvais en front-end, les interfaces ont toujours eu une place importante au
                             sein de mes projets. :)
-                        </Paragraph>
-                        <Paragraph>
+                        </SectionParagraph>
+                        <SectionParagraph>
                             Mais ayant développé une sorte de micro framework PHP pendant près de 2 ans, avant d’être littéralement tombé amoureux de
                             Laravel, je pense pouvoir légitimement dire être spécialisé sur ces deux technos.
-                        </Paragraph>
+                        </SectionParagraph>
                     </div>
                 </div>
             </section>
@@ -140,11 +140,11 @@ defineProps<{
                 <div class="flex">
                     <div class="flex flex-1 flex-col gap-8">
                         <SectionTitle>Avec de nombreux projets à mon actif.</SectionTitle>
-                        <Paragraph>
+                        <SectionParagraph>
                             Sans avoir le niveau d’un développeur senior comme le prétend ma certification Laravel, je maitrise assez bien le
                             framework. Je vous invite à regarder les différents projets que j’ai réalisé avec, ils ont tous leur petite spécificité.
                             :)
-                        </Paragraph>
+                        </SectionParagraph>
                     </div>
                     <div class="hidden flex-1 xl:block"></div>
                 </div>
@@ -165,9 +165,9 @@ defineProps<{
             <section class="flex flex-col items-center gap-16" id="other-skills-section">
                 <div class="inline-flex max-w-[56rem] flex-col items-center gap-8 text-center">
                     <SectionTitle>Mais j'ai aussi d'autres compétences !</SectionTitle>
-                    <Paragraph class="">
+                    <SectionParagraph>
                         De manière générale, j’aime toucher à tout. Il est très important pour moi de savoir être autonome, quel que soit le domaine.
-                    </Paragraph>
+                    </SectionParagraph>
                 </div>
                 <div class="flex gap-16">
                     <div class="flex w-72 shrink-0 flex-col gap-4">
@@ -198,7 +198,7 @@ defineProps<{
                                         Ce que j’aime chez Vue c’est son approche du DOM virtuel.<br />Contrairement à React que je trouve beaucoup
                                         moins ordonné (je le compare souvent à du “PHP fait à l’ancienne”), Vue propose une méthodologie simple et
                                         efficace.
-                                    </div>
+                                    </div class="text-design-system-paragraph">
                                 </div>
                                 <BlackButtonSm>
                                     <span>Voir les projets</span>

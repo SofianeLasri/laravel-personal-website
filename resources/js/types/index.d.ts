@@ -99,21 +99,6 @@ interface CreationDraftWithTranslations extends CreationDraft {
     full_description_translation_key: TranslationKey;
 }
 
-interface FormattedCreation {
-    name: string;
-    slug: string;
-    logo: string;
-    coverImage: string;
-    startedAt: string;
-    endedAt: string;
-    type: string;
-    shortDescription: string;
-    technologies: {
-        name: string;
-        svgIcon: string;
-    }[];
-}
-
 interface Picture {
     id: number;
     filename: string;
@@ -194,6 +179,34 @@ interface SocialMediaLink {
     icon_svg: string;
     name: string;
     url: string;
+}
+
+// The following interfaces are used for the SSR (Server-Side Rendering) creation data
+// that is sent to the frontend through Inertia.js.
+interface SSRCreation {
+    id: number;
+    name: string;
+    slug: string;
+    logo: string;
+    coverImage: string;
+    startedAt: string;
+    endedAt: string;
+    type: string;
+    shortDescription: string;
+    technologies: {
+        name: string;
+        svgIcon: string;
+    }[];
+}
+
+interface SSRTechnologyExperience {
+    id: number;
+    name: string;
+    description: string;
+    creationCount: number;
+    type: 'framework' | 'library' | 'language' | 'other';
+    typeLabel: string;
+    svgIcon: string;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

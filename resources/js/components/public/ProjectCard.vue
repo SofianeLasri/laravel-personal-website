@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { FormattedCreation } from '@/types';
+import { SSRCreation } from '@/types';
 
 const props = defineProps<{
-    creation: FormattedCreation;
+    creation: SSRCreation;
 }>();
 
 // Create date from startedAt

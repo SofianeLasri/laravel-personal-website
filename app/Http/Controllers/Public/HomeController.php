@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Creation;
 use App\Models\SocialMediaLink;
 use App\Models\Technology;
+use App\Models\TechnologyExperience;
 use App\Models\Translation;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -36,6 +37,7 @@ class HomeController extends Controller
 
         $laravelCreationsJson = $laravelCreations->map(function (Creation $creation) {
             return [
+                'id' => $creation->id,
                 'name' => $creation->name,
                 'slug' => $creation->slug,
                 'logo' => $creation->logo->getUrl('medium', 'avif'),
@@ -57,12 +59,29 @@ class HomeController extends Controller
             return $creation['endedAt'] ?? now();
         })->values();
 
+        $technologyExperience = TechnologyExperience::all()->load([
+            'technology', 'descriptionTranslationKey', 'descriptionTranslationKey.translations',
+        ]);
+
+        $technologyExperienceJson = $technologyExperience->map(function (TechnologyExperience $experience) {
+            return [
+                'id' => $experience->id,
+                'name' => $experience->technology->name,
+                'description' => Translation::findByKeyAndLocale($experience->descriptionTranslationKey->key, app()->getLocale())->text,
+                'creationCount' => $experience->technology->creations()->count(),
+                'type' => $experience->technology->type,
+                'typeLabel' => $experience->technology->type->label(),
+                'svgIcon' => $experience->technology->svg_icon,
+            ];
+        });
+
         return Inertia::render('public/Home', [
             'socialMediaLinks' => $socialMediaLinks,
             'yearsOfExperience' => $yearsOfExperience,
             'developmentCreationsCount' => $developmentCreationsCount,
             'technologiesCount' => $technologiesCount,
             'laravelCreations' => $laravelCreationsJson,
+            'technologyExperiences' => $technologyExperienceJson,
         ]);
     }
 }

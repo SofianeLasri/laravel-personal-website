@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import BarStaggeredRegular from '@/components/font-awesome/BarStaggeredRegular.vue';
-import BlackButton from '@/components/public/BlackButton.vue';
 import NavBrand from '@/components/public/NavBrand.vue';
 import NavMenuItem from '@/components/public/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/NavSearchBar.vue';
+import BlackButton from '@/components/public/ui/BlackButton.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 const isMenuOpen = ref(false);

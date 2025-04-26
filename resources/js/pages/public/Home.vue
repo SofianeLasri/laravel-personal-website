@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
 import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
-import BlackButton from '@/components/public/BlackButton.vue';
-import BlackLinkButton from '@/components/public/BlackLinkButton.vue';
-import LightLinkButton from '@/components/public/LightLinkButton.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import Paragraph from '@/components/public/Paragraph.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
 import SectionTitle from '@/components/public/SectionTitle.vue';
+import BlackButton from '@/components/public/ui/BlackButton.vue';
+import BlackButtonSm from '@/components/public/ui/BlackButtonSm.vue';
+import BlackLinkButton from '@/components/public/ui/BlackLinkButton.vue';
+import LightLinkButton from '@/components/public/ui/LightLinkButton.vue';
+import WhiteButton from '@/components/public/ui/WhiteButton.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import Cube from '@/components/shapes/cube.vue';
@@ -166,6 +168,46 @@ defineProps<{
                     <Paragraph class="">
                         De manière générale, j’aime toucher à tout. Il est très important pour moi de savoir être autonome, quel que soit le domaine.
                     </Paragraph>
+                </div>
+                <div class="flex gap-16">
+                    <div class="flex w-72 shrink-0 flex-col gap-4">
+                        <BlackButton>Framework & Librairies</BlackButton>
+                        <WhiteButton>Langages de programmation</WhiteButton>
+                        <WhiteButton>Annexes</WhiteButton>
+                    </div>
+                    <div class="grid grow grid-cols-1 gap-8 lg:grid-cols-2">
+                        <!-- Card -->
+                        <div
+                            class="flex aspect-video flex-col items-center justify-start rounded-2xl bg-black shadow-[0px_4px_8px_0px_rgba(0,0,0,0.25)]"
+                        >
+                            <div class="flex shrink-0 items-center justify-end gap-2.5 self-stretch px-4 py-1">
+                                <div class="justify-center text-sm text-white">Framework</div>
+                            </div>
+                            <div class="flex grow flex-col items-start justify-between rounded-2xl bg-white px-4 py-6">
+                                <div class="flex flex-col items-start justify-start gap-4">
+                                    <div class="flex items-center justify-start gap-4">
+                                        <div class="outline-border flex size-12 items-center justify-center gap-2.5 rounded-lg outline-1">
+                                            <LaravelLogo class="size-7" />
+                                        </div>
+                                        <div class="size- flex flex-col items-start justify-start">
+                                            <div class="text-design-system-title justify-center text-xl font-bold">Vue.js</div>
+                                            <div class="text-design-system-paragraph justify-center text-sm font-medium">4 projets</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-design-system-paragraph">
+                                        Ce que j’aime chez Vue c’est son approche du DOM virtuel.<br />Contrairement à React que je trouve beaucoup
+                                        moins ordonné (je le compare souvent à du “PHP fait à l’ancienne”), Vue propose une méthodologie simple et
+                                        efficace.
+                                    </div>
+                                </div>
+                                <BlackButtonSm>
+                                    <span>Voir les projets</span>
+                                    <ArrowUpRightRegular class="h-4 fill-white" />
+                                </BlackButtonSm>
+                            </div>
+                        </div>
+                        <!-- Card -->
+                    </div>
                 </div>
             </section>
         </div>

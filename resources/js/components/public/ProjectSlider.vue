@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ArrowLeftRegular from '@/components/font-awesome/ArrowLeftRegular.vue';
 import ArrowRightRegular from '@/components/font-awesome/ArrowRightRegular.vue';
-import BlackButton from '@/components/public/BlackButton.vue';
+import BlackButton from '@/components/public/ui/BlackButton.vue';
 import type { FormattedCreation } from '@/types';
 import { computed, onMounted, ref, watch } from 'vue';
 

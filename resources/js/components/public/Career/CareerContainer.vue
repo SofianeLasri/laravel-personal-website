@@ -3,8 +3,8 @@ import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.v
 import BriefcaseSolid from '@/components/font-awesome/BriefcaseSolid.vue';
 import GraduationCapSolid from '@/components/font-awesome/GraduationCapSolid.vue';
 import LocationDotSolid from '@/components/font-awesome/LocationDotSolid.vue';
-import CareerBlackButton from '@/components/public/CareerBlackButton.vue';
-import CareerWhiteButton from '@/components/public/CareerWhiteButton.vue';
+import CareerBlackButton from '@/components/public/Career/CareerBlackButton.vue';
+import CareerWhiteButton from '@/components/public/Career/CareerWhiteButton.vue';
 import BlackButton from '@/components/public/ui/BlackButton.vue';
 import WhiteButton from '@/components/public/ui/WhiteButton.vue';
 import WhiteLinkButtonSm from '@/components/public/ui/WhiteLinkButtonSm.vue';
@@ -132,7 +132,7 @@ const defaultSvgIcon =
         </div>
 
         <div class="flex items-start justify-start gap-8 self-stretch">
-            <div class="flex w-96 shrink-0 flex-col items-start justify-start gap-8">
+            <div class="flex shrink-0 flex-col items-start justify-start gap-8">
                 <!-- Liste des expériences par année -->
                 <div v-for="yearGroup in experiencesByYear" :key="yearGroup.year" class="flex flex-col items-start justify-start gap-4 self-stretch">
                     <div class="justify-center self-stretch text-2xl font-bold">

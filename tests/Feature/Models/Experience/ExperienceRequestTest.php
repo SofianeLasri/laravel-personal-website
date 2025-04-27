@@ -27,7 +27,7 @@ class ExperienceRequestTest extends TestCase
 
         $data = [
             'locale' => 'en',
-            'title' => 'Experience Title',
+            'title' => 'Career Title',
             'organization_name' => 'Organization Name',
             'logo_id' => 1,
             'type' => 'emploi',

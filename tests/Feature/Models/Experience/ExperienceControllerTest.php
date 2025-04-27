@@ -35,7 +35,7 @@ class ExperienceControllerTest extends TestCase
 
         $data = [
             'locale' => 'en',
-            'title' => 'Experience Title',
+            'title' => 'Career Title',
             'organization_name' => 'Organization Name',
             'logo_id' => $logo->id,
             'type' => 'emploi',
@@ -65,7 +65,7 @@ class ExperienceControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('translations', [
-            'text' => 'Experience Title',
+            'text' => 'Career Title',
         ]);
 
         $this->assertDatabaseHas('translations', [
@@ -100,7 +100,7 @@ class ExperienceControllerTest extends TestCase
 
         $data = [
             'locale' => 'en',
-            'title' => 'Updated Experience Title',
+            'title' => 'Updated Career Title',
             'organization_name' => 'Updated Organization Name',
             'logo_id' => $logo->id,
             'type' => 'emploi',

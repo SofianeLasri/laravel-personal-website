@@ -27,7 +27,7 @@ class TechnologyExperienceRequestTest extends TestCase
         $data = [
             'technology_id' => 1,
             'locale' => 'en',
-            'description' => 'Experience description',
+            'description' => 'Career description',
         ];
 
         $validator = Validator::make($data, $this->rules());
@@ -39,7 +39,7 @@ class TechnologyExperienceRequestTest extends TestCase
     {
         $data = [
             'locale' => 'en',
-            'description' => 'Experience description',
+            'description' => 'Career description',
         ];
 
         $validator = Validator::make($data, $this->rules());

@@ -46,7 +46,7 @@ class TechnologyExperienceControllerTest extends TestCase
         $response = $this->postJson(route('dashboard.api.technology-experiences.store'), [
             'technology_id' => 1,
             'locale' => 'en',
-            'description' => 'Experience description',
+            'description' => 'Career description',
         ]);
 
         $response->assertCreated()
@@ -57,7 +57,7 @@ class TechnologyExperienceControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('translations', [
-            'text' => 'Experience description',
+            'text' => 'Career description',
         ]);
     }
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
-import CareerContainer from '@/components/public/CareerContainer.vue';
+import CareerContainer from '@/components/public/Career/CareerContainer.vue';
 import HeroSection from '@/components/public/HeroSection.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
-import TechnologyExperiencesContainer from '@/components/public/TechnologyExperiencesContainer.vue';
+import TechnologyExperiencesContainer from '@/components/public/Technology/TechnologyExperiencesContainer.vue';
 import BlackButton from '@/components/public/ui/BlackButton.vue';
 import SectionParagraph from '@/components/public/ui/SectionParagraph.vue';
 import SectionTitle from '@/components/public/ui/SectionTitle.vue';

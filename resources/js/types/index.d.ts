@@ -191,6 +191,8 @@ interface SSRCreation {
     coverImage: string;
     startedAt: string;
     endedAt: string;
+    startedAtFormatted: string;
+    endedAtFormatted: string | null;
     type: string;
     shortDescription: string;
     technologies: {
@@ -226,6 +228,8 @@ interface SSRExperience {
     type: 'emploi' | 'formation';
     startedAt: string;
     endedAt: string | null;
+    startedAtFormatted: string;
+    endedAtFormatted: string | null;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

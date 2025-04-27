@@ -11,11 +11,34 @@ use App\Models\SocialMediaLink;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class HomeController extends Controller
 {
+    /**
+     * Format a date according to the user's preferred locale with month in CamelCase.
+     *
+     * @param  string|Carbon|null  $date  The date to format
+     * @return string|null Formatted date or null
+     */
+    private function formatDate(Carbon|string|null $date): ?string
+    {
+        if (! $date) {
+            return null;
+        }
+
+        if (! $date instanceof Carbon) {
+            $date = Carbon::parse($date);
+        }
+
+        $month = Str::ucfirst($date->translatedFormat('F'));
+
+        return $month.' '.$date->format('Y');
+    }
+
     public function __invoke(): Response
     {
         $socialMediaLinks = SocialMediaLink::all();
@@ -45,6 +68,8 @@ class HomeController extends Controller
                 'coverImage' => $creation->coverImage->getUrl('medium', 'avif'),
                 'startedAt' => $creation->started_at,
                 'endedAt' => $creation->ended_at,
+                'startedAtFormatted' => $this->formatDate($creation->started_at),
+                'endedAtFormatted' => $this->formatDate($creation->ended_at),
                 'type' => $creation->type->label(),
                 'shortDescription' => Translation::findByKeyAndLocale($creation->shortDescriptionTranslationKey->key, app()->getLocale())->text,
                 'technologies' => $creation->technologies->map(function (Technology $technology) {
@@ -98,6 +123,8 @@ class HomeController extends Controller
                 'type' => $experience->type,
                 'startedAt' => $experience->started_at,
                 'endedAt' => $experience->ended_at,
+                'startedAtFormatted' => $this->formatDate($experience->started_at),
+                'endedAtFormatted' => $this->formatDate($experience->ended_at),
             ];
         });
 

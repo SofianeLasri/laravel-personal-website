@@ -5,7 +5,6 @@ const props = defineProps<{
     creation: SSRCreation;
 }>();
 
-// Create date from startedAt
 const startYear = new Date(props.creation.startedAt).getFullYear();
 const endYear = props.creation.endedAt ? new Date(props.creation.endedAt).getFullYear() : null;
 
@@ -54,5 +53,3 @@ console.log(props.creation.coverImage);
         </div>
     </div>
 </template>
-
-<style scoped></style>

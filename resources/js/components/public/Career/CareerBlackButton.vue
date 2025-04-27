@@ -21,10 +21,8 @@ const emit = defineEmits(['click']);
                 </div>
             </div>
             <div class="justify-center self-stretch text-sm font-medium text-gray-300">
-                {{ new Date(experience.startedAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) }} -
-                {{
-                    experience.endedAt ? new Date(experience.endedAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : "Aujourd'hui"
-                }}
+                {{ experience.startedAtFormatted }} -
+                {{ experience.endedAtFormatted || "Aujourd'hui" }}
             </div>
         </div>
     </div>

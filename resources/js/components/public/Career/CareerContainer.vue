@@ -73,20 +73,11 @@ onMounted(() => {
     selectFirstAvailableExperience();
 });
 
-const formatPeriod = (startDate: string, endDate: string | null) => {
-    const start = new Date(startDate);
-    const startMonth = start.toLocaleString('fr-FR', { month: 'long' });
-    const startYear = start.getFullYear();
-
-    if (!endDate) {
-        return `${startMonth} ${startYear} - Aujourd'hui`;
+const formatPeriod = (startDateFormatted: string, endDateFormatted: string | null) => {
+    if (!endDateFormatted) {
+        return `${startDateFormatted} - Aujourd'hui`;
     }
-
-    const end = new Date(endDate);
-    const endMonth = end.toLocaleString('fr-FR', { month: 'long' });
-    const endYear = end.getFullYear();
-
-    return `${startMonth} ${startYear} - ${endMonth} ${endYear}`;
+    return `${startDateFormatted} - ${endDateFormatted}`;
 };
 
 const changeType = (type: 'emploi' | 'formation') => {
@@ -192,7 +183,7 @@ const defaultSvgIcon =
                         </div>
                         <div class="z-10 inline-flex flex-col items-end justify-start gap-2">
                             <div class="text-design-system-title">
-                                {{ formatPeriod(selectedExperience.startedAt, selectedExperience.endedAt) }}
+                                {{ formatPeriod(selectedExperience.startedAtFormatted, selectedExperience.endedAtFormatted) }}
                             </div>
                             <div class="flex items-center justify-start gap-2">
                                 <LocationDotSolid class="size-4" />

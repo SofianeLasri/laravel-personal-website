@@ -55,6 +55,13 @@ const selectedExperience = computed(() => {
     return props.experience.find((exp) => exp.id === selectedExperienceId.value) || null;
 });
 
+const selectedExperienceYear = computed(() => {
+    if (selectedExperience.value) {
+        return new Date(selectedExperience.value.startedAt).getFullYear();
+    }
+    return null;
+});
+
 const selectFirstAvailableExperience = () => {
     if (experiencesByYear.value.length > 0 && (!selectedExperienceId.value || !selectedExperience.value)) {
         selectedExperienceId.value = experiencesByYear.value[0].experiences[0].id;
@@ -126,7 +133,10 @@ const defaultSvgIcon =
             <div class="flex w-96 shrink-0 flex-col items-start justify-start gap-8">
                 <!-- Liste des expériences par année -->
                 <div v-for="yearGroup in experiencesByYear" :key="yearGroup.year" class="flex flex-col items-start justify-start gap-4 self-stretch">
-                    <div class="justify-center self-stretch text-2xl font-bold">
+                    <div
+                        class="justify-center self-stretch text-2xl font-bold"
+                        :class="{ 'text-design-system-paragraph': selectedExperienceYear && parseInt(yearGroup.year) < selectedExperienceYear }"
+                    >
                         {{ yearGroup.year }}
                         <template
                             v-if="
@@ -182,12 +192,12 @@ const defaultSvgIcon =
                             </div>
                         </div>
                         <div class="z-10 inline-flex flex-col items-end justify-start gap-2">
-                            <div class="text-design-system-title">
+                            <div class="text-design-system-title font-bold">
                                 {{ formatPeriod(selectedExperience.startedAtFormatted, selectedExperience.endedAtFormatted) }}
                             </div>
                             <div class="flex items-center justify-start gap-2">
                                 <LocationDotSolid class="size-4" />
-                                <span class="text-design-system-title text-bold">{{ selectedExperience.location }}</span>
+                                <span class="text-design-system-title">{{ selectedExperience.location }}</span>
                             </div>
                         </div>
                     </div>
@@ -224,13 +234,12 @@ const defaultSvgIcon =
                 </div>
             </div>
 
-            <!-- Message si aucune expérience n'est sélectionnée -->
             <div
                 v-else
                 class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur inline-flex grow gap-2.5 self-stretch rounded-3xl p-2"
             >
                 <div class="outline-border action-container-inner-shadow flex w-full items-center justify-center rounded-2xl bg-white p-8 outline-1">
-                    <p class="text-center text-lg text-gray-500">Veuillez sélectionner une expérience pour voir les détails</p>
+                    <p class="text-design-system-paragraph text-center text-lg">Veuillez sélectionner une expérience pour voir les détails</p>
                 </div>
             </div>
         </div>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
 import BlackLinkButton from '@/components/public/ui/BlackLinkButton.vue';
 import LightLinkButton from '@/components/public/ui/LightLinkButton.vue';
-import { SocialMediaLink } from '@/types';
-import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
+import { SocialMediaLink } from '@/types';
+import { onMounted, ref } from 'vue';
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];

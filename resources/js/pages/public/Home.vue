@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
+import CareerContainer from '@/components/public/CareerContainer.vue';
+import HeroSection from '@/components/public/HeroSection.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
@@ -11,7 +13,6 @@ import SectionTitle from '@/components/public/ui/SectionTitle.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import { SocialMediaLink, SSRCreation, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import HeroSection from '@/components/public/HeroSection.vue';
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -38,7 +39,7 @@ defineProps<{
 
         <LightShape class="absolute top-[40rem] right-[-27rem] z-0 xl:right-[-15rem]" />
 
-        <div class="container mt-16 flex flex-col gap-32" id="backend-and-laravel-specialization-section">
+        <div class="container mt-16 mb-16 flex flex-col gap-32" id="backend-and-laravel-specialization-section">
             <section class="flex">
                 <div class="hidden flex-1 items-center justify-center xl:flex">
                     <div class="h-64 w-60 overflow-hidden">
@@ -107,6 +108,20 @@ defineProps<{
                     </SectionParagraph>
                 </div>
                 <TechnologyExperiencesContainer :experiences="technologyExperiences" />
+            </section>
+
+            <section class="flex flex-col items-center gap-16" id="career-section">
+                <div class="flex">
+                    <div class="flex flex-1 flex-col gap-8">
+                        <SectionTitle>Mon parcours professionnel & scolaire.</SectionTitle>
+                        <SectionParagraph>
+                            Bien souvent, c’est au travers de mes projets personnels que j’apprends le plus. Mais mon parcours scolaire et
+                            professionnel m’a permis d’obtenir de solides bases dans plusieurs domaines.
+                        </SectionParagraph>
+                    </div>
+                    <div class="hidden flex-1 xl:block"></div>
+                </div>
+                <CareerContainer />
             </section>
         </div>
     </div>

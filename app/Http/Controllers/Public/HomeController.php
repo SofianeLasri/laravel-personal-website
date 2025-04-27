@@ -6,6 +6,7 @@ use App\Enums\CreationType;
 use App\Enums\TechnologyType;
 use App\Http\Controllers\Controller;
 use App\Models\Creation;
+use App\Models\Experience;
 use App\Models\SocialMediaLink;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
@@ -75,6 +76,31 @@ class HomeController extends Controller
             ];
         });
 
+        $experiences = Experience::all()->withRelationshipAutoloading();
+
+        $experiencesJson = $experiences->map(function (Experience $experience) {
+            return [
+                'id' => $experience->id,
+                'title' => Translation::findByKeyAndLocale($experience->titleTranslationKey->key, app()->getLocale())->text,
+                'organizationName' => $experience->organization_name,
+                'logo' => $experience->logo->getUrl('medium', 'webp'),
+                'location' => $experience->location,
+                'websiteUrl' => $experience->website_url,
+                'shortDescription' => Translation::findByKeyAndLocale($experience->shortDescriptionTranslationKey->key, app()->getLocale())->text,
+                'fullDescription' => Translation::findByKeyAndLocale($experience->fullDescriptionTranslationKey->key, app()->getLocale())->text,
+                'technologies' => $experience->technologies->map(function (Technology $technology) {
+                    return [
+                        'name' => $technology->name,
+                        'svgIcon' => $technology->svg_icon,
+                        'description' => Translation::findByKeyAndLocale($technology->descriptionTranslationKey->key, app()->getLocale())->text,
+                    ];
+                }),
+                'type' => $experience->type,
+                'startedAt' => $experience->started_at,
+                'endedAt' => $experience->ended_at,
+            ];
+        });
+
         return Inertia::render('public/Home', [
             'socialMediaLinks' => $socialMediaLinks,
             'yearsOfExperience' => $yearsOfExperience,
@@ -82,6 +108,7 @@ class HomeController extends Controller
             'technologiesCount' => $technologiesCount,
             'laravelCreations' => $laravelCreationsJson,
             'technologyExperiences' => $technologyExperienceJson,
+            'experiences' => $experiencesJson,
         ]);
     }
 }

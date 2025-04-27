@@ -24,7 +24,7 @@ class ExperienceController extends Controller
         $shortDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->short_description);
         $fullDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->full_description);
 
-        return Experience::create([
+        $experience = Experience::create([
             'title_translation_key_id' => $titleTranslation->translation_key_id,
             'organization_name' => $request->organization_name,
             'logo_id' => $request->logo_id,
@@ -40,6 +40,12 @@ class ExperienceController extends Controller
             'shortDescriptionTranslationKey.translations',
             'fullDescriptionTranslationKey.translations',
         ]);
+
+        if ($request->technologies) {
+            $experience->technologies()->sync($request->technologies);
+        }
+
+        return $experience;
     }
 
     public function show(int $id)
@@ -73,6 +79,12 @@ class ExperienceController extends Controller
             'started_at' => $request->started_at,
             'ended_at' => $request->ended_at,
         ]);
+
+        if ($request->technologies) {
+            $experience->technologies()->sync($request->technologies);
+        } else {
+            $experience->technologies()->detach();
+        }
 
         return $experience;
     }

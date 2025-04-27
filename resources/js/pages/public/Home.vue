@@ -11,7 +11,7 @@ import BlackButton from '@/components/public/ui/BlackButton.vue';
 import SectionParagraph from '@/components/public/ui/SectionParagraph.vue';
 import SectionTitle from '@/components/public/ui/SectionTitle.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
-import { SocialMediaLink, SSRCreation, SSRTechnologyExperience } from '@/types';
+import { SocialMediaLink, SSRCreation, SSRExperience, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
 
 defineProps<{
@@ -21,6 +21,7 @@ defineProps<{
     technologiesCount: number;
     laravelCreations: SSRCreation[];
     technologyExperiences: SSRTechnologyExperience[];
+    experiences: SSRExperience[];
 }>();
 </script>
 
@@ -121,7 +122,7 @@ defineProps<{
                     </div>
                     <div class="hidden flex-1 xl:block"></div>
                 </div>
-                <CareerContainer />
+                <CareerContainer :experience="experiences" />
             </section>
         </div>
     </div>

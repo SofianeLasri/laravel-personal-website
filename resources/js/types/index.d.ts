@@ -209,4 +209,23 @@ interface SSRTechnologyExperience {
     svgIcon: string;
 }
 
+interface SSRExperience {
+    id: number;
+    title: string;
+    organizationName: string;
+    logo: string;
+    location: string;
+    websiteUrl: string;
+    shortDescription: string;
+    fullDescription: string;
+    technologies: {
+        name: string;
+        svgIcon: string;
+        description: string;
+    };
+    type: 'emploi' | 'formation';
+    startedAt: string;
+    endedAt: string | null;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;

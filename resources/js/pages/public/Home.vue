@@ -25,7 +25,7 @@ defineProps<{
 
 <template>
     <Head title="Accueil" />
-    <div class="relative flex min-h-screen flex-col items-center overflow-x-hidden bg-[url(/resources/images/public/dots.svg)] px-2">
+    <div class="relative flex min-h-screen flex-col items-center overflow-hidden bg-[url(/resources/images/public/dots.svg)] px-2">
         <Navbar />
 
         <LightShape class="absolute top-0 left-[-27rem] z-0 xl:left-[-15rem]" />

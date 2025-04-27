@@ -132,7 +132,7 @@ const defaultSvgIcon =
         </div>
 
         <div class="flex items-start justify-start gap-8 self-stretch">
-            <div class="flex shrink-0 flex-col items-start justify-start gap-8">
+            <div class="flex w-96 shrink-0 flex-col items-start justify-start gap-8">
                 <!-- Liste des expériences par année -->
                 <div v-for="yearGroup in experiencesByYear" :key="yearGroup.year" class="flex flex-col items-start justify-start gap-4 self-stretch">
                     <div class="justify-center self-stretch text-2xl font-bold">
@@ -190,7 +190,7 @@ const defaultSvgIcon =
                                 </WhiteLinkButtonSm>
                             </div>
                         </div>
-                        <div class="z-10 inline-flex w-48 flex-col items-end justify-start gap-2">
+                        <div class="z-10 inline-flex flex-col items-end justify-start gap-2">
                             <div class="text-design-system-title">
                                 {{ formatPeriod(selectedExperience.startedAt, selectedExperience.endedAt) }}
                             </div>

@@ -207,7 +207,7 @@ const defaultSvgIcon =
                     >
                         <div class="flex flex-col gap-4 self-stretch">
                             <h3 class="text-design-system-title text-2xl font-bold">Description</h3>
-                            <vue-markdown class="text-design-system-paragraph" :source="selectedExperience.fullDescription" />
+                            <vue-markdown class="markdown-view" :source="selectedExperience.fullDescription" />
                         </div>
 
                         <div v-if="selectedExperience.technologies" class="flex flex-col items-start justify-start gap-4 self-stretch">

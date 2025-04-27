@@ -93,3 +93,11 @@
         0 1rem 1rem 0 rgba(0, 0, 0, 0.13),
         0 0.625rem 0.75rem 0 rgba(0, 0, 0, 0.15);
 }
+
+@utility markdown-view {
+    @apply text-design-system-paragraph;
+
+    h1 {
+        @apply text-design-system-title mt-8 text-2xl font-bold;
+    }
+}

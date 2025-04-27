@@ -37,7 +37,7 @@ const isButtonActive = (type: string): boolean => {
 
 <template>
     <div class="flex flex-col gap-16 self-stretch 2xl:flex-row">
-        <div class="flex shrink-0 justify-center gap-4 2xl:w-72 2xl:flex-col 2xl:justify-start">
+        <div class="flex shrink-0 flex-col justify-center gap-4 lg:flex-row 2xl:w-72 2xl:flex-col 2xl:justify-start">
             <BlackButton v-if="isButtonActive('frameworks-libraries')" @click="setTechType('framework')"> Framework & Librairies </BlackButton>
             <WhiteButton v-else @click="setTechType('framework')"> Framework & Librairies </WhiteButton>
 

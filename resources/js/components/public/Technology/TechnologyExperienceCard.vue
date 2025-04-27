@@ -17,7 +17,7 @@ if (props.experience.creationCount > 1) {
 
 <template>
     <div
-        class="motion-translate-x-in-[0%] motion-translate-y-in-[5%] motion-blur-in-[.5rem] motion-duration-[0.16s]/blur flex aspect-video flex-col items-center justify-start rounded-2xl bg-black shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
+        class="motion-translate-x-in-[0%] motion-translate-y-in-[5%] motion-blur-in-[.5rem] motion-duration-[0.16s]/blur flex flex-col items-center justify-start rounded-2xl bg-black shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] xl:aspect-video"
     >
         <div class="flex shrink-0 items-center justify-end gap-2.5 self-stretch px-4 py-1">
             <div class="justify-center text-sm text-white">

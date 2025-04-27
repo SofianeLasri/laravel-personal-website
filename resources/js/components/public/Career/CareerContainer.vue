@@ -129,12 +129,14 @@ const defaultSvgIcon =
             </WhiteButton>
         </div>
 
-        <div class="flex items-start justify-start gap-8 self-stretch">
-            <div class="flex w-96 shrink-0 flex-col items-start justify-start gap-8">
+        <!-- Conteneur principal - passage en colonne sur mobile -->
+        <div class="flex flex-col items-start justify-start gap-8 self-stretch lg:flex-row">
+            <!-- Sidebar - liste des expériences - largeur complète sur mobile -->
+            <div class="flex w-full shrink-0 flex-col items-start justify-start gap-8 lg:w-96">
                 <!-- Liste des expériences par année -->
                 <div v-for="yearGroup in experiencesByYear" :key="yearGroup.year" class="flex flex-col items-start justify-start gap-4 self-stretch">
                     <div
-                        class="justify-center self-stretch text-2xl font-bold"
+                        class="justify-center self-stretch text-xl font-bold lg:text-2xl"
                         :class="{ 'text-design-system-paragraph': selectedExperienceYear && parseInt(yearGroup.year) < selectedExperienceYear }"
                     >
                         {{ yearGroup.year }}
@@ -169,21 +171,23 @@ const defaultSvgIcon =
                 <div
                     class="outline-border action-container-inner-shadow inline-flex w-full flex-col items-start justify-start rounded-2xl bg-white outline-1"
                 >
-                    <!-- Header -->
-                    <div class="relative inline-flex items-start justify-between self-stretch px-8 py-6">
+                    <!-- Header - adapté pour mobile -->
+                    <div class="relative inline-flex flex-col items-start justify-between self-stretch px-4 py-4 lg:flex-row lg:px-8 lg:py-6">
                         <div
                             class="absolute top-1 right-1 -bottom-2 left-1 z-0 rounded-t-2xl bg-[url(/resources/images/public/shadowed-dots.svg)] bg-size-[.6rem]"
                         >
                             <div class="from-atomic-tangerine-50 h-[200%] w-full rounded-[50%] bg-radial to-white/0"></div>
                         </div>
-                        <div class="z-10 flex flex-1 items-center justify-start gap-4">
-                            <div class="outline-border flex size-24 items-center justify-center gap-2.5 rounded-xl bg-white p-4 outline-1">
+                        <div class="z-10 flex grow flex-col items-start justify-start gap-4 lg:flex-row lg:items-center">
+                            <div
+                                class="outline-border flex size-16 items-center justify-center gap-2.5 rounded-xl bg-white p-3 outline-1 lg:size-24 lg:p-4"
+                            >
                                 <img class="object-contain" :src="selectedExperience.logo || 'https://placehold.co/64x64'" alt="Logo" />
                             </div>
-                            <div class="inline-flex h-24 flex-1 flex-col items-start justify-between">
+                            <div class="inline-flex h-auto flex-1 flex-col items-start justify-between gap-2 lg:gap-0 xl:h-24">
                                 <div class="flex flex-col items-start justify-start gap-0.5 self-stretch">
-                                    <div class="text-design-system-title text-2xl font-bold">{{ selectedExperience.title }}</div>
-                                    <div class="text-design-system-title">{{ selectedExperience.organizationName }}</div>
+                                    <div class="text-design-system-title text-xl font-bold lg:text-2xl">{{ selectedExperience.title }}</div>
+                                    <div class="text-design-system-title text-sm lg:text-base">{{ selectedExperience.organizationName }}</div>
                                 </div>
                                 <WhiteLinkButtonSm v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
                                     <span>Voir le site internet</span>
@@ -191,39 +195,39 @@ const defaultSvgIcon =
                                 </WhiteLinkButtonSm>
                             </div>
                         </div>
-                        <div class="z-10 inline-flex flex-col items-end justify-start gap-2">
-                            <div class="text-design-system-title font-bold">
+                        <div class="z-10 mt-4 inline-flex flex-col items-start justify-end gap-2 lg:mt-0 lg:items-end xl:shrink-0">
+                            <div class="text-design-system-title text-right text-sm font-bold lg:text-base">
                                 {{ formatPeriod(selectedExperience.startedAtFormatted, selectedExperience.endedAtFormatted) }}
                             </div>
                             <div class="flex items-center justify-start gap-2">
                                 <LocationDotSolid class="size-4" />
-                                <span class="text-design-system-title">{{ selectedExperience.location }}</span>
+                                <span class="text-design-system-title text-sm lg:text-base">{{ selectedExperience.location }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Content -->
                     <div
-                        class="outline-border z-10 flex grow flex-col items-start justify-start gap-8 self-stretch rounded-2xl bg-white p-8 outline-1"
+                        class="outline-border z-10 flex grow flex-col items-start justify-start gap-6 self-stretch rounded-2xl bg-white p-4 outline-1 lg:gap-8 lg:p-8"
                     >
-                        <div class="flex flex-col gap-4 self-stretch">
-                            <h3 class="text-design-system-title text-2xl font-bold">Description</h3>
-                            <vue-markdown class="markdown-view" :source="selectedExperience.fullDescription" />
+                        <div class="flex flex-col gap-3 self-stretch lg:gap-4">
+                            <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">Description</h3>
+                            <vue-markdown class="markdown-view text-sm lg:text-base" :source="selectedExperience.fullDescription" />
                         </div>
 
-                        <div v-if="selectedExperience.technologies" class="flex flex-col items-start justify-start gap-4 self-stretch">
-                            <h3 class="text-design-system-title text-2xl font-bold">Technologies utilisées</h3>
+                        <div v-if="selectedExperience.technologies" class="flex flex-col items-start justify-start gap-3 self-stretch lg:gap-4">
+                            <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">Technologies utilisées</h3>
 
-                            <div class="grid grid-cols-2 gap-4 self-stretch lg:grid-cols-3">
+                            <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                                 <div
                                     v-for="tech in getTechnologies(selectedExperience.technologies)"
                                     :key="tech.name"
                                     class="flex items-center justify-start gap-2 rounded-lg p-2 outline-1 outline-gray-200"
                                 >
-                                    <div class="size-16" v-html="tech.svgIcon || defaultSvgIcon"></div>
+                                    <div class="size-10 lg:size-16" v-html="tech.svgIcon || defaultSvgIcon"></div>
                                     <div class="flex w-full flex-col justify-center gap-1">
-                                        <div class="text-design-system-title">{{ tech.name }}</div>
-                                        <div class="text-design-system-paragraph w-full justify-center text-sm">
+                                        <div class="text-design-system-title text-sm lg:text-base">{{ tech.name }}</div>
+                                        <div class="text-design-system-paragraph w-full justify-center text-xs lg:text-sm">
                                             {{ tech.description }}
                                         </div>
                                     </div>
@@ -238,11 +242,17 @@ const defaultSvgIcon =
                 v-else
                 class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur inline-flex grow gap-2.5 self-stretch rounded-3xl p-2"
             >
-                <div class="outline-border action-container-inner-shadow flex w-full items-center justify-center rounded-2xl bg-white p-8 outline-1">
-                    <p class="text-design-system-paragraph text-center text-lg">Veuillez sélectionner une expérience pour voir les détails</p>
+                <div
+                    class="outline-border action-container-inner-shadow flex w-full items-center justify-center rounded-2xl bg-white p-4 outline-1 lg:p-8"
+                >
+                    <p class="text-design-system-paragraph text-center text-base lg:text-lg">
+                        Veuillez sélectionner une expérience pour voir les détails
+                    </p>
                 </div>
             </div>
         </div>
-        <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[23px] left-[370px]" />
+        <Cube
+            class="motion-preset-oscillate motion-duration-5000 absolute top-[23px] hidden md:left-[100px] md:block lg:left-[250px] xl:left-[370px]"
+        />
     </div>
 </template>

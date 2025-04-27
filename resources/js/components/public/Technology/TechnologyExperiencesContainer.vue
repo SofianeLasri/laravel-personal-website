@@ -36,8 +36,8 @@ const isButtonActive = (type: string): boolean => {
 </script>
 
 <template>
-    <div class="flex gap-16 self-stretch">
-        <div class="flex w-72 shrink-0 flex-col gap-4">
+    <div class="flex flex-col gap-16 self-stretch 2xl:flex-row">
+        <div class="flex shrink-0 justify-center gap-4 2xl:w-72 2xl:flex-col 2xl:justify-start">
             <BlackButton v-if="isButtonActive('frameworks-libraries')" @click="setTechType('framework')"> Framework & Librairies </BlackButton>
             <WhiteButton v-else @click="setTechType('framework')"> Framework & Librairies </WhiteButton>
 
@@ -47,7 +47,7 @@ const isButtonActive = (type: string): boolean => {
             <BlackButton v-if="isButtonActive('other')" @click="setTechType('other')"> Annexes </BlackButton>
             <WhiteButton v-else @click="setTechType('other')"> Annexes </WhiteButton>
         </div>
-        <div class="grid grow grid-cols-1 gap-8 lg:grid-cols-2">
+        <div class="grid grow grid-cols-1 gap-8 xl:grid-cols-2">
             <TechnologyExperienceCard v-for="experience in filteredTechnologies" :key="experience.id" :experience="experience" />
         </div>
     </div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
 import CareerContainer from '@/components/public/Career/CareerContainer.vue';
+import Footer from '@/components/public/Footer.vue';
 import HeroSection from '@/components/public/HeroSection.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import Navbar from '@/components/public/Navbar.vue';
@@ -126,4 +127,5 @@ defineProps<{
             </section>
         </div>
     </div>
+    <Footer :socialMediaLinks="socialMediaLinks" />
 </template>

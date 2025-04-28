@@ -5,7 +5,9 @@ namespace Database\Seeders;
 use App\Enums\TechnologyType;
 use App\Models\Creation;
 use App\Models\CreationDraft;
+use App\Models\Experience;
 use App\Models\Technology;
+use App\Models\TechnologyExperience;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 
@@ -16,6 +18,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->command->info('1. Creating technologies');
+        $this->command->info('-- Type languages...');
         $languages = [
             'JavaScript', 'Python', 'PHP', 'Java', 'C#', 'TypeScript',
             'Ruby', 'Go', 'Swift', 'Kotlin',
@@ -31,6 +35,7 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        $this->command->info('-- Type frameworks...');
         $frameworks = [
             'Laravel', 'Symfony', 'Django', 'Flask', 'Ruby on Rails',
             'Express.js', 'Spring', 'Angular', 'React', 'Vue.js',
@@ -46,6 +51,7 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        $this->command->info('-- Type libraries...');
         $libraries = [
             'jQuery', 'Bootstrap', 'Tailwind CSS', 'Lodash', 'Moment.js',
             'Axios', 'Chart.js', 'Three.js', 'Socket.IO', 'Redux',
@@ -80,6 +86,8 @@ class DatabaseSeeder extends Seeder
             $model->technologies()->attach($selectedTechs);
         };
 
+        $this->command->info('2. Creating creations and drafts');
+
         $creations = Creation::factory()
             ->withPeople()
             ->withFeatures()
@@ -87,6 +95,8 @@ class DatabaseSeeder extends Seeder
             ->withTags()
             ->count(15)
             ->create();
+
+        $this->command->info('-- Attaching random technologies to creations...');
 
         $creations->each($attachRandomTechnologies);
 
@@ -102,9 +112,30 @@ class DatabaseSeeder extends Seeder
             ->count(2)
             ->create();
 
+        $this->command->info('-- Attaching random technologies to drafts...');
         $drafts->each($attachRandomTechnologies);
 
-        $this->command->info('Optimizing pictures...');
+        $this->command->info('4. Creating Experiences');
+
+        $formations = Experience::factory()->formation()->count(3)->create();
+        $emplois = Experience::factory()->emploi()->count(3)->create();
+
+        $this->command->info('-- Attaching random technologies to experiences...');
+
+        $formations->each($attachRandomTechnologies);
+        $emplois->each($attachRandomTechnologies);
+
+        $this->command->info('5. Creating Technologies Experiences');
+
+        $randomTechnologies = Technology::inRandomOrder()->take(3)->get();
+
+        foreach ($randomTechnologies as $technology) {
+            TechnologyExperience::factory()->create([
+                'technology_id' => $technology->id,
+            ]);
+        }
+
+        $this->command->info('6. Starting pictures optimization process');
         Artisan::call('optimize:pictures', [], $this->command->getOutput());
     }
 }

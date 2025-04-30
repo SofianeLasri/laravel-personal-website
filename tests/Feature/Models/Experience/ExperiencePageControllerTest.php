@@ -8,11 +8,18 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\ActsAsUser;
 
 #[CoversClass(ExperiencePageController::class)]
 class ExperiencePageControllerTest extends TestCase
 {
-    use RefreshDatabase, WithoutMiddleware;
+    use ActsAsUser, RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->loginAsAdmin();
+    }
 
     #[Test]
     public function test_list_page(): void

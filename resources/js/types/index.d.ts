@@ -174,4 +174,62 @@ interface Feature {
     description_translation_key?: TranslationKey;
 }
 
+interface SocialMediaLink {
+    id: number;
+    icon_svg: string;
+    name: string;
+    url: string;
+}
+
+// The following interfaces are used for the SSR (Server-Side Rendering) creation data
+// that is sent to the frontend through Inertia.js.
+interface SSRCreation {
+    id: number;
+    name: string;
+    slug: string;
+    logo: string;
+    coverImage: string;
+    startedAt: string;
+    endedAt: string;
+    startedAtFormatted: string;
+    endedAtFormatted: string | null;
+    type: string;
+    shortDescription: string;
+    technologies: {
+        name: string;
+        svgIcon: string;
+    }[];
+}
+
+interface SSRTechnologyExperience {
+    id: number;
+    name: string;
+    description: string;
+    creationCount: number;
+    type: 'framework' | 'library' | 'language' | 'other';
+    typeLabel: string;
+    svgIcon: string;
+}
+
+interface SSRExperience {
+    id: number;
+    title: string;
+    organizationName: string;
+    logo: string;
+    location: string;
+    websiteUrl: string;
+    shortDescription: string;
+    fullDescription: string;
+    technologies: {
+        name: string;
+        svgIcon: string;
+        description: string;
+    };
+    type: 'emploi' | 'formation';
+    startedAt: string;
+    endedAt: string | null;
+    startedAtFormatted: string;
+    endedAtFormatted: string | null;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;

@@ -18,7 +18,7 @@ class ExperienceFactory extends Factory
         $isFormation = $this->faker->boolean();
 
         return [
-            'title_translation_key_id' => TranslationKey::factory(),
+            'title_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'organization_name' => $isFormation
                 ? $this->faker->randomElement(['Université Paris Saclay', 'Efrei Paris'])
                 : $this->faker->company(),
@@ -26,8 +26,8 @@ class ExperienceFactory extends Factory
             'type' => $isFormation ? ExperienceType::FORMATION : ExperienceType::EMPLOI,
             'location' => $this->faker->city().', '.$this->faker->country(),
             'website_url' => $this->faker->optional(0.8)->url(),
-            'short_description_translation_key_id' => TranslationKey::factory(),
-            'full_description_translation_key_id' => TranslationKey::factory(),
+            'short_description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
+            'full_description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'started_at' => $this->faker->dateTimeBetween('-10 years', '-2 years'),
             'ended_at' => $this->faker->optional(0.7)->dateTimeBetween('-2 years', 'now'),
         ];

@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Drivers\Imagick\Driver;
 
 class Picture extends Model
 {
@@ -69,12 +68,11 @@ class Picture extends Model
         ];
 
         foreach (OptimizedPicture::FORMATS as $format) {
-            $previousImage = $originalImage;
             $optimizedImages = [];
 
             foreach ($variants as $variant => $size) {
                 $optimizedDimension = $this->getOptimizedDimension($size, $highestDimension);
-                $optimizedImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $previousImage, $optimizedDimension, $highestDimension, $format);
+                $optimizedImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $optimizedDimension, $highestDimension, $format);
 
                 if (empty($optimizedImage)) {
                     Log::error('UploadedPicture optimization failed: transcoding failed', [
@@ -85,7 +83,6 @@ class Picture extends Model
                 }
 
                 $optimizedImages[$variant] = $optimizedImage;
-                $previousImage = $optimizedImage;
             }
 
             $this->storeOptimizedImages($optimizedImages, $format);
@@ -99,13 +96,12 @@ class Picture extends Model
         // $this->deleteOriginal();
     }
 
-    private function transcodeIfItIsWorthIt($imageTranscodingService, $previousImage, $optimizedDimension, $highestDimension, $format): ?string
+    private function transcodeIfItIsWorthIt($imageTranscodingService, $optimizedDimension, $highestDimension, $format): ?string
     {
-        if ($optimizedDimension < $highestDimension) {
-            return $imageTranscodingService->transcode($previousImage, $optimizedDimension, $format);
-        }
+        $originalImage = Storage::disk('public')->get($this->path_original);
+        $dimensionToUse = $optimizedDimension >= $highestDimension ? null : $optimizedDimension;
 
-        return $previousImage;
+        return $imageTranscodingService->transcode($originalImage, $dimensionToUse, $format);
     }
 
     private function getOptimizedDimension(int $dimension, int $highestDimension): int
@@ -141,5 +137,20 @@ class Picture extends Model
         if ($this->path_original && Storage::disk('public')->exists($this->path_original)) {
             Storage::disk('public')->delete($this->path_original);
         }
+    }
+
+    public function getUrl(string $variant, string $format): string
+    {
+        $optimizedPicture = $this->getOptimizedPicture($variant, $format);
+
+        if ($optimizedPicture) {
+            if (config('app.cdn_disk')) {
+                return Storage::disk(config('app.cdn_disk'))->url($optimizedPicture->path);
+            }
+
+            return Storage::disk('public')->url($optimizedPicture->path);
+        }
+
+        return '';
     }
 }

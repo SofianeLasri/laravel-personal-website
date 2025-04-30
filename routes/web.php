@@ -15,16 +15,19 @@ use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
+use App\Http\Controllers\Public\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('home');
+Route::get('/cv-pdf', function () {
+    return Inertia::location('https://1drv.ms/b/s!Atk178NpnuLmhJoiwLEN2FRww-mGcA?e=I1kL8w');
+})->name('cv');
+
+Route::get('/', HomeController::class)->name('home');
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', function () {
-        return Inertia::render('Dashboard');
+        return Inertia::render('dashboard/Dashboard');
     })->name('index');
 
     Route::name('creations.')->prefix('creations')->group(function () {
@@ -101,8 +104,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::get('experiences/{experience}/technologies', [ExperienceController::class, 'getTechnologies'])
             ->name('experiences.technologies');
     });
+
+    require __DIR__.'/settings.php';
 });
 
-require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/api.php';

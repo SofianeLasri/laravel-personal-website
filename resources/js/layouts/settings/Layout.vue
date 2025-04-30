@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Heading from '@/components/Heading.vue';
+import Heading from '@/components/dashboard/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { type NavItem } from '@/types';
@@ -8,11 +8,15 @@ import { Link, usePage } from '@inertiajs/vue3';
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
-        href: '/settings/profile',
+        href: route('dashboard.profile.edit', undefined, false),
+    },
+    {
+        title: 'Password',
+        href: route('dashboard.password.edit', undefined, false),
     },
     {
         title: 'Appearance',
-        href: '/settings/appearance',
+        href: route('dashboard.appearance', undefined, false),
     },
 ];
 

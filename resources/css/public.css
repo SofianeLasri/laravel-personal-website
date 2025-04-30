@@ -1,0 +1,103 @@
+@import 'tailwindcss';
+
+@plugin "tailwindcss-motion";
+
+@theme {
+    --color-gray-990: rgb(19, 20, 21);
+    --color-gray-975: rgb(39, 41, 43);
+    --color-gray-950: rgb(49, 51, 54);
+    --color-gray-900: rgb(68, 72, 75);
+    --color-gray-800: rgb(87, 92, 96);
+    --color-gray-700: rgb(107, 113, 117);
+    --color-gray-600: rgb(121, 128, 134);
+    --color-gray-500: rgb(148, 153, 157);
+    --color-gray-400: rgb(169, 174, 177);
+    --color-gray-300: rgb(192, 194, 197);
+    --color-gray-200: rgb(223, 225, 226);
+    --color-gray-100: rgb(244, 245, 245);
+    --color-gray-0: rgb(255, 255, 255);
+
+    --color-design-system-border: var(--color-gray-300);
+    --color-design-system-primary: var(--color-atomic-tangerine-400);
+    --color-design-system-title: var(--color-gray-990);
+    --color-design-system-paragraph: var(--color-gray-800);
+    --design-system-border-width: 0.0625rem;
+    --color-design-system-border-radius: 0.5rem;
+    --color-atomic-tangerine-50: rgb(254, 242, 236);
+    --color-atomic-tangerine-100: rgb(252, 216, 198);
+    --color-atomic-tangerine-200: rgb(250, 190, 158);
+    --color-atomic-tangerine-300: rgb(249, 177, 138);
+    --color-atomic-tangerine-400: rgb(247, 142, 87);
+    --color-atomic-tangerine-500: rgb(246, 124, 61);
+    --color-atomic-tangerine-600: rgb(244, 99, 22);
+    --color-atomic-tangerine-700: rgb(215, 82, 9);
+    --color-atomic-tangerine-800: rgb(175, 67, 8);
+    --color-atomic-tangerine-900: rgb(135, 52, 7);
+    --color-atomic-tangerine-950: rgb(117, 43, 5);
+    --color-atomic-tangerine-990: rgb(77, 29, 3);
+
+    --color-action-container-inter-border-radius: var(--color-design-system-border-radius);
+    --color-action-container-outer-border-radius: 1rem;
+    --color-action-container-outer-color: rgba(244, 245, 245, 0.5);
+    --action-container-shadow-x: 0;
+    --action-container-shadow-y: 0.5rem;
+    --action-container-shadow-blur: 1rem;
+    --color-action-container-inter-padding: var(--color-action-container-inter-border-radius);
+    --color-action-container-shadow-color: rgba(0, 0, 0, 0.2);
+    --action-container-background-blur: 0.0625rem;
+
+    --breakpoint-xs: 25rem;
+}
+
+@theme inline {
+    --font-sans: 'Inter', sans-serif;
+    --color-border: var(--color-design-system-border);
+    --color-black: var(--color-gray-990);
+    --color-primary: var(--color-design-system-primary);
+    --color-background: var(--color-gray-100);
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background;
+    }
+}
+
+@utility action-container-shadow {
+    box-shadow: var(--action-container-shadow-x) var(--action-container-shadow-y) var(--action-container-shadow-blur) 0
+        var(--color-action-container-shadow-color);
+}
+
+@utility action-container-background-blur {
+    @apply backdrop-blur-[var(--action-container-background-blur)];
+}
+
+@utility action-container-outer-border {
+    border: var(--design-system-border-width) solid var(--color-gray-200);
+}
+
+@utility action-container-outer-shadow {
+    box-shadow: 0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.06);
+}
+
+@utility action-container-inner-shadow {
+    box-shadow:
+        0 0 0 0.5rem rgba(255, 255, 255, 0.3),
+        0 4rem 1.5rem 0 rgba(0, 0, 0, 0),
+        0 2.75rem 1.375rem 0 rgba(0, 0, 0, 0.02),
+        0 1.75rem 1.25rem 0 rgba(0, 0, 0, 0.08),
+        0 1rem 1rem 0 rgba(0, 0, 0, 0.13),
+        0 0.625rem 0.75rem 0 rgba(0, 0, 0, 0.15);
+}
+
+@utility markdown-view {
+    @apply text-design-system-paragraph;
+
+    h1 {
+        @apply text-design-system-title mt-8 text-2xl font-bold;
+    }
+}

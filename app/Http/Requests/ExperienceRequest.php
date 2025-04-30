@@ -18,6 +18,8 @@ class ExperienceRequest extends FormRequest
             'website_url' => ['nullable'],
             'short_description' => ['required', 'string'],
             'full_description' => ['required', 'string'],
+            'technologies' => ['array'],
+            'technologies.*' => ['exists:technologies,id'],
             'started_at' => ['required', 'date'],
             'ended_at' => ['nullable', 'date'],
         ];

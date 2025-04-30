@@ -186,22 +186,26 @@ class PictureTest extends TestCase
     #[Test]
     public function test_transcoding_when_it_is_worth_it()
     {
-        $picture = new Picture;
-        $imageTranscodingService = $this->createMock(ImageTranscodingService::class);
-
         $originalImage = 'original_content';
         $transcodedImage = 'transcoded_content';
+        Storage::disk('public')->put('original.jpg', $originalImage);
+        $picture = Picture::factory()->create([
+            'path_original' => 'original.jpg',
+            'width' => 1000,
+            'height' => 1000,
+        ]);
+
+        $imageTranscodingService = $this->createMock(ImageTranscodingService::class);
 
         $imageTranscodingService
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('transcode')
-            ->with($originalImage, 500, 'webp')
             ->willReturn($transcodedImage);
 
         $result = $this->invokePrivateMethod(
             $picture,
             'transcodeIfItIsWorthIt',
-            [$imageTranscodingService, $originalImage, 500, 1000, 'webp']
+            [$imageTranscodingService, 500, 1000, 'webp']
         );
 
         $this->assertEquals($transcodedImage, $result);
@@ -209,10 +213,10 @@ class PictureTest extends TestCase
         $result = $this->invokePrivateMethod(
             $picture,
             'transcodeIfItIsWorthIt',
-            [$imageTranscodingService, $originalImage, 1000, 1000, 'webp']
+            [$imageTranscodingService, 1000, 1000, 'webp']
         );
 
-        $this->assertEquals($originalImage, $result);
+        $this->assertEquals($transcodedImage, $result);
     }
 
     #[Test]
@@ -290,6 +294,23 @@ class PictureTest extends TestCase
         $picture->optimize();
 
         $this->assertCount(0, $picture->optimizedPictures);
+    }
+
+    #[Test]
+    public function test_get_url()
+    {
+        $picture = Picture::factory()
+            ->withOptimizedPictures()
+            ->create([
+                'path_original' => 'uploads/test.jpg',
+            ]);
+
+        $url = $picture->getUrl('medium', 'webp');
+
+        $this->assertEquals(
+            Storage::disk('public')->url($picture->getOptimizedPicture('medium', 'webp')->path),
+            $url
+        );
     }
 
     /**

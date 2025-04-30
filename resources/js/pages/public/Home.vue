@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
 import CareerContainer from '@/components/public/Career/CareerContainer.vue';
-import Footer from '@/components/public/Footer.vue';
 import HeroSection from '@/components/public/HeroSection.vue';
 import LightShape from '@/components/public/LightShape.vue';
-import Navbar from '@/components/public/Navbar.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
 import TechnologyExperiencesContainer from '@/components/public/Technology/TechnologyExperiencesContainer.vue';
@@ -12,6 +10,7 @@ import BlackButton from '@/components/public/ui/BlackButton.vue';
 import SectionParagraph from '@/components/public/ui/SectionParagraph.vue';
 import SectionTitle from '@/components/public/ui/SectionTitle.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
+import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRCreation, SSRExperience, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
 
@@ -28,9 +27,7 @@ defineProps<{
 
 <template>
     <Head title="Accueil" />
-    <div class="relative flex min-h-screen flex-col items-center overflow-hidden bg-[url(/resources/images/public/dots.svg)] px-2">
-        <Navbar />
-
+    <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <LightShape class="absolute top-0 left-[-27rem] z-0 xl:left-[-15rem]" />
         <HeroSection
             :socialMediaLinks="socialMediaLinks"
@@ -126,6 +123,5 @@ defineProps<{
                 <CareerContainer :experience="experiences" />
             </section>
         </div>
-    </div>
-    <Footer :socialMediaLinks="socialMediaLinks" />
+    </PublicAppLayout>
 </template>

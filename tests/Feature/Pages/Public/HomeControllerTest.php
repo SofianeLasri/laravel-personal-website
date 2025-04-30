@@ -162,4 +162,17 @@ class HomeControllerTest extends TestCase
         $this->assertEquals(ucfirst(now()->translatedFormat('F Y')), $result);
         $this->assertNotEquals(now(), $result);
     }
+
+    #[Test]
+    public function test_format_date_returns_null_if_date_is_null()
+    {
+        $controller = new HomeController;
+        $reflection = new ReflectionClass($controller);
+        $method = $reflection->getMethod('formatDate');
+
+        $date = null;
+        $result = $method->invoke($controller, $date);
+
+        $this->assertNull($result);
+    }
 }

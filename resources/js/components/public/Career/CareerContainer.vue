@@ -19,7 +19,7 @@ const props = defineProps<{
 
 console.log(props.experience);
 
-const selectedType = ref<'emploi' | 'formation'>('emploi');
+const selectedType = ref<'emploi' | 'formation'>('formation');
 const selectedExperienceId = ref<number | null>(null);
 
 const filteredExperiences = computed(() => {
@@ -110,15 +110,6 @@ const defaultSvgIcon =
     <div class="relative inline-flex flex-col items-center justify-start gap-8 self-stretch">
         <!-- Switch -->
         <div class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex gap-2 rounded-2xl p-2">
-            <BlackButton v-if="selectedType === 'emploi'" class="rounded-lg">
-                <BriefcaseSolid class="h-4 fill-white" />
-                <span>Professionnel</span>
-            </BlackButton>
-            <WhiteButton v-else class="rounded-lg" @click="changeType('emploi')">
-                <BriefcaseSolid class="h-4 fill-black" />
-                <span>Professionnel</span>
-            </WhiteButton>
-
             <BlackButton v-if="selectedType === 'formation'" class="rounded-lg">
                 <GraduationCapSolid class="h-4 fill-white" />
                 <span>Éducation</span>
@@ -126,6 +117,15 @@ const defaultSvgIcon =
             <WhiteButton v-else class="rounded-lg" @click="changeType('formation')">
                 <GraduationCapSolid class="h-4 fill-black" />
                 <span>Éducation</span>
+            </WhiteButton>
+
+            <BlackButton v-if="selectedType === 'emploi'" class="rounded-lg">
+                <BriefcaseSolid class="h-4 fill-white" />
+                <span>Professionnel</span>
+            </BlackButton>
+            <WhiteButton v-else class="rounded-lg" @click="changeType('emploi')">
+                <BriefcaseSolid class="h-4 fill-black" />
+                <span>Professionnel</span>
             </WhiteButton>
         </div>
 

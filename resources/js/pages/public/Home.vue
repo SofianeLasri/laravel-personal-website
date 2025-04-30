@@ -13,6 +13,9 @@ import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRCreation, SSRExperience, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];

@@ -296,6 +296,23 @@ class PictureTest extends TestCase
         $this->assertCount(0, $picture->optimizedPictures);
     }
 
+    #[Test]
+    public function test_get_url()
+    {
+        $picture = Picture::factory()
+            ->withOptimizedPictures()
+            ->create([
+                'path_original' => 'uploads/test.jpg',
+            ]);
+
+        $url = $picture->getUrl('medium', 'webp');
+
+        $this->assertEquals(
+            Storage::disk('public')->url($picture->getOptimizedPicture('medium', 'webp')->path),
+            $url
+        );
+    }
+
     /**
      * Helper method to invoke private methods
      */

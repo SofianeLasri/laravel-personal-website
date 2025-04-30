@@ -7,6 +7,11 @@ import BlackButton from '@/components/public/ui/BlackButton.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 const isMenuOpen = ref(false);
+const activeIndex = ref(0);
+const hoveredItemIndex = ref(null);
+const indicatorPosition = ref(0);
+const linkHeight = ref(48);
+const linkGap = 12;
 
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value;
@@ -22,8 +27,26 @@ const handleEscKey = (event: KeyboardEvent) => {
     }
 };
 
+const updateIndicatorPosition = (index: any) => {
+    hoveredItemIndex.value = index;
+
+    if (index == 0) {
+        indicatorPosition.value = 0;
+    } else {
+        indicatorPosition.value = index * (linkHeight.value + linkGap);
+    }
+};
+
+const resetIndicator = () => {
+    hoveredItemIndex.value = null;
+    indicatorPosition.value = activeIndex.value * linkHeight.value;
+};
+
 watch(isMenuOpen, (value) => {
     document.body.style.overflow = value ? 'hidden' : '';
+    if (value) {
+        resetIndicator();
+    }
 });
 
 onMounted(() => {
@@ -48,7 +71,6 @@ onUnmounted(() => {
         </div>
     </div>
 
-    <!-- Menu plein écran avec transition -->
     <Transition name="menu">
         <div
             v-if="isMenuOpen"
@@ -76,11 +98,24 @@ onUnmounted(() => {
                         <div class="pl-12">
                             <h2 class="text-4xl font-bold">Portfolio.</h2>
                         </div>
-                        <div class="flex flex-col gap-3">
-                            <NavMenuItem text="Accueil" :active="true" />
-                            <NavMenuItem text="Projets" :active="false" />
-                            <NavMenuItem text="Parcours professionnel & scolaire" :active="false" />
-                            <NavMenuItem text="À propos" :active="false" />
+                        <div class="relative flex flex-col gap-3">
+                            <div
+                                class="bg-primary absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
+                                :style="{ transform: `translateY(${indicatorPosition}px)` }"
+                            ></div>
+
+                            <div @mouseenter="updateIndicatorPosition(0)" @mouseleave="resetIndicator">
+                                <NavMenuItem text="Accueil" :active="true" />
+                            </div>
+                            <div @mouseenter="updateIndicatorPosition(1)" @mouseleave="resetIndicator">
+                                <NavMenuItem text="Projets" :active="false" />
+                            </div>
+                            <div @mouseenter="updateIndicatorPosition(2)" @mouseleave="resetIndicator">
+                                <NavMenuItem text="Parcours professionnel & scolaire" :active="false" />
+                            </div>
+                            <div @mouseenter="updateIndicatorPosition(3)" @mouseleave="resetIndicator">
+                                <NavMenuItem text="À propos" :active="false" />
+                            </div>
                         </div>
                     </div>
                 </div>

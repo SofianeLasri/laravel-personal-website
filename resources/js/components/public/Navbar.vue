@@ -6,6 +6,12 @@ import NavSearchBar from '@/components/public/NavSearchBar.vue';
 import BlackButton from '@/components/public/ui/BlackButton.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
+/*
+const page = usePage();
+
+const location = page.props.ziggy.location; // Returns the current URL path
+*/
+
 const isMenuOpen = ref(false);
 const activeIndex = ref(0);
 const hoveredItemIndex = ref(null);
@@ -105,7 +111,7 @@ onUnmounted(() => {
                             ></div>
 
                             <div @mouseenter="updateIndicatorPosition(0)" @mouseleave="resetIndicator">
-                                <NavMenuItem text="Accueil" :active="true" />
+                                <NavMenuItem text="Accueil" :active="true" :to="route('home')" />
                             </div>
                             <div @mouseenter="updateIndicatorPosition(1)" @mouseleave="resetIndicator">
                                 <NavMenuItem text="Projets" :active="false" />

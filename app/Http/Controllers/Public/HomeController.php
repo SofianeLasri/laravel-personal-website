@@ -19,10 +19,8 @@ use Inertia\Response;
 
 class HomeController extends Controller
 {
-    /** @var string La locale actuelle */
-    private string $locale;
+    private string $locale = 'en';
 
-    /** @var array Types de création pour le développement */
     private const DEVELOPMENT_TYPES = [
         CreationType::PORTFOLIO,
         CreationType::LIBRARY,
@@ -30,7 +28,6 @@ class HomeController extends Controller
         CreationType::WEBSITE,
     ];
 
-    /** @var array Comptage des créations par technologie */
     private array $creationCountByTechnology = [];
 
     public function __invoke(): Response

@@ -2,20 +2,28 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Enums\TechnologyType;
 use App\Http\Controllers\Controller;
 use App\Models\Creation;
 use App\Models\SocialMediaLink;
+use App\Models\Technology;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProjectsController extends Controller
 {
     private string $locale = 'fr';
 
+    private array $creationCountByTechnology = [];
+
     public function __invoke()
     {
         $this->locale = app()->getLocale();
+        $this->preloadCreationCountsByTechnology();
+
+        $technologies = Technology::whereIn('type', [TechnologyType::FRAMEWORK, TechnologyType::LIBRARY])->get();
 
         return inertia('public/Projects', [
             'locale' => $this->locale,
@@ -24,6 +32,16 @@ class ProjectsController extends Controller
             ],
             'socialMediaLinks' => $this->getSocialMediaLinks(),
             'creations' => $this->getCreations(),
+            // We want id, name, type, svgIcon & creationCount
+            'technologies' => $technologies->map(function ($technology) {
+                return [
+                    'id' => $technology->id,
+                    'name' => $technology->name,
+                    'type' => $technology->type,
+                    'svgIcon' => $technology->svg_icon,
+                    'creationCount' => $this->creationCountByTechnology[$technology->id] ?? 0,
+                ];
+            }),
         ]);
     }
 
@@ -87,5 +105,17 @@ class ProjectsController extends Controller
         $month = Str::ucfirst($date->translatedFormat('F'));
 
         return $month.' '.$date->format('Y');
+    }
+
+    private function preloadCreationCountsByTechnology(): void
+    {
+        $counts = DB::table('creation_technology')
+            ->select('technology_id', DB::raw('COUNT(creation_id) as count'))
+            ->groupBy('technology_id')
+            ->get();
+
+        foreach ($counts as $count) {
+            $this->creationCountByTechnology[$count->technology_id] = $count->count;
+        }
     }
 }

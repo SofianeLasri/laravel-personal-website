@@ -44,4 +44,24 @@ class Technology extends Model
     {
         return $this->belongsToMany(CreationDraft::class, 'creation_draft_technology', 'technology_id', 'creation_draft_id');
     }
+
+    public function scopeFramework($query)
+    {
+        return $query->where('type', TechnologyType::FRAMEWORK);
+    }
+
+    public function scopeLibrary($query)
+    {
+        return $query->where('type', TechnologyType::LIBRARY);
+    }
+
+    public function scopeLanguage($query)
+    {
+        return $query->where('type', TechnologyType::LANGUAGE);
+    }
+
+    public function scopeOther($query)
+    {
+        return $query->where('type', TechnologyType::OTHER);
+    }
 }

@@ -201,14 +201,17 @@ interface SSRCreation {
     }[];
 }
 
-interface SSRTechnologyExperience {
+interface SSRTechnology {
     id: number;
     name: string;
-    description: string;
     creationCount: number;
     type: 'framework' | 'library' | 'language' | 'other';
-    typeLabel: string;
     svgIcon: string;
+}
+
+interface SSRTechnologyExperience extends SSRTechnology {
+    description: string;
+    typeLabel: string;
 }
 
 interface SSRExperience {

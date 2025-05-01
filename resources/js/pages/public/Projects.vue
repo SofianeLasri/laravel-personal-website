@@ -4,13 +4,10 @@ import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectFilter from '@/components/public/ProjectFilter.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import SectionTitle from '@/components/public/Ui/SectionTitle.vue';
-import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
-import { SocialMediaLink, SSRCreation } from '@/types';
+import { SocialMediaLink, SSRCreation, SSRTechnology } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
-
-const { t } = useTranslation();
+import { ref } from 'vue';
 
 // Définition des types pour les filtres
 type ProjectTab = 'development' | 'games' | 'source-engine';
@@ -20,106 +17,21 @@ type FilterCategory = 'framework' | 'library';
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
     creations: SSRCreation[];
+    technologies: SSRTechnology[];
 }>();
 
-// État pour les filtres actifs
+console.log(props.technologies);
+const frameworks = props.technologies.filter((tech) => tech.type === 'framework');
+const libraries = props.technologies.filter((tech) => tech.type === 'library');
+
 const activeTab = ref<ProjectTab>('development');
 const frameworkFilter = ref<FilterState | null>('active');
 const libraryFilter = ref<FilterState | null>(null);
 
-// Compter le nombre de projets pour chaque filtre
-const filterCounts = computed(() => {
-    const counts = {
-        framework: { active: 0, hovered: 0, inactive: 0 },
-        library: { active: 0, hovered: 0, inactive: 0 },
-    };
+const filteredCreations = [];
 
-    props.creations.forEach((creation) => {
-        // Pour les frameworks
-        if (creation.technologies.some((t) => t.name.toLowerCase().includes('framework'))) {
-            if (!creation.endedAt) {
-                counts.framework.active++;
-            } else {
-                counts.framework.inactive++;
-            }
-            counts.framework.hovered = 4; // Valeur fixe pour l'exemple
-        }
-
-        // Pour les librairies
-        if (creation.technologies.some((t) => t.name.toLowerCase().includes('library'))) {
-            if (!creation.endedAt) {
-                counts.library.active++;
-            } else {
-                counts.library.inactive++;
-            }
-            counts.library.hovered = 4; // Valeur fixe pour l'exemple
-        }
-    });
-
-    return counts;
-});
-
-// Filtrer les créations en fonction de l'onglet actif et des filtres
-const filteredCreations = computed(() => {
-    let filtered = [...props.creations];
-
-    // Filtrer par onglet
-    if (activeTab.value === 'development') {
-        filtered = filtered.filter((creation) => ['portfolio', 'website', 'library', 'tool'].includes(creation.type.toLowerCase()));
-    } else if (activeTab.value === 'games') {
-        filtered = filtered.filter((creation) => ['game'].includes(creation.type.toLowerCase()));
-    } else if (activeTab.value === 'source-engine') {
-        filtered = filtered.filter((creation) => creation.technologies.some((tech) => tech.name.toLowerCase().includes('source')));
-    }
-
-    // Appliquer le filtre de framework
-    if (frameworkFilter.value) {
-        filtered = applyFilter(filtered, 'framework', frameworkFilter.value);
-    }
-
-    // Appliquer le filtre de librairie
-    if (libraryFilter.value) {
-        filtered = applyFilter(filtered, 'library', libraryFilter.value);
-    }
-
-    return filtered;
-});
-
-function applyFilter(creations: SSRCreation[], category: FilterCategory, state: FilterState) {
-    return creations.filter((creation) => {
-        const hasTechnology = creation.technologies.some((tech) => tech.name.toLowerCase().includes(category));
-
-        if (!hasTechnology) return false;
-
-        if (state === 'active' && !creation.endedAt) {
-            return true;
-        }
-
-        if (state === 'inactive' && creation.endedAt) {
-            return true;
-        }
-
-        if (state === 'hovered') {
-            // Implémentation fictive pour "hovered"
-            return true;
-        }
-
-        return false;
-    });
-}
-
-// Changer l'onglet actif
 const setActiveTab = (tab: ProjectTab) => {
     activeTab.value = tab;
-};
-
-// Modifier le filtre pour une catégorie
-const toggleFrameworkFilter = (state: FilterState) => {
-    frameworkFilter.value = frameworkFilter.value === state ? null : state;
-};
-
-const toggleLibraryFilter = (state: FilterState) => {
-    libraryFilter.value = libraryFilter.value === state ? null : state;
 };
 </script>
 
@@ -130,13 +42,13 @@ const toggleLibraryFilter = (state: FilterState) => {
 
         <div class="relative z-10 container mt-16 mb-16">
             <div class="mb-12 flex">
-                <div class="flex flex-1 flex-col gap-6">
+                <div class="flex flex-col gap-6">
                     <SectionTitle>Projects</SectionTitle>
                     <SectionParagraph>
                         Retrouvez tous mes projets et créations passés, allant du mapmaking sur Source Engine au développement web. :)
                     </SectionParagraph>
                 </div>
-                <div class="hidden flex-1 xl:block"></div>
+                <div class="hidden xl:block"></div>
             </div>
 
             <div class="mb-8 border-b border-gray-200">
@@ -169,7 +81,8 @@ const toggleLibraryFilter = (state: FilterState) => {
             <div class="flex flex-col gap-8 lg:flex-row">
                 <!-- Filtres sur la gauche -->
                 <div class="w-full space-y-6 lg:w-72">
-                    <ProjectFilter />
+                    <ProjectFilter name="Framework" :technologies="frameworks" />
+                    <ProjectFilter name="Librairies" :technologies="libraries" />
                 </div>
 
                 <!-- Grille de projets -->

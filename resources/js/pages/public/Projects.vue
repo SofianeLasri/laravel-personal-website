@@ -7,12 +7,10 @@ import SectionTitle from '@/components/public/Ui/SectionTitle.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRCreation, SSRTechnology } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-// Définition des types pour les filtres
 type ProjectTab = 'development' | 'games' | 'source-engine';
 type FilterState = 'active' | 'hovered' | 'inactive';
-type FilterCategory = 'framework' | 'library';
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -20,18 +18,78 @@ const props = defineProps<{
     technologies: SSRTechnology[];
 }>();
 
-console.log(props.technologies);
 const frameworks = props.technologies.filter((tech) => tech.type === 'framework');
 const libraries = props.technologies.filter((tech) => tech.type === 'library');
+const gameEngines = props.technologies.filter((tech) => tech.type === 'game_engine');
 
 const activeTab = ref<ProjectTab>('development');
-const frameworkFilter = ref<FilterState | null>('active');
-const libraryFilter = ref<FilterState | null>(null);
+const selectedFrameworks = ref<number[]>([]);
+const selectedLibraries = ref<number[]>([]);
+const selectedGameEngines = ref<number[]>([]);
 
-const filteredCreations = [];
+const tabToCreationTypes = {
+    development: ['portfolio', 'library', 'website', 'tool'],
+    games: ['game'],
+    'source-engine': ['map', 'other'],
+};
+
+watch(activeTab, () => {
+    selectedFrameworks.value = [];
+    selectedLibraries.value = [];
+    selectedGameEngines.value = [];
+});
+
+const filteredCreations = computed(() => {
+    const creationsByTab = props.creations.filter((creation) => tabToCreationTypes[activeTab.value].includes(creation.type as any));
+
+    if (activeTab.value === 'source-engine') {
+        return creationsByTab;
+    }
+
+    if (activeTab.value === 'development' && selectedFrameworks.value.length === 0 && selectedLibraries.value.length === 0) {
+        return creationsByTab;
+    }
+
+    if (activeTab.value === 'games' && selectedGameEngines.value.length === 0) {
+        return creationsByTab;
+    }
+
+    return creationsByTab.filter((creation) => {
+        const techIds = creation.technologies
+            .map((tech) => {
+                const foundTech = props.technologies.find((t) => t.name === tech.name);
+                return foundTech?.id;
+            })
+            .filter(Boolean) as number[];
+
+        if (activeTab.value === 'development') {
+            const hasSelectedFramework = selectedFrameworks.value.length === 0 || selectedFrameworks.value.some((id) => techIds.includes(id));
+
+            const hasSelectedLibrary = selectedLibraries.value.length === 0 || selectedLibraries.value.some((id) => techIds.includes(id));
+
+            return hasSelectedFramework && hasSelectedLibrary;
+        } else if (activeTab.value === 'games') {
+            return selectedGameEngines.value.length === 0 || selectedGameEngines.value.some((id) => techIds.includes(id));
+        }
+
+        return true;
+    });
+});
 
 const setActiveTab = (tab: ProjectTab) => {
     activeTab.value = tab;
+};
+
+const handleFrameworkFilterChange = (ids: number[]) => {
+    selectedFrameworks.value = ids;
+};
+
+const handleLibraryFilterChange = (ids: number[]) => {
+    selectedLibraries.value = ids;
+};
+
+const handleGameEngineFilterChange = (ids: number[]) => {
+    selectedGameEngines.value = ids;
 };
 </script>
 
@@ -79,11 +137,22 @@ const setActiveTab = (tab: ProjectTab) => {
 
             <!-- Conteneur principal -->
             <div class="flex flex-col gap-8 lg:flex-row">
-                <!-- Filtres sur la gauche -->
-                <div class="w-full space-y-6 lg:w-72">
-                    <ProjectFilter name="Framework" :technologies="frameworks" />
-                    <ProjectFilter name="Librairies" :technologies="libraries" />
+                <!-- Filtres sur la gauche (conditionnels selon l'onglet actif) -->
+                <div v-if="activeTab !== 'source-engine'" class="w-full space-y-6 lg:w-72">
+                    <!-- Filtres pour les projets de développement -->
+                    <template v-if="activeTab === 'development'">
+                        <ProjectFilter name="Framework" :technologies="frameworks" @filter-change="handleFrameworkFilterChange" />
+                        <ProjectFilter name="Librairies" :technologies="libraries" @filter-change="handleLibraryFilterChange" />
+                    </template>
+
+                    <!-- Filtre pour les jeux vidéos -->
+                    <template v-else-if="activeTab === 'games'">
+                        <ProjectFilter name="Moteurs de jeu" :technologies="gameEngines" @filter-change="handleGameEngineFilterChange" />
+                    </template>
                 </div>
+
+                <!-- Espace réservé pour l'alignement quand aucun filtre n'est affiché -->
+                <div v-else class="w-full lg:w-72"></div>
 
                 <!-- Grille de projets -->
                 <div class="flex-1">
@@ -100,7 +169,5 @@ const setActiveTab = (tab: ProjectTab) => {
                 </div>
             </div>
         </div>
-
-        <LightShape class="absolute top-[40rem] right-[-27rem] z-0 xl:right-[-15rem]" />
     </PublicAppLayout>
 </template>

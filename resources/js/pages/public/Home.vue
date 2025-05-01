@@ -76,11 +76,9 @@ defineProps<{
             <section class="flex flex-col gap-16" id="laravel-section">
                 <div class="flex">
                     <div class="flex flex-1 flex-col gap-8">
-                        <SectionTitle>Avec de nombreux projets à mon actif.</SectionTitle>
+                        <SectionTitle>{{ t('home.laravel-section.title') }}</SectionTitle>
                         <SectionParagraph>
-                            Sans avoir le niveau d’un développeur senior comme le prétend ma certification Laravel, je maitrise assez bien le
-                            framework. Je vous invite à regarder les différents projets que j’ai réalisé avec, ils ont tous leur petite spécificité.
-                            :)
+                            {{ t('home.laravel-section.paragraph') }}
                         </SectionParagraph>
                     </div>
                     <div class="hidden flex-1 xl:block"></div>
@@ -92,7 +90,7 @@ defineProps<{
                     </ProjectSlider>
                     <div>
                         <BlackButton>
-                            <span>Voir mes autres projets</span>
+                            <span>{{ t('home.laravel-section.view_other_projects') }}</span>
                             <ArrowUpRightRegular class="h-4 fill-white" />
                         </BlackButton>
                     </div>
@@ -101,9 +99,9 @@ defineProps<{
 
             <section class="flex flex-col items-center gap-16" id="other-skills-section">
                 <div class="inline-flex max-w-[56rem] flex-col items-center gap-8 text-center">
-                    <SectionTitle>Mais j'ai aussi d'autres compétences !</SectionTitle>
+                    <SectionTitle>{{ t('home.laravel-other_skills.title') }}</SectionTitle>
                     <SectionParagraph>
-                        De manière générale, j’aime toucher à tout. Il est très important pour moi de savoir être autonome, quel que soit le domaine.
+                        {{ t('home.laravel-other_skills.description') }}
                     </SectionParagraph>
                 </div>
                 <TechnologyExperiencesContainer :experiences="technologyExperiences" />
@@ -112,10 +110,9 @@ defineProps<{
             <section class="flex flex-col items-center gap-16" id="career-section">
                 <div class="flex">
                     <div class="flex flex-1 flex-col gap-8">
-                        <SectionTitle>Mon parcours professionnel & scolaire.</SectionTitle>
+                        <SectionTitle>{{ t('home.career.title') }}</SectionTitle>
                         <SectionParagraph>
-                            Bien souvent, c’est au travers de mes projets personnels que j’apprends le plus. Mais mon parcours scolaire et
-                            professionnel m’a permis d’obtenir de solides bases dans plusieurs domaines.
+                            {{ t('home.career.description') }}
                         </SectionParagraph>
                     </div>
                     <div class="hidden flex-1 xl:block"></div>

@@ -25,7 +25,7 @@ defineOptions({
         :type="type"
         :disabled="disabled || loading"
         :aria-busy="loading"
-        class="flex h-8 flex-shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-atomic-tangerine-200 px-4 text-black hover:bg-atomic-tangerine-400"
+        class="bg-atomic-tangerine-200 hover:bg-atomic-tangerine-400 flex h-8 flex-shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full px-4 text-black"
         v-bind="$attrs"
     >
         <span v-if="loading" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent"></span>

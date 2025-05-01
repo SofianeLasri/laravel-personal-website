@@ -10,7 +10,6 @@ import { Head } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 
 type ProjectTab = 'development' | 'games' | 'source-engine';
-type FilterState = 'active' | 'hovered' | 'inactive';
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -28,9 +27,9 @@ const selectedLibraries = ref<number[]>([]);
 const selectedGameEngines = ref<number[]>([]);
 
 const tabToCreationTypes = {
-    development: ['portfolio', 'library', 'website', 'tool'],
+    development: ['portfolio', 'library', 'website', 'tool', 'other'],
     games: ['game'],
-    'source-engine': ['map', 'other'],
+    'source-engine': ['map'],
 };
 
 watch(activeTab, () => {
@@ -40,7 +39,7 @@ watch(activeTab, () => {
 });
 
 const filteredCreations = computed(() => {
-    const creationsByTab = props.creations.filter((creation) => tabToCreationTypes[activeTab.value].includes(creation.type as any));
+    const creationsByTab = props.creations.filter((creation) => tabToCreationTypes[activeTab.value].includes(creation.type));
 
     if (activeTab.value === 'source-engine') {
         return creationsByTab;
@@ -55,12 +54,7 @@ const filteredCreations = computed(() => {
     }
 
     return creationsByTab.filter((creation) => {
-        const techIds = creation.technologies
-            .map((tech) => {
-                const foundTech = props.technologies.find((t) => t.name === tech.name);
-                return foundTech?.id;
-            })
-            .filter(Boolean) as number[];
+        const techIds = creation.technologies.map((tech) => tech.id);
 
         if (activeTab.value === 'development') {
             const hasSelectedFramework = selectedFrameworks.value.length === 0 || selectedFrameworks.value.some((id) => techIds.includes(id));
@@ -135,33 +129,26 @@ const handleGameEngineFilterChange = (ids: number[]) => {
                 </div>
             </div>
 
-            <!-- Conteneur principal -->
             <div class="flex flex-col gap-8 lg:flex-row">
-                <!-- Filtres sur la gauche (conditionnels selon l'onglet actif) -->
                 <div v-if="activeTab !== 'source-engine'" class="w-full space-y-6 lg:w-72">
-                    <!-- Filtres pour les projets de développement -->
                     <template v-if="activeTab === 'development'">
                         <ProjectFilter name="Framework" :technologies="frameworks" @filter-change="handleFrameworkFilterChange" />
                         <ProjectFilter name="Librairies" :technologies="libraries" @filter-change="handleLibraryFilterChange" />
                     </template>
 
-                    <!-- Filtre pour les jeux vidéos -->
                     <template v-else-if="activeTab === 'games'">
                         <ProjectFilter name="Moteurs de jeu" :technologies="gameEngines" @filter-change="handleGameEngineFilterChange" />
                     </template>
                 </div>
 
-                <!-- Espace réservé pour l'alignement quand aucun filtre n'est affiché -->
                 <div v-else class="w-full lg:w-72"></div>
 
-                <!-- Grille de projets -->
                 <div class="flex-1">
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div v-for="creation in filteredCreations" :key="creation.id" class="h-full">
-                            <ProjectCard :creation="creation" />
+                    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                        <div v-for="creation in filteredCreations" :key="creation.id">
+                            <ProjectCard class="md:w-full" :creation="creation" />
                         </div>
 
-                        <!-- Message si aucun projet ne correspond aux filtres -->
                         <div v-if="filteredCreations.length === 0" class="col-span-full py-12 text-center">
                             <p class="text-lg text-gray-500">Aucun projet ne correspond à vos critères.</p>
                         </div>

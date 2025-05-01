@@ -136,7 +136,10 @@ class HomeController extends Controller
                 'shortDescription' => $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '',
                 'technologies' => $creation->technologies->map(function ($technology) {
                     return [
+                        'id' => $technology->id,
+                        'creationCount' => $this->creationCountByTechnology[$technology->id] ?? 0,
                         'name' => $technology->name,
+                        'type' => $technology->type,
                         'svgIcon' => $technology->svg_icon,
                     ];
                 }),

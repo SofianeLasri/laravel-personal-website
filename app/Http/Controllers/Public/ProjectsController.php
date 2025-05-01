@@ -73,11 +73,14 @@ class ProjectsController extends Controller
                 'endedAt' => $creation->ended_at,
                 'startedAtFormatted' => $this->formatDate($creation->started_at),
                 'endedAtFormatted' => $this->formatDate($creation->ended_at),
-                'type' => $creation->type->label(),
+                'type' => $creation->type,
                 'shortDescription' => $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '',
                 'technologies' => $creation->technologies->map(function ($technology) {
                     return [
+                        'id' => $technology->id,
+                        'creationCount' => $this->creationCountByTechnology[$technology->id] ?? 0,
                         'name' => $technology->name,
+                        'type' => $technology->type,
                         'svgIcon' => $technology->svg_icon,
                     ];
                 }),

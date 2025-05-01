@@ -197,10 +197,7 @@ interface SSRCreation {
     endedAtFormatted: string | null;
     type: string;
     shortDescription: string;
-    technologies: {
-        name: string;
-        svgIcon: string;
-    }[];
+    technologies: SSRTechnology[];
 }
 
 interface SSRTechnology {

@@ -31,7 +31,7 @@ const toggleFilter = (techId: number) => {
         <div class="flex items-center gap-2.5 px-4 py-3">
             <div class="text-design-system-title justify-center">{{ name }}</div>
         </div>
-        <div class="flex flex-col items-start gap-2 self-stretch overflow-y-auto rounded-2xl border bg-white p-2">
+        <div class="custom-scrollbar flex flex-col items-start gap-2 self-stretch overflow-y-auto rounded-2xl border bg-white p-2">
             <template v-for="tech in technologies" :key="tech.id">
                 <ActiveButton v-if="selectedFilter === tech.id" class="w-full rounded-lg !px-3 py-2" @click="toggleFilter(tech.id)">
                     <div class="flex grow items-center gap-2">
@@ -59,4 +59,30 @@ const toggleFilter = (techId: number) => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.custom-scrollbar {
+    /* Pour Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gray-200) transparent;
+
+    /* Pour les autres navigateurs */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--color-gray-200);
+        border-radius: 10px;
+        border: 2px solid transparent;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-gray-400);
+    }
+}
+</style>

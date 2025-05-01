@@ -34,7 +34,7 @@ defineOptions({
         :target="disabled || loading ? undefined : target"
         :aria-busy="loading"
         :aria-disabled="disabled || loading"
-        class="outline-border flex h-8 flex-shrink-0 items-center justify-center gap-3 rounded-full bg-white px-4 text-black no-underline outline-1 focus:outline-none"
+        class="border-border flex h-8 flex-shrink-0 items-center justify-center gap-3 rounded-full bg-white px-4 text-black no-underline border-1 focus:border-none"
         :class="{
             'cursor-pointer hover:bg-gray-100': !disabled && !loading,
             'cursor-not-allowed opacity-70': disabled || loading,

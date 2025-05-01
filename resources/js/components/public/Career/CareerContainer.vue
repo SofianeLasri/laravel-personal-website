@@ -5,9 +5,9 @@ import GraduationCapSolid from '@/components/font-awesome/GraduationCapSolid.vue
 import LocationDotSolid from '@/components/font-awesome/LocationDotSolid.vue';
 import CareerBlackButton from '@/components/public/Career/CareerBlackButton.vue';
 import CareerWhiteButton from '@/components/public/Career/CareerWhiteButton.vue';
-import BlackButton from '@/components/public/ui/BlackButton.vue';
-import WhiteButton from '@/components/public/ui/WhiteButton.vue';
-import WhiteLinkButtonSm from '@/components/public/ui/WhiteLinkButtonSm.vue';
+import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
+import WhiteLinkButtonSm from '@/components/public/Ui/Button/WhiteLinkButtonSm.vue';
 import Cube from '@/components/shapes/cube.vue';
 import { SSRExperience } from '@/types';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -16,8 +16,6 @@ import VueMarkdown from 'vue-markdown-render';
 const props = defineProps<{
     experience: SSRExperience[];
 }>();
-
-console.log(props.experience);
 
 const selectedType = ref<'emploi' | 'formation'>('formation');
 const selectedExperienceId = ref<number | null>(null);

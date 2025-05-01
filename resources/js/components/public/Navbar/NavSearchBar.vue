@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
-import BlackButton from '@/components/public/ui/BlackButton.vue';
+import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import { ref, watch } from 'vue';
 
 const props = defineProps({

@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\ProjectsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,6 +25,7 @@ Route::get('/cv-pdf', function () {
 })->name('cv');
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/projects', ProjectsController::class)->name('projects');
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', function () {

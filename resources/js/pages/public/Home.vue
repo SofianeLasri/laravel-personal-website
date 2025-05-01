@@ -6,13 +6,16 @@ import LightShape from '@/components/public/LightShape.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
 import TechnologyExperiencesContainer from '@/components/public/Technology/TechnologyExperiencesContainer.vue';
-import BlackButton from '@/components/public/ui/BlackButton.vue';
-import SectionParagraph from '@/components/public/ui/SectionParagraph.vue';
-import SectionTitle from '@/components/public/ui/SectionTitle.vue';
+import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
+import SectionTitle from '@/components/public/Ui/SectionTitle.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRCreation, SSRExperience, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
+
+const { t } = useTranslation();
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -51,23 +54,20 @@ defineProps<{
                     <div class="flex items-center gap-4">
                         <LaravelLogo class="size-12 xl:hidden" />
                         <SectionTitle>
-                            <span>Spécialisé en back-end PHP & </span>
-                            <span class="text-[#FF2D20]">Laravel.</span>
+                            <span>{{ t('home.backend.title_part1') }}</span>
+                            <span class="ml-2 text-[#FF2D20]">{{ t('home.backend.title_part2') }}</span>
                         </SectionTitle>
                     </div>
 
                     <div>
                         <SectionParagraph>
-                            Développant des projets en PHP depuis 2019, s’il y a un bien un domaine dans lequel j’excelle c’est bien celui du
-                            développement d’application back-end (en PHP).
+                            {{ t('home.backend.paragraph1') }}
                         </SectionParagraph>
                         <SectionParagraph>
-                            Cela ne signifie pas pour autant que je suis mauvais en front-end, les interfaces ont toujours eu une place importante au
-                            sein de mes projets. :)
+                            {{ t('home.backend.paragraph2') }}
                         </SectionParagraph>
                         <SectionParagraph>
-                            Mais ayant développé une sorte de micro framework PHP pendant près de 2 ans, avant d’être littéralement tombé amoureux de
-                            Laravel, je pense pouvoir légitimement dire être spécialisé sur ces deux technos.
+                            {{ t('home.backend.paragraph3') }}
                         </SectionParagraph>
                     </div>
                 </div>
@@ -76,11 +76,9 @@ defineProps<{
             <section class="flex flex-col gap-16" id="laravel-section">
                 <div class="flex">
                     <div class="flex flex-1 flex-col gap-8">
-                        <SectionTitle>Avec de nombreux projets à mon actif.</SectionTitle>
+                        <SectionTitle>{{ t('home.laravel-section.title') }}</SectionTitle>
                         <SectionParagraph>
-                            Sans avoir le niveau d’un développeur senior comme le prétend ma certification Laravel, je maitrise assez bien le
-                            framework. Je vous invite à regarder les différents projets que j’ai réalisé avec, ils ont tous leur petite spécificité.
-                            :)
+                            {{ t('home.laravel-section.paragraph') }}
                         </SectionParagraph>
                     </div>
                     <div class="hidden flex-1 xl:block"></div>
@@ -92,7 +90,7 @@ defineProps<{
                     </ProjectSlider>
                     <div>
                         <BlackButton>
-                            <span>Voir mes autres projets</span>
+                            <span>{{ t('home.laravel-section.view_other_projects') }}</span>
                             <ArrowUpRightRegular class="h-4 fill-white" />
                         </BlackButton>
                     </div>
@@ -101,9 +99,9 @@ defineProps<{
 
             <section class="flex flex-col items-center gap-16" id="other-skills-section">
                 <div class="inline-flex max-w-[56rem] flex-col items-center gap-8 text-center">
-                    <SectionTitle>Mais j'ai aussi d'autres compétences !</SectionTitle>
+                    <SectionTitle>{{ t('home.other_skills.title') }}</SectionTitle>
                     <SectionParagraph>
-                        De manière générale, j’aime toucher à tout. Il est très important pour moi de savoir être autonome, quel que soit le domaine.
+                        {{ t('home.other_skills.description') }}
                     </SectionParagraph>
                 </div>
                 <TechnologyExperiencesContainer :experiences="technologyExperiences" />
@@ -112,10 +110,9 @@ defineProps<{
             <section class="flex flex-col items-center gap-16" id="career-section">
                 <div class="flex">
                     <div class="flex flex-1 flex-col gap-8">
-                        <SectionTitle>Mon parcours professionnel & scolaire.</SectionTitle>
+                        <SectionTitle>{{ t('home.career.title') }}</SectionTitle>
                         <SectionParagraph>
-                            Bien souvent, c’est au travers de mes projets personnels que j’apprends le plus. Mais mon parcours scolaire et
-                            professionnel m’a permis d’obtenir de solides bases dans plusieurs domaines.
+                            {{ t('home.career.description') }}
                         </SectionParagraph>
                     </div>
                     <div class="hidden flex-1 xl:block"></div>

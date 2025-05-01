@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
-import BlackLinkButton from '@/components/public/ui/BlackLinkButton.vue';
-import LightLinkButton from '@/components/public/ui/LightLinkButton.vue';
+import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
+import LightLinkButton from '@/components/public/Ui/Button/LightLinkButton.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { SocialMediaLink } from '@/types';
 import { onMounted, ref } from 'vue';
+
+const { t } = useTranslation();
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -59,16 +62,20 @@ onMounted(() => {
                 class="motion-translate-x-in-[0%] motion-translate-y-in-[5%] motion-blur-in-[8px] motion-duration-[0.16s]/blur flex flex-1 flex-col items-start justify-center self-stretch sm:gap-1"
             >
                 <span class="text-design-system-paragraph justify-center self-stretch text-xl font-medium sm:text-2xl sm:leading-6">
-                    Hello, je suis
+                    {{ t('home.hero.hello') }}
                 </span>
                 <span class="text-design-system-title justify-center self-stretch text-3xl font-semibold sm:text-5xl sm:leading-12">
-                    Développeur
+                    {{ t('home.hero.developer') }}
                 </span>
-                <span class="text-primary justify-center self-stretch text-6xl font-bold sm:text-8xl sm:leading-24">Full-Stack.</span>
+                <span class="text-primary justify-center self-stretch text-6xl font-bold sm:text-8xl sm:leading-24">
+                    {{ t('home.hero.fullstack') }}</span
+                >
             </h1>
             <div class="flex flex-col items-start gap-8 self-stretch">
                 <div class="inline-flex items-center gap-2 py-12 xl:py-0">
-                    <BlackLinkButton :href="route('cv')" title="CV" target="_blank"> Télécharger mon CV </BlackLinkButton>
+                    <BlackLinkButton :href="route('cv')" title="CV" target="_blank">
+                        {{ t('home.hero.download_cv') }}
+                    </BlackLinkButton>
                     <LightLinkButton v-for="link in socialMediaLinks" :key="link.name" :href="link.url" :title="link.name" target="_blank">
                         <div class="absolute flex h-4 fill-black" v-html="link.icon_svg"></div>
                     </LightLinkButton>
@@ -80,7 +87,7 @@ onMounted(() => {
                                 {{ animatedYearsOfExperience }}
                             </div>
                             <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
-                                Années d'expériences
+                                {{ t('home.hero.years_experience') }}
                             </div>
                             <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                         </div>
@@ -92,7 +99,7 @@ onMounted(() => {
                                 {{ animatedDevelopmentCreationsCount }}
                             </div>
                             <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
-                                Projets réalisés
+                                {{ t('home.hero.projects_done') }}
                             </div>
                             <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                         </div>
@@ -104,7 +111,7 @@ onMounted(() => {
                                 {{ animatedTechnologiesCount }}
                             </div>
                             <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
-                                Frameworks maîtrisés
+                                {{ t('home.hero.frameworks_mastered') }}
                             </div>
                             <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                         </div>

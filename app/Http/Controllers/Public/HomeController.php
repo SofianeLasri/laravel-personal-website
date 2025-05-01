@@ -39,6 +39,10 @@ class HomeController extends Controller
         $developmentStats = $this->getDevelopmentStats();
 
         return Inertia::render('public/Home', [
+            'locale' => $this->locale,
+            'translations' => [
+                'home' => __('home'),
+            ],
             'socialMediaLinks' => $this->getSocialMediaLinks(),
             'yearsOfExperience' => $developmentStats['yearsOfExperience'],
             'developmentCreationsCount' => $developmentStats['count'],

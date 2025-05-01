@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
-import BlackButtonSm from '@/components/public/ui/BlackButtonSm.vue';
 import { SSRTechnologyExperience } from '@/types';
+import BlackButtonSm from '@/components/public/Ui/Button/BlackButtonSm.vue';
 
 const props = defineProps<{
     experience: SSRTechnologyExperience;

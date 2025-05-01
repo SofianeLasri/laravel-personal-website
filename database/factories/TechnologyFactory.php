@@ -89,10 +89,22 @@ class TechnologyFactory extends Factory
         ]);
     }
 
-    public function featured(): static
+    public function gameEngine(): static
     {
+        $names = [
+            'Unity',
+            'Unreal Engine',
+            'Godot',
+            'CryEngine',
+            'Amazon Lumberyard',
+            'Bevy',
+            'Source Engine',
+            'Source 2',
+        ];
+
         return $this->state([
-            'featured' => true,
+            'name' => $this->faker->unique()->randomElement($names),
+            'type' => TechnologyType::GAME_ENGINE,
         ]);
     }
 }

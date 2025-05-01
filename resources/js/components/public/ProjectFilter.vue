@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import ActiveButton from '@/components/public/Ui/Button/ActiveButton.vue';
 import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
-import { ref } from 'vue';
 import { SSRTechnology } from '@/types';
+import { ref } from 'vue';
 
 defineProps<{
     name: string;
@@ -36,7 +36,7 @@ const toggleFilter = (techId: number) => {
                 <ActiveButton v-if="selectedFilters.has(tech.id)" class="w-full rounded-lg !px-3 py-2" @click="toggleFilter(tech.id)">
                     <div class="flex grow items-center gap-2">
                         <div class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2">
-                            <div v-html="tech.svgIcon"></div>
+                            <div v-html="tech.svgIcon" class="size-full"></div>
                         </div>
                         <div>{{ tech.name }}</div>
                     </div>
@@ -46,7 +46,7 @@ const toggleFilter = (techId: number) => {
                 <WhiteButton v-else class="w-full rounded-lg border-none !px-3 py-2" @click="toggleFilter(tech.id)">
                     <div class="flex grow items-center gap-2">
                         <div class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2">
-                            <div v-html="tech.svgIcon"></div>
+                            <div v-html="tech.svgIcon" class="size-full"></div>
                         </div>
                         <div>{{ tech.name }}</div>
                     </div>

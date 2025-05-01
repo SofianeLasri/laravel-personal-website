@@ -66,9 +66,24 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        $this->command->info('-- Type game engines...');
+        $gameEngines = [
+            'Unity', 'Unreal Engine', 'Godot', 'CryEngine',
+            'Amazon Lumberyard', 'Bevy', 'Source Engine', 'Source 2',
+        ];
+        $gameEngineTechnologies = collect();
+        foreach ($gameEngines as $gameEngine) {
+            $gameEngineTechnologies->push(
+                Technology::factory()->create([
+                    'name' => $gameEngine,
+                    'type' => TechnologyType::GAME_ENGINE,
+                ])
+            );
+        }
+
         $allTechnologies = $languageTechnologies->merge($frameworkTechnologies)->merge($libraryTechnologies);
 
-        $attachRandomTechnologies = function ($model) use ($allTechnologies, $languageTechnologies, $frameworkTechnologies, $libraryTechnologies) {
+        $attachRandomTechnologies = function ($model) use ($gameEngineTechnologies, $allTechnologies, $languageTechnologies, $frameworkTechnologies, $libraryTechnologies) {
             $selectedTechs = collect();
 
             $selectedTechs->push($languageTechnologies->random());
@@ -77,6 +92,9 @@ class DatabaseSeeder extends Seeder
 
             if (rand(0, 1)) {
                 $selectedTechs->push($libraryTechnologies->random());
+            }
+            if (rand(0, 1)) {
+                $selectedTechs->push($gameEngineTechnologies->random());
             }
 
             $remainingCount = rand(1, 3);
@@ -93,7 +111,7 @@ class DatabaseSeeder extends Seeder
             ->withFeatures()
             ->withScreenshots()
             ->withTags()
-            ->count(15)
+            ->count(35)
             ->create();
 
         $this->command->info('-- Attaching random technologies to creations...');

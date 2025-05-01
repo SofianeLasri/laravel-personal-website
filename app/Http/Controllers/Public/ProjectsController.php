@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Enums\TechnologyType;
 use App\Http\Controllers\Controller;
 use App\Models\Creation;
 use App\Models\SocialMediaLink;
@@ -23,7 +22,7 @@ class ProjectsController extends Controller
         $this->locale = app()->getLocale();
         $this->preloadCreationCountsByTechnology();
 
-        $technologies = Technology::whereIn('type', [TechnologyType::FRAMEWORK, TechnologyType::LIBRARY])->get();
+        $technologies = Technology::all();
 
         return inertia('public/Projects', [
             'locale' => $this->locale,

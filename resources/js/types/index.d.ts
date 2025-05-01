@@ -118,10 +118,12 @@ interface Tag {
     updated_at: string;
 }
 
+type TechnologyType = 'framework' | 'library' | 'language' | 'game_engine' | 'other';
+
 interface Technology {
     id: number;
     name: string;
-    type: 'framework' | 'library' | 'language' | 'other';
+    type: TechnologyType;
     svg_icon: string;
     description_translation_key_id: number;
     created_at: string;
@@ -205,7 +207,7 @@ interface SSRTechnology {
     id: number;
     name: string;
     creationCount: number;
-    type: 'framework' | 'library' | 'language' | 'other';
+    type: TechnologyType;
     svgIcon: string;
 }
 

@@ -17,8 +17,6 @@ const props = defineProps<{
     experience: SSRExperience[];
 }>();
 
-console.log(props.experience);
-
 const selectedType = ref<'emploi' | 'formation'>('formation');
 const selectedExperienceId = ref<number | null>(null);
 

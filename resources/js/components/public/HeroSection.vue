@@ -6,9 +6,9 @@ import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
 import { SocialMediaLink } from '@/types';
 import { onMounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from '@/composables/useTranslation';
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];

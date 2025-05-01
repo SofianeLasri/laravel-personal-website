@@ -15,8 +15,6 @@ if (startYear && endYear) {
 } else {
     formattedYears = `${startYear} - Aujd`;
 }
-
-console.log(props.creation.coverImage);
 </script>
 
 <template>

@@ -4,17 +4,14 @@ import { usePage } from '@inertiajs/vue3';
 export function useTranslation() {
     const page = usePage();
 
-    const translations = computed(() => page.props.translations || {});
-    const locale = computed(() => page.props.locale || 'fr');
-
     function t(key: string): string {
         const keys = key.split('.');
-        let result = translations.value;
+        let result: any = page.props.translations || {};
 
         for (const k of keys) {
-            if (result && typeof result === 'object' && k in result) {
-                result = result[k];
-            } else {
+            result = result[k as keyof typeof result] || null;
+
+            if (result === null) {
                 return key;
             }
         }
@@ -22,5 +19,8 @@ export function useTranslation() {
         return result as string;
     }
 
-    return { t, locale };
+    return {
+        t,
+        locale: computed(() => (page.props.locale as string) || 'fr'),
+    };
 }

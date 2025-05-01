@@ -99,9 +99,9 @@ defineProps<{
 
             <section class="flex flex-col items-center gap-16" id="other-skills-section">
                 <div class="inline-flex max-w-[56rem] flex-col items-center gap-8 text-center">
-                    <SectionTitle>{{ t('home.laravel-other_skills.title') }}</SectionTitle>
+                    <SectionTitle>{{ t('home.other_skills.title') }}</SectionTitle>
                     <SectionParagraph>
-                        {{ t('home.laravel-other_skills.description') }}
+                        {{ t('home.other_skills.description') }}
                     </SectionParagraph>
                 </div>
                 <TechnologyExperiencesContainer :experiences="technologyExperiences" />

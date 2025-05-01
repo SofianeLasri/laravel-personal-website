@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TechnologyExperienceCard from '@/components/public/Technology/TechnologyExperienceCard.vue';
-import BlackButton from '@/components/public/ui/BlackButton.vue';
-import WhiteButton from '@/components/public/ui/WhiteButton.vue';
+import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
 import { SSRTechnologyExperience } from '@/types';
 import { computed, ref } from 'vue';
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
-import BlackLinkButton from '@/components/public/ui/BlackLinkButton.vue';
-import LightLinkButton from '@/components/public/ui/LightLinkButton.vue';
+import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
+import LightLinkButton from '@/components/public/Ui/Button/LightLinkButton.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { SocialMediaLink } from '@/types';
 import { onMounted, ref } from 'vue';
-import { useTranslation } from '@/composables/useTranslation';
 
 const { t } = useTranslation();
 

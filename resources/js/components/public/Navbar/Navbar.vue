@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import BarStaggeredRegular from '@/components/font-awesome/BarStaggeredRegular.vue';
-import NavBrand from '@/components/public/NavBrand.vue';
-import NavMenuItem from '@/components/public/NavMenuItem.vue';
-import NavSearchBar from '@/components/public/NavSearchBar.vue';
-import BlackButton from '@/components/public/ui/BlackButton.vue';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import NavBrand from '@/components/public/Navbar/NavBrand.vue';
+import NavMenuItem from '@/components/public/Navbar/NavMenuItem.vue';
+import NavSearchBar from '@/components/public/Navbar/NavSearchBar.vue';
+import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import { usePage } from '@inertiajs/vue3';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const page = usePage();
 const currentUrl = computed(() => new URL(page.props.ziggy.location));

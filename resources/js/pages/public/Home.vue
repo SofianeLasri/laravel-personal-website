@@ -6,14 +6,14 @@ import LightShape from '@/components/public/LightShape.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
 import TechnologyExperiencesContainer from '@/components/public/Technology/TechnologyExperiencesContainer.vue';
-import BlackButton from '@/components/public/ui/BlackButton.vue';
+import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import SectionParagraph from '@/components/public/ui/SectionParagraph.vue';
 import SectionTitle from '@/components/public/ui/SectionTitle.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRCreation, SSRExperience, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { useTranslation } from '@/composables/useTranslation';
 
 const { t } = useTranslation();
 

@@ -54,23 +54,20 @@ defineProps<{
                     <div class="flex items-center gap-4">
                         <LaravelLogo class="size-12 xl:hidden" />
                         <SectionTitle>
-                            <span>Spécialisé en back-end PHP & </span>
-                            <span class="text-[#FF2D20]">Laravel.</span>
+                            <span>{{ t('home.backend.title_part1') }}</span>
+                            <span class="ml-2 text-[#FF2D20]">{{ t('home.backend.title_part2') }}</span>
                         </SectionTitle>
                     </div>
 
                     <div>
                         <SectionParagraph>
-                            Développant des projets en PHP depuis 2019, s’il y a un bien un domaine dans lequel j’excelle c’est bien celui du
-                            développement d’application back-end (en PHP).
+                            {{ t('home.backend.paragraph1') }}
                         </SectionParagraph>
                         <SectionParagraph>
-                            Cela ne signifie pas pour autant que je suis mauvais en front-end, les interfaces ont toujours eu une place importante au
-                            sein de mes projets. :)
+                            {{ t('home.backend.paragraph2') }}
                         </SectionParagraph>
                         <SectionParagraph>
-                            Mais ayant développé une sorte de micro framework PHP pendant près de 2 ans, avant d’être littéralement tombé amoureux de
-                            Laravel, je pense pouvoir légitimement dire être spécialisé sur ces deux technos.
+                            {{ t('home.backend.paragraph3') }}
                         </SectionParagraph>
                     </div>
                 </div>

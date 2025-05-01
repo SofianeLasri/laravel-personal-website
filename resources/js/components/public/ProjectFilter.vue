@@ -10,19 +10,19 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: 'filter-change', value: number | null): void;
+    (e: 'filter-change', value: number[]): void;
 }>();
 
-const selectedFilter = ref<number | null>(null);
+const selectedFilters = ref<Set<number>>(new Set());
 
 const toggleFilter = (techId: number) => {
-    if (selectedFilter.value === techId) {
-        selectedFilter.value = null;
+    if (selectedFilters.value.has(techId)) {
+        selectedFilters.value.delete(techId);
     } else {
-        selectedFilter.value = techId;
+        selectedFilters.value.add(techId);
     }
 
-    emit('filter-change', selectedFilter.value);
+    emit('filter-change', Array.from(selectedFilters.value));
 };
 </script>
 
@@ -33,7 +33,7 @@ const toggleFilter = (techId: number) => {
         </div>
         <div class="custom-scrollbar flex flex-col items-start gap-2 self-stretch overflow-y-auto rounded-2xl border bg-white p-2">
             <template v-for="tech in technologies" :key="tech.id">
-                <ActiveButton v-if="selectedFilter === tech.id" class="w-full rounded-lg !px-3 py-2" @click="toggleFilter(tech.id)">
+                <ActiveButton v-if="selectedFilters.has(tech.id)" class="w-full rounded-lg !px-3 py-2" @click="toggleFilter(tech.id)">
                     <div class="flex grow items-center gap-2">
                         <div class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2">
                             <div v-html="tech.svgIcon"></div>
@@ -61,11 +61,11 @@ const toggleFilter = (techId: number) => {
 
 <style scoped>
 .custom-scrollbar {
-    /* Pour Firefox */
+    /* Firefox */
     scrollbar-width: thin;
     scrollbar-color: var(--color-gray-200) transparent;
 
-    /* Pour les autres navigateurs */
+    /* Webkit */
     &::-webkit-scrollbar {
         width: 6px;
     }

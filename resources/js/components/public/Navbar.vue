@@ -4,20 +4,34 @@ import NavBrand from '@/components/public/NavBrand.vue';
 import NavMenuItem from '@/components/public/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/NavSearchBar.vue';
 import BlackButton from '@/components/public/ui/BlackButton.vue';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 
-/*
 const page = usePage();
-
-const location = page.props.ziggy.location; // Returns the current URL path
-*/
+const currentUrl = computed(() => new URL(page.props.ziggy.location));
+const currentPath = computed(() => currentUrl.value.href);
 
 const isMenuOpen = ref(false);
-const activeIndex = ref(0);
 const hoveredItemIndex = ref(null);
 const indicatorPosition = ref(0);
 const linkHeight = ref(48);
 const linkGap = 12;
+
+const routes = [
+    { path: route('home'), name: 'Accueil', index: 0 },
+    { path: route('projects'), name: 'Projets', index: 1 },
+    { path: '#', name: 'Parcours professionnel & scolaire', index: 2 },
+    { path: '#', name: 'À propos', index: 3 },
+];
+
+const activeIndex = computed(() => {
+    const matchingRoute = routes.find((r) => r.path === currentPath.value);
+    return matchingRoute ? matchingRoute.index : 0;
+});
+
+const isItemActive = (index: any) => {
+    return index === activeIndex.value;
+};
 
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value;
@@ -45,7 +59,7 @@ const updateIndicatorPosition = (index: any) => {
 
 const resetIndicator = () => {
     hoveredItemIndex.value = null;
-    indicatorPosition.value = activeIndex.value * linkHeight.value;
+    indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
 };
 
 watch(isMenuOpen, (value) => {
@@ -57,6 +71,7 @@ watch(isMenuOpen, (value) => {
 
 onMounted(() => {
     document.addEventListener('keydown', handleEscKey);
+    resetIndicator();
 });
 
 onUnmounted(() => {
@@ -110,17 +125,13 @@ onUnmounted(() => {
                                 :style="{ transform: `translateY(${indicatorPosition}px)` }"
                             ></div>
 
-                            <div @mouseenter="updateIndicatorPosition(0)" @mouseleave="resetIndicator">
-                                <NavMenuItem text="Accueil" :active="true" :to="route('home')" />
-                            </div>
-                            <div @mouseenter="updateIndicatorPosition(1)" @mouseleave="resetIndicator">
-                                <NavMenuItem text="Projets" :active="false" />
-                            </div>
-                            <div @mouseenter="updateIndicatorPosition(2)" @mouseleave="resetIndicator">
-                                <NavMenuItem text="Parcours professionnel & scolaire" :active="false" />
-                            </div>
-                            <div @mouseenter="updateIndicatorPosition(3)" @mouseleave="resetIndicator">
-                                <NavMenuItem text="À propos" :active="false" />
+                            <div
+                                v-for="(item, index) in routes"
+                                :key="index"
+                                @mouseenter="updateIndicatorPosition(index)"
+                                @mouseleave="resetIndicator"
+                            >
+                                <NavMenuItem :text="item.name" :active="isItemActive(index)" :to="item.path" />
                             </div>
                         </div>
                     </div>

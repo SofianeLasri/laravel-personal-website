@@ -5,6 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $icon_svg
+ * @property string $name
+ * @property string $url
+ * @property mixed $use_factory
+ *
+ * @method static \Database\Factories\SocialMediaLinkFactory<self> factory($count = null, $state = [])
+ */
 class SocialMediaLink extends Model
 {
     use HasFactory;

@@ -8,6 +8,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $translation_key_id
+ * @property string $locale
+ * @property string $text
+ * @property mixed $use_factory
+ * @property mixed $key
+ * @property int|null $translation_keys_count
+ * @property-read \App\Models\TranslationKey|null $translationKey
+ *
+ * @method static \Database\Factories\TranslationFactory<self> factory($count = null, $state = [])
+ */
 class Translation extends Model
 {
     use HasFactory;

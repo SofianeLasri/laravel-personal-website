@@ -10,6 +10,21 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * @property int $id
+ * @property string $filename
+ * @property int|null $width
+ * @property int|null $height
+ * @property int|null $size
+ * @property string|null $path_original
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property mixed $use_factory
+ * @property int|null $optimized_pictures_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\OptimizedPicture[] $optimizedPictures
+ *
+ * @method static \Database\Factories\PictureFactory<self> factory($count = null, $state = [])
+ */
 class Picture extends Model
 {
     use HasFactory;

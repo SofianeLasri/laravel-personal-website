@@ -9,6 +9,46 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property int|null $logo_id
+ * @property int|null $cover_image_id
+ * @property \App\Enums\CreationType $type
+ * @property \Illuminate\Support\Carbon $started_at
+ * @property string|null $ended_at
+ * @property int $short_description_translation_key_id
+ * @property int $full_description_translation_key_id
+ * @property string|null $external_url
+ * @property string|null $source_code_url
+ * @property bool $featured
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property mixed $use_factory
+ * @property int|null $logos_count
+ * @property int|null $cover_images_count
+ * @property int|null $short_description_translation_keys_count
+ * @property int|null $full_description_translation_keys_count
+ * @property int|null $features_count
+ * @property int|null $screenshots_count
+ * @property int|null $technologies_count
+ * @property int|null $people_count
+ * @property int|null $tags_count
+ * @property int|null $drafts_count
+ * @property-read \App\Models\Picture|null $logo
+ * @property-read \App\Models\Picture|null $coverImage
+ * @property-read \App\Models\TranslationKey|null $shortDescriptionTranslationKey
+ * @property-read \App\Models\TranslationKey|null $fullDescriptionTranslationKey
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Feature[] $features
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Screenshot[] $screenshots
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Technology[] $technologies
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Person[] $people
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Tag[] $tags
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\CreationDraft[] $drafts
+ *
+ * @method static \Database\Factories\CreationFactory<self> factory($count = null, $state = [])
+ */
 class Creation extends Model
 {
     use HasFactory;

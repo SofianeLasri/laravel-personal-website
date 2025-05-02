@@ -8,6 +8,34 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property int $id
+ * @property int $title_translation_key_id
+ * @property string $organization_name
+ * @property int|null $logo_id
+ * @property \App\Enums\ExperienceType $type
+ * @property string $location
+ * @property string|null $website_url
+ * @property int $short_description_translation_key_id
+ * @property int $full_description_translation_key_id
+ * @property \Illuminate\Support\Carbon $started_at
+ * @property \Illuminate\Support\Carbon|null $ended_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property mixed $use_factory
+ * @property int|null $title_translation_keys_count
+ * @property int|null $short_description_translation_keys_count
+ * @property int|null $full_description_translation_keys_count
+ * @property int|null $logos_count
+ * @property int|null $technologies_count
+ * @property-read \App\Models\TranslationKey|null $titleTranslationKey
+ * @property-read \App\Models\TranslationKey|null $shortDescriptionTranslationKey
+ * @property-read \App\Models\TranslationKey|null $fullDescriptionTranslationKey
+ * @property-read \App\Models\Picture|null $logo
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Technology[] $technologies
+ *
+ * @method static \Database\Factories\ExperienceFactory<self> factory($count = null, $state = [])
+ */
 class Experience extends Model
 {
     use HasFactory;

@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $key
+ * @property mixed $use_factory
+ *
+ * @method static \Database\Factories\TranslationKeyFactory<self> factory($count = null, $state = [])
+ */
 class TranslationKey extends Model
 {
     use HasFactory;

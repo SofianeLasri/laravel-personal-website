@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @property int $id
+ * @property int $picture_id
+ * @property string $variant
+ * @property string $path
+ * @property string $format
+ * @property mixed $use_factory
+ * @property int|null $pictures_count
+ * @property-read \App\Models\Picture|null $picture
+ *
+ * @method static \Database\Factories\OptimizedPictureFactory<self> factory($count = null, $state = [])
+ */
 class OptimizedPicture extends Model
 {
     use HasFactory;

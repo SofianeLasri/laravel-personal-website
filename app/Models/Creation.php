@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Enums\CreationType;
+use Database\Factories\CreationFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,16 +18,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $slug
  * @property int|null $logo_id
  * @property int|null $cover_image_id
- * @property \App\Enums\CreationType $type
- * @property \Illuminate\Support\Carbon $started_at
+ * @property CreationType $type
+ * @property Carbon $started_at
  * @property string|null $ended_at
  * @property int $short_description_translation_key_id
  * @property int $full_description_translation_key_id
  * @property string|null $external_url
  * @property string|null $source_code_url
  * @property bool $featured
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property mixed $use_factory
  * @property int|null $logos_count
  * @property int|null $cover_images_count
@@ -36,18 +39,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $people_count
  * @property int|null $tags_count
  * @property int|null $drafts_count
- * @property-read \App\Models\Picture|null $logo
- * @property-read \App\Models\Picture|null $coverImage
- * @property-read \App\Models\TranslationKey|null $shortDescriptionTranslationKey
- * @property-read \App\Models\TranslationKey|null $fullDescriptionTranslationKey
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Feature[] $features
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Screenshot[] $screenshots
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Technology[] $technologies
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Person[] $people
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Tag[] $tags
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\CreationDraft[] $drafts
+ * @property-read Picture|null $logo
+ * @property-read Picture|null $coverImage
+ * @property-read TranslationKey|null $shortDescriptionTranslationKey
+ * @property-read TranslationKey|null $fullDescriptionTranslationKey
+ * @property-read Collection|Feature[] $features
+ * @property-read Collection|Screenshot[] $screenshots
+ * @property-read Collection|Technology[] $technologies
+ * @property-read Collection|Person[] $people
+ * @property-read Collection|Tag[] $tags
+ * @property-read Collection|CreationDraft[] $drafts
  *
- * @method static \Database\Factories\CreationFactory<self> factory($count = null, $state = [])
+ * @method static CreationFactory<self> factory($count = null, $state = [])
  */
 class Creation extends Model
 {

@@ -2,26 +2,28 @@
 
 namespace App\Models;
 
+use Database\Factories\CreationDraftScreenshotFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $creation_draft_id
  * @property int $picture_id
  * @property int|null $caption_translation_key_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property mixed $use_factory
  * @property int|null $creation_drafts_count
  * @property int|null $pictures_count
  * @property int|null $caption_translation_keys_count
- * @property-read \App\Models\CreationDraft|null $creationDraft
- * @property-read \App\Models\Picture|null $picture
- * @property-read \App\Models\TranslationKey|null $captionTranslationKey
+ * @property-read CreationDraft|null $creationDraft
+ * @property-read Picture|null $picture
+ * @property-read TranslationKey|null $captionTranslationKey
  *
- * @method static \Database\Factories\CreationDraftScreenshotFactory<self> factory($count = null, $state = [])
+ * @method static CreationDraftScreenshotFactory<self> factory($count = null, $state = [])
  */
 class CreationDraftScreenshot extends Model
 {

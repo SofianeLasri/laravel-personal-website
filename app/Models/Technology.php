@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\TechnologyType;
+use Database\Factories\TechnologyFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,11 +28,11 @@ use Illuminate\Support\Carbon;
  * @property-read TranslationKey|null $descriptionTranslationKey
  * @property-read Collection|CreationDraft[] $creationDrafts
  *
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Technology framework()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Technology library()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Technology language()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Technology other()
- * @method static \Database\Factories\TechnologyFactory<self> factory($count = null, $state = [])
+ * @method static Builder|Technology framework()
+ * @method static Builder|Technology library()
+ * @method static Builder|Technology language()
+ * @method static Builder|Technology other()
+ * @method static TechnologyFactory<self> factory($count = null, $state = [])
  */
 class Technology extends Model
 {

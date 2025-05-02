@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\TechnologyExperienceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,10 +14,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property mixed $use_factory
  * @property int|null $technologies_count
  * @property int|null $description_translation_keys_count
- * @property-read \App\Models\Technology|null $technology
- * @property-read \App\Models\TranslationKey|null $descriptionTranslationKey
+ * @property-read Technology|null $technology
+ * @property-read TranslationKey|null $descriptionTranslationKey
  *
- * @method static \Database\Factories\TechnologyExperienceFactory<self> factory($count = null, $state = [])
+ * @method static TechnologyExperienceFactory<self> factory($count = null, $state = [])
  */
 class TechnologyExperience extends Model
 {

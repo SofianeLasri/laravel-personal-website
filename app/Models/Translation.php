@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\TranslationFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,9 +17,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property mixed $use_factory
  * @property mixed $key
  * @property int|null $translation_keys_count
- * @property-read \App\Models\TranslationKey|null $translationKey
+ * @property-read TranslationKey|null $translationKey
  *
- * @method static \Database\Factories\TranslationFactory<self> factory($count = null, $state = [])
+ * @method static TranslationFactory<self> factory($count = null, $state = [])
  */
 class Translation extends Model
 {

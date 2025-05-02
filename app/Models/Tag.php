@@ -2,23 +2,26 @@
 
 namespace App\Models;
 
+use Database\Factories\TagFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property mixed $use_factory
  * @property int|null $creations_count
  * @property int|null $creation_drafts_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Creation[] $creations
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\CreationDraft[] $creationDrafts
+ * @property-read Collection|\App\Models\Creation[] $creations
+ * @property-read Collection|\App\Models\CreationDraft[] $creationDrafts
  *
- * @method static \Database\Factories\TagFactory<self> factory($count = null, $state = [])
+ * @method static TagFactory<self> factory($count = null, $state = [])
  */
 class Tag extends Model
 {

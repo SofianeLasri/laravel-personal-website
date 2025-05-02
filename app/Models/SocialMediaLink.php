@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\SocialMediaLinkFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $url
  * @property mixed $use_factory
  *
- * @method static \Database\Factories\SocialMediaLinkFactory<self> factory($count = null, $state = [])
+ * @method static SocialMediaLinkFactory<self> factory($count = null, $state = [])
  */
 class SocialMediaLink extends Model
 {

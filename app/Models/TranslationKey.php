@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\TranslationKeyFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,8 +12,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $key
  * @property mixed $use_factory
+ * @property int|null $translations_count
+ * @property-read Collection|Translation[] $translations
  *
- * @method static \Database\Factories\TranslationKeyFactory<self> factory($count = null, $state = [])
+ * @method static TranslationKeyFactory<self> factory($count = null, $state = [])
  */
 class TranslationKey extends Model
 {
@@ -27,7 +31,7 @@ class TranslationKey extends Model
         'key' => 'string',
     ];
 
-    public function translations(): HasMany|TranslationKey
+    public function translations(): HasMany
     {
         return $this->hasMany(Translation::class);
     }

@@ -21,7 +21,7 @@ defineProps<{
     socialMediaLinks: SocialMediaLink[];
     yearsOfExperience: number;
     developmentCreationsCount: number;
-    technologiesCount: number;
+    masteredFrameworksCount: number;
     laravelCreations: SSRCreation[];
     technologyExperiences: SSRTechnologyExperience[];
     experiences: SSRExperience[];
@@ -41,7 +41,7 @@ defineProps<{
             :socialMediaLinks="socialMediaLinks"
             :yearsOfExperience="yearsOfExperience"
             :developmentCreationsCount="developmentCreationsCount"
-            :technologiesCount="technologiesCount"
+            :masteredFrameworksCount="masteredFrameworksCount"
         />
 
         <div class="container mt-16 mb-16 flex flex-col gap-32" id="backend-and-laravel-specialization-section">

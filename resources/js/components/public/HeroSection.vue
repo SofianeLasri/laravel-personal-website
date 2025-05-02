@@ -14,7 +14,7 @@ const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
     yearsOfExperience: number;
     developmentCreationsCount: number;
-    technologiesCount: number;
+    masteredFrameworksCount: number;
 }>();
 
 // Valeurs réactives pour l'animation des compteurs
@@ -50,7 +50,7 @@ onMounted(() => {
         animatedDevelopmentCreationsCount.value = value;
     });
 
-    animateCounter(0, props.technologiesCount, 2500, (value) => {
+    animateCounter(0, props.masteredFrameworksCount, 2500, (value) => {
         animatedTechnologiesCount.value = value;
     });
 });

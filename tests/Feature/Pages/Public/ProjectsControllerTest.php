@@ -22,6 +22,7 @@ class ProjectsControllerTest extends TestCase
             ->has('locale')
             ->has('translations.projects')
             ->has('socialMediaLinks')
+            ->has('technologies')
         );
     }
 }

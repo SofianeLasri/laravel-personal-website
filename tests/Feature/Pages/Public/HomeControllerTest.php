@@ -25,7 +25,7 @@ class HomeControllerTest extends TestCase
                     ->has('socialMediaLinks')
                     ->has('yearsOfExperience')
                     ->has('developmentCreationsCount')
-                    ->has('technologiesCount')
+                    ->has('masteredFrameworksCount')
                     ->has('laravelCreations')
                     ->has('technologyExperiences')
                     ->has('experiences')

@@ -28,7 +28,7 @@ class PublicControllersService
     public function __construct()
     {
         $this->locale = app()->getLocale();
-        $this->creationCountByTechnology = $this->getCreationCountsByTechnology();
+        $this->creationCountByTechnology = $this->getCreationCountByTechnology();
     }
 
     /**
@@ -36,7 +36,7 @@ class PublicControllersService
      *
      * @return array{int, int}
      */
-    public function getCreationCountsByTechnology(): array
+    public function getCreationCountByTechnology(): array
     {
         $creationCountByTechnology = [];
 

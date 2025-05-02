@@ -14,7 +14,7 @@ class ProjectsControllerTest extends TestCase
 
     public function test_basic()
     {
-        $response = $this->get(route('projects')); //
+        $response = $this->get(route('projects'));
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page

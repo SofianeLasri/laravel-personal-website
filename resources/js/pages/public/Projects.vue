@@ -94,13 +94,13 @@ const handleGameEngineFilterChange = (ids: number[]) => {
 
         <div class="relative z-10 container mt-16 mb-16">
             <div class="mb-12 flex">
-                <div class="flex flex-col gap-6">
+                <div class="flex flex-1 flex-col gap-6">
                     <SectionTitle>Projects</SectionTitle>
                     <SectionParagraph>
                         Retrouvez tous mes projets et créations passés, allant du mapmaking sur Source Engine au développement web. :)
                     </SectionParagraph>
                 </div>
-                <div class="hidden xl:block"></div>
+                <div class="hidden flex-1 xl:block"></div>
             </div>
 
             <div class="mb-8 border-b border-gray-200">

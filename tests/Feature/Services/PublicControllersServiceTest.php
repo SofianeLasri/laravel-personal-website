@@ -72,6 +72,19 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
+    public function test_get_laravel_creations_but_laravel_tech_doesnt_exists()
+    {
+        Creation::factory()->count(3)->create([
+            'type' => 'website',
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getLaravelCreations();
+
+        $this->assertCount(0, $result);
+    }
+
+    #[Test]
     public function test_get_creations()
     {
         Creation::factory()->withTechnologies()->count(3)->create();

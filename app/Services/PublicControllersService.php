@@ -80,7 +80,7 @@ class PublicControllersService
     {
         $laravel = Technology::where('name', 'Laravel')->first();
 
-        if ($laravel->doesntExist()) {
+        if (! $laravel) {
             return collect();
         }
 

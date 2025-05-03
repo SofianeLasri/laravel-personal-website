@@ -259,7 +259,7 @@
   </component>
   <component name="PhpStanOptionsConfiguration">
     <option name="autoload" value="vendor/autoload.php" />
-    <option name="config" value="./phpstan.neon" />
+    <option name="config" value="phpstan.neon" />
     <option name="level" value="5" />
     <option name="transferred" value="true" />
   </component>

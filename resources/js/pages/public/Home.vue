@@ -21,7 +21,7 @@ defineProps<{
     socialMediaLinks: SocialMediaLink[];
     yearsOfExperience: number;
     developmentCreationsCount: number;
-    technologiesCount: number;
+    masteredFrameworksCount: number;
     laravelCreations: SSRCreation[];
     technologyExperiences: SSRTechnologyExperience[];
     experiences: SSRExperience[];
@@ -32,14 +32,17 @@ defineProps<{
     <Head title="Accueil" />
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <LightShape class="absolute top-0 left-[-27rem] z-0 xl:left-[-15rem]" />
+        <LightShape class="absolute top-[40rem] right-[-27rem] z-0 xl:right-[-15rem]" />
+        <LightShape class="absolute top-[80rem] left-[-27rem] z-0 xl:left-[-15rem]" />
+        <LightShape class="absolute top-[140rem] right-[-27rem] z-0 xl:right-[-15rem]" />
+        <LightShape class="absolute bottom-[40rem] left-[-27rem] z-0 xl:left-[-15rem]" />
+
         <HeroSection
             :socialMediaLinks="socialMediaLinks"
             :yearsOfExperience="yearsOfExperience"
             :developmentCreationsCount="developmentCreationsCount"
-            :technologiesCount="technologiesCount"
+            :masteredFrameworksCount="masteredFrameworksCount"
         />
-
-        <LightShape class="absolute top-[40rem] right-[-27rem] z-0 xl:right-[-15rem]" />
 
         <div class="container mt-16 mb-16 flex flex-col gap-32" id="backend-and-laravel-specialization-section">
             <section class="flex">

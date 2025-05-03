@@ -118,10 +118,12 @@ interface Tag {
     updated_at: string;
 }
 
+type TechnologyType = 'framework' | 'library' | 'language' | 'game_engine' | 'other';
+
 interface Technology {
     id: number;
     name: string;
-    type: 'framework' | 'library' | 'language' | 'other';
+    type: TechnologyType;
     svg_icon: string;
     description_translation_key_id: number;
     created_at: string;
@@ -195,20 +197,20 @@ interface SSRCreation {
     endedAtFormatted: string | null;
     type: string;
     shortDescription: string;
-    technologies: {
-        name: string;
-        svgIcon: string;
-    }[];
+    technologies: SSRTechnology[];
 }
 
-interface SSRTechnologyExperience {
+interface SSRTechnology {
     id: number;
     name: string;
-    description: string;
     creationCount: number;
-    type: 'framework' | 'library' | 'language' | 'other';
-    typeLabel: string;
+    type: TechnologyType;
     svgIcon: string;
+}
+
+interface SSRTechnologyExperience extends SSRTechnology {
+    description: string;
+    typeLabel: string;
 }
 
 interface SSRExperience {

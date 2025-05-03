@@ -3,13 +3,31 @@
 namespace App\Models;
 
 use App\Services\ImageTranscodingService;
+use Database\Factories\PictureFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+/**
+ * @property int $id
+ * @property string $filename
+ * @property int|null $width
+ * @property int|null $height
+ * @property int|null $size
+ * @property string|null $path_original
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property mixed $use_factory
+ * @property int|null $optimized_pictures_count
+ * @property-read Collection|OptimizedPicture[] $optimizedPictures
+ *
+ * @method static PictureFactory<self> factory($count = null, $state = [])
+ */
 class Picture extends Model
 {
     use HasFactory;

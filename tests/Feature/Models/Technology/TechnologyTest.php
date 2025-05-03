@@ -82,4 +82,13 @@ class TechnologyTest extends TestCase
         $this->assertEquals('Un framework PHP', $technology->getDescription('fr'));
         $this->assertEquals('A PHP framework', $technology->getDescription('en'));
     }
+
+    public function test_scopes()
+    {
+        Technology::factory()->create(['type' => 'library']);
+        $this->assertTrue(Technology::library()->exists());
+        $this->assertFalse(Technology::framework()->exists());
+        $this->assertFalse(Technology::language()->exists());
+        $this->assertFalse(Technology::other()->exists());
+    }
 }

@@ -7,6 +7,7 @@ enum TechnologyType: string
     case FRAMEWORK = 'framework';
     case LIBRARY = 'library';
     case LANGUAGE = 'language';
+    case GAME_ENGINE = 'game_engine';
     case OTHER = 'other';
 
     public function label(): string
@@ -15,6 +16,7 @@ enum TechnologyType: string
             self::FRAMEWORK => 'Framework',
             self::LIBRARY => 'Bibliothèque',
             self::LANGUAGE => 'Langage',
+            self::GAME_ENGINE => 'Moteur de jeu',
             self::OTHER => 'Autre',
         };
     }

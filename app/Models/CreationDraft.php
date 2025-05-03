@@ -4,13 +4,57 @@ namespace App\Models;
 
 use App\Enums\CreationType;
 use App\Services\CreationConversionService;
+use Database\Factories\CreationDraftFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property int|null $logo_id
+ * @property int|null $cover_image_id
+ * @property CreationType $type
+ * @property Carbon $started_at
+ * @property string|null $ended_at
+ * @property int|null $short_description_translation_key_id
+ * @property int|null $full_description_translation_key_id
+ * @property string|null $external_url
+ * @property string|null $source_code_url
+ * @property bool $featured
+ * @property int|null $original_creation_id
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property mixed $use_factory
+ * @property int|null $original_creations_count
+ * @property int|null $logos_count
+ * @property int|null $cover_images_count
+ * @property int|null $short_description_translation_keys_count
+ * @property int|null $full_description_translation_keys_count
+ * @property int|null $features_count
+ * @property int|null $screenshots_count
+ * @property int|null $technologies_count
+ * @property int|null $people_count
+ * @property int|null $tags_count
+ * @property-read Creation|null $originalCreation
+ * @property-read Picture|null $logo
+ * @property-read Picture|null $coverImage
+ * @property-read TranslationKey|null $shortDescriptionTranslationKey
+ * @property-read TranslationKey|null $fullDescriptionTranslationKey
+ * @property-read Collection|CreationDraftFeature[] $features
+ * @property-read Collection|CreationDraftScreenshot[] $screenshots
+ * @property-read Collection|Technology[] $technologies
+ * @property-read Collection|Person[] $people
+ * @property-read Collection|Tag[] $tags
+ *
+ * @method static CreationDraftFactory<self> factory($count = null, $state = [])
+ */
 class CreationDraft extends Model
 {
     use HasFactory;

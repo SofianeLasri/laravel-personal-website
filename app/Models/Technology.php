@@ -3,11 +3,37 @@
 namespace App\Models;
 
 use App\Enums\TechnologyType;
+use Database\Factories\TechnologyFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property TechnologyType $type
+ * @property string $svg_icon
+ * @property int $description_translation_key_id
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property mixed $use_factory
+ * @property int|null $creations_count
+ * @property int|null $description_translation_keys_count
+ * @property int|null $creation_drafts_count
+ * @property-read Collection|Creation[] $creations
+ * @property-read TranslationKey|null $descriptionTranslationKey
+ * @property-read Collection|CreationDraft[] $creationDrafts
+ *
+ * @method static Builder|Technology framework()
+ * @method static Builder|Technology library()
+ * @method static Builder|Technology language()
+ * @method static Builder|Technology other()
+ * @method static TechnologyFactory<self> factory($count = null, $state = [])
+ */
 class Technology extends Model
 {
     use HasFactory;
@@ -43,5 +69,25 @@ class Technology extends Model
     public function creationDrafts(): BelongsToMany
     {
         return $this->belongsToMany(CreationDraft::class, 'creation_draft_technology', 'technology_id', 'creation_draft_id');
+    }
+
+    public function scopeFramework($query)
+    {
+        return $query->where('type', TechnologyType::FRAMEWORK);
+    }
+
+    public function scopeLibrary($query)
+    {
+        return $query->where('type', TechnologyType::LIBRARY);
+    }
+
+    public function scopeLanguage($query)
+    {
+        return $query->where('type', TechnologyType::LANGUAGE);
+    }
+
+    public function scopeOther($query)
+    {
+        return $query->where('type', TechnologyType::OTHER);
     }
 }

@@ -130,35 +130,69 @@ class PublicControllersService
      */
     public function getCreations(): Collection
     {
-        $creations = Creation::with([
-            'technologies',
-            'logo',
-            'coverImage',
-            'shortDescriptionTranslationKey.translations' => function ($query) {
-                $query->where('locale', $this->locale);
-            },
-        ])->get();
+        $creations = Creation::all()->withRelationshipAutoloading();
 
         return $creations->map(function (Creation $creation) {
-            $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->first();
+            return $this->formatCreationForSSRShort($creation);
+        });
+    }
+
+    /**
+     * Format the Creation model for Server-Side Rendering (SSR).
+     * Returns a SSRSimplifiedCreation TypeScript type compatible array.
+     *
+     * @param  Creation  $creation  The creation to format
+     * @return array{id: int, name: string, slug: string, logo: string, coverImage: string, startedAt: string, endedAt: string|null, startedAtFormatted: string|null, endedAtFormatted: string|null, type: CreationType, shortDescription: string|null, technologies: array<int, array{id: int, creationCount: mixed, name: string, type: TechnologyType, svgIcon: string}>}
+     */
+    public function formatCreationForSSRShort(Creation $creation): array
+    {
+        $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+
+        return [
+            'id' => $creation->id,
+            'name' => $creation->name,
+            'slug' => $creation->slug,
+            'logo' => $creation->logo->getUrl('medium', 'avif'),
+            'coverImage' => $creation->coverImage->getUrl('medium', 'avif'),
+            'startedAt' => $creation->started_at,
+            'endedAt' => $creation->ended_at,
+            'startedAtFormatted' => $this->formatDate($creation->started_at),
+            'endedAtFormatted' => $this->formatDate($creation->ended_at),
+            'type' => $creation->type,
+            'shortDescription' => $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '',
+            'technologies' => $creation->technologies->map(function ($technology) {
+                return $this->formatTechnologyForSSR($technology);
+            }),
+        ];
+    }
+
+    /**
+     * Format the Creation model for Server-Side Rendering (SSR) with full description.
+     * Returns a SSSRFullCreation TypeScript type compatible array.
+     *
+     * @param  Creation  $creation  The creation to format
+     * @return array{id: int, name: string, slug: string, logo: string, coverImage: string, startedAt: string, endedAt: string|null, startedAtFormatted: string|null, endedAtFormatted: string|null, type: CreationType, shortDescription: string|null, fullDescription: string|null, features: array<int, array{id: int, title: string, description: string, picture: string}>}
+     */
+    public function formatCreationForSSRFull(Creation $creation): array
+    {
+        $shortCreation = $this->formatCreationForSSRShort($creation);
+        $fullDescriptionTranslation = $creation->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+
+        $shortCreation['fullDescription'] = $fullDescriptionTranslation ?? '';
+        $shortCreation['features'] = $creation->features->map(function ($feature) {
+            $titleTranslation = $feature->titleTranslationKey->translations->where('locale', $this->locale)->first();
+            $descriptionTranslation = $feature->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $pictureUrl = $feature->picture ? $feature->picture->getUrl('medium', 'avif') : null;
 
             return [
-                'id' => $creation->id,
-                'name' => $creation->name,
-                'slug' => $creation->slug,
-                'logo' => $creation->logo->getUrl('medium', 'avif'),
-                'coverImage' => $creation->coverImage->getUrl('medium', 'avif'),
-                'startedAt' => $creation->started_at,
-                'endedAt' => $creation->ended_at,
-                'startedAtFormatted' => $this->formatDate($creation->started_at),
-                'endedAtFormatted' => $this->formatDate($creation->ended_at),
-                'type' => $creation->type,
-                'shortDescription' => $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '',
-                'technologies' => $creation->technologies->map(function ($technology) {
-                    return $this->formatTechnologyForSSR($technology);
-                }),
+                'id' => $feature->id,
+                'title' => $titleTranslation ? $titleTranslation->text : '',
+                'description' => $descriptionTranslation ? $descriptionTranslation->text : '',
+                'picture' => $pictureUrl,
             ];
         });
+
+        return $shortCreation;
     }
 
     /**

@@ -3,18 +3,24 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Creation;
 use App\Models\SocialMediaLink;
+use App\Services\PublicControllersService;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
+    public function __construct(protected PublicControllersService $service) {}
+
     public function __invoke(string $slug)
     {
-        $project = SocialMediaLink::where('slug', $slug)->firstOrFail();
+        $creation = Creation::where('slug', $slug)->firstOrFail()
+            ->withRelationshipAutoloading();
 
         return Inertia::render('public/Project', [
             'locale' => app()->getLocale(),
             'socialMediaLinks' => SocialMediaLink::all(),
+            'creation' => $this->service->formatCreationForSSRFull($creation),
         ]);
     }
 }

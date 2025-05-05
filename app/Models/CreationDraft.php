@@ -22,7 +22,7 @@ use Illuminate\Validation\ValidationException;
  * @property int|null $cover_image_id
  * @property CreationType $type
  * @property Carbon $started_at
- * @property string|null $ended_at
+ * @property Carbon|null $ended_at
  * @property int|null $short_description_translation_key_id
  * @property int|null $full_description_translation_key_id
  * @property string|null $external_url
@@ -80,7 +80,7 @@ class CreationDraft extends Model
         'slug' => 'string',
         'type' => CreationType::class,
         'started_at' => 'date',
-        'ended_at' => 'date:Y-m-d',
+        'ended_at' => 'date',
         'external_url' => 'string',
         'source_code_url' => 'string',
         'featured' => 'boolean',

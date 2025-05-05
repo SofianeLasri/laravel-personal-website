@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Enums\CreationType;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\Feature;
 use App\Models\Screenshot;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -18,7 +20,7 @@ class CreationConversionService
     {
         $this->validateDraft($draft);
 
-        if ($draft->originalCreation()->exists()) {
+        if ($draft->originalCreation) {
             $creation = $draft->originalCreation;
             $creation->update($this->mapDraftAttributes($draft));
 
@@ -64,6 +66,22 @@ class CreationConversionService
         }
     }
 
+    /**
+     * @param  CreationDraft  $draft  The draft to map
+     * @return array{
+     *     name: string,
+     *     slug: string,
+     *     logo_id: int|null,
+     *     cover_image_id: int|null,
+     *     type: CreationType, started_at: Carbon,
+     *     ended_at: Carbon|null,
+     *     external_url: string|null,
+     *     source_code_url: string|null,
+     *     featured: bool,
+     *     short_description_translation_key_id: int|null,
+     *     full_description_translation_key_id: int|null,
+     * }
+     */
     private function mapDraftAttributes(CreationDraft $draft): array
     {
         return $draft->only([

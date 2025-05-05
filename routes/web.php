@@ -24,7 +24,7 @@ use Inertia\Inertia;
 Route::name('public.')->group(function () {
     Route::get('/cv-pdf', function () {
         return Inertia::location('https://1drv.ms/b/s!Atk178NpnuLmhJoiwLEN2FRww-mGcA?e=I1kL8w');
-    })->name('public.cv');
+    })->name('cv');
 
     Route::get('/', HomeController::class)->name('home');
     Route::get('/projects', ProjectsController::class)->name('projects');

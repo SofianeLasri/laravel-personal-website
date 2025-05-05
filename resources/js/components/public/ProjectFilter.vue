@@ -14,6 +14,11 @@ const emit = defineEmits<{
 }>();
 
 const selectedFilters = ref<Set<number>>(new Set());
+const isCollapsed = ref(false);
+
+const toggleCollapse = () => {
+    isCollapsed.value = !isCollapsed.value;
+};
 
 const toggleFilter = (techId: number) => {
     if (selectedFilters.value.has(techId)) {
@@ -28,10 +33,24 @@ const toggleFilter = (techId: number) => {
 
 <template>
     <div class="flex max-h-96 w-full flex-col items-start overflow-hidden rounded-2xl border bg-gray-100">
-        <div class="flex items-center gap-2.5 px-4 py-3">
+        <div class="flex w-full cursor-pointer items-center justify-between gap-2.5 px-4 py-3" @click="toggleCollapse" :aria-expanded="!isCollapsed">
             <div class="text-design-system-title justify-center">{{ name }}</div>
+            <svg
+                class="h-5 w-5 transition-transform duration-300"
+                :class="isCollapsed ? '' : 'rotate-180'"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+            >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
         </div>
-        <div class="outline-border flex flex-col self-stretch overflow-hidden rounded-2xl rounded-b-none outline-1">
+
+        <div
+            class="outline-border flex flex-col self-stretch overflow-hidden rounded-2xl rounded-b-none outline-1 transition-all duration-300 ease-in-out"
+            :class="isCollapsed ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100'"
+        >
             <div class="custom-scrollbar flex flex-col items-start gap-2 overflow-y-auto bg-white p-2">
                 <template v-for="tech in technologies" :key="tech.id">
                     <ActiveButton v-if="selectedFilters.has(tech.id)" class="w-full rounded-lg !px-3 py-2" @click="toggleFilter(tech.id)">

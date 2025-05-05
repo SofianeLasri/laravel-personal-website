@@ -17,6 +17,10 @@ const props = defineProps<{
     technologies: SSRTechnology[];
 }>();
 
+const containerKey = computed(() => {
+    return `${activeTab.value}-${selectedFrameworks.value.join('-')}-${selectedLibraries.value.join('-')}-${selectedGameEngines.value.join('-')}`;
+});
+
 const frameworks = props.technologies.filter((tech) => tech.type === 'framework');
 const libraries = props.technologies.filter((tech) => tech.type === 'library');
 const gameEngines = props.technologies.filter((tech) => tech.type === 'game_engine');
@@ -146,17 +150,36 @@ const handleGameEngineFilterChange = (ids: number[]) => {
                 <div v-else class="w-full lg:w-72"></div>
 
                 <div class="flex-1">
-                    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                        <div v-for="creation in filteredCreations" :key="creation.id">
-                            <ProjectCard class="md:w-full" :creation="creation" />
-                        </div>
+                    <Transition name="projects-fade" mode="out-in">
+                        <div :key="containerKey">
+                            <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                                <div v-for="creation in filteredCreations" :key="creation.id">
+                                    <ProjectCard class="md:w-full" :creation="creation" />
+                                </div>
 
-                        <div v-if="filteredCreations.length === 0" class="col-span-full py-12 text-center">
-                            <p class="text-lg text-gray-500">Aucun projet ne correspond à vos critères.</p>
+                                <div v-if="filteredCreations.length === 0" class="col-span-full py-12 text-center">
+                                    <p class="text-lg text-gray-500">Aucun projet ne correspond à vos critères.</p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </Transition>
                 </div>
             </div>
         </div>
     </PublicAppLayout>
 </template>
+
+<style scoped>
+.projects-fade-enter-active,
+.projects-fade-leave-active {
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+.projects-fade-enter-from,
+.projects-fade-leave-to {
+    opacity: 0;
+    transform: translateY(0.5rem);
+}
+</style>

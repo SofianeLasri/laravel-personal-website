@@ -168,7 +168,7 @@ class PublicControllersService
 
     /**
      * Format the Creation model for Server-Side Rendering (SSR) with full description.
-     * Returns a SSSRFullCreation TypeScript type compatible array.
+     * Returns a SSRFullCreation TypeScript type compatible array.
      *
      * @param  Creation  $creation  The creation to format
      * @return array{id: int, name: string, slug: string, logo: string, coverImage: string, startedAt: string, endedAt: string|null, startedAtFormatted: string|null, endedAtFormatted: string|null, type: CreationType, shortDescription: string|null, fullDescription: string|null, features: array<int, array{id: int, title: string, description: string, picture: string}>}

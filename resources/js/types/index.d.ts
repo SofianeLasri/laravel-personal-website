@@ -200,7 +200,7 @@ interface SSRSimplifiedCreation {
     technologies: SSRTechnology[];
 }
 
-interface SSSRFullCreation extends SSRSimplifiedCreation {
+interface SSRFullCreation extends SSRSimplifiedCreation {
     fullDescription: string;
     features: SSRFeature[];
 }

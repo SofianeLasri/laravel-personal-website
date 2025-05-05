@@ -31,11 +31,13 @@ defineProps<{
 <template>
     <Head title="Accueil" />
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
-        <LightShape class="absolute top-0 left-[-27rem] z-0 xl:left-[-15rem]" />
-        <LightShape class="absolute top-[40rem] right-[-27rem] z-0 xl:right-[-15rem]" />
-        <LightShape class="absolute top-[80rem] left-[-27rem] z-0 xl:left-[-15rem]" />
-        <LightShape class="absolute top-[140rem] right-[-27rem] z-0 xl:right-[-15rem]" />
-        <LightShape class="absolute bottom-[40rem] left-[-27rem] z-0 xl:left-[-15rem]" />
+        <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
+            <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
+            <LightShape class="absolute top-[40rem] right-[-27rem] xl:right-[-15rem]" />
+            <LightShape class="absolute top-[80rem] left-[-27rem] xl:left-[-15rem]" />
+            <LightShape class="absolute top-[140rem] right-[-27rem] xl:right-[-15rem]" />
+            <LightShape class="absolute bottom-[40rem] left-[-27rem] xl:left-[-15rem]" />
+        </div>
 
         <HeroSection
             :socialMediaLinks="socialMediaLinks"

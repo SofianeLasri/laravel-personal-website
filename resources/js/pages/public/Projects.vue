@@ -90,7 +90,9 @@ const handleGameEngineFilterChange = (ids: number[]) => {
 <template>
     <Head title="Projets" />
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
-        <LightShape class="absolute top-0 left-[-27rem] z-0 xl:left-[-15rem]" />
+        <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
+            <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
+        </div>
 
         <div class="relative z-10 container mt-16 mb-16">
             <div class="mb-12 flex">

@@ -23,7 +23,7 @@ class PublicControllersServiceTest extends TestCase
         Creation::factory()->withTechnologies(5)->count(3)->create();
 
         $service = new PublicControllersService;
-        $result = $service->getCreationCountByTechnology();
+        $result = $service->calcCreationCountByTechnology();
 
         $this->assertCount(15, $result);
     }

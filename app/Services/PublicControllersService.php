@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use App\Enums\CreationType;
+use App\Enums\ExperienceType;
 use App\Enums\TechnologyType;
 use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -23,20 +24,23 @@ class PublicControllersService
         CreationType::WEBSITE,
     ];
 
+    /**
+     * @var array<int, int|null>
+     */
     private array $creationCountByTechnology;
 
     public function __construct()
     {
         $this->locale = app()->getLocale();
-        $this->creationCountByTechnology = $this->getCreationCountByTechnology();
+        $this->creationCountByTechnology = $this->calcCreationCountByTechnology();
     }
 
     /**
      * Return projects count per technology.
      *
-     * @return array{int, int}
+     * @return array<int, int|null>
      */
-    public function getCreationCountByTechnology(): array
+    public function calcCreationCountByTechnology(): array
     {
         $creationCountByTechnology = [];
 
@@ -52,7 +56,7 @@ class PublicControllersService
     /**
      * Get the projects count and development years of experience.
      *
-     * @return array{'yearsOfExperience': int, 'count': int}
+     * @return array{yearsOfExperience: 0|float, count: int<0, max>}
      */
     public function getDevelopmentStats(): array
     {
@@ -75,6 +79,21 @@ class PublicControllersService
     /**
      * Get all the Laravel projects.
      * Returns a SSRSimplifiedCreation TypeScript type compatible object.
+     *
+     * @return Collection<int, array{
+     *     id: int,
+     *     name: string,
+     *     slug: string,
+     *     logo: string|null,
+     *     coverImage: string|null,
+     *     startedAt: Carbon,
+     *     endedAt: Carbon|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null,
+     *     type: CreationType,
+     *     shortDescription: string,
+     *     technologies: Collection<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>
+     * }>
      */
     public function getLaravelCreations(): Collection
     {
@@ -84,35 +103,30 @@ class PublicControllersService
             return collect();
         }
 
-        $developmentCreations = Creation::with([
-            'technologies',
-            'logo',
-            'coverImage',
-            'shortDescriptionTranslationKey.translations' => function ($query) {
-                $query->where('locale', $this->locale);
-            },
-        ])
-            ->whereIn('type', self::DEVELOPMENT_TYPES)
+        $developmentCreations = Creation::whereIn('type', self::DEVELOPMENT_TYPES)
             ->whereHas('technologies', function ($query) use ($laravel) {
                 $query->where('technologies.id', $laravel->id);
-            })
-            ->get();
+            })->get()->withRelationshipAutoloading();
 
         $creations = $developmentCreations->map(function (Creation $creation) {
-            $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->first();
+            $shortDescription = '';
+            if ($creation->shortDescriptionTranslationKey) {
+                $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+                $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
+            }
 
             return [
                 'id' => $creation->id,
                 'name' => $creation->name,
                 'slug' => $creation->slug,
-                'logo' => $creation->logo->getUrl('medium', 'avif'),
-                'coverImage' => $creation->coverImage->getUrl('medium', 'avif'),
+                'logo' => $creation->logo ? $creation->logo->getUrl('medium', 'avif') : null,
+                'coverImage' => $creation->coverImage ? $creation->coverImage->getUrl('large', 'avif') : null,
                 'startedAt' => $creation->started_at,
                 'endedAt' => $creation->ended_at,
                 'startedAtFormatted' => $this->formatDate($creation->started_at),
                 'endedAtFormatted' => $this->formatDate($creation->ended_at),
-                'type' => $creation->type->label(),
-                'shortDescription' => $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '',
+                'type' => $creation->type,
+                'shortDescription' => $shortDescription,
                 'technologies' => $creation->technologies->map(function ($technology) {
                     return $this->formatTechnologyForSSR($technology);
                 }),
@@ -127,6 +141,21 @@ class PublicControllersService
     /**
      * Get all the projects.
      * Returns a SSRSimplifiedCreation TypeScript type compatible object.
+     *
+     * @return Collection<int, array{
+     *     id: int,
+     *     name: string,
+     *     slug: string,
+     *     logo: string|null,
+     *     coverImage: string|null,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null,
+     *     type: CreationType,
+     *     shortDescription: string|null,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>
+     * }>
      */
     public function getCreations(): Collection
     {
@@ -142,27 +171,44 @@ class PublicControllersService
      * Returns a SSRSimplifiedCreation TypeScript type compatible array.
      *
      * @param  Creation  $creation  The creation to format
-     * @return array{id: int, name: string, slug: string, logo: string, coverImage: string, startedAt: string, endedAt: string|null, startedAtFormatted: string|null, endedAtFormatted: string|null, type: CreationType, shortDescription: string|null, technologies: array<int, array{id: int, creationCount: mixed, name: string, type: TechnologyType, svgIcon: string}>}
+     * @return array{
+     *     id: int,
+     *     name: string,
+     *     slug: string,
+     *     logo: string|null,
+     *     coverImage: string|null,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null,
+     *     type: CreationType,
+     *     shortDescription: string|null,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>
+     * }
      */
     public function formatCreationForSSRShort(Creation $creation): array
     {
-        $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+        $shortDescription = null;
+        if ($creation->shortDescriptionTranslationKey) {
+            $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
+        }
 
         return [
             'id' => $creation->id,
             'name' => $creation->name,
             'slug' => $creation->slug,
-            'logo' => $creation->logo->getUrl('medium', 'avif'),
-            'coverImage' => $creation->coverImage->getUrl('medium', 'avif'),
+            'logo' => $creation->logo ? $creation->logo->getUrl('medium', 'avif') : null,
+            'coverImage' => $creation->coverImage ? $creation->coverImage->getUrl('medium', 'avif') : null,
             'startedAt' => $creation->started_at,
             'endedAt' => $creation->ended_at,
             'startedAtFormatted' => $this->formatDate($creation->started_at),
             'endedAtFormatted' => $this->formatDate($creation->ended_at),
             'type' => $creation->type,
-            'shortDescription' => $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '',
+            'shortDescription' => $shortDescription,
             'technologies' => $creation->technologies->map(function ($technology) {
                 return $this->formatTechnologyForSSR($technology);
-            }),
+            })->toArray(),
         ];
     }
 
@@ -171,26 +217,53 @@ class PublicControllersService
      * Returns a SSRFullCreation TypeScript type compatible array.
      *
      * @param  Creation  $creation  The creation to format
-     * @return array{id: int, name: string, slug: string, logo: string, coverImage: string, startedAt: string, endedAt: string|null, startedAtFormatted: string|null, endedAtFormatted: string|null, type: CreationType, shortDescription: string|null, fullDescription: string|null, features: array<int, array{id: int, title: string, description: string, picture: string}>}
+     * @return array{id: int,
+     *     name: string,
+     *     slug: string,
+     *     logo: string|null,
+     *     coverImage: string|null,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null,
+     *     type: CreationType,
+     *     shortDescription: string|null,
+     *     fullDescription: string|null,
+     *     features: array<int, array{id: int, title: string, description: string, picture: string}>}
      */
     public function formatCreationForSSRFull(Creation $creation): array
     {
         $shortCreation = $this->formatCreationForSSRShort($creation);
-        $fullDescriptionTranslation = $creation->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
 
-        $shortCreation['fullDescription'] = $fullDescriptionTranslation ?? '';
+        $fullDescription = '';
+        if ($creation->fullDescriptionTranslationKey) {
+            $fullDescriptionTranslation = $creation->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
+        }
+
+        $shortCreation['fullDescription'] = $fullDescription;
         $shortCreation['features'] = $creation->features->map(function ($feature) {
-            $titleTranslation = $feature->titleTranslationKey->translations->where('locale', $this->locale)->first();
-            $descriptionTranslation = $feature->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $title = '';
+            if ($feature->titleTranslationKey) {
+                $titleTranslation = $feature->titleTranslationKey->translations->where('locale', $this->locale)->first();
+                $title = $titleTranslation ? $titleTranslation->text : '';
+            }
+
+            $description = '';
+            if ($feature->descriptionTranslationKey) {
+                $descriptionTranslation = $feature->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
+                $description = $descriptionTranslation ? $descriptionTranslation->text : '';
+            }
+
             $pictureUrl = $feature->picture ? $feature->picture->getUrl('medium', 'avif') : null;
 
             return [
                 'id' => $feature->id,
-                'title' => $titleTranslation ? $titleTranslation->text : '',
-                'description' => $descriptionTranslation ? $descriptionTranslation->text : '',
+                'title' => $title,
+                'description' => $description,
                 'picture' => $pictureUrl,
             ];
-        });
+        })->toArray();
 
         return $shortCreation;
     }
@@ -199,7 +272,7 @@ class PublicControllersService
      * Format the Technology model for Server-Side Rendering (SSR).
      * Returns a SSRTechnology TypeScript type compatible array.
      *
-     * @return array{id: int, creationCount: mixed, name: string, type: TechnologyType, svgIcon: string}
+     * @return array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
@@ -215,24 +288,29 @@ class PublicControllersService
     /**
      * Get all the technology experiences.
      * Returns a SSRTechnologyExperience TypeScript type compatible object.
+     *
+     * @return Collection<int, array{
+     *     id: int,
+     *     name: string,
+     *     description: string,
+     *     creationCount: int,
+     *     type: TechnologyType,
+     *     typeLabel: string,
+     *     svgIcon: string}>
      */
     public function getTechnologyExperiences(): Collection
     {
-        $experiences = TechnologyExperience::with([
-            'technology',
-            'descriptionTranslationKey.translations' => function ($query) {
-                $query->where('locale', $this->locale);
-            },
-        ])->get();
+        $experiences = TechnologyExperience::all()->withRelationshipAutoloading();
 
         return $experiences->map(function (TechnologyExperience $experience) {
-            $description = $experience->descriptionTranslationKey->translations->first();
             $technologyId = $experience->technology->id;
+            $descriptionTranslation = $experience->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $description = $descriptionTranslation ? $descriptionTranslation->text : '';
 
             return [
                 'id' => $experience->id,
                 'name' => $experience->technology->name,
-                'description' => $description ? $description->text : '',
+                'description' => $description,
                 'creationCount' => $this->creationCountByTechnology[$technologyId] ?? 0,
                 'type' => $experience->technology->type,
                 'typeLabel' => $experience->technology->type->label(),
@@ -244,50 +322,64 @@ class PublicControllersService
     /**
      * Get all the experiences.
      * Returns a SSRExperience TypeScript type compatible object.
+     *
+     * @return Collection<int, array{
+     *     id: int,
+     *     title: string,
+     *     organizationName: string,
+     *     logo: string|null,
+     *     location: string,
+     *     websiteUrl: string|null,
+     *     shortDescription: string,
+     *     fullDescription: string,
+     *     technologies: Collection<int, array{name: string, svgIcon: string, description: string}>,
+     *     type: ExperienceType,
+     *     startedAt: Carbon,
+     *     endedAt: Carbon|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null}>
      */
     public function getExperiences(): Collection
     {
-        $experiences = Experience::with([
-            'technologies' => function ($query) {
-                $query->with([
-                    'descriptionTranslationKey.translations' => function ($query) {
-                        $query->where('locale', $this->locale);
-                    },
-                ]);
-            },
-            'logo',
-            'titleTranslationKey.translations' => function ($query) {
-                $query->where('locale', $this->locale);
-            },
-            'shortDescriptionTranslationKey.translations' => function ($query) {
-                $query->where('locale', $this->locale);
-            },
-            'fullDescriptionTranslationKey.translations' => function ($query) {
-                $query->where('locale', $this->locale);
-            },
-        ])->get();
+        $experiences = Experience::all()->withRelationshipAutoloading();
 
         return $experiences->map(function (Experience $experience) {
-            $title = $experience->titleTranslationKey->translations->first();
-            $shortDescription = $experience->shortDescriptionTranslationKey->translations->first();
-            $fullDescription = $experience->fullDescriptionTranslationKey->translations->first();
+            $title = '';
+            if ($experience->titleTranslationKey) {
+                $titleTranslation = $experience->titleTranslationKey->translations->where('locale', $this->locale)->first();
+                $title = $titleTranslation ? $titleTranslation->text : '';
+            }
+            $shortDescription = '';
+            if ($experience->shortDescriptionTranslationKey) {
+                $shortDescriptionTranslation = $experience->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+                $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
+            }
+            $fullDescription = '';
+            if ($experience->fullDescriptionTranslationKey) {
+                $fullDescriptionTranslation = $experience->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+                $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
+            }
 
             return [
                 'id' => $experience->id,
-                'title' => $title ? $title->text : '',
+                'title' => $title,
                 'organizationName' => $experience->organization_name,
-                'logo' => $experience->logo->getUrl('medium', 'webp'),
+                'logo' => $experience->logo ? $experience->logo->getUrl('medium', 'avif') : null,
                 'location' => $experience->location,
                 'websiteUrl' => $experience->website_url,
-                'shortDescription' => $shortDescription ? $shortDescription->text : '',
-                'fullDescription' => $fullDescription ? $fullDescription->text : '',
+                'shortDescription' => $shortDescription,
+                'fullDescription' => $fullDescription,
                 'technologies' => $experience->technologies->map(function ($technology) {
-                    $description = $technology->descriptionTranslationKey->translations->first();
+                    $description = '';
+                    if ($technology->descriptionTranslationKey) {
+                        $descriptionTranslation = $technology->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
+                        $description = $descriptionTranslation ? $descriptionTranslation->text : '';
+                    }
 
                     return [
                         'name' => $technology->name,
                         'svgIcon' => $technology->svg_icon,
-                        'description' => $description ? $description->text : '',
+                        'description' => $description,
                     ];
                 }),
                 'type' => $experience->type,

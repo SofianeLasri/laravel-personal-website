@@ -185,7 +185,7 @@ interface SocialMediaLink {
 
 // The following interfaces are used for the SSR (Server-Side Rendering) creation data
 // that is sent to the frontend through Inertia.js.
-interface SSRCreation {
+interface SSRSimplifiedCreation {
     id: number;
     name: string;
     slug: string;
@@ -198,6 +198,11 @@ interface SSRCreation {
     type: string;
     shortDescription: string;
     technologies: SSRTechnology[];
+}
+
+interface SSSRFullCreation extends SSRSimplifiedCreation {
+    fullDescription: string;
+    features: SSRFeature[];
 }
 
 interface SSRTechnology {
@@ -232,6 +237,13 @@ interface SSRExperience {
     endedAt: string | null;
     startedAtFormatted: string;
     endedAtFormatted: string | null;
+}
+
+interface SSRFeature {
+    id: number;
+    title: string;
+    description: string;
+    picture: string | null;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

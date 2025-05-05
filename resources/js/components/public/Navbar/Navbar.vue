@@ -18,8 +18,8 @@ const linkHeight = ref(48);
 const linkGap = 12;
 
 const routes = [
-    { path: route('home'), name: 'Accueil', index: 0 },
-    { path: route('projects'), name: 'Projets', index: 1 },
+    { path: route('public.home'), name: 'Accueil', index: 0 },
+    { path: route('public.projects'), name: 'Projets', index: 1 },
     { path: '#', name: 'Parcours professionnel & scolaire', index: 2 },
     { path: '#', name: 'À propos', index: 3 },
 ];

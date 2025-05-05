@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
-    <Link class="flex flex-shrink-0 items-center gap-4" :href="route('home')">
+    <Link class="flex flex-shrink-0 items-center gap-4" :href="route('public.home')">
         <Logo />
         <div class="xs:flex hidden flex-col">
             <div class="text-xl leading-5 font-bold">Sofiane Lasri.</div>

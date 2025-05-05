@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { SSRCreation } from '@/types';
+import { SSRSimplifiedCreation } from '@/types';
 
 const props = defineProps<{
-    creation: SSRCreation;
+    creation: SSRSimplifiedCreation;
 }>();
 
 const startYear = new Date(props.creation.startedAt).getFullYear();

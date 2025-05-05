@@ -2,11 +2,11 @@
 import ArrowLeftRegular from '@/components/font-awesome/ArrowLeftRegular.vue';
 import ArrowRightRegular from '@/components/font-awesome/ArrowRightRegular.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
-import type { SSRCreation } from '@/types';
+import type { SSRSimplifiedCreation } from '@/types';
 import { computed, onMounted, ref, watch } from 'vue';
 
 interface Props {
-    items: SSRCreation[];
+    items: SSRSimplifiedCreation[];
 }
 
 const props = defineProps<Props>();

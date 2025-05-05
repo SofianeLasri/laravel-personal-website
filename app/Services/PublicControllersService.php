@@ -74,7 +74,7 @@ class PublicControllersService
 
     /**
      * Get all the Laravel projects.
-     * Returns a SSRCreation TypeScript type compatible object.
+     * Returns a SSRSimplifiedCreation TypeScript type compatible object.
      */
     public function getLaravelCreations(): Collection
     {
@@ -126,7 +126,7 @@ class PublicControllersService
 
     /**
      * Get all the projects.
-     * Returns a SSRCreation TypeScript type compatible object.
+     * Returns a SSRSimplifiedCreation TypeScript type compatible object.
      */
     public function getCreations(): Collection
     {

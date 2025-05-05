@@ -5,7 +5,7 @@ import ProjectFilter from '@/components/public/ProjectFilter.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import SectionTitle from '@/components/public/Ui/SectionTitle.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
-import { SocialMediaLink, SSRCreation, SSRTechnology } from '@/types';
+import { SocialMediaLink, SSRSimplifiedCreation, SSRTechnology } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 
@@ -13,7 +13,7 @@ type ProjectTab = 'development' | 'games' | 'source-engine';
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
-    creations: SSRCreation[];
+    creations: SSRSimplifiedCreation[];
     technologies: SSRTechnology[];
 }>();
 

@@ -12,7 +12,7 @@ import SectionTitle from '@/components/public/Ui/SectionTitle.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
-import { SocialMediaLink, SSRCreation, SSRExperience, SSRTechnologyExperience } from '@/types';
+import { SocialMediaLink, SSRExperience, SSRSimplifiedCreation, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
 
 const { t } = useTranslation();
@@ -22,7 +22,7 @@ defineProps<{
     yearsOfExperience: number;
     developmentCreationsCount: number;
     masteredFrameworksCount: number;
-    laravelCreations: SSRCreation[];
+    laravelCreations: SSRSimplifiedCreation[];
     technologyExperiences: SSRTechnologyExperience[];
     experiences: SSRExperience[];
 }>();

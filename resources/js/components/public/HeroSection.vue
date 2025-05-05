@@ -73,7 +73,7 @@ onMounted(() => {
             </h1>
             <div class="flex flex-col items-start gap-8 self-stretch">
                 <div class="inline-flex items-center gap-2 py-12 xl:py-0">
-                    <BlackLinkButton :href="route('cv')" title="CV" target="_blank">
+                    <BlackLinkButton :href="route('public.cv')" title="CV" target="_blank">
                         {{ t('home.hero.download_cv') }}
                     </BlackLinkButton>
                     <LightLinkButton v-for="link in socialMediaLinks" :key="link.name" :href="link.url" :title="link.name" target="_blank">

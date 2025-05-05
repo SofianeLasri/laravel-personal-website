@@ -2,7 +2,8 @@
 <project version="4">
   <component name="LocaleSphereService">
     <directories>
-      <php.laravel.php path="$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Translation/lang" defaultLanguage="fr" />
+      <php.laravel.php path="$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Translation/lang" defaultLanguage="en" />
+      <php.laravel.php path="$PROJECT_DIR$/lang" defaultLanguage="fr" />
     </directories>
   </component>
 </project>

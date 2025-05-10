@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Logo from '@/components/public/Logo.vue';
 import { SocialMediaLink } from '@/types';
+import { Link } from '@inertiajs/vue3';
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -31,10 +32,10 @@ defineProps<{
                             <div class="text-xl font-bold text-black">Portfolio.</div>
                             <ul class="text-design-system-paragraph text-base font-normal">
                                 <li class="mb-2 list-none">
-                                    <a href="/" title="Accueil">Accueil</a>
+                                    <Link :href="route('home')" title="Accueil">Accueil</Link>
                                 </li>
                                 <li class="mb-2 list-none">
-                                    <a href="/projects" title="Mes projets">Projets</a>
+                                    <Link :href="route('projects')" title="Mes projets">Projets</Link>
                                 </li>
                                 <li class="mb-2 list-none">
                                     <a href="/career" title="Mon parcours professionnel & scolaire">Parcours</a>

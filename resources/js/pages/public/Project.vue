@@ -137,13 +137,21 @@ const defaultSvgIcon =
                     <a
                         v-for="screenshot in creation.screenshots"
                         :key="screenshot.id"
-                        :href="screenshot.picture"
-                        data-pswp-width="128"
-                        data-pswp-height="128"
+                        :href="screenshot.picture.avif.full"
+                        :data-pswp-width="screenshot.picture.width"
+                        :data-pswp-height="screenshot.picture.height"
                         target="_blank"
-                        class="focus:ring-pink-normal relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl focus:ring-2 focus:outline-none"
+                        class="relative flex aspect-square w-full shrink-0 overflow-hidden rounded-2xl focus:ring-2"
                     >
-                        <img class="h-full w-full object-cover" :src="screenshot.picture" :alt="screenshot.caption || 'Screenshot'" loading="lazy" />
+                        <picture class="h-full w-full">
+                            <source :srcset="screenshot.picture.webp.medium" type="image/webp" />
+                            <img
+                                :src="screenshot.picture.avif.medium"
+                                :alt="screenshot.caption || 'Screenshot'"
+                                loading="lazy"
+                                class="h-full w-full object-cover"
+                            />
+                        </picture>
 
                         <!-- Overlay -->
                         <div

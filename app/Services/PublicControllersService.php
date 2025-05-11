@@ -8,6 +8,7 @@ use App\Enums\TechnologyType;
 use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\Feature;
+use App\Models\Picture;
 use App\Models\Screenshot;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
@@ -234,7 +235,7 @@ class PublicControllersService
      *     externalUrl: string|null,
      *     sourceCodeUrl: string|null,
      *     features: array<int, array{id: int, title: string, description: string, picture: string}>,
-     *     screenshots: array<int, array{id: int, picture: string|null, caption: string}>,
+     *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string}>,
      *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>}
      */
     public function formatCreationForSSRFull(Creation $creation): array
@@ -274,6 +275,7 @@ class PublicControllersService
         })->toArray();
 
         $response['screenshots'] = $creation->screenshots->map(function (Screenshot $screenshot) {
+
             $caption = '';
             if ($screenshot->captionTranslationKey) {
                 $captionTranslation = $screenshot->captionTranslationKey->translations->where('locale', $this->locale)->first();
@@ -282,12 +284,57 @@ class PublicControllersService
 
             return [
                 'id' => $screenshot->id,
-                'picture' => $screenshot->picture ? $screenshot->picture->getUrl('large', 'avif') : null,
+                'picture' => $this->formatPictureForSSR($screenshot->picture),
                 'caption' => $caption,
             ];
         })->toArray();
 
         return $response;
+    }
+
+    /**
+     * Format the Picture model for Server-Side Rendering (SSR).
+     *
+     * @param  Picture  $picture  The picture to format
+     * @return array{
+     *  filename: string,
+     *  width: int|null,
+     *  height: int|null,
+     *  avif: array{
+     *      thumbnail: string,
+     *      small: string,
+     *      medium: string,
+     *      large: string,
+     *      full: string,},
+     *  webp: array{
+     *      thumbnail: string,
+     *      small: string,
+     *      medium: string,
+     *      large: string,
+     *      full: string,},
+     * }
+     */
+    public function formatPictureForSSR(Picture $picture): array
+    {
+        return [
+            'filename' => $picture->filename,
+            'width' => $picture->width,
+            'height' => $picture->height,
+            'avif' => [
+                'thumbnail' => $picture->getUrl('thumbnail', 'avif'),
+                'small' => $picture->getUrl('small', 'avif'),
+                'medium' => $picture->getUrl('medium', 'avif'),
+                'large' => $picture->getUrl('large', 'avif'),
+                'full' => $picture->getUrl('full', 'avif'),
+            ],
+            'webp' => [
+                'thumbnail' => $picture->getUrl('thumbnail', 'webp'),
+                'small' => $picture->getUrl('small', 'webp'),
+                'medium' => $picture->getUrl('medium', 'webp'),
+                'large' => $picture->getUrl('large', 'webp'),
+                'full' => $picture->getUrl('full', 'webp'),
+            ],
+        ];
     }
 
     /**

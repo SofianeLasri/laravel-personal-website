@@ -248,8 +248,28 @@ interface SSRFeature {
 
 interface SSRScreenshot {
     id: number;
-    picture: string;
+    picture: SSRPicture;
     caption: string | null;
+}
+
+interface SSRPicture {
+    filename: string;
+    width: number | null;
+    height: number | null;
+    avif: {
+        thumbnail: string;
+        small: string;
+        medium: string;
+        large: string;
+        full: string;
+    };
+    webp: {
+        thumbnail: string;
+        small: string;
+        medium: string;
+        large: string;
+        full: string;
+    };
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

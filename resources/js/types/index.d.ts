@@ -189,8 +189,8 @@ interface SSRSimplifiedCreation {
     id: number;
     name: string;
     slug: string;
-    logo: string;
-    coverImage: string;
+    logo: SSRPicture;
+    coverImage: SSRPicture;
     startedAt: string;
     endedAt: string | null;
     startedAtFormatted: string;

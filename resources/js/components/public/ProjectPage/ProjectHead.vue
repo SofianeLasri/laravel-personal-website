@@ -14,7 +14,10 @@ defineProps<{
             <div class="flex flex-col gap-6 self-stretch">
                 <div class="inline-flex justify-between self-stretch">
                     <div class="bg-gray-0 flex size-24 items-center justify-center gap-2.5 overflow-hidden rounded-lg border p-4">
-                        <img class="flex-1 self-stretch" :src="creation.logo" alt="Logo du projet" />
+                        <picture class="flex-1">
+                            <source :srcset="creation.logo.webp.small" type="image/webp" />
+                            <img :src="creation.logo.avif.small" alt="Logo of the project" class="h-full w-full object-cover" loading="eager" />
+                        </picture>
                     </div>
                     <div class="flex w-64 flex-col items-end" v-if="creation.endedAt">
                         <div class="text-design-system-paragraph justify-center font-medium">Réalisé en</div>
@@ -52,7 +55,10 @@ defineProps<{
                 <div
                     class="action-container-inner-shadow flex aspect-video h-36 flex-1 flex-col items-center justify-center overflow-hidden rounded-2xl border bg-white lg:h-[360px] 2xl:h-[480px]"
                 >
-                    <img class="h-full w-full object-cover" :src="creation.coverImage" alt="Image de couverture" />
+                    <picture class="h-full w-full">
+                        <source :srcset="creation.coverImage.webp.large" type="image/webp" />
+                        <img :src="creation.coverImage.avif.large" alt="Project cover" class="h-full w-full object-cover" loading="eager" />
+                    </picture>
                 </div>
             </div>
         </div>

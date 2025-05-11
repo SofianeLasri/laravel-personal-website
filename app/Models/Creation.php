@@ -39,8 +39,8 @@ use Illuminate\Support\Carbon;
  * @property int|null $people_count
  * @property int|null $tags_count
  * @property int|null $drafts_count
- * @property-read Picture|null $logo
- * @property-read Picture|null $coverImage
+ * @property-read Picture $logo
+ * @property-read Picture $coverImage
  * @property-read TranslationKey|null $shortDescriptionTranslationKey
  * @property-read TranslationKey|null $fullDescriptionTranslationKey
  * @property-read Collection|Feature[] $features

@@ -24,14 +24,20 @@ if (startYear && endYear) {
             class="flex aspect-video flex-col gap-2.5 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
             :href="route('public.projects.show', { slug: creation.slug })"
         >
-            <img class="h-full w-full object-cover" alt="Project Image" :src="creation.coverImage" draggable="false" />
+            <picture class="h-full w-full">
+                <source :srcset="creation.coverImage.webp.medium" type="image/webp" />
+                <img :src="creation.coverImage.avif.medium" alt="Project cover" class="h-full w-full object-cover" loading="lazy" />
+            </picture>
         </Link>
         <div class="flex gap-4 rounded-2xl">
             <Link
                 class="flex size-20 items-center justify-center gap-2.5 rounded-lg border bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
                 :href="route('public.projects.show', { slug: creation.slug })"
             >
-                <img class="flex-1" :src="creation.logo" alt="Logo of the project" draggable="false" />
+                <picture class="flex-1">
+                    <source :srcset="creation.logo.webp.thumbnail" type="image/webp" />
+                    <img :src="creation.logo.avif.thumbnail" alt="Logo of the project" class="h-full w-full object-cover" loading="lazy" />
+                </picture>
             </Link>
             <div class="flex flex-1 flex-col gap-4">
                 <div class="flex flex-col gap-px">

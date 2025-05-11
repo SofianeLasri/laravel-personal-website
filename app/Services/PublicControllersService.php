@@ -83,27 +83,27 @@ class PublicControllersService
      * Get all the Laravel projects.
      * Returns a SSRSimplifiedCreation TypeScript type compatible object.
      *
-     * @return Collection<int, array{
-     *     id: int,
-     *     name: string,
-     *     slug: string,
-     *     logo: string|null,
-     *     coverImage: string|null,
-     *     startedAt: Carbon,
-     *     endedAt: Carbon|null,
-     *     startedAtFormatted: string|null,
-     *     endedAtFormatted: string|null,
-     *     type: CreationType,
-     *     shortDescription: string,
-     *     technologies: Collection<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
-     * }>
+     * @return array{
+     *      id: int,
+     *      name: string,
+     *      slug: string,
+     *      logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *      coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *      startedAt: string,
+     *      endedAt: string|null,
+     *      startedAtFormatted: string|null,
+     *      endedAtFormatted: string|null,
+     *      type: CreationType,
+     *      shortDescription: string|null,
+     *      technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
+     *  }
      */
-    public function getLaravelCreations(): Collection
+    public function getLaravelCreations(): array
     {
         $laravel = Technology::where('name', 'Laravel')->first();
 
         if (! $laravel) {
-            return collect();
+            return [];
         }
 
         $developmentCreations = Creation::whereIn('type', self::DEVELOPMENT_TYPES)
@@ -112,33 +112,12 @@ class PublicControllersService
             })->get()->withRelationshipAutoloading();
 
         $creations = $developmentCreations->map(function (Creation $creation) {
-            $shortDescription = '';
-            if ($creation->shortDescriptionTranslationKey) {
-                $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-                $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
-            }
-
-            return [
-                'id' => $creation->id,
-                'name' => $creation->name,
-                'slug' => $creation->slug,
-                'logo' => $creation->logo ? $creation->logo->getUrl('medium', 'avif') : null,
-                'coverImage' => $creation->coverImage ? $creation->coverImage->getUrl('large', 'avif') : null,
-                'startedAt' => $creation->started_at,
-                'endedAt' => $creation->ended_at,
-                'startedAtFormatted' => $this->formatDate($creation->started_at),
-                'endedAtFormatted' => $this->formatDate($creation->ended_at),
-                'type' => $creation->type,
-                'shortDescription' => $shortDescription,
-                'technologies' => $creation->technologies->map(function ($technology) {
-                    return $this->formatTechnologyForSSR($technology);
-                }),
-            ];
+            return $this->formatCreationForSSRShort($creation);
         });
 
         return $creations->sortByDesc(function ($creation) {
             return $creation['endedAt'] ?? now();
-        })->values();
+        })->toArray();
     }
 
     /**
@@ -178,8 +157,8 @@ class PublicControllersService
      *     id: int,
      *     name: string,
      *     slug: string,
-     *     logo: string|null,
-     *     coverImage: string|null,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
      *     startedAt: string,
      *     endedAt: string|null,
      *     startedAtFormatted: string|null,
@@ -201,8 +180,8 @@ class PublicControllersService
             'id' => $creation->id,
             'name' => $creation->name,
             'slug' => $creation->slug,
-            'logo' => $creation->logo ? $creation->logo->getUrl('medium', 'avif') : null,
-            'coverImage' => $creation->coverImage ? $creation->coverImage->getUrl('medium', 'avif') : null,
+            'logo' => $this->formatPictureForSSR($creation->logo),
+            'coverImage' => $this->formatPictureForSSR($creation->coverImage),
             'startedAt' => $creation->started_at,
             'endedAt' => $creation->ended_at,
             'startedAtFormatted' => $this->formatDate($creation->started_at),
@@ -223,8 +202,8 @@ class PublicControllersService
      * @return array{id: int,
      *     name: string,
      *     slug: string,
-     *     logo: string|null,
-     *     coverImage: string|null,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
      *     startedAt: string,
      *     endedAt: string|null,
      *     startedAtFormatted: string|null,

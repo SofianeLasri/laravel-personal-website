@@ -17,7 +17,7 @@ class PictureFactory extends Factory
     public function definition(): array
     {
         return [
-            'filename' => $this->faker->word(),
+            'filename' => $this->faker->slug(),
             'width' => $this->faker->randomNumber(),
             'height' => $this->faker->randomNumber(),
             'size' => $this->faker->randomNumber(),

@@ -229,11 +229,13 @@ class PublicControllersService
      *     type: CreationType,
      *     shortDescription: string|null,
      *     fullDescription: string|null,
+     *     externalUrl: string|null,
+     *     sourceCodeUrl: string|null,
      *     features: array<int, array{id: int, title: string, description: string, picture: string}>}
      */
     public function formatCreationForSSRFull(Creation $creation): array
     {
-        $shortCreation = $this->formatCreationForSSRShort($creation);
+        $response = $this->formatCreationForSSRShort($creation);
 
         $fullDescription = '';
         if ($creation->fullDescriptionTranslationKey) {
@@ -241,8 +243,10 @@ class PublicControllersService
             $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
         }
 
-        $shortCreation['fullDescription'] = $fullDescription;
-        $shortCreation['features'] = $creation->features->map(function ($feature) {
+        $response['fullDescription'] = $fullDescription;
+        $response['externalUrl'] = $creation->external_url;
+        $response['sourceCodeUrl'] = $creation->source_code_url;
+        $response['features'] = $creation->features->map(function ($feature) {
             $title = '';
             if ($feature->titleTranslationKey) {
                 $titleTranslation = $feature->titleTranslationKey->translations->where('locale', $this->locale)->first();
@@ -265,7 +269,7 @@ class PublicControllersService
             ];
         })->toArray();
 
-        return $shortCreation;
+        return $response;
     }
 
     /**

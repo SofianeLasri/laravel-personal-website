@@ -28,7 +28,7 @@ if (startYear && endYear) {
         </Link>
         <div class="flex gap-4 rounded-2xl">
             <Link
-                class="outline-border flex size-20 items-center justify-center gap-2.5 rounded-lg bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] outline"
+                class="flex size-20 items-center justify-center gap-2.5 rounded-lg border bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
                 :href="route('public.projects.show', { slug: creation.slug })"
             >
                 <img class="flex-1" :src="creation.logo" alt="Logo of the project" draggable="false" />

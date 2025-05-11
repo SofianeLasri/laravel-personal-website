@@ -192,7 +192,7 @@ interface SSRSimplifiedCreation {
     logo: string;
     coverImage: string;
     startedAt: string;
-    endedAt: string;
+    endedAt: string | null;
     startedAtFormatted: string;
     endedAtFormatted: string | null;
     type: string;
@@ -202,6 +202,8 @@ interface SSRSimplifiedCreation {
 
 interface SSRFullCreation extends SSRSimplifiedCreation {
     fullDescription: string;
+    externalUrl: string | null;
+    sourceCodeUrl: string | null;
     features: SSRFeature[];
 }
 

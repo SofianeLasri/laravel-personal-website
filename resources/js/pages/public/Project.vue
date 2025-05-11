@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import ExpandSolid from '@/components/font-awesome/ExpandSolid.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
+import ProjectScreenshotsContainer from '@/components/public/ProjectPage/ProjectScreenshotsContainer.vue';
+import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import PhotoSwipeLightbox from 'photoswipe/lightbox';
-import 'photoswipe/style.css';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
 
@@ -55,20 +54,11 @@ const handleScroll = () => {
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);
-    const lightbox = new PhotoSwipeLightbox({
-        gallery: `#medias`,
-        children: 'a',
-        pswpModule: () => import('photoswipe'),
-    });
-    lightbox.init();
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener('scroll', handleScroll);
 });
-
-const defaultSvgIcon =
-    '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 14.9L12.5 12.2V7Z" fill="currentColor"></path></svg>';
 </script>
 
 <template>
@@ -115,54 +105,20 @@ const defaultSvgIcon =
             <section id="technologies" class="flex flex-col gap-8" v-if="creation.technologies.length > 0">
                 <ContentSectionTitle>Technologies utilisées</ContentSectionTitle>
                 <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
-                    <div
+                    <TechnologyCard
                         v-for="tech in creation.technologies"
                         :key="tech.name"
-                        class="flex items-center justify-start gap-2 rounded-lg p-2 outline-1 outline-gray-200"
-                    >
-                        <div class="size-10 lg:size-16" v-html="tech.svgIcon || defaultSvgIcon"></div>
-                        <div class="flex w-full flex-col justify-center gap-1">
-                            <div class="text-design-system-title text-sm lg:text-base">{{ tech.name }}</div>
-                            <div class="text-design-system-paragraph w-full justify-center text-xs lg:text-sm">
-                                {{ tech.description }}
-                            </div>
-                        </div>
-                    </div>
+                        :name="tech.name"
+                        :description="tech.description"
+                        :svgIcon="tech.svgIcon"
+                        class="bg-gray-100"
+                    />
                 </div>
             </section>
 
             <section id="screenshots" class="flex flex-col gap-8" v-if="creation.screenshots.length > 0">
                 <ContentSectionTitle>Captures d'écrans</ContentSectionTitle>
-                <div id="medias" class="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    <a
-                        v-for="screenshot in creation.screenshots"
-                        :key="screenshot.id"
-                        :href="screenshot.picture.avif.full"
-                        :data-pswp-width="screenshot.picture.width"
-                        :data-pswp-height="screenshot.picture.height"
-                        target="_blank"
-                        class="relative flex aspect-square w-full shrink-0 overflow-hidden rounded-2xl focus:ring-2"
-                    >
-                        <picture class="h-full w-full">
-                            <source :srcset="screenshot.picture.webp.medium" type="image/webp" />
-                            <img
-                                :src="screenshot.picture.avif.medium"
-                                :alt="screenshot.caption || 'Screenshot'"
-                                loading="lazy"
-                                class="h-full w-full object-cover"
-                            />
-                        </picture>
-
-                        <!-- Overlay -->
-                        <div
-                            class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-300 hover:opacity-100"
-                        >
-                            <div class="text-white">
-                                <ExpandSolid class="size-8 fill-white" />
-                            </div>
-                        </div>
-                    </a>
-                </div>
+                <ProjectScreenshotsContainer :screenshots="creation.screenshots" />
             </section>
         </div>
     </PublicAppLayout>

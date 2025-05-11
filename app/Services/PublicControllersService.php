@@ -294,6 +294,7 @@ class PublicControllersService
 
     /**
      * Format the Picture model for Server-Side Rendering (SSR).
+     * Returns a SSRPicture TypeScript type compatible array.
      *
      * @param  Picture  $picture  The picture to format
      * @return array{
@@ -403,7 +404,7 @@ class PublicControllersService
      *     id: int,
      *     title: string,
      *     organizationName: string,
-     *     logo: string|null,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
      *     location: string,
      *     websiteUrl: string|null,
      *     shortDescription: string,
@@ -440,7 +441,7 @@ class PublicControllersService
                 'id' => $experience->id,
                 'title' => $title,
                 'organizationName' => $experience->organization_name,
-                'logo' => $experience->logo ? $experience->logo->getUrl('medium', 'avif') : null,
+                'logo' => $this->formatPictureForSSR($experience->logo),
                 'location' => $experience->location,
                 'websiteUrl' => $experience->website_url,
                 'shortDescription' => $shortDescription,

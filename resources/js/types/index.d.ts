@@ -226,7 +226,7 @@ interface SSRExperience {
     id: number;
     title: string;
     organizationName: string;
-    logo: string;
+    logo: SSRPicture;
     location: string;
     websiteUrl: string;
     shortDescription: string;

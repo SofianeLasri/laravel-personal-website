@@ -106,7 +106,6 @@ const defaultSvgIcon =
 
 <template>
     <div class="relative inline-flex flex-col items-center justify-start gap-8 self-stretch">
-        <!-- Switch -->
         <div class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex gap-2 rounded-2xl p-2">
             <BlackButton v-if="selectedType === 'formation'" class="rounded-lg">
                 <GraduationCapSolid class="h-4 fill-white" />
@@ -127,11 +126,8 @@ const defaultSvgIcon =
             </WhiteButton>
         </div>
 
-        <!-- Conteneur principal - passage en colonne sur mobile -->
         <div class="flex flex-col items-start justify-start gap-8 self-stretch lg:flex-row">
-            <!-- Sidebar - liste des expériences - largeur complète sur mobile -->
             <div class="flex w-full shrink-0 flex-col items-start justify-start gap-8 lg:w-96">
-                <!-- Liste des expériences par année -->
                 <div v-for="yearGroup in experiencesByYear" :key="yearGroup.year" class="flex flex-col items-start justify-start gap-4 self-stretch">
                     <div
                         class="justify-center self-stretch text-xl font-bold lg:text-2xl"
@@ -161,7 +157,6 @@ const defaultSvgIcon =
                 </div>
             </div>
 
-            <!-- Détails de l'expérience sélectionnée -->
             <div
                 v-if="selectedExperience"
                 class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur inline-flex grow gap-2.5 self-stretch rounded-3xl p-2"
@@ -169,7 +164,6 @@ const defaultSvgIcon =
                 <div
                     class="outline-border action-container-inner-shadow inline-flex w-full flex-col items-start justify-start rounded-2xl bg-white outline-1"
                 >
-                    <!-- Header - adapté pour mobile -->
                     <div class="relative inline-flex flex-col items-start justify-between self-stretch px-4 py-4 lg:flex-row lg:px-8 lg:py-6">
                         <div
                             class="absolute top-1 right-1 -bottom-2 left-1 z-0 rounded-t-2xl bg-[url(/resources/images/public/shadowed-dots.svg)] bg-size-[.6rem]"
@@ -180,7 +174,15 @@ const defaultSvgIcon =
                             <div
                                 class="outline-border flex size-16 items-center justify-center gap-2.5 rounded-xl bg-white p-3 outline-1 lg:size-24 lg:p-4"
                             >
-                                <img class="object-contain" :src="selectedExperience.logo || 'https://placehold.co/64x64'" alt="Logo" />
+                                <picture class="h-full w-full">
+                                    <source :srcset="selectedExperience.logo.webp.thumbnail" type="image/webp" />
+                                    <img
+                                        :src="selectedExperience.logo.avif.thumbnail"
+                                        :alt="selectedExperience.title"
+                                        class="object-contain"
+                                        loading="lazy"
+                                    />
+                                </picture>
                             </div>
                             <div class="inline-flex h-auto flex-1 flex-col items-start justify-between gap-2 lg:gap-0 xl:h-24">
                                 <div class="flex flex-col items-start justify-start gap-0.5 self-stretch">

@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import ExpandSolid from '@/components/font-awesome/ExpandSolid.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
 import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import PhotoSwipeLightbox from 'photoswipe/lightbox';
+import 'photoswipe/style.css';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
 
@@ -52,6 +55,12 @@ const handleScroll = () => {
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);
+    const lightbox = new PhotoSwipeLightbox({
+        gallery: `#medias`,
+        children: 'a',
+        pswpModule: () => import('photoswipe'),
+    });
+    lightbox.init();
 });
 
 onBeforeUnmount(() => {
@@ -93,7 +102,7 @@ const defaultSvgIcon =
                 <vue-markdown class="markdown-view" :source="creation.fullDescription" />
             </section>
 
-            <section id="features" class="flex flex-col gap-8">
+            <section id="features" class="flex flex-col gap-8" v-if="creation.features.length > 0">
                 <ContentSectionTitle>Fonctionnalités clés</ContentSectionTitle>
                 <div class="grid gap-16 md:grid-cols-2 lg:grid-cols-3">
                     <div v-for="feature in creation.features" :key="feature.id" class="flex flex-col gap-6">
@@ -103,7 +112,7 @@ const defaultSvgIcon =
                 </div>
             </section>
 
-            <section id="technologies" class="flex flex-col gap-8">
+            <section id="technologies" class="flex flex-col gap-8" v-if="creation.technologies.length > 0">
                 <ContentSectionTitle>Technologies utilisées</ContentSectionTitle>
                 <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                     <div
@@ -119,6 +128,32 @@ const defaultSvgIcon =
                             </div>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <section id="screenshots" class="flex flex-col gap-8" v-if="creation.screenshots.length > 0">
+                <ContentSectionTitle>Captures d'écrans</ContentSectionTitle>
+                <div id="medias" class="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <a
+                        v-for="screenshot in creation.screenshots"
+                        :key="screenshot.id"
+                        :href="screenshot.picture"
+                        data-pswp-width="128"
+                        data-pswp-height="128"
+                        target="_blank"
+                        class="focus:ring-pink-normal relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl focus:ring-2 focus:outline-none"
+                    >
+                        <img class="h-full w-full object-cover" :src="screenshot.picture" :alt="screenshot.caption || 'Screenshot'" loading="lazy" />
+
+                        <!-- Overlay -->
+                        <div
+                            class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-300 hover:opacity-100"
+                        >
+                            <div class="text-white">
+                                <ExpandSolid class="size-8 fill-white" />
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </section>
         </div>

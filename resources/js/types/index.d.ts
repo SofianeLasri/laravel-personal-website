@@ -211,6 +211,7 @@ interface SSRFullCreation extends SSRSimplifiedCreation {
 interface SSRTechnology {
     id: number;
     name: string;
+    description: string;
     creationCount: number;
     type: TechnologyType;
     svgIcon: string;
@@ -230,11 +231,7 @@ interface SSRExperience {
     websiteUrl: string;
     shortDescription: string;
     fullDescription: string;
-    technologies: {
-        name: string;
-        svgIcon: string;
-        description: string;
-    };
+    technologies: SSRTechnology[];
     type: 'emploi' | 'formation';
     startedAt: string;
     endedAt: string | null;

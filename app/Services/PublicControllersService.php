@@ -94,7 +94,7 @@ class PublicControllersService
      *     endedAtFormatted: string|null,
      *     type: CreationType,
      *     shortDescription: string,
-     *     technologies: Collection<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>
+     *     technologies: Collection<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
      * }>
      */
     public function getLaravelCreations(): Collection
@@ -156,7 +156,7 @@ class PublicControllersService
      *     endedAtFormatted: string|null,
      *     type: CreationType,
      *     shortDescription: string|null,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
      * }>
      */
     public function getCreations(): Collection
@@ -185,7 +185,7 @@ class PublicControllersService
      *     endedAtFormatted: string|null,
      *     type: CreationType,
      *     shortDescription: string|null,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
      * }
      */
     public function formatCreationForSSRShort(Creation $creation): array
@@ -208,7 +208,7 @@ class PublicControllersService
             'endedAtFormatted' => $this->formatDate($creation->ended_at),
             'type' => $creation->type,
             'shortDescription' => $shortDescription,
-            'technologies' => $creation->technologies->map(function ($technology) {
+            'technologies' => $creation->technologies->map(function (Technology $technology) {
                 return $this->formatTechnologyForSSR($technology);
             })->toArray(),
         ];
@@ -294,14 +294,21 @@ class PublicControllersService
      * Format the Technology model for Server-Side Rendering (SSR).
      * Returns a SSRTechnology TypeScript type compatible array.
      *
-     * @return array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}
+     * @return array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
+        $description = '';
+        if ($technology->descriptionTranslationKey) {
+            $descriptionTranslation = $technology->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $description = $descriptionTranslation ? $descriptionTranslation->text : '';
+        }
+
         return [
             'id' => $technology->id,
             'creationCount' => $this->creationCountByTechnology[$technology->id] ?? 0,
             'name' => $technology->name,
+            'description' => $description,
             'type' => $technology->type,
             'svgIcon' => $technology->svg_icon,
         ];
@@ -354,7 +361,7 @@ class PublicControllersService
      *     websiteUrl: string|null,
      *     shortDescription: string,
      *     fullDescription: string,
-     *     technologies: Collection<int, array{name: string, svgIcon: string, description: string}>,
+     *     technologies: Collection<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>,
      *     type: ExperienceType,
      *     startedAt: Carbon,
      *     endedAt: Carbon|null,
@@ -391,18 +398,8 @@ class PublicControllersService
                 'websiteUrl' => $experience->website_url,
                 'shortDescription' => $shortDescription,
                 'fullDescription' => $fullDescription,
-                'technologies' => $experience->technologies->map(function ($technology) {
-                    $description = '';
-                    if ($technology->descriptionTranslationKey) {
-                        $descriptionTranslation = $technology->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
-                        $description = $descriptionTranslation ? $descriptionTranslation->text : '';
-                    }
-
-                    return [
-                        'name' => $technology->name,
-                        'svgIcon' => $technology->svg_icon,
-                        'description' => $description,
-                    ];
+                'technologies' => $experience->technologies->map(function (Technology $technology) {
+                    return $this->formatTechnologyForSSR($technology);
                 }),
                 'type' => $experience->type,
                 'startedAt' => $experience->started_at,

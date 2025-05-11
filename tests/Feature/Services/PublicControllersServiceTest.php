@@ -219,12 +219,28 @@ class PublicControllersServiceTest extends TestCase
     #[Test]
     public function test_format_creation_for_ssr_full()
     {
-        $creation = Creation::factory()->create([
-            'name' => 'Test Creation',
-            'type' => 'website',
-            'started_at' => now(),
-            'ended_at' => now()->addMonth(),
-        ]);
+        $creation = Creation::factory()
+            ->withFeatures(3)
+            ->withScreenshots(4)
+            ->create([
+                'name' => 'Test Creation',
+                'type' => 'website',
+                'started_at' => now(),
+                'ended_at' => now()->addMonth(),
+                'external_url' => 'https://example.com',
+                'source_code_url' => 'https://github.com/example/repo',
+            ]);
+
+        $this->assertCount(3, $creation->features);
+        $this->assertCount(4, $creation->screenshots);
+
+        $featureWithoutPicture = $creation->features->first();
+        $featureWithoutPicture->update(['picture_id' => null]);
+
+        $screenshotWithoutCaption = $creation->screenshots->first();
+        $screenshotWithoutCaption->update(['caption_translation_key_id' => null]);
+
+        $creation->refresh();
 
         $service = new PublicControllersService;
         $result = $service->formatCreationForSSRFull($creation);
@@ -237,25 +253,41 @@ class PublicControllersServiceTest extends TestCase
         foreach ($creation->features as $feature) {
             $resultFeature = collect($result['features'])->firstWhere('id', $feature->id);
 
+            $this->assertEquals($feature->id, $resultFeature['id']);
+
             $featureName = $feature->titleTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
             $featureDescription = $feature->descriptionTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
 
-            $this->assertEquals($feature->id, $resultFeature['id']);
-            $this->assertEquals($featureName, $resultFeature['name']);
+            $this->assertEquals($featureName, $resultFeature['title']);
             $this->assertEquals($featureDescription, $resultFeature['description']);
 
-            if ($feature->picture) {
+            if ($feature->picture_id) {
                 $this->assertNotNull($resultFeature['picture']);
+                $this->assertEquals($feature->picture->filename, $resultFeature['picture']['filename']);
+                $this->assertArrayHasKey('avif', $resultFeature['picture']);
+                $this->assertArrayHasKey('webp', $resultFeature['picture']);
+            } else {
+                $this->assertNull($resultFeature['picture']);
             }
         }
 
         foreach ($creation->screenshots as $screenshot) {
             $resultScreenshot = collect($result['screenshots'])->firstWhere('id', $screenshot->id);
-            $caption = $screenshot->captionTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
 
             $this->assertEquals($screenshot->id, $resultScreenshot['id']);
-            $this->assertEquals($caption, $resultScreenshot['caption']);
+
+            if ($screenshot->caption_translation_key_id) {
+                $caption = $screenshot->captionTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
+                $this->assertEquals($caption, $resultScreenshot['caption']);
+            } else {
+                $this->assertEmpty($resultScreenshot['caption']);
+            }
+
             $this->assertNotNull($resultScreenshot['picture']);
+            $this->assertEquals($screenshot->picture->filename, $resultScreenshot['picture']['filename']);
+
+            $this->assertArrayHasKey('avif', $resultScreenshot['picture']);
+            $this->assertArrayHasKey('webp', $resultScreenshot['picture']);
         }
     }
 }

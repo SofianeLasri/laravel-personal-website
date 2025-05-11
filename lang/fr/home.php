@@ -24,7 +24,7 @@ return [
     ],
     'other_skills' => [
         'title' => "Mais j'ai aussi d'autres compétences !",
-        'paragraph' => 'De manière générale, j’aime toucher à tout. Il est très important pour moi de savoir être autonome, quel que soit le domaine.',
+        'description' => 'De manière générale, j’aime toucher à tout. Il est très important pour moi de savoir être autonome, quel que soit le domaine.',
     ],
     'career' => [
         'title' => 'Mon parcours professionnel & scolaire.',

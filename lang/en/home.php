@@ -24,7 +24,7 @@ return [
     ],
     'other_skills' => [
         'title' => 'But I also have other skills!',
-        'paragraph' => 'Generally, I like to dabble in everything. It\'s very important for me to be self-sufficient, regardless of the field.',
+        'description' => 'Generally, I like to dabble in everything. It\'s very important for me to be self-sufficient, regardless of the field.',
     ],
     'career' => [
         'title' => 'My professional & educational background.',

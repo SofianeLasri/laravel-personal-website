@@ -5,6 +5,7 @@ import GraduationCapSolid from '@/components/font-awesome/GraduationCapSolid.vue
 import LocationDotSolid from '@/components/font-awesome/LocationDotSolid.vue';
 import CareerBlackButton from '@/components/public/Career/CareerBlackButton.vue';
 import CareerWhiteButton from '@/components/public/Career/CareerWhiteButton.vue';
+import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
 import WhiteLinkButtonSm from '@/components/public/Ui/Button/WhiteLinkButtonSm.vue';
@@ -99,15 +100,13 @@ const getTechnologies = (technologies: any) => {
     if (Array.isArray(technologies)) return technologies;
     return [technologies];
 };
-
-const defaultSvgIcon =
-    '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 14.9L12.5 12.2V7Z" fill="currentColor"></path></svg>';
 </script>
 
 <template>
     <div class="relative inline-flex flex-col items-center justify-start gap-8 self-stretch">
-        <!-- Switch -->
-        <div class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex gap-2 rounded-2xl p-2">
+        <div
+            class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex flex-col gap-2 rounded-2xl p-2 sm:flex-row"
+        >
             <BlackButton v-if="selectedType === 'formation'" class="rounded-lg">
                 <GraduationCapSolid class="h-4 fill-white" />
                 <span>Éducation</span>
@@ -127,11 +126,8 @@ const defaultSvgIcon =
             </WhiteButton>
         </div>
 
-        <!-- Conteneur principal - passage en colonne sur mobile -->
         <div class="flex flex-col items-start justify-start gap-8 self-stretch lg:flex-row">
-            <!-- Sidebar - liste des expériences - largeur complète sur mobile -->
             <div class="flex w-full shrink-0 flex-col items-start justify-start gap-8 lg:w-96">
-                <!-- Liste des expériences par année -->
                 <div v-for="yearGroup in experiencesByYear" :key="yearGroup.year" class="flex flex-col items-start justify-start gap-4 self-stretch">
                     <div
                         class="justify-center self-stretch text-xl font-bold lg:text-2xl"
@@ -161,7 +157,6 @@ const defaultSvgIcon =
                 </div>
             </div>
 
-            <!-- Détails de l'expérience sélectionnée -->
             <div
                 v-if="selectedExperience"
                 class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur inline-flex grow gap-2.5 self-stretch rounded-3xl p-2"
@@ -169,7 +164,6 @@ const defaultSvgIcon =
                 <div
                     class="outline-border action-container-inner-shadow inline-flex w-full flex-col items-start justify-start rounded-2xl bg-white outline-1"
                 >
-                    <!-- Header - adapté pour mobile -->
                     <div class="relative inline-flex flex-col items-start justify-between self-stretch px-4 py-4 lg:flex-row lg:px-8 lg:py-6">
                         <div
                             class="absolute top-1 right-1 -bottom-2 left-1 z-0 rounded-t-2xl bg-[url(/resources/images/public/shadowed-dots.svg)] bg-size-[.6rem]"
@@ -180,7 +174,15 @@ const defaultSvgIcon =
                             <div
                                 class="outline-border flex size-16 items-center justify-center gap-2.5 rounded-xl bg-white p-3 outline-1 lg:size-24 lg:p-4"
                             >
-                                <img class="object-contain" :src="selectedExperience.logo || 'https://placehold.co/64x64'" alt="Logo" />
+                                <picture class="h-full w-full">
+                                    <source :srcset="selectedExperience.logo.webp.thumbnail" type="image/webp" />
+                                    <img
+                                        :src="selectedExperience.logo.avif.thumbnail"
+                                        :alt="selectedExperience.title"
+                                        class="object-contain"
+                                        loading="lazy"
+                                    />
+                                </picture>
                             </div>
                             <div class="inline-flex h-auto flex-1 flex-col items-start justify-between gap-2 lg:gap-0 xl:h-24">
                                 <div class="flex flex-col items-start justify-start gap-0.5 self-stretch">
@@ -217,19 +219,13 @@ const defaultSvgIcon =
                             <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">Technologies utilisées</h3>
 
                             <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
-                                <div
+                                <TechnologyCard
                                     v-for="tech in getTechnologies(selectedExperience.technologies)"
                                     :key="tech.name"
-                                    class="flex items-center justify-start gap-2 rounded-lg p-2 outline-1 outline-gray-200"
-                                >
-                                    <div class="size-10 lg:size-16" v-html="tech.svgIcon || defaultSvgIcon"></div>
-                                    <div class="flex w-full flex-col justify-center gap-1">
-                                        <div class="text-design-system-title text-sm lg:text-base">{{ tech.name }}</div>
-                                        <div class="text-design-system-paragraph w-full justify-center text-xs lg:text-sm">
-                                            {{ tech.description }}
-                                        </div>
-                                    </div>
-                                </div>
+                                    :name="tech.name"
+                                    :description="tech.description"
+                                    :svgIcon="tech.svgIcon"
+                                />
                             </div>
                         </div>
                     </div>

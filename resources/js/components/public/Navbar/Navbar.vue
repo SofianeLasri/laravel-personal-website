@@ -14,19 +14,21 @@ const currentPath = computed(() => currentUrl.value.href);
 const isMenuOpen = ref(false);
 const hoveredItemIndex = ref(null);
 const indicatorPosition = ref(0);
+const indicatorVisible = ref(false);
 const linkHeight = ref(48);
 const linkGap = 12;
 
 const routes = [
-    { path: route('home'), name: 'Accueil', index: 0 },
-    { path: route('projects'), name: 'Projets', index: 1 },
+    { path: route('public.home'), name: 'Accueil', index: 0 },
+    { path: route('public.projects'), name: 'Projets', index: 1 },
     { path: '#', name: 'Parcours professionnel & scolaire', index: 2 },
     { path: '#', name: 'À propos', index: 3 },
 ];
 
 const activeIndex = computed(() => {
-    const matchingRoute = routes.find((r) => r.path === currentPath.value);
-    return matchingRoute ? matchingRoute.index : 0;
+    const cleanedPath = currentPath.value.endsWith('/') ? currentPath.value.slice(0, -1) : currentPath.value;
+    const matchingRoute = routes.find((r) => r.path === cleanedPath);
+    return matchingRoute ? matchingRoute.index : null;
 });
 
 const isItemActive = (index: any) => {
@@ -49,8 +51,9 @@ const handleEscKey = (event: KeyboardEvent) => {
 
 const updateIndicatorPosition = (index: any) => {
     hoveredItemIndex.value = index;
+    indicatorVisible.value = true;
 
-    if (index == 0) {
+    if (index === 0) {
         indicatorPosition.value = 0;
     } else {
         indicatorPosition.value = index * (linkHeight.value + linkGap);
@@ -59,19 +62,38 @@ const updateIndicatorPosition = (index: any) => {
 
 const resetIndicator = () => {
     hoveredItemIndex.value = null;
-    indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+
+    if (activeIndex.value !== null) {
+        indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+        indicatorVisible.value = true;
+    } else {
+        indicatorVisible.value = false;
+    }
 };
 
 watch(isMenuOpen, (value) => {
     document.body.style.overflow = value ? 'hidden' : '';
     if (value) {
-        resetIndicator();
+        if (activeIndex.value !== null) {
+            indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+            indicatorVisible.value = true;
+        } else {
+            indicatorPosition.value = 0;
+            indicatorVisible.value = false;
+        }
     }
 });
 
 onMounted(() => {
     document.addEventListener('keydown', handleEscKey);
-    resetIndicator();
+
+    if (activeIndex.value !== null) {
+        indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+        indicatorVisible.value = true;
+    } else {
+        indicatorPosition.value = 0;
+        indicatorVisible.value = false;
+    }
 });
 
 onUnmounted(() => {
@@ -81,13 +103,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="navbar z-10 container flex content-center justify-between py-16">
+    <div class="navbar z-10 container flex content-center justify-between px-4 py-16">
         <NavBrand />
         <div class="flex flex-nowrap items-center justify-center gap-4">
             <NavSearchBar class="hidden md:flex" />
-            <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu">
-                <span>Menu</span>
-                <BarStaggeredRegular class="h-4 fill-white" />
+            <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
+                <span class="xs:block hidden">Menu</span>
+                <BarStaggeredRegular class="xs:relative absolute size-4 fill-white" />
             </BlackButton>
         </div>
     </div>
@@ -111,8 +133,8 @@ onUnmounted(() => {
                         aria-controls="fullscreen-menu"
                         aria-label="Fermer le menu"
                     >
-                        <span>Femer</span>
-                        <BarStaggeredRegular class="h-4 fill-white" />
+                        <span>Fermer</span>
+                        <BarStaggeredRegular class="size-4 fill-white" />
                     </BlackButton>
 
                     <div class="flex flex-col gap-8">
@@ -122,7 +144,10 @@ onUnmounted(() => {
                         <div class="relative flex flex-col gap-3">
                             <div
                                 class="bg-primary absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
-                                :style="{ transform: `translateY(${indicatorPosition}px)` }"
+                                :style="{
+                                    transform: `translateY(${indicatorPosition}px)`,
+                                    opacity: indicatorVisible ? 1 : 0,
+                                }"
                             ></div>
 
                             <div

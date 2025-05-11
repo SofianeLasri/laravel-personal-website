@@ -12,7 +12,7 @@ class ExperienceRequest extends FormRequest
             'locale' => ['required', 'string', 'in:fr,en'],
             'title' => ['required', 'string'],
             'organization_name' => ['required'],
-            'logo_id' => ['nullable', 'exists:pictures,id'],
+            'logo_id' => ['exists:pictures,id'],
             'type' => ['required'],
             'location' => ['required'],
             'website_url' => ['nullable'],

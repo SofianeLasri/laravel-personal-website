@@ -30,6 +30,7 @@ class ExperienceTest extends TestCase
             'organization_name' => 'Université Paris Saclay',
             'type' => ExperienceType::FORMATION,
             'location' => 'Saclay, France',
+            'logo_id' => Picture::factory()->create()->id,
             'website_url' => 'https://www.universite-paris-saclay.fr/',
             'short_description_translation_key_id' => $shortDescKey->id,
             'full_description_translation_key_id' => $fullDescKey->id,

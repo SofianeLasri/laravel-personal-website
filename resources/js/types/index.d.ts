@@ -185,14 +185,14 @@ interface SocialMediaLink {
 
 // The following interfaces are used for the SSR (Server-Side Rendering) creation data
 // that is sent to the frontend through Inertia.js.
-interface SSRCreation {
+interface SSRSimplifiedCreation {
     id: number;
     name: string;
     slug: string;
-    logo: string;
-    coverImage: string;
+    logo: SSRPicture;
+    coverImage: SSRPicture;
     startedAt: string;
-    endedAt: string;
+    endedAt: string | null;
     startedAtFormatted: string;
     endedAtFormatted: string | null;
     type: string;
@@ -200,9 +200,18 @@ interface SSRCreation {
     technologies: SSRTechnology[];
 }
 
+interface SSRFullCreation extends SSRSimplifiedCreation {
+    fullDescription: string;
+    externalUrl: string | null;
+    sourceCodeUrl: string | null;
+    features: SSRFeature[];
+    screenshots: SSRScreenshot[];
+}
+
 interface SSRTechnology {
     id: number;
     name: string;
+    description: string;
     creationCount: number;
     type: TechnologyType;
     svgIcon: string;
@@ -217,21 +226,50 @@ interface SSRExperience {
     id: number;
     title: string;
     organizationName: string;
-    logo: string;
+    logo: SSRPicture;
     location: string;
     websiteUrl: string;
     shortDescription: string;
     fullDescription: string;
-    technologies: {
-        name: string;
-        svgIcon: string;
-        description: string;
-    };
+    technologies: SSRTechnology[];
     type: 'emploi' | 'formation';
     startedAt: string;
     endedAt: string | null;
     startedAtFormatted: string;
     endedAtFormatted: string | null;
+}
+
+interface SSRFeature {
+    id: number;
+    title: string;
+    description: string;
+    picture: string | null;
+}
+
+interface SSRScreenshot {
+    id: number;
+    picture: SSRPicture;
+    caption: string | null;
+}
+
+interface SSRPicture {
+    filename: string;
+    width: number | null;
+    height: number | null;
+    avif: {
+        thumbnail: string;
+        small: string;
+        medium: string;
+        large: string;
+        full: string;
+    };
+    webp: {
+        thumbnail: string;
+        small: string;
+        medium: string;
+        large: string;
+        full: string;
+    };
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

@@ -16,16 +16,22 @@ use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ProjectsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/cv-pdf', function () {
-    return Inertia::location('https://1drv.ms/b/s!Atk178NpnuLmhJoiwLEN2FRww-mGcA?e=I1kL8w');
-})->name('cv');
+Route::name('public.')->group(function () {
+    Route::get('/cv-pdf', function () {
+        return Inertia::location('https://1drv.ms/b/s!Atk178NpnuLmhJoiwLEN2FRww-mGcA?e=I1kL8w');
+    })->name('cv');
 
-Route::get('/', HomeController::class)->name('home');
-Route::get('/projects', ProjectsController::class)->name('projects');
+    Route::get('/', HomeController::class)->name('home');
+    Route::get('/projects', ProjectsController::class)->name('projects');
+    Route::get('/projects/{slug}', ProjectController::class)
+        ->where('slug', '[A-Za-z0-9\-]+')
+        ->name('projects.show');
+});
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', function () {

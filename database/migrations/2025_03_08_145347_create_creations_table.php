@@ -14,8 +14,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->foreignIdFor(Picture::class, 'logo_id')->nullable()->constrained('pictures')->nullOnDelete();
-            $table->foreignIdFor(Picture::class, 'cover_image_id')->nullable()->constrained('pictures')->nullOnDelete();
+            $table->foreignIdFor(Picture::class, 'logo_id')->constrained('pictures')->nullOnDelete();
+            $table->foreignIdFor(Picture::class, 'cover_image_id')->constrained('pictures')->nullOnDelete();
             $table->enum('type', ['portfolio', 'game', 'library', 'website', 'tool', 'map', 'other']);
             $table->date('started_at');
             $table->date('ended_at')->nullable();

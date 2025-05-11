@@ -7,12 +7,12 @@ import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
 import TechnologyExperiencesContainer from '@/components/public/Technology/TechnologyExperiencesContainer.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
-import SectionTitle from '@/components/public/Ui/SectionTitle.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
-import { SocialMediaLink, SSRCreation, SSRExperience, SSRTechnologyExperience } from '@/types';
+import { SocialMediaLink, SSRExperience, SSRSimplifiedCreation, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
 
 const { t } = useTranslation();
@@ -22,7 +22,7 @@ defineProps<{
     yearsOfExperience: number;
     developmentCreationsCount: number;
     masteredFrameworksCount: number;
-    laravelCreations: SSRCreation[];
+    laravelCreations: SSRSimplifiedCreation[];
     technologyExperiences: SSRTechnologyExperience[];
     experiences: SSRExperience[];
 }>();
@@ -46,7 +46,7 @@ defineProps<{
             :masteredFrameworksCount="masteredFrameworksCount"
         />
 
-        <div class="container mt-16 mb-16 flex flex-col gap-32" id="backend-and-laravel-specialization-section">
+        <div class="z-10 container mt-16 mb-16 flex flex-col gap-32 px-4" id="backend-and-laravel-specialization-section">
             <section class="flex">
                 <div class="hidden flex-1 items-center justify-center xl:flex">
                     <div class="h-64 w-60 overflow-hidden">
@@ -58,10 +58,10 @@ defineProps<{
                 <div class="flex flex-1 flex-col gap-8">
                     <div class="flex items-center gap-4">
                         <LaravelLogo class="size-12 xl:hidden" />
-                        <SectionTitle>
+                        <HeroSectionTitle>
                             <span>{{ t('home.backend.title_part1') }}</span>
                             <span class="ml-2 text-[#FF2D20]">{{ t('home.backend.title_part2') }}</span>
-                        </SectionTitle>
+                        </HeroSectionTitle>
                     </div>
 
                     <div>
@@ -81,7 +81,7 @@ defineProps<{
             <section class="flex flex-col gap-16" id="laravel-section">
                 <div class="flex">
                     <div class="flex flex-1 flex-col gap-8">
-                        <SectionTitle>{{ t('home.laravel-section.title') }}</SectionTitle>
+                        <HeroSectionTitle>{{ t('home.laravel-section.title') }}</HeroSectionTitle>
                         <SectionParagraph>
                             {{ t('home.laravel-section.paragraph') }}
                         </SectionParagraph>
@@ -104,7 +104,7 @@ defineProps<{
 
             <section class="flex flex-col items-center gap-16" id="other-skills-section">
                 <div class="inline-flex max-w-[56rem] flex-col items-center gap-8 text-center">
-                    <SectionTitle>{{ t('home.other_skills.title') }}</SectionTitle>
+                    <HeroSectionTitle>{{ t('home.other_skills.title') }}</HeroSectionTitle>
                     <SectionParagraph>
                         {{ t('home.other_skills.description') }}
                     </SectionParagraph>
@@ -115,7 +115,7 @@ defineProps<{
             <section class="flex flex-col items-center gap-16" id="career-section">
                 <div class="flex">
                     <div class="flex flex-1 flex-col gap-8">
-                        <SectionTitle>{{ t('home.career.title') }}</SectionTitle>
+                        <HeroSectionTitle>{{ t('home.career.title') }}</HeroSectionTitle>
                         <SectionParagraph>
                             {{ t('home.career.description') }}
                         </SectionParagraph>

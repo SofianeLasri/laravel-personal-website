@@ -19,7 +19,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $pictures_count
  * @property int|null $caption_translation_keys_count
  * @property-read \App\Models\Creation|null $creation
- * @property-read Picture|null $picture
+ * @property-read Picture $picture
  * @property-read \App\Models\TranslationKey|null $captionTranslationKey
  *
  * @method static \Database\Factories\ScreenshotFactory<self> factory($count = null, $state = [])

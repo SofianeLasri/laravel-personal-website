@@ -16,7 +16,7 @@ class HomeControllerTest extends TestCase
     #[Test]
     public function test_basic()
     {
-        $response = $this->get(route('home'));
+        $response = $this->get(route('public.home'));
 
         $response->assertOk()
             ->assertInertia(

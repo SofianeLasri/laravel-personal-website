@@ -24,7 +24,7 @@ if (props.experience.creationCount > 1) {
                 {{ experience.typeLabel }}
             </div>
         </div>
-        <div class="flex grow flex-col items-start justify-between self-stretch rounded-2xl bg-white px-4 py-6">
+        <div class="flex grow flex-col items-start justify-between gap-4 self-stretch rounded-2xl bg-white px-4 py-6">
             <div class="flex flex-col items-start justify-start gap-4">
                 <div class="flex items-center justify-start gap-4">
                     <div class="outline-border flex size-12 items-center justify-center gap-2.5 rounded-lg outline-1">

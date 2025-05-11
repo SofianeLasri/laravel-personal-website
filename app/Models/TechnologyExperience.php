@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property mixed $use_factory
  * @property int|null $technologies_count
  * @property int|null $description_translation_keys_count
- * @property-read Technology|null $technology
- * @property-read TranslationKey|null $descriptionTranslationKey
+ * @property-read Technology $technology
+ * @property-read TranslationKey $descriptionTranslationKey
  *
  * @method static TechnologyExperienceFactory<self> factory($count = null, $state = [])
  */

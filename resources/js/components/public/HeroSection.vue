@@ -56,7 +56,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="container inline-flex items-center py-16">
+    <div class="container inline-flex items-center px-4 py-16">
         <div class="relative inline-flex flex-1 flex-col items-start self-stretch">
             <h1
                 class="motion-translate-x-in-[0%] motion-translate-y-in-[5%] motion-blur-in-[8px] motion-duration-[0.16s]/blur flex flex-1 flex-col items-start justify-center self-stretch sm:gap-1"
@@ -73,44 +73,44 @@ onMounted(() => {
             </h1>
             <div class="flex flex-col items-start gap-8 self-stretch">
                 <div class="inline-flex items-center gap-2 py-12 xl:py-0">
-                    <BlackLinkButton :href="route('cv')" title="CV" target="_blank">
+                    <BlackLinkButton :href="route('public.cv')" title="CV" target="_blank">
                         {{ t('home.hero.download_cv') }}
                     </BlackLinkButton>
                     <LightLinkButton v-for="link in socialMediaLinks" :key="link.name" :href="link.url" :title="link.name" target="_blank">
                         <div class="absolute flex h-4 fill-black" v-html="link.icon_svg"></div>
                     </LightLinkButton>
                 </div>
-                <div class="flex flex-wrap items-center gap-4 self-stretch">
-                    <div class="size- flex items-start gap-4">
-                        <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
-                            <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
+                <div class="flex flex-col items-center gap-4 self-stretch sm:flex-row sm:flex-wrap">
+                    <div class="flex flex-col items-start gap-4 sm:flex-row">
+                        <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
+                            <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
                                 {{ animatedYearsOfExperience }}
                             </div>
-                            <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
+                            <div class="text-design-system-paragraph self-stretch text-base font-normal sm:leading-5">
                                 {{ t('home.hero.years_experience') }}
                             </div>
                             <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                         </div>
-                        <div class="flex items-center self-stretch py-8">
+                        <div class="hidden items-center self-stretch py-8 sm:flex">
                             <div class="bg-border w-px self-stretch" />
                         </div>
-                        <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
-                            <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
+                        <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
+                            <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
                                 {{ animatedDevelopmentCreationsCount }}
                             </div>
-                            <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
+                            <div class="text-design-system-paragraph self-stretch text-base font-normal sm:leading-5">
                                 {{ t('home.hero.projects_done') }}
                             </div>
                             <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                         </div>
-                        <div class="flex items-center self-stretch py-8">
+                        <div class="hidden items-center self-stretch py-8 sm:flex">
                             <div class="bg-border w-px self-stretch" />
                         </div>
-                        <div class="relative inline-flex w-24 flex-col items-center justify-center gap-1 rounded-2xl p-2 sm:w-32">
-                            <div class="text-design-system-title justify-center self-stretch text-center text-4xl font-bold sm:text-6xl">
+                        <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
+                            <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
                                 {{ animatedTechnologiesCount }}
                             </div>
-                            <div class="text-design-system-paragraph self-stretch text-sm font-normal sm:text-base sm:leading-5">
+                            <div class="text-design-system-paragraph self-stretch text-base leading-5 font-normal">
                                 {{ t('home.hero.frameworks_mastered') }}
                             </div>
                             <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
@@ -119,7 +119,7 @@ onMounted(() => {
                     <LaravelCertification class="h-40" />
                 </div>
             </div>
-            <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[67px] left-[496px]" />
+            <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-0 right-4 md:top-16 md:right-auto md:left-[496px]" />
             <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[540px] left-[805px] hidden xl:block" />
             <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[300px] left-[-80px]" />
         </div>

@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read \App\Models\TranslationKey|null $titleTranslationKey
  * @property-read \App\Models\TranslationKey|null $shortDescriptionTranslationKey
  * @property-read \App\Models\TranslationKey|null $fullDescriptionTranslationKey
- * @property-read \App\Models\Picture|null $logo
+ * @property-read Picture $logo
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Technology[] $technologies
  *
  * @method static \Database\Factories\ExperienceFactory<self> factory($count = null, $state = [])

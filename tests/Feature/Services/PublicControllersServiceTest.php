@@ -23,7 +23,7 @@ class PublicControllersServiceTest extends TestCase
         Creation::factory()->withTechnologies(5)->count(3)->create();
 
         $service = new PublicControllersService;
-        $result = $service->getCreationCountByTechnology();
+        $result = $service->calcCreationCountByTechnology();
 
         $this->assertCount(15, $result);
     }
@@ -176,5 +176,118 @@ class PublicControllersServiceTest extends TestCase
         $result = $service->formatDate(null);
 
         $this->assertNull($result);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_short()
+    {
+        $creation = Creation::factory()->create([
+            'name' => 'Test Creation',
+            'type' => 'website',
+            'started_at' => now(),
+            'ended_at' => now()->addMonth(),
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRShort($creation);
+
+        $this->assertEquals($creation->id, $result['id']);
+        $this->assertEquals($creation->name, $result['name']);
+        $this->assertEquals($creation->type, $result['type']);
+        $this->assertEquals($creation->slug, $result['slug']);
+        $this->assertEquals($creation->started_at, $result['startedAt']);
+        $this->assertEquals($creation->ended_at, $result['endedAt']);
+        $this->assertArrayHasKey('technologies', $result);
+        $this->assertCount($creation->technologies->count(), $result['technologies']);
+
+        foreach ($creation->technologies as $technology) {
+            $resultTechnology = collect($result['technologies'])->firstWhere('id', $technology->id);
+
+            $this->assertEquals($technology->id, $resultTechnology['id']);
+            $this->assertEquals($technology->name, $resultTechnology['name']);
+            $this->assertEquals($technology->type, $resultTechnology['type']);
+            $this->assertEquals($technology->svg_icon, $resultTechnology['svgIcon']);
+        }
+
+        $this->assertArrayHasKey('logo', $result);
+        $this->assertEquals($creation->logo->filename, $result['logo']['filename']);
+
+        $this->assertArrayHasKey('coverImage', $result);
+        $this->assertEquals($creation->coverImage->filename, $result['coverImage']['filename']);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full()
+    {
+        $creation = Creation::factory()
+            ->withFeatures(3)
+            ->withScreenshots(4)
+            ->create([
+                'name' => 'Test Creation',
+                'type' => 'website',
+                'started_at' => now(),
+                'ended_at' => now()->addMonth(),
+                'external_url' => 'https://example.com',
+                'source_code_url' => 'https://github.com/example/repo',
+            ]);
+
+        $this->assertCount(3, $creation->features);
+        $this->assertCount(4, $creation->screenshots);
+
+        $featureWithoutPicture = $creation->features->first();
+        $featureWithoutPicture->update(['picture_id' => null]);
+
+        $screenshotWithoutCaption = $creation->screenshots->first();
+        $screenshotWithoutCaption->update(['caption_translation_key_id' => null]);
+
+        $creation->refresh();
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertEquals($creation->external_url, $result['externalUrl']);
+        $this->assertEquals($creation->source_code_url, $result['sourceCodeUrl']);
+        $this->assertCount($creation->features->count(), $result['features']);
+        $this->assertCount($creation->screenshots->count(), $result['screenshots']);
+
+        foreach ($creation->features as $feature) {
+            $resultFeature = collect($result['features'])->firstWhere('id', $feature->id);
+
+            $this->assertEquals($feature->id, $resultFeature['id']);
+
+            $featureName = $feature->titleTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
+            $featureDescription = $feature->descriptionTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
+
+            $this->assertEquals($featureName, $resultFeature['title']);
+            $this->assertEquals($featureDescription, $resultFeature['description']);
+
+            if ($feature->picture_id) {
+                $this->assertNotNull($resultFeature['picture']);
+                $this->assertEquals($feature->picture->filename, $resultFeature['picture']['filename']);
+                $this->assertArrayHasKey('avif', $resultFeature['picture']);
+                $this->assertArrayHasKey('webp', $resultFeature['picture']);
+            } else {
+                $this->assertNull($resultFeature['picture']);
+            }
+        }
+
+        foreach ($creation->screenshots as $screenshot) {
+            $resultScreenshot = collect($result['screenshots'])->firstWhere('id', $screenshot->id);
+
+            $this->assertEquals($screenshot->id, $resultScreenshot['id']);
+
+            if ($screenshot->captionTranslationKey) {
+                $caption = $screenshot->captionTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
+                $this->assertEquals($caption, $resultScreenshot['caption']);
+            } else {
+                $this->assertEmpty($resultScreenshot['caption']);
+            }
+
+            $this->assertNotNull($resultScreenshot['picture']);
+            $this->assertEquals($screenshot->picture->filename, $resultScreenshot['picture']['filename']);
+
+            $this->assertArrayHasKey('avif', $resultScreenshot['picture']);
+            $this->assertArrayHasKey('webp', $resultScreenshot['picture']);
+        }
     }
 }

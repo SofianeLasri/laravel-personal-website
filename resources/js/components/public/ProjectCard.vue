@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { SSRCreation } from '@/types';
+import { SSRSimplifiedCreation } from '@/types';
+import { Link } from '@inertiajs/vue3';
 
 const props = defineProps<{
-    creation: SSRCreation;
+    creation: SSRSimplifiedCreation;
 }>();
 
 const startYear = new Date(props.creation.startedAt).getFullYear();
@@ -19,20 +20,33 @@ if (startYear && endYear) {
 
 <template>
     <div class="flex w-full flex-shrink-0 flex-col gap-4 select-none md:w-[40rem]">
-        <div class="flex aspect-video flex-col gap-2.5 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
-            <img class="h-full w-full object-cover" alt="Project Image" :src="creation.coverImage" draggable="false" />
-        </div>
+        <Link
+            class="flex aspect-video flex-col gap-2.5 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
+            :href="route('public.projects.show', { slug: creation.slug })"
+        >
+            <picture class="h-full w-full">
+                <source :srcset="creation.coverImage.webp.medium" type="image/webp" />
+                <img :src="creation.coverImage.avif.medium" alt="Project cover" class="h-full w-full object-cover" loading="lazy" />
+            </picture>
+        </Link>
         <div class="flex gap-4 rounded-2xl">
-            <div
-                class="outline-border flex size-20 items-center justify-center gap-2.5 rounded-lg bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] outline"
+            <Link
+                class="flex size-20 items-center justify-center gap-2.5 rounded-lg border bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
+                :href="route('public.projects.show', { slug: creation.slug })"
             >
-                <img class="flex-1" :src="creation.logo" alt="Logo of the project" draggable="false" />
-            </div>
+                <picture class="flex-1">
+                    <source :srcset="creation.logo.webp.thumbnail" type="image/webp" />
+                    <img :src="creation.logo.avif.thumbnail" alt="Logo of the project" class="h-full w-full object-cover" loading="lazy" />
+                </picture>
+            </Link>
             <div class="flex flex-1 flex-col gap-4">
                 <div class="flex flex-col gap-px">
-                    <div class="text-design-system-title justify-center text-base font-bold">
+                    <Link
+                        class="text-design-system-title justify-center text-base font-bold"
+                        :href="route('public.projects.show', { slug: creation.slug })"
+                    >
                         {{ creation.name }}
-                    </div>
+                    </Link>
                     <div class="text-design-system-paragraph justify-center text-sm font-semibold" lang="fr">
                         {{ creation.type }}
                     </div>

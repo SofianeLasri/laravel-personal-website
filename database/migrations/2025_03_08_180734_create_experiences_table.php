@@ -14,7 +14,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(TranslationKey::class, 'title_translation_key_id')->constrained('translation_keys');
             $table->string('organization_name');
-            $table->foreignIdFor(Picture::class, 'logo_id')->nullable()->constrained('pictures')->nullOnDelete();
+            $table->foreignIdFor(Picture::class, 'logo_id')->constrained('pictures')->nullOnDelete();
             $table->enum('type', ['formation', 'emploi']);
             $table->string('location');
             $table->string('website_url')->nullable();

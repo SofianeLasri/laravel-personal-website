@@ -19,7 +19,7 @@ class ProjectsControllerTest extends TestCase
     #[Test]
     public function test_basic()
     {
-        $response = $this->get(route('projects'));
+        $response = $this->get(route('public.projects'));
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
@@ -48,7 +48,7 @@ class ProjectsControllerTest extends TestCase
             });
         });
 
-        $response = $this->get(route('projects'));
+        $response = $this->get(route('public.projects'));
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('public/Projects')

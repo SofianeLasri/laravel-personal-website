@@ -16,12 +16,10 @@ class HomeController extends Controller
 
     public function __invoke(): Response
     {
-        $locale = app()->getLocale();
-
         $developmentStats = $this->service->getDevelopmentStats();
 
         return Inertia::render('public/Home', [
-            'locale' => $locale,
+            'locale' => app()->getLocale(),
             'translations' => [
                 'home' => __('home'),
             ],

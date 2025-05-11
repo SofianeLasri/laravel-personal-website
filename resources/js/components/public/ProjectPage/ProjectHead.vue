@@ -9,7 +9,7 @@ defineProps<{
 }>();
 </script>
 <template>
-    <div class="container flex items-center justify-between gap-8 xl:gap-32">
+    <div class="flex items-center justify-between gap-8 xl:gap-32">
         <div class="flex grow flex-col gap-16">
             <div class="flex flex-col gap-6 self-stretch">
                 <div class="inline-flex justify-between self-stretch">

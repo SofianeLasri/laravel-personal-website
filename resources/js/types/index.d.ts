@@ -205,6 +205,7 @@ interface SSRFullCreation extends SSRSimplifiedCreation {
     externalUrl: string | null;
     sourceCodeUrl: string | null;
     features: SSRFeature[];
+    screenshots: SSRScreenshot[];
 }
 
 interface SSRTechnology {
@@ -246,6 +247,12 @@ interface SSRFeature {
     title: string;
     description: string;
     picture: string | null;
+}
+
+interface SSRScreenshot {
+    id: number;
+    picture: string;
+    caption: string | null;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

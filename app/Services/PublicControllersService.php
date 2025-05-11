@@ -7,6 +7,8 @@ use App\Enums\ExperienceType;
 use App\Enums\TechnologyType;
 use App\Models\Creation;
 use App\Models\Experience;
+use App\Models\Feature;
+use App\Models\Screenshot;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use Illuminate\Support\Carbon;
@@ -231,7 +233,9 @@ class PublicControllersService
      *     fullDescription: string|null,
      *     externalUrl: string|null,
      *     sourceCodeUrl: string|null,
-     *     features: array<int, array{id: int, title: string, description: string, picture: string}>}
+     *     features: array<int, array{id: int, title: string, description: string, picture: string}>,
+     *     screenshots: array<int, array{id: int, picture: string|null, caption: string}>,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>}
      */
     public function formatCreationForSSRFull(Creation $creation): array
     {
@@ -246,7 +250,7 @@ class PublicControllersService
         $response['fullDescription'] = $fullDescription;
         $response['externalUrl'] = $creation->external_url;
         $response['sourceCodeUrl'] = $creation->source_code_url;
-        $response['features'] = $creation->features->map(function ($feature) {
+        $response['features'] = $creation->features->map(function (Feature $feature) {
             $title = '';
             if ($feature->titleTranslationKey) {
                 $titleTranslation = $feature->titleTranslationKey->translations->where('locale', $this->locale)->first();
@@ -266,6 +270,20 @@ class PublicControllersService
                 'title' => $title,
                 'description' => $description,
                 'picture' => $pictureUrl,
+            ];
+        })->toArray();
+
+        $response['screenshots'] = $creation->screenshots->map(function (Screenshot $screenshot) {
+            $caption = '';
+            if ($screenshot->captionTranslationKey) {
+                $captionTranslation = $screenshot->captionTranslationKey->translations->where('locale', $this->locale)->first();
+                $caption = $captionTranslation ? $captionTranslation->text : '';
+            }
+
+            return [
+                'id' => $screenshot->id,
+                'picture' => $screenshot->picture ? $screenshot->picture->getUrl('large', 'avif') : null,
+                'caption' => $caption,
             ];
         })->toArray();
 

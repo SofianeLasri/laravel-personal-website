@@ -113,21 +113,21 @@ const handleGameEngineFilterChange = (ids: number[]) => {
                 <div class="flex space-x-8">
                     <button
                         @click="setActiveTab('development')"
-                        class="border-b-2 py-4 text-xl transition-colors"
+                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
                         :class="activeTab === 'development' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
                     >
                         Développement
                     </button>
                     <button
                         @click="setActiveTab('games')"
-                        class="border-b-2 py-4 text-xl transition-colors"
+                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
                         :class="activeTab === 'games' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
                     >
                         Jeux vidéos
                     </button>
                     <button
                         @click="setActiveTab('source-engine')"
-                        class="border-b-2 py-4 text-xl transition-colors"
+                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
                         :class="activeTab === 'source-engine' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
                     >
                         Source Engine

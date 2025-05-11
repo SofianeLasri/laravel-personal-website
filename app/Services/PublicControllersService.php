@@ -83,7 +83,7 @@ class PublicControllersService
      * Get all the Laravel projects.
      * Returns a SSRSimplifiedCreation TypeScript type compatible object.
      *
-     * @return array{
+     * @return Collection<int, array{
      *      id: int,
      *      name: string,
      *      slug: string,
@@ -96,14 +96,14 @@ class PublicControllersService
      *      type: CreationType,
      *      shortDescription: string|null,
      *      technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
-     *  }
+     *  }>
      */
-    public function getLaravelCreations(): array
+    public function getLaravelCreations(): Collection
     {
         $laravel = Technology::where('name', 'Laravel')->first();
 
         if (! $laravel) {
-            return [];
+            return collect();
         }
 
         $developmentCreations = Creation::whereIn('type', self::DEVELOPMENT_TYPES)
@@ -117,7 +117,7 @@ class PublicControllersService
 
         return $creations->sortByDesc(function ($creation) {
             return $creation['endedAt'] ?? now();
-        })->toArray();
+        });
     }
 
     /**
@@ -213,7 +213,7 @@ class PublicControllersService
      *     fullDescription: string|null,
      *     externalUrl: string|null,
      *     sourceCodeUrl: string|null,
-     *     features: array<int, array{id: int, title: string, description: string, picture: string}>,
+     *     features: array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
      *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string}>,
      *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>}
      */
@@ -243,13 +243,13 @@ class PublicControllersService
                 $description = $descriptionTranslation ? $descriptionTranslation->text : '';
             }
 
-            $pictureUrl = $feature->picture ? $feature->picture->getUrl('medium', 'avif') : null;
+            $picture = $feature->picture ? $this->formatPictureForSSR($feature->picture) : null;
 
             return [
                 'id' => $feature->id,
                 'title' => $title,
                 'description' => $description,
-                'picture' => $pictureUrl,
+                'picture' => $picture,
             ];
         })->toArray();
 

@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import ArrowLeftRegular from '@/components/font-awesome/ArrowLeftRegular.vue';
+import ArrowRightRegular from '@/components/font-awesome/ArrowRightRegular.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
 import ProjectScreenshotsContainer from '@/components/public/ProjectPage/ProjectScreenshotsContainer.vue';
 import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
+import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
 
 const props = defineProps<{
@@ -18,8 +21,11 @@ const props = defineProps<{
 const activeSection = ref('description');
 const contentContainer = ref<HTMLElement | null>(null);
 const navBarRef = ref<HTMLElement | null>(null);
+const navScrollContainer = ref<HTMLElement | null>(null);
 const isNavSticky = ref(false);
 const navHeight = ref(0);
+const showLeftArrow = ref(false);
+const showRightArrow = ref(false);
 
 const sections = [{ id: 'description', label: 'Description' }];
 
@@ -47,6 +53,40 @@ const scrollToSection = (sectionId: string) => {
     }
 };
 
+const checkNavArrows = () => {
+    if (!navScrollContainer.value) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = navScrollContainer.value;
+    showLeftArrow.value = scrollLeft > 0;
+    showRightArrow.value = scrollLeft + clientWidth < scrollWidth - 5; // Petite marge d'erreur
+};
+
+const scrollNavLeft = () => {
+    if (!navScrollContainer.value) return;
+    navScrollContainer.value.scrollBy({ left: -100, behavior: 'smooth' });
+};
+
+const scrollNavRight = () => {
+    if (!navScrollContainer.value) return;
+    navScrollContainer.value.scrollBy({ left: 100, behavior: 'smooth' });
+};
+
+const scrollToActiveButton = () => {
+    if (!navScrollContainer.value) return;
+
+    const activeButton = navScrollContainer.value.querySelector(`button[data-section="${activeSection.value}"]`);
+    if (activeButton) {
+        const buttonRect = activeButton.getBoundingClientRect();
+        const containerRect = navScrollContainer.value.getBoundingClientRect();
+
+        if (buttonRect.left < containerRect.left) {
+            activeButton.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        } else if (buttonRect.right > containerRect.right) {
+            activeButton.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' });
+        }
+    }
+};
+
 const handleScroll = () => {
     const scrollPosition = window.scrollY + 200;
     for (const section of sections) {
@@ -68,7 +108,15 @@ const handleScroll = () => {
 
         isNavSticky.value = containerTop <= 0 && containerBottom > navHeight.value;
     }
+
+    if (isNavSticky.value) {
+        checkNavArrows();
+    }
 };
+
+watch(activeSection, () => {
+    setTimeout(scrollToActiveButton, 50);
+});
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);
@@ -77,11 +125,28 @@ onMounted(() => {
         navHeight.value = navBarRef.value.offsetHeight;
     }
 
+    if (navScrollContainer.value) {
+        navScrollContainer.value.addEventListener('scroll', checkNavArrows);
+        checkNavArrows();
+    }
+
     handleScroll();
+
+    window.addEventListener('resize', () => {
+        checkNavArrows();
+        scrollToActiveButton();
+        if (navBarRef.value) {
+            navHeight.value = navBarRef.value.offsetHeight;
+        }
+    });
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener('scroll', handleScroll);
+    if (navScrollContainer.value) {
+        navScrollContainer.value.removeEventListener('scroll', checkNavArrows);
+    }
+    window.removeEventListener('resize', () => {});
 });
 </script>
 
@@ -98,15 +163,27 @@ onBeforeUnmount(() => {
             <div ref="contentContainer" class="flex flex-col">
                 <div
                     ref="navBarRef"
-                    class="border-b border-gray-200 transition-all duration-200"
-                    :class="isNavSticky ? 'fixed top-0 right-0 left-0 z-50 bg-gray-100 shadow-md' : 'bg-transparent'"
+                    class="w-full border-b border-gray-200 transition-all duration-200"
+                    :class="{
+                        'fixed top-0 right-0 left-0 z-50 bg-gray-100 shadow-md': isNavSticky,
+                        'bg-transparent': !isNavSticky,
+                    }"
                 >
-                    <div class="container mx-auto">
-                        <div class="flex space-x-8">
+                    <div class="relative container mx-auto px-4">
+                        <BlackButton
+                            v-if="showLeftArrow"
+                            @click="scrollNavLeft"
+                            class="absolute top-1/2 left-0 z-10 w-12 -translate-y-1/2 transition-all"
+                        >
+                            <ArrowLeftRegular class="absolute size-5 fill-white" />
+                        </BlackButton>
+
+                        <div ref="navScrollContainer" class="no-scrollbar flex space-x-8 overflow-x-auto">
                             <button
                                 v-for="section in sections"
                                 :key="section.id"
-                                class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
+                                :data-section="section.id"
+                                class="flex-shrink-0 cursor-pointer border-b-2 py-4 text-xl whitespace-nowrap transition-colors"
                                 :class="
                                     activeSection === section.id ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'
                                 "
@@ -115,6 +192,14 @@ onBeforeUnmount(() => {
                                 {{ section.label }}
                             </button>
                         </div>
+
+                        <BlackButton
+                            v-if="showRightArrow"
+                            @click="scrollNavRight"
+                            class="absolute top-1/2 right-0 z-10 w-12 -translate-y-1/2 transition-all"
+                        >
+                            <ArrowRightRegular class="absolute size-5 fill-white" />
+                        </BlackButton>
                     </div>
                 </div>
 
@@ -159,3 +244,14 @@ onBeforeUnmount(() => {
         </div>
     </PublicAppLayout>
 </template>
+
+<style scoped>
+.no-scrollbar {
+    scrollbar-width: none; /* Pour Firefox */
+    -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+</style>

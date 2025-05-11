@@ -34,7 +34,7 @@ const onInput = () => {
 <template>
     <div class="relative flex w-64 items-center gap-4 rounded-full bg-gray-200 pe-6">
         <BlackButton class="w-12">
-            <MagnifyingGlassRegular class="absolute h-4 fill-white" />
+            <MagnifyingGlassRegular class="absolute size-4 fill-white" />
         </BlackButton>
         <input
             type="text"

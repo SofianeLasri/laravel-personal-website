@@ -18,9 +18,9 @@ class PictureFactory extends Factory
     {
         return [
             'filename' => $this->faker->slug(),
-            'width' => $this->faker->randomNumber(),
-            'height' => $this->faker->randomNumber(),
-            'size' => $this->faker->randomNumber(),
+            'width' => $this->faker->numberBetween(100, 200),
+            'height' => $this->faker->numberBetween(100, 200),
+            'size' => $this->faker->numberBetween(1000, 2000),
             'path_original' => $this->createDummyImage(),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),

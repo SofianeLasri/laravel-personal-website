@@ -276,7 +276,7 @@ class PublicControllersServiceTest extends TestCase
 
             $this->assertEquals($screenshot->id, $resultScreenshot['id']);
 
-            if ($screenshot->caption_translation_key_id) {
+            if ($screenshot->captionTranslationKey) {
                 $caption = $screenshot->captionTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
                 $this->assertEquals($caption, $resultScreenshot['caption']);
             } else {

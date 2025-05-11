@@ -157,7 +157,7 @@ onBeforeUnmount(() => {
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
         </div>
 
-        <div class="z-10 container mb-16 flex flex-col gap-16">
+        <div class="z-10 container mb-16 flex flex-col gap-16 px-4">
             <ProjectHead :creation="creation" />
 
             <div ref="contentContainer" class="flex flex-col">

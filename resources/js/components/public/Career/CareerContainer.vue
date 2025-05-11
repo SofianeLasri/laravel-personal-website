@@ -104,7 +104,9 @@ const getTechnologies = (technologies: any) => {
 
 <template>
     <div class="relative inline-flex flex-col items-center justify-start gap-8 self-stretch">
-        <div class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex gap-2 rounded-2xl p-2">
+        <div
+            class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex flex-col gap-2 rounded-2xl p-2 sm:flex-row"
+        >
             <BlackButton v-if="selectedType === 'formation'" class="rounded-lg">
                 <GraduationCapSolid class="h-4 fill-white" />
                 <span>Éducation</span>

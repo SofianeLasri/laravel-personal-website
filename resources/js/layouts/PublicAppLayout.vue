@@ -13,7 +13,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <div class="relative flex min-h-screen flex-col items-center bg-[url(/resources/images/public/dots.svg)] px-2">
+    <div class="relative flex min-h-screen flex-col items-center bg-[url(/resources/images/public/dots.svg)]">
         <Navbar />
         <slot />
     </div>

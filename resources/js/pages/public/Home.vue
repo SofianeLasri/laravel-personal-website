@@ -46,7 +46,7 @@ defineProps<{
             :masteredFrameworksCount="masteredFrameworksCount"
         />
 
-        <div class="z-10 container mt-16 mb-16 flex flex-col gap-32" id="backend-and-laravel-specialization-section">
+        <div class="z-10 container mt-16 mb-16 flex flex-col gap-32 px-4" id="backend-and-laravel-specialization-section">
             <section class="flex">
                 <div class="hidden flex-1 items-center justify-center xl:flex">
                     <div class="h-64 w-60 overflow-hidden">

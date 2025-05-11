@@ -12,7 +12,7 @@ defineProps<{
         <div
             class="border-border flex w-full flex-col items-center justify-start gap-2.5 rounded-br-2xl rounded-bl-2xl border-t bg-gray-100 py-8 md:py-16"
         >
-            <div class="container space-y-8 px-2 md:space-y-0">
+            <div class="container space-y-8 px-4 md:space-y-0">
                 <!-- Section principale du footer -->
                 <div class="flex flex-col gap-8 md:flex-row md:items-center md:justify-between md:gap-4">
                     <!-- Logo et informations -->
@@ -66,7 +66,7 @@ defineProps<{
 
         <!-- Copyright -->
         <div class="flex w-full flex-col items-center justify-start gap-2.5">
-            <div class="container flex h-12 items-center justify-center px-2 text-center md:justify-start md:px-0 md:text-left">
+            <div class="container flex h-12 items-center justify-center px-4 text-center md:justify-start md:px-0 md:text-left">
                 <div class="text-sm text-white md:text-base">2025 - Sofiane Lasri-Trienpont, développé sur Laravel.</div>
             </div>
         </div>

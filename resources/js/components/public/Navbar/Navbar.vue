@@ -103,13 +103,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="navbar z-10 container flex content-center justify-between py-16">
+    <div class="navbar z-10 container flex content-center justify-between px-4 py-16">
         <NavBrand />
         <div class="flex flex-nowrap items-center justify-center gap-4">
             <NavSearchBar class="hidden md:flex" />
-            <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu">
-                <span>Menu</span>
-                <BarStaggeredRegular class="h-4 fill-white" />
+            <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
+                <span class="xs:block hidden">Menu</span>
+                <BarStaggeredRegular class="xs:relative absolute size-4 fill-white" />
             </BlackButton>
         </div>
     </div>
@@ -134,7 +134,7 @@ onUnmounted(() => {
                         aria-label="Fermer le menu"
                     >
                         <span>Fermer</span>
-                        <BarStaggeredRegular class="h-4 fill-white" />
+                        <BarStaggeredRegular class="size-4 fill-white" />
                     </BlackButton>
 
                     <div class="flex flex-col gap-8">

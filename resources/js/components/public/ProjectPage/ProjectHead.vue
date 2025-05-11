@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LightShape from '@/components/public/LightShape.vue';
 import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
 import WhiteLinkButton from '@/components/public/Ui/Button/WhiteLinkButton.vue';
 import { SSRFullCreation } from '@/types';
@@ -43,13 +44,16 @@ defineProps<{
                 <WhiteLinkButton v-if="creation.sourceCodeUrl" :href="creation.sourceCodeUrl"> Code source </WhiteLinkButton>
             </div>
         </div>
-        <div
-            class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur shrink-0 overflow-hidden rounded-3xl p-2"
-        >
+        <div class="relative">
+            <LightShape class="absolute top-0 -left-64 z-0" />
             <div
-                class="action-container-inner-shadow flex aspect-video h-36 flex-1 flex-col items-center justify-center overflow-hidden rounded-2xl border bg-white lg:h-[360px] 2xl:h-[480px]"
+                class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur shrink-0 overflow-hidden rounded-3xl p-2"
             >
-                <img class="h-full w-full object-cover" :src="creation.coverImage" alt="Image de couverture" />
+                <div
+                    class="action-container-inner-shadow flex aspect-video h-36 flex-1 flex-col items-center justify-center overflow-hidden rounded-2xl border bg-white lg:h-[360px] 2xl:h-[480px]"
+                >
+                    <img class="h-full w-full object-cover" :src="creation.coverImage" alt="Image de couverture" />
+                </div>
             </div>
         </div>
     </div>

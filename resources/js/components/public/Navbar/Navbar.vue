@@ -14,6 +14,7 @@ const currentPath = computed(() => currentUrl.value.href);
 const isMenuOpen = ref(false);
 const hoveredItemIndex = ref(null);
 const indicatorPosition = ref(0);
+const indicatorVisible = ref(false);
 const linkHeight = ref(48);
 const linkGap = 12;
 
@@ -50,6 +51,7 @@ const handleEscKey = (event: KeyboardEvent) => {
 
 const updateIndicatorPosition = (index: any) => {
     hoveredItemIndex.value = index;
+    indicatorVisible.value = true;
 
     if (index === 0) {
         indicatorPosition.value = 0;
@@ -63,21 +65,35 @@ const resetIndicator = () => {
 
     if (activeIndex.value !== null) {
         indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+        indicatorVisible.value = true;
     } else {
-        indicatorPosition.value = -1; // Valeur pour "masquer" l'indicateur
+        indicatorVisible.value = false;
     }
 };
 
 watch(isMenuOpen, (value) => {
     document.body.style.overflow = value ? 'hidden' : '';
     if (value) {
-        resetIndicator();
+        if (activeIndex.value !== null) {
+            indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+            indicatorVisible.value = true;
+        } else {
+            indicatorPosition.value = 0;
+            indicatorVisible.value = false;
+        }
     }
 });
 
 onMounted(() => {
     document.addEventListener('keydown', handleEscKey);
-    resetIndicator();
+
+    if (activeIndex.value !== null) {
+        indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+        indicatorVisible.value = true;
+    } else {
+        indicatorPosition.value = 0;
+        indicatorVisible.value = false;
+    }
 });
 
 onUnmounted(() => {
@@ -127,9 +143,11 @@ onUnmounted(() => {
                         </div>
                         <div class="relative flex flex-col gap-3">
                             <div
-                                v-if="activeIndex !== null"
                                 class="bg-primary absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
-                                :style="{ transform: `translateY(${indicatorPosition}px)` }"
+                                :style="{
+                                    transform: `translateY(${indicatorPosition}px)`,
+                                    opacity: indicatorVisible ? 1 : 0,
+                                }"
                             ></div>
 
                             <div

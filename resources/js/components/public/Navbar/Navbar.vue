@@ -25,8 +25,9 @@ const routes = [
 ];
 
 const activeIndex = computed(() => {
-    const matchingRoute = routes.find((r) => r.path === currentPath.value);
-    return matchingRoute ? matchingRoute.index : 0;
+    const cleanedPath = currentPath.value.endsWith('/') ? currentPath.value.slice(0, -1) : currentPath.value;
+    const matchingRoute = routes.find((r) => r.path === cleanedPath);
+    return matchingRoute ? matchingRoute.index : null;
 });
 
 const isItemActive = (index: any) => {
@@ -50,7 +51,7 @@ const handleEscKey = (event: KeyboardEvent) => {
 const updateIndicatorPosition = (index: any) => {
     hoveredItemIndex.value = index;
 
-    if (index == 0) {
+    if (index === 0) {
         indicatorPosition.value = 0;
     } else {
         indicatorPosition.value = index * (linkHeight.value + linkGap);
@@ -59,7 +60,12 @@ const updateIndicatorPosition = (index: any) => {
 
 const resetIndicator = () => {
     hoveredItemIndex.value = null;
-    indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+
+    if (activeIndex.value !== null) {
+        indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+    } else {
+        indicatorPosition.value = -1; // Valeur pour "masquer" l'indicateur
+    }
 };
 
 watch(isMenuOpen, (value) => {
@@ -111,7 +117,7 @@ onUnmounted(() => {
                         aria-controls="fullscreen-menu"
                         aria-label="Fermer le menu"
                     >
-                        <span>Femer</span>
+                        <span>Fermer</span>
                         <BarStaggeredRegular class="h-4 fill-white" />
                     </BlackButton>
 
@@ -121,6 +127,7 @@ onUnmounted(() => {
                         </div>
                         <div class="relative flex flex-col gap-3">
                             <div
+                                v-if="activeIndex !== null"
                                 class="bg-primary absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
                                 :style="{ transform: `translateY(${indicatorPosition}px)` }"
                             ></div>

@@ -5,14 +5,59 @@ import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue'
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
 
-defineProps<{
+const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
     creation: SSRFullCreation;
 }>();
 
-const activeSection = 'description';
+const activeSection = ref('description');
+
+const sections = [{ id: 'description', label: 'Description' }];
+
+if (props.creation.features.length > 0) {
+    sections.push({ id: 'features', label: 'Fonctionnalités clés' });
+}
+if (props.creation.technologies.length > 0) {
+    sections.push({ id: 'technologies', label: 'Technologies utilisées' });
+}
+if (props.creation.screenshots.length > 0) {
+    sections.push({ id: 'screenshots', label: "Capture d'écrans" });
+}
+
+const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+        activeSection.value = sectionId;
+    }
+};
+
+const handleScroll = () => {
+    const scrollPosition = window.scrollY + 200;
+    for (const section of sections) {
+        const element = document.getElementById(section.id);
+        if (element) {
+            const offsetTop = element.offsetTop;
+            const offsetHeight = element.offsetHeight;
+            if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+                activeSection.value = section.id;
+                break;
+            }
+        }
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('scroll', handleScroll);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('scroll', handleScroll);
+});
+
 const defaultSvgIcon =
     '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.2 16.2L17 14.9L12.5 12.2V7Z" fill="currentColor"></path></svg>';
 </script>
@@ -28,34 +73,16 @@ const defaultSvgIcon =
             <ProjectHead :creation="creation" />
 
             <!-- Barre de navigation -->
-            <div class="border-b border-gray-200">
+            <div class="sticky top-0 z-50 border-b border-gray-200 bg-gray-100">
                 <div class="flex space-x-8">
                     <button
+                        v-for="section in sections"
+                        :key="section.id"
                         class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
-                        :class="activeSection === 'description' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
+                        :class="activeSection === section.id ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
+                        @click="scrollToSection(section.id)"
                     >
-                        Description
-                    </button>
-                    <button
-                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
-                        :class="activeSection === 'features' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
-                        v-if="creation.features.length"
-                    >
-                        Fonctionnalités clés
-                    </button>
-                    <button
-                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
-                        :class="activeSection === 'technologies' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
-                        v-if="creation.technologies.length"
-                    >
-                        Technologies utilisées
-                    </button>
-                    <button
-                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
-                        :class="activeSection === 'screnshots' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
-                        v-if="creation.screenshots.length"
-                    >
-                        Capture d'écrans
+                        {{ section.label }}
                     </button>
                 </div>
             </div>

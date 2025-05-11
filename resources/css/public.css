@@ -97,7 +97,13 @@
 @utility markdown-view {
     @apply text-design-system-paragraph;
 
-    h1 {
+    /* Markdown view shouldn't have h1 title !*/
+    h1,
+    h2 {
         @apply text-design-system-title mt-8 text-2xl font-bold;
+    }
+
+    h3 {
+        @apply text-design-system-paragraph mt-8 text-xl font-bold;
     }
 }

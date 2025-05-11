@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import LightShape from '@/components/public/LightShape.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
+import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import VueMarkdown from 'vue-markdown-render';
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -56,6 +58,21 @@ const activeSection = 'description';
                 </div>
             </div>
             <!-- Fin de la barre de navigation -->
+
+            <section id="description" class="flex flex-col gap-8">
+                <ContentSectionTitle>Description</ContentSectionTitle>
+                <vue-markdown class="markdown-view" :source="creation.fullDescription" />
+            </section>
+
+            <section id="features" class="flex flex-col gap-8">
+                <ContentSectionTitle>Fonctionnalités clés</ContentSectionTitle>
+                <div class="grid gap-16 md:grid-cols-2 lg:grid-cols-3">
+                    <div v-for="feature in creation.features" :key="feature.id" class="flex flex-col gap-6">
+                        <h3 class="text-design-system-paragraph text-xl font-bold">{{ feature.title }}</h3>
+                        <div class="text-design-system-paragraph text-lg font-normal">{{ feature.description }}</div>
+                    </div>
+                </div>
+            </section>
         </div>
     </PublicAppLayout>
 </template>

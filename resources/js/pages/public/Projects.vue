@@ -2,8 +2,8 @@
 import LightShape from '@/components/public/LightShape.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectFilter from '@/components/public/ProjectFilter.vue';
+import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
-import SectionTitle from '@/components/public/Ui/SectionTitle.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRSimplifiedCreation, SSRTechnology } from '@/types';
 import { Head } from '@inertiajs/vue3';
@@ -101,7 +101,7 @@ const handleGameEngineFilterChange = (ids: number[]) => {
         <div class="relative z-10 container mt-16 mb-16">
             <div class="mb-12 flex">
                 <div class="flex flex-1 flex-col gap-6">
-                    <SectionTitle>Projects</SectionTitle>
+                    <HeroSectionTitle>Projects</HeroSectionTitle>
                     <SectionParagraph>
                         Retrouvez tous mes projets et créations passés, allant du mapmaking sur Source Engine au développement web. :)
                     </SectionParagraph>

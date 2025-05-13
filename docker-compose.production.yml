@@ -10,7 +10,7 @@ services:
     ports:
       - "${DOCKER_APP_PORT:-1006}:80"
     networks:
-      - app-network
+      - traefik-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     deploy:
@@ -77,9 +77,8 @@ networks:
     driver: overlay
     attachable: true
     name: app-network
-  default:
+  traefik-net:
     external: true
-    name: traefik-net
 
 volumes:
   app-data:

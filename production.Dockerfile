@@ -39,6 +39,10 @@ RUN npm install
 
 COPY . /app/
 
+# Création des dossiers de cache
+RUN mkdir -p /app/storage/framework/{sessions,views,cache}
+RUN chmod -R 775 /app/storage/framework
+
 # Finalisation de l'installation
 RUN composer dump-autoload --optimize
 RUN php artisan ziggy:generate

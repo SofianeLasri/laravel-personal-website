@@ -3,7 +3,7 @@
 php artisan key:generate
 
 echo "Migrating database..."
-php artisan migrate
+php artisan migrate --force
 
 echo "Launching Supervisor..."
 service supervisor start

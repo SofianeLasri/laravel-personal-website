@@ -51,3 +51,4 @@ RUN chmod +x /app/docker-init/entrypoint.sh
 
 # Définition de l'entrypoint
 ENTRYPOINT ["/app/docker-init/entrypoint.sh"]
+CMD ["-f","/dev/null"]

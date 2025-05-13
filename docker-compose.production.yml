@@ -7,8 +7,6 @@ services:
       dockerfile: production.Dockerfile
     ports:
       - '${DOCKER_APP_PORT:-1006}:8000'
-    networks:
-      - app-network
     deploy:
       replicas: 2
       update_config:
@@ -34,8 +32,6 @@ services:
 
   redis:
     image: redis:alpine
-    networks:
-      - app-network
     deploy:
       replicas: 1
       update_config:
@@ -50,11 +46,6 @@ services:
       retries: 3
     volumes:
       - redis-data:/data
-
-networks:
-  app-network:
-    driver: overlay
-    attachable: true
 
 volumes:
   app-data:

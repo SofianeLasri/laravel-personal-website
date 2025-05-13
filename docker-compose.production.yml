@@ -20,12 +20,12 @@ services:
       dockerfile: production.Dockerfile
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel-personal-website.rule=Host(`127.0.0.1`)"
+      - "traefik.http.routers.laravel-personal-website.rule=PathPrefix(`/`)"
       - "traefik.http.services.laravel-personal-website.loadbalancer.server.port=8000"
     networks:
       - app-network
     deploy:
-      replicas: 1
+      replicas: 2
       update_config:
         parallelism: 1
         order: start-first

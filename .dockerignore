@@ -1,0 +1,5 @@
+storage/app
+storage/framework
+vendor
+node_modules
+public/build

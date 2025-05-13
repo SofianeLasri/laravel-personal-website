@@ -1,12 +1,10 @@
-name: laravel-personal-website
+name: laravel-personal-website-prod
 
 services:
   app:
-    image: ${DOCKER_REGISTRY:-localhost}/laravel-personal-website:${IMAGE_TAG:-latest}
     build:
       context: .
-    working_dir: /app
-    entrypoint: ["docker-init/entrypoint-production.sh"]
+      dockerfile: production.Dockerfile
     ports:
       - '${DOCKER_APP_PORT:-1006}:8000'
     networks:
@@ -30,7 +28,6 @@ services:
     volumes:
       - app-data:/app/storage
       - app-env:/app/.env
-      - ./docker-init:/app/docker-init
     depends_on:
       - redis
 

@@ -1,12 +1,5 @@
 #!/bin/bash
 
-echo "Installing dependencies..."
-composer install
-php artisan key:generate
-
-npm install
-npm run build:ssr
-
 echo "Migrating database..."
 php artisan migrate
 

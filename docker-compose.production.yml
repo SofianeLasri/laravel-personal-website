@@ -2,7 +2,7 @@ name: laravel-personal-website
 
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:v3.4
     command:
       - "--providers.docker=true"
       - "--providers.docker.swarmMode=true"

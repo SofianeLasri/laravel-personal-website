@@ -30,6 +30,7 @@ services:
     volumes:
       - app-data:/app/storage
       - app-env:/app/.env
+      - ./docker-init:/app/docker-init
     depends_on:
       - redis
 

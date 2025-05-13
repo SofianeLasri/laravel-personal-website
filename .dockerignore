@@ -1,5 +1,4 @@
-storage/app
-storage/framework
+storage/app/public
 vendor
 node_modules
 public/build

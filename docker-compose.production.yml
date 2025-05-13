@@ -20,7 +20,7 @@ services:
       dockerfile: production.Dockerfile
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel-personal-website.rule=Host(`localhost`)"
+      - "traefik.http.routers.laravel-personal-website.rule=Host(`127.0.0.1`)"
       - "traefik.http.services.laravel-personal-website.loadbalancer.server.port=8000"
     networks:
       - app-network

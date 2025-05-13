@@ -6,6 +6,7 @@ services:
     command:
       - "--log.level=DEBUG"
       - "--providers.docker=true"
+      - "--providers.docker.network=app-network"
       - "--providers.swarm.exposedbydefault=false"
     ports:
       - "${DOCKER_APP_PORT:-1006}:80"
@@ -22,7 +23,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.laravel-personal-website.rule=PathPrefix(`/`)"
       - "traefik.http.services.laravel-personal-website.loadbalancer.server.port=8000"
-      - "traefik.docker.network=app-network"
     networks:
       - app-network
     deploy:
@@ -71,6 +71,7 @@ networks:
   app-network:
     driver: overlay
     attachable: true
+    external: true
 
 volumes:
   app-data:

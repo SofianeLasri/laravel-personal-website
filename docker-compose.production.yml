@@ -6,7 +6,7 @@ services:
     build:
       context: .
     working_dir: /app
-    entrypoint: ["docker-init/entrypoint.sh"]
+    entrypoint: ["docker-init/entrypoint-production.sh"]
     ports:
       - '${DOCKER_APP_PORT:-1006}:8000'
     networks:

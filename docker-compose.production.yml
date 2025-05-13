@@ -10,7 +10,7 @@ services:
     ports:
       - "${DOCKER_APP_PORT:-1006}:80"
     networks:
-      - traefik-net
+      - app-network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     deploy:
@@ -18,6 +18,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "traefik.enable=false"
 
   app:
     build:
@@ -29,7 +31,6 @@ services:
       - "traefik.http.services.laravel-personal-website.loadbalancer.server.port=8000"
     networks:
       - app-network
-      - traefik-net
     deploy:
       replicas: 2
       update_config:
@@ -77,8 +78,6 @@ networks:
     driver: overlay
     attachable: true
     name: app-network
-  traefik-net:
-    external: true
 
 volumes:
   app-data:

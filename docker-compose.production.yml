@@ -72,6 +72,7 @@ networks:
     driver: overlay
     attachable: true
     external: true
+    name: app-network
 
 volumes:
   app-data:

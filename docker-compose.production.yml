@@ -57,5 +57,5 @@ networks:
     attachable: true
 
 volumes:
-  app-env:
+  app-data:
   redis-data:

@@ -38,9 +38,6 @@ defineProps<{
                                     <Link :href="route('public.projects')" title="Mes projets">Projets</Link>
                                 </li>
                                 <li class="mb-2 list-none">
-                                    <a href="/career" title="Mon parcours professionnel & scolaire">Parcours</a>
-                                </li>
-                                <li class="mb-2 list-none">
                                     <a href="/about" title="À propos de moi">À propos</a>
                                 </li>
                             </ul>

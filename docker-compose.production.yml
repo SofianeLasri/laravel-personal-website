@@ -22,6 +22,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.laravel-personal-website.rule=PathPrefix(`/`)"
       - "traefik.http.services.laravel-personal-website.loadbalancer.server.port=8000"
+      - "traefik.docker.network=app-network"
     networks:
       - app-network
     deploy:

@@ -1,4 +1,4 @@
-name: laravel-personal-website-prod
+name: laravel-personal-website
 
 services:
   traefik:
@@ -20,8 +20,8 @@ services:
       dockerfile: production.Dockerfile
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel-app.rule=Host(`localhost`)"
-      - "traefik.http.services.laravel-app.loadbalancer.server.port=8000"
+      - "traefik.http.routers.laravel-personal-website.rule=Host(`localhost`)"
+      - "traefik.http.services.laravel-personal-website.loadbalancer.server.port=8000"
     networks:
       - app-network
     deploy:

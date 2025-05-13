@@ -6,7 +6,6 @@ services:
     command:
       - "--log.level=DEBUG"
       - "--providers.docker=true"
-      - "-providers.docker.network=traefik-net"
       - "--providers.swarm.exposedbydefault=false"
     ports:
       - "${DOCKER_APP_PORT:-1006}:80"

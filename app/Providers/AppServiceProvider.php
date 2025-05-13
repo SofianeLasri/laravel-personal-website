@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\ImageTranscodingService;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Intervention\Image\Drivers\Imagick\Driver;
 
@@ -23,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }

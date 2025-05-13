@@ -25,9 +25,10 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+    env_file:
+      - stack.env
     volumes:
       - app-data:/app/storage
-      - app-env:/app/.env
     depends_on:
       - redis
 
@@ -56,6 +57,5 @@ networks:
     attachable: true
 
 volumes:
-  app-data:
   app-env:
   redis-data:

@@ -43,7 +43,6 @@ COPY . /app/
 RUN composer dump-autoload --optimize
 RUN php artisan ziggy:generate
 RUN php artisan storage:link
-RUN php artisan key:generate
 RUN npm run build:ssr
 
 # Copie du script d'entrypoint

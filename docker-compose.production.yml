@@ -1,12 +1,29 @@
 name: laravel-personal-website-prod
 
 services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+    ports:
+      - "${DOCKER_APP_PORT:-1006}:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      replicas: 1
+
   app:
     build:
       context: .
       dockerfile: production.Dockerfile
-    ports:
-      - '${DOCKER_APP_PORT:-1006}:8000'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.laravel-app.rule=Host(`localhost`)"
+      - "traefik.http.services.laravel-app.loadbalancer.server.port=8000"
+    networks:
+      - app-network
     deploy:
       replicas: 2
       update_config:
@@ -32,6 +49,8 @@ services:
 
   redis:
     image: redis:alpine
+    networks:
+      - app-network
     deploy:
       replicas: 1
       update_config:
@@ -46,6 +65,11 @@ services:
       retries: 3
     volumes:
       - redis-data:/data
+
+networks:
+  app-network:
+    driver: overlay
+    attachable: true
 
 volumes:
   app-data:

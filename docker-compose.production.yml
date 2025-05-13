@@ -4,6 +4,7 @@ services:
   traefik:
     image: traefik:v3.4
     command:
+      - "--log.level=DEBUG"
       - "--providers.docker=true"
       - "--providers.swarm.exposedbydefault=false"
     ports:

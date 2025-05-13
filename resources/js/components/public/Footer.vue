@@ -32,10 +32,10 @@ defineProps<{
                             <div class="text-xl font-bold text-black">Portfolio.</div>
                             <ul class="text-design-system-paragraph text-base font-normal">
                                 <li class="mb-2 list-none">
-                                    <Link :href="route('home')" title="Accueil">Accueil</Link>
+                                    <Link :href="route('public.home')" title="Accueil">Accueil</Link>
                                 </li>
                                 <li class="mb-2 list-none">
-                                    <Link :href="route('projects')" title="Mes projets">Projets</Link>
+                                    <Link :href="route('public.projects')" title="Mes projets">Projets</Link>
                                 </li>
                                 <li class="mb-2 list-none">
                                     <a href="/career" title="Mon parcours professionnel & scolaire">Parcours</a>

@@ -6,6 +6,7 @@ services:
     command:
       - "--log.level=DEBUG"
       - "--providers.docker=true"
+      - "-providers.docker.network=traefik-net"
       - "--providers.swarm.exposedbydefault=false"
     ports:
       - "${DOCKER_APP_PORT:-1006}:80"
@@ -25,6 +26,7 @@ services:
       - "traefik.docker.network=app-network"
     networks:
       - app-network
+      - traefik-net
     deploy:
       replicas: 2
       update_config:
@@ -72,6 +74,9 @@ networks:
     driver: overlay
     attachable: true
     name: app-network
+  default:
+    external: true
+    name: traefik-net
 
 volumes:
   app-data:

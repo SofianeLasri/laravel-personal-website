@@ -2,20 +2,84 @@ name: laravel-personal-website
 
 services:
   app:
-    restart: always
+    image: ${DOCKER_REGISTRY:-localhost}/laravel-personal-website:${IMAGE_TAG:-latest}
+    build:
+      context: .
     working_dir: /app
-    entrypoint: ["docker-init/entrypoint.sh"]
-    ports:
-      - '${DOCKER_APP_PORT}:8000'
+    entrypoint: ["docker-init/entrypoint-production.sh"]
+    networks:
+      - app-network
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.laravel-app.rule=Host(`${DOMAIN_NAME:-localhost}`)"
+        - "traefik.http.services.laravel-app.loadbalancer.server.port=8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     volumes:
-      - .:/app
-      - /app/vendor
-      - /app/node_modules
-      - /app/public/build
+      - app-data:/app/storage
+      - app-env:/app/.env
     depends_on:
       - redis
+      - traefik
 
   redis:
     image: redis:alpine
-    restart: always
-    tty: true
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - redis-data:/data
+
+  traefik:
+    image: traefik:v2.10
+    ports:
+      - "${DOCKER_APP_PORT:-80}:80"
+      - "443:443"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      replicas: 1
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: overlay
+
+volumes:
+  app-data:
+  app-env:
+  redis-data:

@@ -10,10 +10,15 @@ services:
       - "--providers.swarm.exposedbydefault=false"
     ports:
       - "${DOCKER_APP_PORT:-1006}:80"
+    networks:
+      - app-network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
 
   app:
     build:
@@ -23,7 +28,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.laravel-personal-website.rule=PathPrefix(`/`)"
       - "traefik.http.services.laravel-personal-website.loadbalancer.server.port=8000"
-      - "traefik.docker.network=app-network"
     networks:
       - app-network
       - traefik-net

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Creation::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Picture::class)->constrained('pictures')->cascadeOnDelete();
-            $table->foreignIdFor(TranslationKey::class, 'caption_translation_key_id')->nullable()->constrained('translation_keys');
+            $table->foreignIdFor(TranslationKey::class, 'caption_translation_key_id')->nullable()->constrained('translation_keys')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -47,7 +47,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_creates_new_screenshot_with_translation(): void
+    public function test_store_creates_new_screenshot_with_caption(): void
     {
         $picture = Picture::factory()->create();
 
@@ -74,6 +74,27 @@ class CreationDraftScreenshotControllerTest extends TestCase
             ->first();
 
         $this->assertEquals('Test Caption', $translation->text);
+    }
+
+    #[Test]
+    public function test_store_creates_new_screenshot_without_caption(): void
+    {
+        $picture = Picture::factory()->create();
+
+        $response = $this->postJson(
+            route('dashboard.api.creation-drafts.draft-screenshots.store', $this->draft),
+            [
+                'picture_id' => $picture->id,
+            ]
+        );
+
+        $response->assertCreated()
+            ->assertJsonPath('picture_id', $picture->id);
+
+        $this->assertDatabaseHas('creation_draft_screenshots', [
+            'creation_draft_id' => $this->draft->id,
+            'picture_id' => $picture->id,
+        ]);
     }
 
     #[Test]
@@ -123,6 +144,25 @@ class CreationDraftScreenshotControllerTest extends TestCase
             ->first();
 
         $this->assertEquals('Updated Caption', $translation->text);
+    }
+
+    #[Test]
+    public function test_update_with_no_caption_removes_caption_translation_id(): void
+    {
+        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
+
+        $response = $this->putJson(
+            route('dashboard.api.draft-screenshots.update', $screenshot),
+            [
+                'caption' => null,
+                'locale' => 'en',
+            ]
+        );
+
+        $response->assertOk();
+
+        $screenshot->refresh();
+        $this->assertNull($screenshot->caption_translation_key_id);
     }
 
     #[Test]

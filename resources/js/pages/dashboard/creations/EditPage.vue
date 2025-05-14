@@ -127,8 +127,8 @@ const { isFieldDirty, handleSubmit, setFieldValue, meta } = useForm({
         short_description_content: shortDescriptionContent,
         full_description_content: fullDescriptionContent,
         featured: currentCreationDraft.value?.featured ?? false,
-        started_at: currentCreationDraft.value?.started_at ?? today,
-        ended_at: currentCreationDraft.value?.ended_at ?? null,
+        started_at: currentCreationDraft.value?.started_at ? currentCreationDraft.value.started_at.split('T')[0] : today,
+        ended_at: currentCreationDraft.value?.ended_at ? currentCreationDraft.value.ended_at.split('T')[0] : null,
     },
 });
 
@@ -176,8 +176,13 @@ const onSubmit = handleSubmit(async (formValues) => {
     isSubmitting.value = true;
 
     try {
-        const payload = {
+        const processedFormValues = {
             ...formValues,
+            ended_at: formValues.ended_at === '' ? null : formValues.ended_at,
+        };
+
+        const payload = {
+            ...processedFormValues,
             original_creation_id: originalCreationId.value,
         };
 

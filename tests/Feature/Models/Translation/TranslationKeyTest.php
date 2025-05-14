@@ -96,4 +96,30 @@ class TranslationKeyTest extends TestCase
             $this->assertTrue(true, 'Exception for duplicate key correctly thrown');
         }
     }
+
+    #[Test]
+    public function it_deletes_related_translations()
+    {
+        $translationKey = TranslationKey::factory()->create([
+            'key' => 'key.to.delete',
+        ]);
+
+        Translation::factory()->create([
+            'translation_key_id' => $translationKey->id,
+            'locale' => 'fr',
+            'text' => 'Texte en français',
+        ]);
+
+        $this->assertDatabaseCount('translations', 1);
+
+        $translationKey->delete();
+
+        $this->assertDatabaseCount('translations', 0);
+        $this->assertDatabaseMissing('translation_keys', [
+            'id' => $translationKey->id,
+        ]);
+        $this->assertDatabaseMissing('translations', [
+            'translation_key_id' => $translationKey->id,
+        ]);
+    }
 }

@@ -31,6 +31,13 @@ class TranslationKey extends Model
         'key' => 'string',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (TranslationKey $translationKey) {
+            $translationKey->translations()->delete();
+        });
+    }
+
     public function translations(): HasMany
     {
         return $this->hasMany(Translation::class);

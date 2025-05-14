@@ -57,11 +57,19 @@ class CreationDraftScreenshotController extends Controller
 
         if ($request->filled('caption')) {
             $caption = $request->caption;
-            $translationKey = $creationDraftScreenshot->captionTranslationKey ? $creationDraftScreenshot->captionTranslationKey : uniqid();
+            $translationKey = uniqid();
 
-            Translation::createOrUpdate($translationKey,
+            if ($creationDraftScreenshot->captionTranslationKey) {
+                $translationKey = $creationDraftScreenshot->captionTranslationKey;
+            }
+
+            $translationKeyId = Translation::createOrUpdate($translationKey,
                 $request->locale,
-                $caption);
+                $caption)->translation_key_id;
+
+            $creationDraftScreenshot->update([
+                'caption_translation_key_id' => $translationKeyId,
+            ]);
         } else {
             $creationDraftScreenshot->captionTranslationKey()->delete();
         }

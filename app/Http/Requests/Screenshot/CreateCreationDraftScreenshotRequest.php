@@ -11,7 +11,7 @@ class CreateCreationDraftScreenshotRequest extends FormRequest
         return [
             'locale' => ['required_with:caption', 'string', 'in:en,fr'],
             'picture_id' => ['required', 'exists:pictures,id'],
-            'caption' => ['sometimes', 'string'],
+            'caption' => ['sometimes', 'nullable', 'string'],
         ];
     }
 }

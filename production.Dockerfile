@@ -53,5 +53,13 @@ RUN npm run build:ssr
 COPY docker-init/entrypoint-production.sh /app/docker-init/entrypoint.sh
 RUN chmod +x /app/docker-init/entrypoint.sh
 
-# Définition de l'entrypoint
-ENTRYPOINT ["/app/docker-init/entrypoint.sh"]
+# Entrypoint
+RUN php artisan key:generate
+RUN php artisan migrate --force
+
+RUN service supervisor start
+RUN supervisorctl start all
+
+RUN php artisan inertia:start-ssr &
+
+ENTRYPOINT ["php", "artisan", "octane:frankenphp"]

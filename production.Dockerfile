@@ -54,7 +54,6 @@ COPY docker-init/entrypoint-production.sh /app/docker-init/entrypoint.sh
 RUN chmod +x /app/docker-init/entrypoint.sh
 
 # Entrypoint
-RUN php artisan key:generate
 RUN php artisan migrate --force
 
 RUN service supervisor start

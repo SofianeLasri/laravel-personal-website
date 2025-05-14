@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 
@@ -160,6 +161,44 @@ class CreationDraftScreenshotControllerTest extends TestCase
         );
 
         $response->assertOk();
+
+        $screenshot->refresh();
+        $this->assertNull($screenshot->caption_translation_key_id);
+    }
+
+    #[TestDox('It test that creating a screenshots with no caption, and then, updating it with a caption, will create a new translation key')]
+    public function test_update_creates_new_translation_key(): void
+    {
+        $screenshot = CreationDraftScreenshot::factory([
+            'caption_translation_key_id' => null,
+        ])->create();
+
+        $response = $this->putJson(
+            route('dashboard.api.draft-screenshots.update', $screenshot),
+            [
+                'caption' => 'Updated Caption',
+                'locale' => 'en',
+            ]
+        );
+
+        $response->assertOk();
+
+        $screenshot->refresh();
+        $translation = Translation::where('translation_key_id', $screenshot->caption_translation_key_id)
+            ->where('locale', 'en')
+            ->first();
+
+        $this->assertEquals('Updated Caption', $translation->text);
+    }
+
+    #[TestDox('Test that updating a screenshot that has a caption with no data will remove the caption')]
+    public function test_update_removes_caption(): void
+    {
+        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
+
+        $this->putJson(
+            route('dashboard.api.draft-screenshots.update', $screenshot),
+        );
 
         $screenshot->refresh();
         $this->assertNull($screenshot->caption_translation_key_id);

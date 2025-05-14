@@ -26,12 +26,15 @@ class CreationDraftScreenshotController extends Controller
      */
     public function store(CreateCreationDraftScreenshotRequest $request, CreationDraft $creationDraft): JsonResponse
     {
-        if ($request->has('caption')) {
-            $caption = Translation::createOrUpdate(uniqid(), $request->locale, $request->caption);
+        $translation = null;
+        if ($request->filled('caption')) {
+            $caption = $request->caption;
+            $translation = Translation::createOrUpdate(uniqid(), $request->locale, $caption)->translation_key_id;
         }
+
         $creationDraftScreenshot = $creationDraft->screenshots()->create([
             'picture_id' => $request->picture_id,
-            'caption_translation_key_id' => $caption->translation_key_id,
+            'caption_translation_key_id' => $translation,
         ])->load(['picture', 'captionTranslationKey.translations']);
 
         return response()->json($creationDraftScreenshot, Response::HTTP_CREATED);
@@ -52,14 +55,15 @@ class CreationDraftScreenshotController extends Controller
     {
         $creationDraftScreenshot = CreationDraftScreenshot::findOrFail($creationDraftScreenshotId);
 
-        if ($request->has('caption')) {
-            $caption = Translation::createOrUpdate($creationDraftScreenshot->captionTranslationKey ? $creationDraftScreenshot->captionTranslationKey : uniqid(),
-                $request->locale,
-                $request->caption);
+        if ($request->filled('caption')) {
+            $caption = $request->caption;
+            $translationKey = $creationDraftScreenshot->captionTranslationKey ? $creationDraftScreenshot->captionTranslationKey : uniqid();
 
-            $creationDraftScreenshot->update([
-                'caption_translation_key_id' => $caption->translation_key_id,
-            ]);
+            Translation::createOrUpdate($translationKey,
+                $request->locale,
+                $caption);
+        } else {
+            $creationDraftScreenshot->captionTranslationKey()->delete();
         }
 
         return response()->json($creationDraftScreenshot->load(['picture', 'captionTranslationKey.translations']));

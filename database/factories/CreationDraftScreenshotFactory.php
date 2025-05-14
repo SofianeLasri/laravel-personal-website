@@ -21,14 +21,14 @@ class CreationDraftScreenshotFactory extends Factory
 
             'creation_draft_id' => CreationDraft::factory(),
             'picture_id' => Picture::factory(),
-            'caption_translation_key_id' => $this->faker->optional(0.7)->randomElement([TranslationKey::factory()]),
+            'caption_translation_key_id' => $this->faker->optional(0.7)->randomElement([TranslationKey::factory()->withTranslations()->create()]),
         ];
     }
 
     public function withCaption(): self
     {
         return $this->state([
-            'caption_translation_key_id' => TranslationKey::factory(),
+            'caption_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
         ]);
     }
 }

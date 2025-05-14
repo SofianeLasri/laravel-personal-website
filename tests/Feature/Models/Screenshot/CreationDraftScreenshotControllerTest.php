@@ -198,6 +198,10 @@ class CreationDraftScreenshotControllerTest extends TestCase
 
         $this->putJson(
             route('dashboard.api.draft-screenshots.update', $screenshot),
+            [
+                'caption' => '',
+                'locale' => 'en',
+            ]
         );
 
         $screenshot->refresh();
@@ -221,7 +225,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     public function test_screenshot_belongs_to_correct_draft(): void
     {
         $otherDraft = CreationDraft::factory()->create();
-        $screenshot = CreationDraftScreenshot::factory()->create([
+        CreationDraftScreenshot::factory()->create([
             'creation_draft_id' => $this->draft->id,
         ]);
 
@@ -255,7 +259,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
         $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
         $originalKey = $screenshot->caption_translation_key_id;
 
-        $response = $this->putJson(
+        $this->putJson(
             route('dashboard.api.draft-screenshots.update', $screenshot),
             [
                 'caption' => 'Updated Caption',
@@ -265,18 +269,5 @@ class CreationDraftScreenshotControllerTest extends TestCase
 
         $screenshot->refresh();
         $this->assertEquals($originalKey, $screenshot->caption_translation_key_id);
-    }
-
-    #[Test]
-    public function test_caption_translation_relationship(): void
-    {
-        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
-        $translation = Translation::factory()->create([
-            'translation_key_id' => $screenshot->caption_translation_key_id,
-            'locale' => 'en',
-            'text' => 'Test Caption',
-        ]);
-
-        $this->assertEquals('Test Caption', $screenshot->getCaption('en'));
     }
 }

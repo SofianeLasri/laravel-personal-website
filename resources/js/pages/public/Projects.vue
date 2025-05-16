@@ -3,6 +3,7 @@ import LightShape from '@/components/public/LightShape.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectFilter from '@/components/public/ProjectFilter.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
+import HorizontalNavbar from '@/components/public/Ui/HorizontalNavbar.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRSimplifiedCreation, SSRTechnology } from '@/types';
@@ -29,6 +30,12 @@ const activeTab = ref<ProjectTab>('development');
 const selectedFrameworks = ref<number[]>([]);
 const selectedLibraries = ref<number[]>([]);
 const selectedGameEngines = ref<number[]>([]);
+
+const navItems = [
+    { id: 'development', label: 'Développement' },
+    { id: 'games', label: 'Jeux vidéos' },
+    { id: 'source-engine', label: 'Source Engine' },
+];
 
 const tabToCreationTypes = {
     development: ['portfolio', 'library', 'website', 'tool', 'other'],
@@ -62,9 +69,7 @@ const filteredCreations = computed(() => {
 
         if (activeTab.value === 'development') {
             const hasSelectedFramework = selectedFrameworks.value.length === 0 || selectedFrameworks.value.some((id) => techIds.includes(id));
-
             const hasSelectedLibrary = selectedLibraries.value.length === 0 || selectedLibraries.value.some((id) => techIds.includes(id));
-
             return hasSelectedFramework && hasSelectedLibrary;
         } else if (activeTab.value === 'games') {
             return selectedGameEngines.value.length === 0 || selectedGameEngines.value.some((id) => techIds.includes(id));
@@ -73,10 +78,6 @@ const filteredCreations = computed(() => {
         return true;
     });
 });
-
-const setActiveTab = (tab: ProjectTab) => {
-    activeTab.value = tab;
-};
 
 const handleFrameworkFilterChange = (ids: number[]) => {
     selectedFrameworks.value = ids;
@@ -109,30 +110,8 @@ const handleGameEngineFilterChange = (ids: number[]) => {
                 <div class="hidden flex-1 xl:block"></div>
             </div>
 
-            <div class="mb-8 border-b border-gray-200">
-                <div class="flex space-x-8">
-                    <button
-                        @click="setActiveTab('development')"
-                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
-                        :class="activeTab === 'development' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
-                    >
-                        Développement
-                    </button>
-                    <button
-                        @click="setActiveTab('games')"
-                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
-                        :class="activeTab === 'games' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
-                    >
-                        Jeux vidéos
-                    </button>
-                    <button
-                        @click="setActiveTab('source-engine')"
-                        class="cursor-pointer border-b-2 py-4 text-xl transition-colors"
-                        :class="activeTab === 'source-engine' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
-                    >
-                        Source Engine
-                    </button>
-                </div>
+            <div class="mb-8">
+                <HorizontalNavbar :items="navItems" v-model:activeItem="activeTab" mode="manual" :sticky="false" :showArrows="false" />
             </div>
 
             <div class="flex flex-col gap-8 lg:flex-row">

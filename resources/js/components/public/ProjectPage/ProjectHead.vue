@@ -19,13 +19,13 @@ defineProps<{
                             <img :src="creation.logo.avif.small" alt="Logo of the project" class="h-full w-full object-cover" loading="eager" />
                         </picture>
                     </div>
-                    <div class="flex w-64 flex-col items-end" v-if="creation.endedAt">
+                    <div class="flex flex-col items-end" v-if="creation.endedAt">
                         <div class="text-design-system-paragraph justify-center font-medium">Réalisé en</div>
                         <div class="text-design-system-paragraph justify-center text-2xl font-bold">
                             {{ new Date(creation.endedAt).getFullYear() }}
                         </div>
                     </div>
-                    <div class="flex w-64 flex-col items-end" v-else>
+                    <div class="flex flex-col items-end" v-else>
                         <div class="text-design-system-paragraph justify-center font-medium">Réalisation</div>
                         <div class="text-design-system-paragraph justify-center text-2xl font-bold">En cours</div>
                     </div>

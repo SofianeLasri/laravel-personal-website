@@ -38,6 +38,7 @@ COPY package.json package-lock.json /app/
 RUN npm install
 
 COPY . /app/
+COPY stack.env /app/.env
 
 # Création des dossiers de cache
 RUN mkdir -p /app/storage/framework/{sessions,views,cache}

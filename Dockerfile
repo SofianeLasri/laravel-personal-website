@@ -28,5 +28,3 @@ COPY docker-init/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Setting PHP Configuration
 COPY docker-init/php.ini $PHP_INI_DIR/php.ini
-
-COPY stack.env /app/.env

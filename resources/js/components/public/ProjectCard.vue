@@ -31,7 +31,7 @@ if (startYear && endYear) {
         </Link>
         <div class="flex gap-4 rounded-2xl">
             <Link
-                class="flex size-20 items-center justify-center gap-2.5 rounded-lg border bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
+                class="flex size-20 flex-shrink-0 items-center justify-center gap-2.5 rounded-lg border bg-white p-3 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] md:p-4"
                 :href="route('public.projects.show', { slug: creation.slug })"
             >
                 <picture class="flex-1">
@@ -55,7 +55,7 @@ if (startYear && endYear) {
                     {{ formattedYears }}
                 </div>
             </div>
-            <div class="flex flex-col gap-2.5 py-2">
+            <div class="hidden flex-col gap-2.5 py-2 md:flex">
                 <div class="flex items-center gap-2">
                     <div v-for="technology in creation.technologies" :key="technology.name">
                         <div v-html="technology.svgIcon" class="size-4"></div>

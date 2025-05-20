@@ -28,7 +28,6 @@ use Illuminate\Support\Carbon;
  * @property bool $featured
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property mixed $use_factory
  * @property int|null $logos_count
  * @property int|null $cover_images_count
  * @property int|null $short_description_translation_keys_count
@@ -41,19 +40,18 @@ use Illuminate\Support\Carbon;
  * @property int|null $drafts_count
  * @property-read Picture $logo
  * @property-read Picture $coverImage
- * @property-read TranslationKey|null $shortDescriptionTranslationKey
- * @property-read TranslationKey|null $fullDescriptionTranslationKey
+ * @property-read TranslationKey $shortDescriptionTranslationKey
+ * @property-read TranslationKey $fullDescriptionTranslationKey
  * @property-read Collection|Feature[] $features
  * @property-read Collection|Screenshot[] $screenshots
  * @property-read Collection|Technology[] $technologies
  * @property-read Collection|Person[] $people
  * @property-read Collection|Tag[] $tags
  * @property-read Collection|CreationDraft[] $drafts
- *
- * @method static CreationFactory<self> factory($count = null, $state = [])
  */
 class Creation extends Model
 {
+    /** @use HasFactory<CreationFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -82,51 +80,81 @@ class Creation extends Model
         'featured' => 'boolean',
     ];
 
+    /**
+     * @return BelongsTo<Picture, $this>
+     */
     public function logo(): BelongsTo
     {
         return $this->belongsTo(Picture::class, 'logo_id');
     }
 
+    /**
+     * @return BelongsTo<Picture, $this>
+     */
     public function coverImage(): BelongsTo
     {
         return $this->belongsTo(Picture::class, 'cover_image_id');
     }
 
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
     public function shortDescriptionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'short_description_translation_key_id');
     }
 
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
     public function fullDescriptionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'full_description_translation_key_id');
     }
 
+    /**
+     * @return HasMany<Feature, $this>
+     */
     public function features(): HasMany
     {
         return $this->hasMany(Feature::class);
     }
 
+    /**
+     * @return HasMany<Screenshot, $this>
+     */
     public function screenshots(): HasMany
     {
         return $this->hasMany(Screenshot::class);
     }
 
+    /**
+     * @return BelongsToMany<Technology, $this>
+     */
     public function technologies(): BelongsToMany
     {
         return $this->belongsToMany(Technology::class);
     }
 
+    /**
+     * @return BelongsToMany<Person, $this>
+     */
     public function people(): BelongsToMany
     {
         return $this->belongsToMany(Person::class);
     }
 
+    /**
+     * @return BelongsToMany<Tag, $this>
+     */
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
 
+    /**
+     * @return HasMany<CreationDraft, $this>
+     */
     public function drafts(): HasMany
     {
         return $this->hasMany(CreationDraft::class, 'original_creation_id', 'id');

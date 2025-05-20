@@ -14,15 +14,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $translation_key_id
  * @property string $locale
  * @property string $text
- * @property mixed $use_factory
  * @property mixed $key
  * @property int|null $translation_keys_count
- * @property-read TranslationKey|null $translationKey
- *
- * @method static TranslationFactory<self> factory($count = null, $state = [])
+ * @property-read TranslationKey $translationKey
  */
 class Translation extends Model
 {
+    /** @use HasFactory<TranslationFactory> */
     use HasFactory;
 
     public $timestamps = false;
@@ -55,6 +53,9 @@ class Translation extends Model
         });
     }
 
+    /**
+     * @return Attribute<string, string>
+     */
     public function key(): Attribute
     {
         return Attribute::make(
@@ -67,6 +68,9 @@ class Translation extends Model
         );
     }
 
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
     public function translationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class);

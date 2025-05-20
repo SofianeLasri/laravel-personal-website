@@ -11,16 +11,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $technology_id
  * @property int $description_translation_key_id
- * @property mixed $use_factory
  * @property int|null $technologies_count
  * @property int|null $description_translation_keys_count
  * @property-read Technology $technology
  * @property-read TranslationKey $descriptionTranslationKey
- *
- * @method static TechnologyExperienceFactory<self> factory($count = null, $state = [])
  */
 class TechnologyExperience extends Model
 {
+    /** @use HasFactory<TechnologyExperienceFactory> */
     use HasFactory;
 
     public $timestamps = false;
@@ -30,11 +28,17 @@ class TechnologyExperience extends Model
         'description_translation_key_id',
     ];
 
+    /**
+     * @return BelongsTo<TechnologyExperience, $this>
+     */
     public function technology(): BelongsTo
     {
         return $this->belongsTo(Technology::class);
     }
 
+    /**
+     * @return BelongsTo<TechnologyExperience, $this>
+     */
     public function descriptionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'description_translation_key_id');

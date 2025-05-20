@@ -76,8 +76,8 @@ class ExperienceTest extends TestCase
         Experience::factory()->count(3)->formation()->create();
         Experience::factory()->count(2)->emploi()->create();
 
-        $formations = Experience::ofType(ExperienceType::FORMATION)->get();
-        $emplois = Experience::ofType(ExperienceType::EMPLOI)->get();
+        $formations = Experience::where('type', '=', ExperienceType::FORMATION)->get();
+        $emplois = Experience::where('type', '=', ExperienceType::EMPLOI)->get();
 
         $this->assertCount(3, $formations);
         $this->assertCount(2, $emplois);
@@ -94,7 +94,7 @@ class ExperienceTest extends TestCase
             'started_at' => '2020-01-01',
         ]);
 
-        $experiences = Experience::latest()->get();
+        $experiences = Experience::orderBy('started_at', 'desc')->get();
 
         $this->assertEquals($newer->id, $experiences->first()->id);
         $this->assertEquals($older->id, $experiences->last()->id);

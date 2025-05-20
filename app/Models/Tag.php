@@ -15,16 +15,14 @@ use Illuminate\Support\Carbon;
  * @property string $slug
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property mixed $use_factory
  * @property int|null $creations_count
  * @property int|null $creation_drafts_count
- * @property-read Collection|\App\Models\Creation[] $creations
- * @property-read Collection|\App\Models\CreationDraft[] $creationDrafts
- *
- * @method static TagFactory<self> factory($count = null, $state = [])
+ * @property-read Collection|Creation[] $creations
+ * @property-read Collection|CreationDraft[] $creationDrafts
  */
 class Tag extends Model
 {
+    /** @use HasFactory<TagFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -37,11 +35,17 @@ class Tag extends Model
         'slug' => 'string',
     ];
 
+    /**
+     * @return BelongsToMany<Creation, $this>
+     */
     public function creations(): BelongsToMany
     {
         return $this->belongsToMany(Creation::class);
     }
 
+    /**
+     * @return BelongsToMany<CreationDraft, $this>
+     */
     public function creationDrafts(): BelongsToMany
     {
         return $this->belongsToMany(CreationDraft::class, 'creation_draft_tag', 'tag_id', 'creation_draft_id');

@@ -16,20 +16,18 @@ use Illuminate\Support\Carbon;
  * @property int|null $picture_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property mixed $use_factory
  * @property int|null $creations_count
  * @property int|null $title_translation_keys_count
  * @property int|null $description_translation_keys_count
  * @property int|null $pictures_count
- * @property-read Creation|null $creation
- * @property-read TranslationKey|null $titleTranslationKey
- * @property-read TranslationKey|null $descriptionTranslationKey
+ * @property-read Creation $creation
+ * @property-read TranslationKey $titleTranslationKey
+ * @property-read TranslationKey $descriptionTranslationKey
  * @property-read Picture|null $picture
- *
- * @method static FeatureFactory<self> factory($count = null, $state = [])
  */
 class Feature extends Model
 {
+    /** @use HasFactory<FeatureFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -39,21 +37,33 @@ class Feature extends Model
         'picture_id',
     ];
 
+    /**
+     * @return BelongsTo<Creation, $this>
+     */
     public function creation(): BelongsTo
     {
         return $this->belongsTo(Creation::class);
     }
 
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
     public function titleTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'title_translation_key_id');
     }
 
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
     public function descriptionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'description_translation_key_id');
     }
 
+    /**
+     * @return BelongsTo<Picture, $this>
+     */
     public function picture(): BelongsTo
     {
         return $this->belongsTo(Picture::class);

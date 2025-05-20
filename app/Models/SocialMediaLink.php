@@ -11,12 +11,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $icon_svg
  * @property string $name
  * @property string $url
- * @property mixed $use_factory
- *
- * @method static SocialMediaLinkFactory<self> factory($count = null, $state = [])
  */
 class SocialMediaLink extends Model
 {
+    /** @use HasFactory<SocialMediaLinkFactory> */
     use HasFactory;
 
     public $timestamps = false;

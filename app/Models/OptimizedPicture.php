@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\OptimizedPictureFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,14 +14,12 @@ use Illuminate\Support\Facades\Storage;
  * @property string $variant
  * @property string $path
  * @property string $format
- * @property mixed $use_factory
  * @property int|null $pictures_count
- * @property-read \App\Models\Picture|null $picture
- *
- * @method static \Database\Factories\OptimizedPictureFactory<self> factory($count = null, $state = [])
+ * @property-read Picture $picture
  */
 class OptimizedPicture extends Model
 {
+    /** @use HasFactory<OptimizedPictureFactory> */
     use HasFactory;
 
     public $timestamps = false;
@@ -60,6 +59,9 @@ class OptimizedPicture extends Model
         });
     }
 
+    /**
+     * @return BelongsTo<Picture, $this>
+     */
     public function picture(): BelongsTo
     {
         return $this->belongsTo(Picture::class);

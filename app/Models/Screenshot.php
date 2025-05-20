@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ScreenshotFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,18 +15,16 @@ use Illuminate\Support\Carbon;
  * @property int|null $caption_translation_key_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property mixed $use_factory
  * @property int|null $creations_count
  * @property int|null $pictures_count
  * @property int|null $caption_translation_keys_count
- * @property-read \App\Models\Creation|null $creation
- * @property-read Picture $picture
- * @property-read \App\Models\TranslationKey|null $captionTranslationKey
- *
- * @method static \Database\Factories\ScreenshotFactory<self> factory($count = null, $state = [])
+ * @property-read Creation|null $creation
+ * @property-read Picture|null $picture
+ * @property-read TranslationKey|null $captionTranslationKey
  */
 class Screenshot extends Model
 {
+    /** @use HasFactory<ScreenshotFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -34,16 +33,25 @@ class Screenshot extends Model
         'caption_translation_key_id',
     ];
 
+    /**
+     * @return BelongsTo<Creation, $this>
+     */
     public function creation(): BelongsTo
     {
         return $this->belongsTo(Creation::class);
     }
 
+    /**
+     * @return BelongsTo<Picture, $this>
+     */
     public function picture(): BelongsTo
     {
         return $this->belongsTo(Picture::class);
     }
 
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
     public function captionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'caption_translation_key_id');

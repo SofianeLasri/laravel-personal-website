@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\SocialMediaLink;
 use App\Models\Technology;
 use App\Services\PublicControllersService;
+use Inertia\Response;
 
 class ProjectsController extends Controller
 {
     public function __construct(protected PublicControllersService $service) {}
 
-    public function __invoke()
+    public function __invoke(): Response
     {
         $locale = app()->getLocale();
 

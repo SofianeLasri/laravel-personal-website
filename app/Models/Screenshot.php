@@ -18,8 +18,8 @@ use Illuminate\Support\Carbon;
  * @property int|null $creations_count
  * @property int|null $pictures_count
  * @property int|null $caption_translation_keys_count
- * @property-read Creation|null $creation
- * @property-read Picture|null $picture
+ * @property-read Creation $creation
+ * @property-read Picture $picture
  * @property-read TranslationKey|null $captionTranslationKey
  */
 class Screenshot extends Model

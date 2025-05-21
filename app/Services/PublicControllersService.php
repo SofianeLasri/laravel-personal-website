@@ -170,11 +170,8 @@ class PublicControllersService
      */
     public function formatCreationForSSRShort(Creation $creation): array
     {
-        $shortDescription = null;
-        if ($creation->shortDescriptionTranslationKey) {
-            $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-            $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
-        }
+        $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+        $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
 
         return [
             'id' => $creation->id,
@@ -221,27 +218,18 @@ class PublicControllersService
     {
         $response = $this->formatCreationForSSRShort($creation);
 
-        $fullDescription = '';
-        if ($creation->fullDescriptionTranslationKey) {
-            $fullDescriptionTranslation = $creation->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-            $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
-        }
+        $fullDescriptionTranslation = $creation->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+        $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
 
         $response['fullDescription'] = $fullDescription;
         $response['externalUrl'] = $creation->external_url;
         $response['sourceCodeUrl'] = $creation->source_code_url;
         $response['features'] = $creation->features->map(function (Feature $feature) {
-            $title = '';
-            if ($feature->titleTranslationKey) {
-                $titleTranslation = $feature->titleTranslationKey->translations->where('locale', $this->locale)->first();
-                $title = $titleTranslation ? $titleTranslation->text : '';
-            }
+            $titleTranslation = $feature->titleTranslationKey->translations->where('locale', $this->locale)->first();
+            $title = $titleTranslation ? $titleTranslation->text : '';
 
-            $description = '';
-            if ($feature->descriptionTranslationKey) {
-                $descriptionTranslation = $feature->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
-                $description = $descriptionTranslation ? $descriptionTranslation->text : '';
-            }
+            $descriptionTranslation = $feature->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $description = $descriptionTranslation ? $descriptionTranslation->text : '';
 
             $picture = $feature->picture ? $this->formatPictureForSSR($feature->picture) : null;
 
@@ -325,11 +313,8 @@ class PublicControllersService
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
-        $description = '';
-        if ($technology->descriptionTranslationKey) {
-            $descriptionTranslation = $technology->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
-            $description = $descriptionTranslation ? $descriptionTranslation->text : '';
-        }
+        $descriptionTranslation = $technology->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
+        $description = $descriptionTranslation ? $descriptionTranslation->text : '';
 
         return [
             'id' => $technology->id,
@@ -400,21 +385,12 @@ class PublicControllersService
         $experiences = Experience::all()->withRelationshipAutoloading();
 
         return $experiences->map(function (Experience $experience) {
-            $title = '';
-            if ($experience->titleTranslationKey) {
-                $titleTranslation = $experience->titleTranslationKey->translations->where('locale', $this->locale)->first();
-                $title = $titleTranslation ? $titleTranslation->text : '';
-            }
-            $shortDescription = '';
-            if ($experience->shortDescriptionTranslationKey) {
-                $shortDescriptionTranslation = $experience->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-                $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
-            }
-            $fullDescription = '';
-            if ($experience->fullDescriptionTranslationKey) {
-                $fullDescriptionTranslation = $experience->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-                $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
-            }
+            $titleTranslation = $experience->titleTranslationKey->translations->where('locale', $this->locale)->first();
+            $title = $titleTranslation ? $titleTranslation->text : '';
+            $shortDescriptionTranslation = $experience->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
+            $fullDescriptionTranslation = $experience->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
+            $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
 
             return [
                 'id' => $experience->id,

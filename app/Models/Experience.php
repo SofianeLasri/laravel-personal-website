@@ -33,7 +33,7 @@ use Illuminate\Support\Carbon;
  * @property-read TranslationKey $titleTranslationKey
  * @property-read TranslationKey $shortDescriptionTranslationKey
  * @property-read TranslationKey $fullDescriptionTranslationKey
- * @property-read Picture|null $logo
+ * @property-read Picture $logo
  * @property-read Collection|Technology[] $technologies
  */
 class Experience extends Model

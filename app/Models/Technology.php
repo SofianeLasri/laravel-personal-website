@@ -78,24 +78,4 @@ class Technology extends Model
     {
         return Translation::trans($this->descriptionTranslationKey->key, $locale);
     }
-
-    public function scopeFramework(Builder $query)
-    {
-        return $query->where('type', TechnologyType::FRAMEWORK);
-    }
-
-    public function scopeLibrary(Builder $query)
-    {
-        return $query->where('type', TechnologyType::LIBRARY);
-    }
-
-    public function scopeLanguage(Builder $query)
-    {
-        return $query->where('type', TechnologyType::LANGUAGE);
-    }
-
-    public function scopeOther(Builder $query)
-    {
-        return $query->where('type', TechnologyType::OTHER);
-    }
 }

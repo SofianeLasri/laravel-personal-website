@@ -29,7 +29,7 @@ class TechnologyExperience extends Model
     ];
 
     /**
-     * @return BelongsTo<TechnologyExperience, $this>
+     * @return BelongsTo<Technology, $this>
      */
     public function technology(): BelongsTo
     {
@@ -37,7 +37,7 @@ class TechnologyExperience extends Model
     }
 
     /**
-     * @return BelongsTo<TechnologyExperience, $this>
+     * @return BelongsTo<TranslationKey, $this>
      */
     public function descriptionTranslationKey(): BelongsTo
     {

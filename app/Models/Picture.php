@@ -61,7 +61,7 @@ class Picture extends Model
 
     public function optimize(): void
     {
-        if (is_null($this->path_original) || empty($this->path_original)) {
+        if (! $this->hasValidOriginalPath()) {
             Log::warning('UploadedPicture optimization failed: path_original is empty');
 
             return;
@@ -126,7 +126,7 @@ class Picture extends Model
      */
     private function transcodeIfItIsWorthIt(ImageTranscodingService $imageTranscodingService, int $optimizedDimension, int $highestDimension, string $format): ?string
     {
-        if (is_null($this->path_original) || empty($this->path_original)) {
+        if (! $this->hasValidOriginalPath()) {
             Log::warning('UploadedPicture transcoding failed: path_original is empty');
 
             return null;
@@ -162,7 +162,7 @@ class Picture extends Model
      */
     private function storeOptimizedImages(array $optimizedImages, string $format): void
     {
-        if (is_null($this->path_original) || empty($this->path_original)) {
+        if (! $this->hasValidOriginalPath()) {
             Log::warning('UploadedPicture storeOptimizedImages failed: path_original is empty');
 
             return;
@@ -209,5 +209,10 @@ class Picture extends Model
         }
 
         return '';
+    }
+
+    public function hasValidOriginalPath(): bool
+    {
+        return ! is_null($this->path_original) && ! empty($this->path_original);
     }
 }

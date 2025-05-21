@@ -409,6 +409,26 @@ class PictureTest extends TestCase
         );
     }
 
+    #[Test]
+    public function test_has_valid_original_path()
+    {
+        $picture = Picture::factory()->create([
+            'path_original' => 'uploads/test.jpg',
+        ]);
+
+        $this->assertTrue($picture->hasValidOriginalPath());
+    }
+
+    #[Test]
+    public function test_has_invalid_original_path()
+    {
+        $picture = Picture::factory()->create([
+            'path_original' => null,
+        ]);
+
+        $this->assertFalse($picture->hasValidOriginalPath());
+    }
+
     /**
      * Helper method to invoke private methods
      */

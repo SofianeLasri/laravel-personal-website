@@ -13,19 +13,19 @@ class SocialMediaLinkController extends Controller
         return SocialMediaLink::all();
     }
 
-    public function store(SocialMediaLinkRequest $request)
+    public function store(SocialMediaLinkRequest $request): SocialMediaLink
     {
         return SocialMediaLink::create($request->validated());
     }
 
-    public function show(int $id)
+    public function show(int $id): SocialMediaLink
     {
         $socialMediaLink = SocialMediaLink::findOrFail($id);
 
         return $socialMediaLink;
     }
 
-    public function update(SocialMediaLinkRequest $request, int $id)
+    public function update(SocialMediaLinkRequest $request, int $id): SocialMediaLink
     {
         $socialMediaLink = SocialMediaLink::findOrFail($id);
         $socialMediaLink->update($request->validated());

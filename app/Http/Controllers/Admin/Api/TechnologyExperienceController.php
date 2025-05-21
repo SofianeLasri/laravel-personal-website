@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TechnologyExperienceRequest;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
+use Illuminate\Http\Response;
 
 class TechnologyExperienceController extends Controller
 {
@@ -14,9 +15,9 @@ class TechnologyExperienceController extends Controller
         return TechnologyExperience::all();
     }
 
-    public function store(TechnologyExperienceRequest $request)
+    public function store(TechnologyExperienceRequest $request): TechnologyExperience
     {
-        $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->description);
+        $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->description);
 
         return TechnologyExperience::create([
             'technology_id' => $request->technology_id,
@@ -24,14 +25,14 @@ class TechnologyExperienceController extends Controller
         ]);
     }
 
-    public function show(TechnologyExperience $technologyExperience)
+    public function show(TechnologyExperience $technologyExperience): TechnologyExperience
     {
         return $technologyExperience;
     }
 
-    public function update(TechnologyExperienceRequest $request, TechnologyExperience $technologyExperience)
+    public function update(TechnologyExperienceRequest $request, TechnologyExperience $technologyExperience): TechnologyExperience
     {
-        $descriptionTranslation = Translation::createOrUpdate($technologyExperience->descriptionTranslationKey, $request->locale, $request->description);
+        $descriptionTranslation = Translation::createOrUpdate($technologyExperience->descriptionTranslationKey, $request->input('locale'), $request->description);
         $technologyExperience->update([
             'technology_id' => $request->technology_id,
             'description_translation_key_id' => $descriptionTranslation->translation_key_id,
@@ -40,7 +41,7 @@ class TechnologyExperienceController extends Controller
         return $technologyExperience;
     }
 
-    public function destroy(TechnologyExperience $technologyExperience)
+    public function destroy(TechnologyExperience $technologyExperience): Response
     {
         $technologyExperience->delete();
 

@@ -61,6 +61,12 @@ class Picture extends Model
 
     public function optimize(): void
     {
+        if (! $this->hasValidOriginalPath()) {
+            Log::warning('UploadedPicture optimization failed: path_original is empty');
+
+            return;
+        }
+
         if (! Storage::disk('public')->exists($this->path_original)) {
             Log::warning('UploadedPicture optimization failed: file does not exist', [
                 'path' => $this->path_original,
@@ -68,8 +74,6 @@ class Picture extends Model
 
             return;
         }
-
-        $this->deleteOptimized();
 
         $originalImage = Storage::disk('public')->get($this->path_original);
         // $imageTranscodingService = new ImageTranscodingService(new Driver);
@@ -115,9 +119,29 @@ class Picture extends Model
         // $this->deleteOriginal();
     }
 
-    private function transcodeIfItIsWorthIt($imageTranscodingService, $optimizedDimension, $highestDimension, $format): ?string
+    /**
+     * Transcode the image if it is worth it.
+     *
+     * This method checks if the optimized dimension is less than the highest dimension.
+     */
+    private function transcodeIfItIsWorthIt(ImageTranscodingService $imageTranscodingService, int $optimizedDimension, int $highestDimension, string $format): ?string
     {
+        if (! $this->hasValidOriginalPath()) {
+            Log::warning('UploadedPicture transcoding failed: path_original is empty');
+
+            return null;
+        }
+
         $originalImage = Storage::disk('public')->get($this->path_original);
+
+        if (empty($originalImage)) {
+            Log::warning('UploadedPicture transcoding failed: original image is empty', [
+                'path' => $this->path_original,
+            ]);
+
+            return null;
+        }
+
         $dimensionToUse = $optimizedDimension >= $highestDimension ? null : $optimizedDimension;
 
         return $imageTranscodingService->transcode($originalImage, $dimensionToUse, $format);
@@ -128,10 +152,24 @@ class Picture extends Model
         return min($dimension, $highestDimension);
     }
 
+    /**
+     * Store the optimized images in the public disk and CDN disk if configured.
+     *
+     * **Note:** This method assumes that the optimized images are already in the correct format.
+     * It does not perform any conversion.
+     *
+     * @param  array<string, string>  $optimizedImages
+     */
     private function storeOptimizedImages(array $optimizedImages, string $format): void
     {
-        foreach ($optimizedImages as $variant => $image) {
-            $path = Str::beforeLast($this->path_original, '.')."_$variant.$format";
+        if (! $this->hasValidOriginalPath()) {
+            Log::warning('UploadedPicture storeOptimizedImages failed: path_original is empty');
+
+            return;
+        }
+
+        foreach ($optimizedImages as $variantName => $image) {
+            $path = Str::beforeLast($this->path_original, '.')."_$variantName.$format";
             Storage::disk('public')->put($path, $image);
 
             if (config('app.cdn_disk')) {
@@ -139,7 +177,7 @@ class Picture extends Model
             }
 
             $this->optimizedPictures()->create([
-                'variant' => $variant,
+                'variant' => $variantName,
                 'path' => $path,
                 'format' => $format,
             ]);
@@ -171,5 +209,10 @@ class Picture extends Model
         }
 
         return '';
+    }
+
+    public function hasValidOriginalPath(): bool
+    {
+        return ! is_null($this->path_original) && ! empty($this->path_original);
     }
 }

@@ -32,7 +32,7 @@ class TechnologyController extends Controller
             'description' => ['required', 'string'],
         ]);
 
-        $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->description);
+        $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->description);
 
         $technology = Technology::create([
             'name' => $request->name,
@@ -72,7 +72,7 @@ class TechnologyController extends Controller
         }
 
         if ($request->has('description')) {
-            Translation::createOrUpdate($technology->descriptionTranslationKey, $request->locale, $request->description);
+            Translation::createOrUpdate($technology->descriptionTranslationKey, $request->input('locale'), $request->description);
         }
 
         $technology->update($request->only(['name', 'type', 'svg_icon']));

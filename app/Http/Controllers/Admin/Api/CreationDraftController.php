@@ -22,8 +22,8 @@ class CreationDraftController extends Controller
 
     public function store(CreationDraftRequest $request): JsonResponse
     {
-        $shortDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->short_description_content);
-        $fullDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->full_description_content);
+        $shortDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->short_description_content);
+        $fullDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->full_description_content);
 
         $draft = CreationDraft::create([
             'name' => $request->name,
@@ -63,8 +63,8 @@ class CreationDraftController extends Controller
 
     public function update(CreationDraftRequest $request, CreationDraft $creationDraft): JsonResponse
     {
-        $shortDescriptionTranslation = Translation::createOrUpdate($creationDraft->shortDescriptionTranslationKey, $request->locale, $request->short_description_content);
-        $fullDescriptionTranslation = Translation::createOrUpdate($creationDraft->fullDescriptionTranslationKey, $request->locale, $request->full_description_content);
+        $shortDescriptionTranslation = Translation::createOrUpdate($creationDraft->shortDescriptionTranslationKey, $request->input('locale'), $request->short_description_content);
+        $fullDescriptionTranslation = Translation::createOrUpdate($creationDraft->fullDescriptionTranslationKey, $request->input('locale'), $request->full_description_content);
 
         $creationDraft->update([
             'name' => $request->name,

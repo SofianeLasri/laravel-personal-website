@@ -22,8 +22,8 @@ class CreationDraftFeatureController extends Controller
     {
         $creationDraft = CreationDraft::findOrFail($creationDraftId);
 
-        $titleTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->title);
-        $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->description);
+        $titleTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->title);
+        $descriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->description);
         $creationDraftFeature = $creationDraft->features()->create([
             'title_translation_key_id' => $titleTranslation->translation_key_id,
             'description_translation_key_id' => $descriptionTranslation->translation_key_id,
@@ -43,11 +43,11 @@ class CreationDraftFeatureController extends Controller
         $creationDraftFeature = CreationDraftFeature::findOrFail($creationDraftFeatureId);
 
         if ($request->has('title')) {
-            Translation::createOrUpdate($creationDraftFeature->titleTranslationKey, $request->locale, $request->title);
+            Translation::createOrUpdate($creationDraftFeature->titleTranslationKey, $request->input('locale'), $request->title);
         }
 
         if ($request->has('description')) {
-            Translation::createOrUpdate($creationDraftFeature->descriptionTranslationKey, $request->locale, $request->description);
+            Translation::createOrUpdate($creationDraftFeature->descriptionTranslationKey, $request->input('locale'), $request->description);
         }
 
         if ($request->has('picture_id')) {

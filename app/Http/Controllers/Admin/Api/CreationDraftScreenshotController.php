@@ -29,7 +29,7 @@ class CreationDraftScreenshotController extends Controller
         $translation = null;
         if ($request->filled('caption')) {
             $caption = $request->caption;
-            $translation = Translation::createOrUpdate(uniqid(), $request->locale, $caption)->translation_key_id;
+            $translation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $caption)->translation_key_id;
         }
 
         $creationDraftScreenshot = $creationDraft->screenshots()->create([
@@ -64,7 +64,7 @@ class CreationDraftScreenshotController extends Controller
             }
 
             $translationKeyId = Translation::createOrUpdate($translationKey,
-                $request->locale,
+                $request->input('locale'),
                 $caption)->translation_key_id;
 
             $creationDraftScreenshot->update([

@@ -46,7 +46,7 @@ class CreationPageController extends Controller
         }
 
         if ($request->has('creation-id')) {
-            $creation = Creation::find($request->input('creation-id'));
+            $creation = Creation::findOrFail($request->input('creation-id'));
             $creationDraft = CreationDraft::fromCreation($creation);
         }
 

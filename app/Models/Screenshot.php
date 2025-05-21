@@ -59,7 +59,7 @@ class Screenshot extends Model
 
     public function getCaption(string $locale): string
     {
-        if ($this->captionTranslationKey()->exists()) {
+        if ($this->captionTranslationKey) {
             return $this->captionTranslationKey->translations()->where('locale', $locale)->value('text');
         }
 

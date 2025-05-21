@@ -13,6 +13,7 @@ use Intervention\Image\ImageManager;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 #[CoversClass(Picture::class)]
@@ -138,6 +139,26 @@ class PictureTest extends TestCase
     }
 
     #[Test]
+    public function test_cant_optimize_with_empty_original_picture()
+    {
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('UploadedPicture optimization failed: path_original is empty');
+
+        $imageTranscodingService = $this->createMock(ImageTranscodingService::class);
+        $imageTranscodingService
+            ->expects($this->never())
+            ->method('getDimensions');
+
+        $picture = Picture::factory()->create([
+            'path_original' => null,
+        ]);
+
+        $picture->optimize();
+        $this->assertCount(0, $picture->optimizedPictures);
+    }
+
+    #[Test]
     public function test_get_optimized_dimension_returns_correct_value()
     {
         $picture = new Picture;
@@ -184,6 +205,65 @@ class PictureTest extends TestCase
     }
 
     #[Test]
+    public function test_transcoding_when_it_is_worth_it_returns_null_if_no_original_picture()
+    {
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('UploadedPicture transcoding failed: path_original is empty');
+
+        $picture = Picture::factory()->create([
+            'path_original' => null,
+        ]);
+
+        $imageTranscodingService = $this->createMock(ImageTranscodingService::class);
+        $imageTranscodingService
+            ->expects($this->never())
+            ->method('transcode');
+        $imageTranscodingService
+            ->expects($this->never())
+            ->method('getDimensions');
+
+        $result = $this->invokePrivateMethod(
+            $picture,
+            'transcodeIfItIsWorthIt',
+            [$imageTranscodingService, 500, 1000, 'webp']
+        );
+
+        $this->assertNull($result);
+    }
+
+    #[TestDox('Test transcoding when it is worth it returns null if original picture file exists but is empty')]
+    public function test_transcoding_when_it_is_worth_it_returns_null_if_original_picture_is_empty()
+    {
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('UploadedPicture transcoding failed: original image is empty', [
+                'path' => 'empty_file.jpg',
+            ]);
+
+        Storage::disk('public')->put('empty_file.jpg', '');
+        $picture = Picture::factory()->create([
+            'path_original' => 'empty_file.jpg',
+        ]);
+
+        $imageTranscodingService = $this->createMock(ImageTranscodingService::class);
+        $imageTranscodingService
+            ->expects($this->never())
+            ->method('transcode');
+        $imageTranscodingService
+            ->expects($this->never())
+            ->method('getDimensions');
+
+        $result = $this->invokePrivateMethod(
+            $picture,
+            'transcodeIfItIsWorthIt',
+            [$imageTranscodingService, 500, 1000, 'webp']
+        );
+
+        $this->assertNull($result);
+    }
+
+    #[Test]
     public function test_transcoding_when_it_is_worth_it()
     {
         $originalImage = 'original_content';
@@ -217,6 +297,22 @@ class PictureTest extends TestCase
         );
 
         $this->assertEquals($transcodedImage, $result);
+    }
+
+    #[Test]
+    public function test_store_optimized_images_with_empty_path()
+    {
+        $picture = Picture::factory()->create([
+            'path_original' => null,
+        ]);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('UploadedPicture storeOptimizedImages failed: path_original is empty');
+
+        $this->invokePrivateMethod($picture, 'storeOptimizedImages', [[], 'webp']);
+
+        $this->assertCount(0, $picture->optimizedPictures);
     }
 
     #[Test]

@@ -20,9 +20,9 @@ class ExperienceController extends Controller
 
     public function store(ExperienceRequest $request)
     {
-        $titleTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->title);
-        $shortDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->short_description);
-        $fullDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->locale, $request->full_description);
+        $titleTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->title);
+        $shortDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->short_description);
+        $fullDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->full_description);
 
         $experience = Experience::create([
             'title_translation_key_id' => $titleTranslation->translation_key_id,
@@ -63,9 +63,9 @@ class ExperienceController extends Controller
     {
         $experience = Experience::findOrFail($id);
 
-        $titleTranslation = Translation::createOrUpdate($experience->titleTranslationKey, $request->locale, $request->title);
-        $shortDescriptionTranslation = Translation::createOrUpdate($experience->shortDescriptionTranslationKey, $request->locale, $request->short_description);
-        $fullDescriptionTranslation = Translation::createOrUpdate($experience->fullDescriptionTranslationKey, $request->locale, $request->full_description);
+        $titleTranslation = Translation::createOrUpdate($experience->titleTranslationKey, $request->input('locale'), $request->title);
+        $shortDescriptionTranslation = Translation::createOrUpdate($experience->shortDescriptionTranslationKey, $request->input('locale'), $request->short_description);
+        $fullDescriptionTranslation = Translation::createOrUpdate($experience->fullDescriptionTranslationKey, $request->input('locale'), $request->full_description);
 
         $experience->update([
             'title_translation_key_id' => $titleTranslation->translation_key_id,

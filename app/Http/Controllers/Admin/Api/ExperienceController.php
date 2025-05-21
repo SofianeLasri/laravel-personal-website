@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ExperienceRequest;
 use App\Models\Experience;
 use App\Models\Translation;
+use Illuminate\Http\Response;
 
 class ExperienceController extends Controller
 {
@@ -89,7 +90,7 @@ class ExperienceController extends Controller
         return $experience;
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id): Response
     {
         $experience = Experience::findOrFail($id);
         $experience->delete();

@@ -234,7 +234,10 @@ class CreationDraft extends Model
      */
     public function toCreation(): Creation
     {
-        return app(CreationConversionService::class)->convertDraftToCreation($this);
+        $creation = app(CreationConversionService::class)->convertDraftToCreation($this);
+        $this->delete();
+
+        return $creation;
     }
 
     /**

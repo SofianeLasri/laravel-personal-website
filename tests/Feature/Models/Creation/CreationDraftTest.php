@@ -230,6 +230,10 @@ class CreationDraftTest extends TestCase
         $this->assertCount(3, $creation->technologies);
         $this->assertCount(2, $creation->people);
         $this->assertCount(2, $creation->tags);
+
+        $this->assertDatabaseMissing('creation_drafts', [
+            'id' => $draft->id,
+        ]);
     }
 
     #[Test]

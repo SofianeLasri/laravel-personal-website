@@ -104,17 +104,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('creation-drafts.technologies');
         Route::get('technologies/{technology}/check-associations', [TechnologyController::class, 'checkAssociations'])
             ->name('technologies.check-associations');
-
-        Route::post('experiences/{experience}/attach-technology', [ExperienceController::class, 'attachTechnology'])
-            ->name('experiences.attach-technology');
-        Route::post('experiences/{experience}/detach-technology', [ExperienceController::class, 'detachTechnology'])
-            ->name('experiences.detach-technology');
-        Route::get('experiences/{experience}/technologies', [ExperienceController::class, 'getTechnologies'])
-            ->name('experiences.technologies');
     });
 
     require __DIR__.'/settings.php';
 });
 
 require __DIR__.'/auth.php';
-require __DIR__.'/api.php';

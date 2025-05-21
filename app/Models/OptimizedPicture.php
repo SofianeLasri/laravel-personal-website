@@ -67,7 +67,7 @@ class OptimizedPicture extends Model
         return $this->belongsTo(Picture::class);
     }
 
-    public function deleteFile($disk = 'public'): void
+    public function deleteFile(string $disk = 'public'): void
     {
         if (Storage::disk($disk)->exists($this->path)) {
             Storage::disk($disk)->delete($this->path);

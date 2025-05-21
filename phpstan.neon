@@ -17,4 +17,5 @@ parameters:
 #
     excludePaths:
         - tests/
+        - app/Http/Requests
 #        - ./*/*/FileToBeExcluded.php

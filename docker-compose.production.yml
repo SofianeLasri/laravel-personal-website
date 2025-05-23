@@ -11,6 +11,7 @@ services:
       - "${DOCKER_APP_PORT:-1006}:80"
     networks:
       - app-network
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     deploy:

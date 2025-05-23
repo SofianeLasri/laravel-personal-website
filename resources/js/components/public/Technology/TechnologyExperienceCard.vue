@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
-import BlackButtonSm from '@/components/public/Ui/Button/BlackButtonSm.vue';
 import { SSRTechnologyExperience } from '@/types';
 import VueMarkdown from 'vue-markdown-render';
+import BlackLinkButtonSm from '@/components/public/Ui/Button/BlackLinkButtonSm.vue';
+import { computed } from 'vue';
 
 const props = defineProps<{
     experience: SSRTechnologyExperience;
@@ -14,6 +15,22 @@ if (props.experience.creationCount > 1) {
 } else {
     projectsNumberText = `${props.experience.creationCount} projet`;
 }
+
+const projectsUrl = computed(() => {
+    const params = new URLSearchParams();
+    params.set('tab', 'development');
+
+    if (props.experience.type === 'framework') {
+        params.set('frameworks', props.experience.id.toString());
+    } else if (props.experience.type === 'library') {
+        params.set('libraries', props.experience.id.toString());
+    } else if (props.experience.type === 'game_engine') {
+        params.set('tab', 'games');
+        params.set('gameEngines', props.experience.id.toString());
+    }
+
+    return `/projects?${params.toString()}`;
+});
 </script>
 
 <template>
@@ -44,10 +61,10 @@ if (props.experience.creationCount > 1) {
                     <vue-markdown class="markdown-view" :source="experience.description" />
                 </div>
             </div>
-            <BlackButtonSm>
+            <BlackLinkButtonSm :href="projectsUrl">
                 <span>Voir les projets</span>
                 <ArrowUpRightRegular class="h-4 fill-white" />
-            </BlackButtonSm>
+            </BlackLinkButtonSm>
         </div>
     </div>
 </template>

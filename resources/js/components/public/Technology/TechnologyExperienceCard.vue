@@ -2,6 +2,7 @@
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
 import BlackButtonSm from '@/components/public/Ui/Button/BlackButtonSm.vue';
 import { SSRTechnologyExperience } from '@/types';
+import VueMarkdown from 'vue-markdown-render';
 
 const props = defineProps<{
     experience: SSRTechnologyExperience;
@@ -40,7 +41,7 @@ if (props.experience.creationCount > 1) {
                     </div>
                 </div>
                 <div class="text-design-system-paragraph">
-                    {{ experience.description }}
+                    <vue-markdown class="markdown-view" :source="experience.description" />
                 </div>
             </div>
             <BlackButtonSm>

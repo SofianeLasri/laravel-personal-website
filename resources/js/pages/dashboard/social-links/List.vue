@@ -225,12 +225,12 @@ const deleteLink = async () => {
                 <div class="space-y-4 py-4">
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Nom</label>
-                        <Input v-model="newLink.name" placeholder="ex: LinkedIn, Twitter, etc." />
+                        <Input v-model="newLink.name" placeholder="ex: LinkedIn, Twitter, etc." data-form-type="other" />
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium">URL</label>
-                        <Input v-model="newLink.url" placeholder="https://..." />
+                        <Input v-model="newLink.url" placeholder="https://..." data-form-type="other" />
                     </div>
 
                     <div class="space-y-2">

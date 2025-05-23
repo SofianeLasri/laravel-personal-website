@@ -304,7 +304,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     <FormItem>
                         <FormLabel>Titre du poste / diplôme</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="text" placeholder="Titre du poste ou du diplôme" />
+                            <Input v-bind="componentField" type="text" placeholder="Titre du poste ou du diplôme" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -313,7 +313,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     <FormItem>
                         <FormLabel>Nom de l'organisation</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="text" placeholder="Nom de l'entreprise ou de l'école" />
+                            <Input v-bind="componentField" type="text" placeholder="Nom de l'entreprise ou de l'école" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -343,7 +343,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     <FormItem>
                         <FormLabel>Lieu</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="text" placeholder="Ville, Pays" />
+                            <Input v-bind="componentField" type="text" placeholder="Ville, Pays" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -352,7 +352,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     <FormItem>
                         <FormLabel>Site web</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="url" placeholder="https://exemple.com" />
+                            <Input v-bind="componentField" type="url" placeholder="https://exemple.com" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -365,7 +365,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     <FormItem>
                         <FormLabel>Date de début</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="date" />
+                            <Input v-bind="componentField" type="date" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -374,7 +374,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     <FormItem>
                         <FormLabel>Date de fin (laisser vide si en cours)</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="date" />
+                            <Input v-bind="componentField" type="date" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

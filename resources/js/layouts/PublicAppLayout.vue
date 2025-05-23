@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Footer from '@/components/public/Ui/Footer.vue';
 import Navbar from '@/components/public/Navbar/Navbar.vue';
+import Footer from '@/components/public/Ui/Footer.vue';
 import { SocialMediaLink } from '@/types';
 
 interface Props {

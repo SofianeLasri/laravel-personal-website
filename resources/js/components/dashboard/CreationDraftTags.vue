@@ -367,7 +367,7 @@ watch(
                     <div class="py-4">
                         <div class="relative mb-4">
                             <Search class="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
-                            <Input v-model="searchQuery" placeholder="Rechercher un tag..." class="pl-8" />
+                            <Input v-model="searchQuery" placeholder="Rechercher un tag..." class="pl-8" data-form-type="other" />
                         </div>
 
                         <Button variant="outline" class="mb-4 flex w-full items-center justify-center py-2" @click="isAddTagDialogOpen = true">
@@ -438,7 +438,7 @@ watch(
                     <div class="space-y-4 py-4">
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Nom</label>
-                            <Input v-model="newTagName" placeholder="Nom du tag" />
+                            <Input v-model="newTagName" placeholder="Nom du tag" data-form-type="other" />
                             <p class="text-muted-foreground text-xs">Le slug sera généré automatiquement.</p>
                         </div>
                     </div>
@@ -462,7 +462,7 @@ watch(
                     <div class="space-y-4 py-4">
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Nom</label>
-                            <Input v-model="editTagName" placeholder="Nom du tag" />
+                            <Input v-model="editTagName" placeholder="Nom du tag" data-form-type="other" />
                             <p class="text-muted-foreground text-xs">Le slug sera mis à jour automatiquement.</p>
                         </div>
                     </div>

@@ -249,7 +249,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 <div class="space-y-4 py-4">
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Titre ({{ props.locale }})</label>
-                        <Input v-model="newFeatureTitle" placeholder="Titre de la fonctionnalité" />
+                        <Input v-model="newFeatureTitle" placeholder="Titre de la fonctionnalité" data-form-type="other" />
                     </div>
 
                     <div class="space-y-2">
@@ -290,7 +290,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Titre ({{ props.locale }})</label>
-                        <Input v-model="editFeatureTitle" placeholder="Titre de la fonctionnalité" />
+                        <Input v-model="editFeatureTitle" placeholder="Titre de la fonctionnalité" data-form-type="other" />
                     </div>
 
                     <div class="space-y-2">

@@ -331,7 +331,7 @@ onMounted(() => {
                     <FormItem>
                         <FormLabel>Nom de la création</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" v-model="nameField" type="text" placeholder="Nom de la création" />
+                            <Input v-bind="componentField" v-model="nameField" type="text" placeholder="Nom de la création" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -340,7 +340,7 @@ onMounted(() => {
                     <FormItem>
                         <FormLabel>Slug de la création</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="text" placeholder="Slug de la création" />
+                            <Input v-bind="componentField" type="text" placeholder="Slug de la création" data-form-type="other" />
                         </FormControl>
                         <FormDescription> Généré automatiquement à partir du nom. Peut être modifié manuellement si nécessaire. </FormDescription>
                         <FormMessage />
@@ -354,7 +354,7 @@ onMounted(() => {
                     <FormItem>
                         <FormLabel>Date de début</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="date" />
+                            <Input v-bind="componentField" type="date" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -363,7 +363,7 @@ onMounted(() => {
                     <FormItem>
                         <FormLabel>Date de fin (optionnelle)</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="date" />
+                            <Input v-bind="componentField" type="date" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -415,7 +415,7 @@ onMounted(() => {
                         <FormItem>
                             <FormLabel>URL du projet (externe & publique)</FormLabel>
                             <FormControl>
-                                <Input v-bind="componentField" type="text" placeholder="URL du projet" />
+                                <Input v-bind="componentField" type="text" placeholder="URL du projet" data-form-type="other" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -424,7 +424,7 @@ onMounted(() => {
                         <FormItem>
                             <FormLabel>URL du code source</FormLabel>
                             <FormControl>
-                                <Input v-bind="componentField" type="text" placeholder="URL du code source" />
+                                <Input v-bind="componentField" type="text" placeholder="URL du code source" data-form-type="other" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

@@ -243,7 +243,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Description ({{ props.locale }})</label>
-                        <Input v-model="newScreenshotCaption" placeholder="Description de la capture d'écran" />
+                        <Input v-model="newScreenshotCaption" placeholder="Description de la capture d'écran" data-form-type="other" />
                         <p class="text-muted-foreground text-xs">La description peut être laissée vide. Elle pourra être ajoutée ultérieurement.</p>
                     </div>
                 </div>
@@ -275,7 +275,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Description ({{ props.locale }})</label>
-                        <Input v-model="editScreenshotCaption" placeholder="Description de la capture d'écran" />
+                        <Input v-model="editScreenshotCaption" placeholder="Description de la capture d'écran" data-form-type="other" />
                     </div>
                 </div>
 

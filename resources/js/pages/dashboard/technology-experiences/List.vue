@@ -381,7 +381,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <div class="flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-2">
                     <div class="relative w-full lg:w-64">
                         <Search class="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
-                        <Input v-model="searchQuery" placeholder="Rechercher une technologie..." class="pl-8" />
+                        <Input v-model="searchQuery" placeholder="Rechercher une technologie..." class="pl-8" data-form-type="other" />
                     </div>
                     <Select v-model="locale">
                         <SelectTrigger class="w-full lg:w-32">
@@ -500,7 +500,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <div class="space-y-4 py-4">
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Nom</label>
-                        <Input v-model="newTechnologyName" placeholder="Nom de la technologie" />
+                        <Input v-model="newTechnologyName" placeholder="Nom de la technologie" data-form-type="other" />
                     </div>
 
                     <div class="space-y-2">
@@ -552,7 +552,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <div class="space-y-4 py-4">
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Nom</label>
-                        <Input v-model="editTechnologyName" placeholder="Nom de la technologie" />
+                        <Input v-model="editTechnologyName" placeholder="Nom de la technologie" data-form-type="other" />
                     </div>
 
                     <div class="space-y-2">

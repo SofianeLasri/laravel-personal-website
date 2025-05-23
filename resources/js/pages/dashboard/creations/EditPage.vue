@@ -30,8 +30,9 @@ import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head, router } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import axios from 'axios';
+import slugify from 'slugify';
 import { useForm } from 'vee-validate';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import * as z from 'zod';
 
@@ -134,6 +135,22 @@ const { isFieldDirty, handleSubmit, setFieldValue, meta } = useForm({
 
 const hasUnsavedChanges = computed(() => {
     return meta.value.dirty;
+});
+
+const generateSlug = (name: string): string => {
+    return slugify(name, {
+        lower: true,
+        strict: true,
+        trim: true,
+    });
+};
+
+const nameField = ref(currentCreationDraft.value?.name ?? '');
+
+watch(nameField, (newName) => {
+    if (newName) {
+        setFieldValue('slug', generateSlug(newName));
+    }
 });
 
 const updateContentForLocale = (newLocale: any) => {
@@ -314,7 +331,7 @@ onMounted(() => {
                     <FormItem>
                         <FormLabel>Nom de la création</FormLabel>
                         <FormControl>
-                            <Input v-bind="componentField" type="text" placeholder="Nom de la création" />
+                            <Input v-bind="componentField" v-model="nameField" type="text" placeholder="Nom de la création" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -325,6 +342,7 @@ onMounted(() => {
                         <FormControl>
                             <Input v-bind="componentField" type="text" placeholder="Slug de la création" />
                         </FormControl>
+                        <FormDescription> Généré automatiquement à partir du nom. Peut être modifié manuellement si nécessaire. </FormDescription>
                         <FormMessage />
                     </FormItem>
                 </FormField>

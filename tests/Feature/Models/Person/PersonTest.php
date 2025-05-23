@@ -30,6 +30,21 @@ class PersonTest extends TestCase
     }
 
     #[Test]
+    public function it_can_create_a_person_with_url()
+    {
+        $person = Person::factory()->create([
+            'name' => 'John Doe',
+            'url' => 'https://johndoe.com',
+        ]);
+
+        $this->assertDatabaseHas('people', [
+            'id' => $person->id,
+            'name' => 'John Doe',
+            'url' => 'https://johndoe.com',
+        ]);
+    }
+
+    #[Test]
     public function it_can_have_a_picture()
     {
         $picture = Picture::factory()->create();

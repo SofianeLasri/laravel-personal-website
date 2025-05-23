@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $name
+ * @property string|null $url
  * @property int|null $picture_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -30,11 +31,13 @@ class Person extends Model
 
     protected $fillable = [
         'name',
+        'url',
         'picture_id',
     ];
 
     protected $casts = [
         'name' => 'string',
+        'url' => 'string',
     ];
 
     /**

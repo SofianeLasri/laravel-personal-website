@@ -37,7 +37,7 @@ class PersonControllerTest extends TestCase
         $response->assertOk()
             ->assertJsonCount(3)
             ->assertJsonStructure([
-                ['id', 'name', 'picture_id', 'created_at', 'updated_at'],
+                ['id', 'name', 'url', 'picture_id', 'created_at', 'updated_at'],
             ]);
     }
 
@@ -48,14 +48,17 @@ class PersonControllerTest extends TestCase
 
         $response = $this->postJson(route('dashboard.api.people.store'), [
             'name' => 'John Doe',
+            'url' => 'https://example.com',
             'picture_id' => $picture->id,
         ]);
 
         $response->assertCreated()
-            ->assertJsonPath('name', 'John Doe');
+            ->assertJsonPath('name', 'John Doe')
+            ->assertJsonPath('url', 'https://example.com');
 
         $this->assertDatabaseHas('people', [
             'name' => 'John Doe',
+            'url' => 'https://example.com',
             'picture_id' => $picture->id,
         ]);
     }
@@ -108,16 +111,19 @@ class PersonControllerTest extends TestCase
 
         $response = $this->putJson(route('dashboard.api.people.update', $person), [
             'name' => 'Updated Name',
+            'url' => 'https://updated-example.com',
             'picture_id' => $newPicture->id,
         ]);
 
         $response->assertOk()
             ->assertJsonPath('name', 'Updated Name')
+            ->assertJsonPath('url', 'https://updated-example.com')
             ->assertJsonPath('picture_id', $newPicture->id);
 
         $this->assertDatabaseHas('people', [
             'id' => $person->id,
             'name' => 'Updated Name',
+            'url' => 'https://updated-example.com',
         ]);
     }
 

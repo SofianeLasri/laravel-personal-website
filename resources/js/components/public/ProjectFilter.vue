@@ -2,19 +2,32 @@
 import ActiveButton from '@/components/public/Ui/Button/ActiveButton.vue';
 import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
 import { SSRTechnology } from '@/types';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     name: string;
     technologies: SSRTechnology[];
+    initialSelectedFilters?: number[];
 }>();
 
 const emit = defineEmits<{
     (e: 'filter-change', value: number[]): void;
 }>();
 
-const selectedFilters = ref<Set<number>>(new Set());
+const selectedFilters = ref<Set<number>>(new Set(props.initialSelectedFilters || []));
 const isCollapsed = ref(false);
+
+watch(
+    () => props.initialSelectedFilters,
+    (newFilters) => {
+        if (newFilters) {
+            selectedFilters.value = new Set(newFilters);
+        } else {
+            selectedFilters.value.clear();
+        }
+    },
+    { deep: true },
+);
 
 const toggleCollapse = () => {
     isCollapsed.value = !isCollapsed.value;

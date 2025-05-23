@@ -8,7 +8,7 @@ import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRSimplifiedCreation, SSRTechnology } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 type ProjectTab = 'development' | 'games' | 'source-engine';
 
@@ -26,10 +26,71 @@ const frameworks = props.technologies.filter((tech) => tech.type === 'framework'
 const libraries = props.technologies.filter((tech) => tech.type === 'library');
 const gameEngines = props.technologies.filter((tech) => tech.type === 'game_engine');
 
+const parseUrlParams = () => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab') as ProjectTab | null;
+
+    if (tab && ['development', 'games', 'source-engine'].includes(tab)) {
+        activeTab.value = tab;
+    }
+
+    const frameworksParam = params.get('frameworks');
+    const librariesParam = params.get('libraries');
+    const gameEnginesParam = params.get('gameEngines');
+
+    if (frameworksParam) {
+        selectedFrameworks.value = frameworksParam
+            .split(',')
+            .map(Number)
+            .filter((id) => frameworks.some((tech) => tech.id === id));
+    }
+
+    if (librariesParam) {
+        selectedLibraries.value = librariesParam
+            .split(',')
+            .map(Number)
+            .filter((id) => libraries.some((tech) => tech.id === id));
+    }
+
+    if (gameEnginesParam) {
+        selectedGameEngines.value = gameEnginesParam
+            .split(',')
+            .map(Number)
+            .filter((id) => gameEngines.some((tech) => tech.id === id));
+    }
+};
+
+const updateUrlParams = () => {
+    const params = new URLSearchParams();
+
+    params.set('tab', activeTab.value);
+
+    if (selectedFrameworks.value.length > 0) {
+        params.set('frameworks', selectedFrameworks.value.join(','));
+    }
+
+    if (selectedLibraries.value.length > 0) {
+        params.set('libraries', selectedLibraries.value.join(','));
+    }
+
+    if (selectedGameEngines.value.length > 0) {
+        params.set('gameEngines', selectedGameEngines.value.join(','));
+    }
+
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+};
+
 const activeTab = ref<ProjectTab>('development');
 const selectedFrameworks = ref<number[]>([]);
 const selectedLibraries = ref<number[]>([]);
 const selectedGameEngines = ref<number[]>([]);
+
+onMounted(() => {
+    setTimeout(() => {
+        parseUrlParams();
+    }, 0);
+});
 
 const navItems = [
     { id: 'development', label: 'Développement' },
@@ -47,6 +108,7 @@ watch(activeTab, () => {
     selectedFrameworks.value = [];
     selectedLibraries.value = [];
     selectedGameEngines.value = [];
+    updateUrlParams();
 });
 
 const filteredCreations = computed(() => {
@@ -81,14 +143,17 @@ const filteredCreations = computed(() => {
 
 const handleFrameworkFilterChange = (ids: number[]) => {
     selectedFrameworks.value = ids;
+    updateUrlParams();
 };
 
 const handleLibraryFilterChange = (ids: number[]) => {
     selectedLibraries.value = ids;
+    updateUrlParams();
 };
 
 const handleGameEngineFilterChange = (ids: number[]) => {
     selectedGameEngines.value = ids;
+    updateUrlParams();
 };
 </script>
 
@@ -117,12 +182,27 @@ const handleGameEngineFilterChange = (ids: number[]) => {
             <div class="flex flex-col gap-8 lg:flex-row">
                 <div v-if="activeTab !== 'source-engine'" class="w-full space-y-6 lg:w-72">
                     <template v-if="activeTab === 'development'">
-                        <ProjectFilter name="Framework" :technologies="frameworks" @filter-change="handleFrameworkFilterChange" />
-                        <ProjectFilter name="Librairies" :technologies="libraries" @filter-change="handleLibraryFilterChange" />
+                        <ProjectFilter
+                            name="Framework"
+                            :technologies="frameworks"
+                            :initial-selected-filters="selectedFrameworks"
+                            @filter-change="handleFrameworkFilterChange"
+                        />
+                        <ProjectFilter
+                            name="Librairies"
+                            :technologies="libraries"
+                            :initial-selected-filters="selectedLibraries"
+                            @filter-change="handleLibraryFilterChange"
+                        />
                     </template>
 
                     <template v-else-if="activeTab === 'games'">
-                        <ProjectFilter name="Moteurs de jeu" :technologies="gameEngines" @filter-change="handleGameEngineFilterChange" />
+                        <ProjectFilter
+                            name="Moteurs de jeu"
+                            :technologies="gameEngines"
+                            :initial-selected-filters="selectedGameEngines"
+                            @filter-change="handleGameEngineFilterChange"
+                        />
                     </template>
                 </div>
 

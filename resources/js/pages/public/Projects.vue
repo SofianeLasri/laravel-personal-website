@@ -8,7 +8,7 @@ import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRSimplifiedCreation, SSRTechnology } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 type ProjectTab = 'development' | 'games' | 'source-engine';
 
@@ -85,11 +85,32 @@ const activeTab = ref<ProjectTab>('development');
 const selectedFrameworks = ref<number[]>([]);
 const selectedLibraries = ref<number[]>([]);
 const selectedGameEngines = ref<number[]>([]);
+const isParsingUrlParams = ref(false);
+
+const handlePopState = () => {
+    isParsingUrlParams.value = true;
+    parseUrlParams();
+    setTimeout(() => {
+        isParsingUrlParams.value = false;
+    }, 0);
+};
 
 onMounted(() => {
+    isParsingUrlParams.value = true;
+
     setTimeout(() => {
         parseUrlParams();
+
+        setTimeout(() => {
+            isParsingUrlParams.value = false;
+        }, 0);
     }, 0);
+
+    window.addEventListener('popstate', handlePopState);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('popstate', handlePopState);
 });
 
 const navItems = [
@@ -105,9 +126,11 @@ const tabToCreationTypes = {
 };
 
 watch(activeTab, () => {
-    selectedFrameworks.value = [];
-    selectedLibraries.value = [];
-    selectedGameEngines.value = [];
+    if (!isParsingUrlParams.value) {
+        selectedFrameworks.value = [];
+        selectedLibraries.value = [];
+        selectedGameEngines.value = [];
+    }
     updateUrlParams();
 });
 

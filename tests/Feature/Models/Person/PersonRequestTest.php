@@ -27,6 +27,7 @@ class PersonRequestTest extends TestCase
 
         $data = [
             'name' => 'John Doe',
+            'url' => 'https://example.com',
             'picture_id' => $picture->id,
         ];
 
@@ -36,6 +37,18 @@ class PersonRequestTest extends TestCase
 
     #[Test]
     public function it_passes_with_valid_data_without_picture(): void
+    {
+        $data = [
+            'name' => 'John Doe',
+            'url' => 'https://example.com',
+        ];
+
+        $validator = Validator::make($data, $this->rules());
+        $this->assertTrue($validator->passes());
+    }
+
+    #[Test]
+    public function it_passes_with_valid_data_without_url(): void
     {
         $data = [
             'name' => 'John Doe',
@@ -49,6 +62,7 @@ class PersonRequestTest extends TestCase
     public function it_fails_when_name_is_missing(): void
     {
         $data = [
+            'url' => 'https://example.com',
             'picture_id' => null,
         ];
 
@@ -62,6 +76,7 @@ class PersonRequestTest extends TestCase
     {
         $data = [
             'name' => 'John Doe',
+            'url' => 'https://example.com',
             'picture_id' => 9999,
         ];
 

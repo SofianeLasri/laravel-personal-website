@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Person } from '@/types';
 import axios from 'axios';
-import { Loader2, Pencil, Plus, Search, Trash2, User, UserMinus, UserPlus } from 'lucide-vue-next';
+import { Link, Loader2, Pencil, Plus, Search, Trash2, User, UserMinus, UserPlus } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -36,9 +36,11 @@ const isAddPersonDialogOpen = ref(false);
 const isEditPersonDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 const newPersonName = ref('');
+const newPersonUrl = ref('');
 const newPersonPictureId = ref<number | undefined>(undefined);
 const editPersonId = ref<number | null>(null);
 const editPersonName = ref('');
+const editPersonUrl = ref('');
 const editPersonPictureId = ref<number | undefined>(undefined);
 const personToDelete = ref<Person | null>(null);
 const personHasAssociations = ref(false);
@@ -158,6 +160,7 @@ const createPerson = async () => {
     try {
         const response = await axios.post(route('dashboard.api.people.store'), {
             name: newPersonName.value.trim(),
+            url: newPersonUrl.value.trim() || null,
             picture_id: newPersonPictureId.value,
         });
 
@@ -192,6 +195,7 @@ const updatePerson = async () => {
             }),
             {
                 name: editPersonName.value.trim(),
+                url: editPersonUrl.value.trim() || null,
                 picture_id: editPersonPictureId.value,
             },
         );
@@ -272,6 +276,7 @@ const checkPersonAssociations = async (personId: number): Promise<boolean> => {
 const openEditForm = (person: Person) => {
     editPersonId.value = person.id;
     editPersonName.value = person.name;
+    editPersonUrl.value = person.url || '';
     editPersonPictureId.value = person.picture_id || undefined;
     isEditPersonDialogOpen.value = true;
 };
@@ -286,12 +291,14 @@ const confirmDeletePerson = async (person: Person) => {
 
 const resetPersonForm = () => {
     newPersonName.value = '';
+    newPersonUrl.value = '';
     newPersonPictureId.value = undefined;
 };
 
 const resetEditForm = () => {
     editPersonId.value = null;
     editPersonName.value = '';
+    editPersonUrl.value = '';
     editPersonPictureId.value = undefined;
 };
 
@@ -356,6 +363,16 @@ watch(
 
                         <div class="ml-3 min-w-0 flex-1">
                             <p class="truncate text-sm font-medium">{{ person.name }}</p>
+                            <a
+                                v-if="person.url"
+                                :href="person.url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-muted-foreground flex items-center text-xs hover:underline"
+                            >
+                                <Link class="mr-1 h-3 w-3" />
+                                {{ person.url }}
+                            </a>
                         </div>
 
                         <div class="ml-2 flex space-x-1">
@@ -413,6 +430,16 @@ watch(
 
                                     <div class="ml-3 min-w-0 flex-1">
                                         <p class="truncate text-sm font-medium">{{ person.name }}</p>
+                                        <a
+                                            v-if="person.url"
+                                            :href="person.url"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-muted-foreground flex items-center text-xs hover:underline"
+                                        >
+                                            <Link class="mr-1 h-3 w-3" />
+                                            {{ person.url }}
+                                        </a>
                                     </div>
 
                                     <div class="ml-2 flex space-x-1">
@@ -461,6 +488,11 @@ watch(
                         </div>
 
                         <div class="space-y-2">
+                            <label class="text-sm font-medium">URL (optionnelle)</label>
+                            <Input v-model="newPersonUrl" placeholder="https://example.com" data-form-type="other" />
+                        </div>
+
+                        <div class="space-y-2">
                             <label class="text-sm font-medium">Photo (optionnelle)</label>
                             <PictureInput v-model="newPersonPictureId" />
                         </div>
@@ -486,6 +518,11 @@ watch(
                         <div class="space-y-2">
                             <label class="text-sm font-medium">Nom</label>
                             <Input v-model="editPersonName" placeholder="Nom du contributeur" data-form-type="other" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium">URL (optionnelle)</label>
+                            <Input v-model="editPersonUrl" placeholder="https://example.com" data-form-type="other" />
                         </div>
 
                         <div class="space-y-2">

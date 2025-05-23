@@ -519,7 +519,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Icône SVG</label>
-                        <Textarea v-model="newTechnologySvg" placeholder="<svg>...</svg>" rows="3" />
+                        <Textarea v-model="newTechnologySvg" placeholder="<svg>...</svg>" rows="3" class="max-h-32" />
                         <div v-if="newTechnologySvg" class="mt-2 flex justify-center rounded-md border p-2">
                             <div class="h-10 w-10" v-html="newTechnologySvg"></div>
                         </div>
@@ -571,7 +571,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Icône SVG</label>
-                        <Textarea v-model="editTechnologySvg" placeholder="<svg>...</svg>" rows="3" />
+                        <Textarea v-model="editTechnologySvg" placeholder="<svg>...</svg>" rows="3" class="max-h-32" />
                         <div v-if="editTechnologySvg" class="mt-2 flex justify-center rounded-md border p-2">
                             <div class="h-10 w-10" v-html="editTechnologySvg"></div>
                         </div>

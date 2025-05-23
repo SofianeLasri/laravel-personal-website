@@ -332,6 +332,7 @@ class PublicControllersService
      *
      * @return Collection<int, array{
      *     id: int,
+     *     technologyId: int,
      *     name: string,
      *     description: string,
      *     creationCount: int,
@@ -350,6 +351,7 @@ class PublicControllersService
 
             return [
                 'id' => $experience->id,
+                'technologyId' => $technologyId,
                 'name' => $experience->technology->name,
                 'description' => $description,
                 'creationCount' => $this->creationCountByTechnology[$technologyId] ?? 0,

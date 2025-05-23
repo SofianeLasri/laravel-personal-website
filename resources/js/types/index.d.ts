@@ -218,6 +218,7 @@ interface SSRTechnology {
 }
 
 interface SSRTechnologyExperience extends SSRTechnology {
+    technologyId: number;
     description: string;
     typeLabel: string;
 }

@@ -19,12 +19,13 @@ const props = defineProps<{
 }>();
 
 const containerKey = computed(() => {
-    return `${activeTab.value}-${selectedFrameworks.value.join('-')}-${selectedLibraries.value.join('-')}-${selectedGameEngines.value.join('-')}`;
+    return `${activeTab.value}-${selectedFrameworks.value.join('-')}-${selectedLibraries.value.join('-')}-${selectedGameEngines.value.join('-')}-${selectedLanguages.value.join('-')}`;
 });
 
 const frameworks = props.technologies.filter((tech) => tech.type === 'framework');
 const libraries = props.technologies.filter((tech) => tech.type === 'library');
 const gameEngines = props.technologies.filter((tech) => tech.type === 'game_engine');
+const languages = props.technologies.filter((tech) => tech.type === 'language');
 
 const parseUrlParams = () => {
     const params = new URLSearchParams(window.location.search);
@@ -37,6 +38,7 @@ const parseUrlParams = () => {
     const frameworksParam = params.get('frameworks');
     const librariesParam = params.get('libraries');
     const gameEnginesParam = params.get('gameEngines');
+    const languagesParam = params.get('languages');
 
     if (frameworksParam) {
         selectedFrameworks.value = frameworksParam
@@ -58,6 +60,13 @@ const parseUrlParams = () => {
             .map(Number)
             .filter((id) => gameEngines.some((tech) => tech.id === id));
     }
+
+    if (languagesParam) {
+        selectedLanguages.value = languagesParam
+            .split(',')
+            .map(Number)
+            .filter((id) => languages.some((tech) => tech.id === id));
+    }
 };
 
 const updateUrlParams = () => {
@@ -77,6 +86,10 @@ const updateUrlParams = () => {
         params.set('gameEngines', selectedGameEngines.value.join(','));
     }
 
+    if (selectedLanguages.value.length > 0) {
+        params.set('languages', selectedLanguages.value.join(','));
+    }
+
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.pushState({ path: newUrl }, '', newUrl);
 };
@@ -85,6 +98,7 @@ const activeTab = ref<ProjectTab>('development');
 const selectedFrameworks = ref<number[]>([]);
 const selectedLibraries = ref<number[]>([]);
 const selectedGameEngines = ref<number[]>([]);
+const selectedLanguages = ref<number[]>([]);
 const isParsingUrlParams = ref(false);
 
 const handlePopState = () => {
@@ -130,6 +144,7 @@ watch(activeTab, () => {
         selectedFrameworks.value = [];
         selectedLibraries.value = [];
         selectedGameEngines.value = [];
+        selectedLanguages.value = [];
     }
     updateUrlParams();
 });
@@ -141,7 +156,12 @@ const filteredCreations = computed(() => {
         return creationsByTab;
     }
 
-    if (activeTab.value === 'development' && selectedFrameworks.value.length === 0 && selectedLibraries.value.length === 0) {
+    if (
+        activeTab.value === 'development' &&
+        selectedFrameworks.value.length === 0 &&
+        selectedLibraries.value.length === 0 &&
+        selectedLanguages.value.length === 0
+    ) {
         return creationsByTab;
     }
 
@@ -155,7 +175,8 @@ const filteredCreations = computed(() => {
         if (activeTab.value === 'development') {
             const hasSelectedFramework = selectedFrameworks.value.length === 0 || selectedFrameworks.value.some((id) => techIds.includes(id));
             const hasSelectedLibrary = selectedLibraries.value.length === 0 || selectedLibraries.value.some((id) => techIds.includes(id));
-            return hasSelectedFramework && hasSelectedLibrary;
+            const hasSelectedLanguage = selectedLanguages.value.length === 0 || selectedLanguages.value.some((id) => techIds.includes(id));
+            return hasSelectedFramework && hasSelectedLibrary && hasSelectedLanguage;
         } else if (activeTab.value === 'games') {
             return selectedGameEngines.value.length === 0 || selectedGameEngines.value.some((id) => techIds.includes(id));
         }
@@ -176,6 +197,11 @@ const handleLibraryFilterChange = (ids: number[]) => {
 
 const handleGameEngineFilterChange = (ids: number[]) => {
     selectedGameEngines.value = ids;
+    updateUrlParams();
+};
+
+const handleLanguageFilterChange = (ids: number[]) => {
+    selectedLanguages.value = ids;
     updateUrlParams();
 };
 </script>
@@ -216,6 +242,12 @@ const handleGameEngineFilterChange = (ids: number[]) => {
                             :technologies="libraries"
                             :initial-selected-filters="selectedLibraries"
                             @filter-change="handleLibraryFilterChange"
+                        />
+                        <ProjectFilter
+                            name="Langages"
+                            :technologies="languages"
+                            :initial-selected-filters="selectedLanguages"
+                            @filter-change="handleLanguageFilterChange"
                         />
                     </template>
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
-import { SSRTechnologyExperience } from '@/types';
-import VueMarkdown from 'vue-markdown-render';
 import BlackLinkButtonSm from '@/components/public/Ui/Button/BlackLinkButtonSm.vue';
+import { SSRTechnologyExperience } from '@/types';
 import { computed } from 'vue';
+import VueMarkdown from 'vue-markdown-render';
 
 const props = defineProps<{
     experience: SSRTechnologyExperience;
@@ -17,19 +17,27 @@ if (props.experience.creationCount > 1) {
 }
 
 const projectsUrl = computed(() => {
-    const params = new URLSearchParams();
-    params.set('tab', 'development');
+    const params: Record<string, string> = {
+        tab: 'development',
+    };
 
-    if (props.experience.type === 'framework') {
-        params.set('frameworks', props.experience.id.toString());
-    } else if (props.experience.type === 'library') {
-        params.set('libraries', props.experience.id.toString());
-    } else if (props.experience.type === 'game_engine') {
-        params.set('tab', 'games');
-        params.set('gameEngines', props.experience.id.toString());
+    switch (props.experience.type) {
+        case 'framework':
+            params.frameworks = props.experience.technologyId.toString();
+            break;
+        case 'library':
+            params.libraries = props.experience.technologyId.toString();
+            break;
+        case 'language':
+            params.languages = props.experience.technologyId.toString();
+            break;
+        case 'game_engine':
+            params.tab = 'games';
+            params.gameEngines = props.experience.technologyId.toString();
+            break;
     }
 
-    return `/projects?${params.toString()}`;
+    return route('public.projects', params);
 });
 </script>
 

@@ -8,6 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
 
 #[CoversClass(PictureRequest::class)]
@@ -81,5 +82,22 @@ class PictureRequestTest extends TestCase
         $validator = Validator::make($data, $this->rules());
         $this->assertFalse($validator->passes(), 'La validation devrait échouer si la taille du fichier dépasse 50mb.');
         $this->assertArrayHasKey('picture', $validator->errors()->toArray());
+    }
+
+    #[TestDox('All the supported image formats are valid')]
+    public function test_it_passes_with_supported_image_formats(): void
+    {
+        $this->setImageConfig();
+
+        $supportedFormats = config('app.supported_image_formats');
+
+        foreach ($supportedFormats as $format) {
+            $file = UploadedFile::fake()->image("test.$format");
+
+            $data = ['picture' => $file];
+
+            $validator = Validator::make($data, $this->rules());
+            $this->assertTrue($validator->passes(), "La validation devrait réussir avec le format d'image: $format.");
+        }
     }
 }

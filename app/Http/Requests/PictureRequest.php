@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 
 class PictureRequest extends FormRequest
@@ -11,9 +10,13 @@ class PictureRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'picture' => File::image()
-                ->max('50mb')
-                ->dimensions(Rule::dimensions()->maxWidth(config('app.imagick.max_width'))->maxHeight(config('app.imagick.max_height'))),
+            'picture' => [
+                'required',
+                'file',
+                'dimensions:max_width='.config('app.imagick.max_width').',max_height='.config('app.imagick.max_height'),
+                File::types(config('app.supported_image_formats'))
+                    ->max('50mb'),
+            ],
         ];
     }
 }

@@ -140,7 +140,7 @@ return [
         'max_area' => env('IMAGICK_MAX_AREA', 128000000), // 128 megapixels
     ],
 
-    'supported_image_formats' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic', 'heif', 'bmp', 'tiff'],
+    'supported_image_formats' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic', 'heif', 'bmp'],
 
     /*
     |--------------------------------------------------------------------------

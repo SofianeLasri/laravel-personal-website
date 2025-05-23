@@ -29,7 +29,6 @@ const props = defineProps<{
     technologyExperiences: TechnologyExperience[];
 }>();
 
-// État local
 const searchQuery = ref('');
 const locale = ref<'fr' | 'en'>('fr');
 const isAddTechnologyDialogOpen = ref(false);
@@ -40,7 +39,6 @@ const isDeleteTechnologyDialogOpen = ref(false);
 const isDeleteExperienceDialogOpen = ref(false);
 const isLoading = ref(false);
 
-// Formes et valeurs pour les technologies
 const newTechnologyName = ref('');
 const newTechnologyType = ref('framework');
 const newTechnologySvg = ref('');
@@ -53,7 +51,6 @@ const editTechnologySvg = ref('');
 const editTechnologyDescription = ref('');
 const technologyToDelete = ref<TechnologyWithCreationsCount | null>(null);
 
-// Formes et valeurs pour les expériences
 const newExperienceTechnologyId = ref<number | null>(null);
 const newExperienceDescription = ref('');
 
@@ -69,7 +66,6 @@ const technologyTypes = [
     { value: 'other', label: 'Autre' },
 ];
 
-// Filtrage des technologies
 const filteredTechnologies = computed(() => {
     if (!searchQuery.value.trim()) return props.technologies;
 
@@ -77,7 +73,6 @@ const filteredTechnologies = computed(() => {
     return props.technologies.filter((tech) => tech.name.toLowerCase().includes(query) || tech.type.toLowerCase().includes(query));
 });
 
-// Helpers pour obtenir des traductions
 const getTechnologyDescription = (technology: TechnologyWithCreationsCount): string => {
     if (!technology.description_translation_key) return '';
 
@@ -99,7 +94,6 @@ const getTechnologyTypeLabel = (type: string): string => {
     return typeObj ? typeObj.label : type;
 };
 
-// Méthodes pour les technologies
 const createTechnology = async () => {
     if (!newTechnologyName.value.trim() || !newTechnologySvg.value.trim() || !newTechnologyDescription.value.trim()) return;
 

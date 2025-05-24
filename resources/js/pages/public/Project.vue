@@ -24,6 +24,9 @@ const sections = [{ id: 'description', label: 'Description' }];
 if (props.creation.features.length > 0) {
     sections.push({ id: 'features', label: 'Fonctionnalités clés' });
 }
+if (props.creation.people.length > 0) {
+    sections.push({ id: 'people', label: 'Personnes impliquées' });
+}
 if (props.creation.technologies.length > 0) {
     sections.push({ id: 'technologies', label: 'Technologies utilisées' });
 }

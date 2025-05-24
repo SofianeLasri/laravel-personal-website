@@ -41,6 +41,7 @@ const onInput = () => {
             :placeholder="placeholder"
             v-model="searchQuery"
             class="w-full border-none bg-transparent py-2 pr-4 focus:outline-none"
+            data-form-type="query"
             @input="onInput"
         />
     </div>

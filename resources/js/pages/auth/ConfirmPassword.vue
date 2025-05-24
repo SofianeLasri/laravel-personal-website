@@ -35,6 +35,7 @@ const submit = () => {
                         v-model="form.password"
                         required
                         autocomplete="current-password"
+                        data-form-type="password"
                         autofocus
                     />
 

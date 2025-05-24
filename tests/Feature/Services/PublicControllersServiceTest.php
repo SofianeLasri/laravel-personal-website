@@ -222,6 +222,7 @@ class PublicControllersServiceTest extends TestCase
         $creation = Creation::factory()
             ->withFeatures(3)
             ->withScreenshots(4)
+            ->withPeople(2)
             ->create([
                 'name' => 'Test Creation',
                 'type' => 'website',
@@ -288,6 +289,15 @@ class PublicControllersServiceTest extends TestCase
 
             $this->assertArrayHasKey('avif', $resultScreenshot['picture']);
             $this->assertArrayHasKey('webp', $resultScreenshot['picture']);
+        }
+
+        foreach ($creation->people as $person) {
+            $resultPerson = collect($result['people'])->firstWhere('id', $person->id);
+
+            $this->assertEquals($person->id, $resultPerson['id']);
+            $this->assertEquals($person->name, $resultPerson['name']);
+            $this->assertEquals($person->url, $resultPerson['url']);
+            $this->assertEquals($person->picture->filename, $resultPerson['picture']['filename']);
         }
     }
 }

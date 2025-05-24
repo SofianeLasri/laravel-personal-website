@@ -8,6 +8,7 @@ use App\Enums\TechnologyType;
 use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\Feature;
+use App\Models\Person;
 use App\Models\Picture;
 use App\Models\Screenshot;
 use App\Models\Technology;
@@ -212,7 +213,8 @@ class PublicControllersService
      *     sourceCodeUrl: string|null,
      *     features: array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
      *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string}>,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>}
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>,
+     *     people: array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>}
      */
     public function formatCreationForSSRFull(Creation $creation): array
     {
@@ -253,6 +255,21 @@ class PublicControllersService
                 'id' => $screenshot->id,
                 'picture' => $this->formatPictureForSSR($screenshot->picture),
                 'caption' => $caption,
+            ];
+        })->toArray();
+
+        $response['people'] = $creation->people->map(function (Person $person) {
+            $picture = null;
+
+            if ($person->picture) {
+                $picture = $this->formatPictureForSSR($person->picture);
+            }
+
+            return [
+                'id' => $person->id,
+                'name' => $person->name,
+                'url' => $person->url,
+                'picture' => $picture,
             ];
         })->toArray();
 

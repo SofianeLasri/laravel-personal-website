@@ -206,6 +206,12 @@ interface SSRFullCreation extends SSRSimplifiedCreation {
     sourceCodeUrl: string | null;
     features: SSRFeature[];
     screenshots: SSRScreenshot[];
+    people: {
+        id: number;
+        name: string;
+        url: string | null;
+        picture: SSRPicture | null;
+    }[];
 }
 
 interface SSRTechnology {

@@ -5,7 +5,7 @@ import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
-import { Bold, Code, Italic, Link as LucideLink, Strikethrough, Underline as LucideUnderline } from 'lucide-vue-next';
+import { Bold, Code, FileCode, Italic, Link as LucideLink, Strikethrough, Underline as LucideUnderline } from 'lucide-vue-next';
 import { Markdown } from 'tiptap-markdown';
 import { onBeforeUnmount, ref, watch } from 'vue';
 
@@ -20,6 +20,8 @@ const emit = defineEmits<{
 }>();
 
 const content = ref(props.modelValue || '');
+const rawMode = ref(false);
+const rawContent = ref(props.modelValue || '');
 
 const editor = useEditor({
     content: content.value,
@@ -42,6 +44,7 @@ const editor = useEditor({
     onUpdate: ({ editor }) => {
         const markdown = editor.storage.markdown.getMarkdown();
         content.value = markdown;
+        rawContent.value = markdown;
         emit('update:modelValue', markdown);
     },
 });
@@ -53,6 +56,7 @@ watch(
 
         if (newValue !== content.value) {
             content.value = newValue;
+            rawContent.value = newValue;
 
             if (editor.value && editor.value.storage.markdown.getMarkdown() !== newValue) {
                 editor.value.commands.setContent(newValue, false);
@@ -69,6 +73,27 @@ watch(
         }
     },
 );
+
+const handleRawContentChange = (event: Event) => {
+    const newContent = (event.target as HTMLTextAreaElement).value;
+    rawContent.value = newContent;
+    content.value = newContent;
+    emit('update:modelValue', newContent);
+
+    if (!rawMode.value && editor.value) {
+        editor.value.commands.setContent(newContent, false);
+    }
+};
+
+const toggleRawMode = () => {
+    rawMode.value = !rawMode.value;
+
+    if (!rawMode.value && editor.value) {
+        editor.value.commands.setContent(rawContent.value, false);
+    } else if (rawMode.value && editor.value) {
+        rawContent.value = editor.value.storage.markdown.getMarkdown();
+    }
+};
 
 onBeforeUnmount(() => {
     editor.value?.destroy();
@@ -109,6 +134,7 @@ const isActive = (type: string, options = {}) => {
     <Card class="markdown-editor gap-0 py-0">
         <div class="editor-toolbar flex flex-wrap gap-2 border-b p-1">
             <Button
+                v-if="!rawMode"
                 size="sm"
                 variant="outline"
                 type="button"
@@ -120,6 +146,7 @@ const isActive = (type: string, options = {}) => {
             </Button>
 
             <Button
+                v-if="!rawMode"
                 size="sm"
                 variant="outline"
                 type="button"
@@ -131,6 +158,7 @@ const isActive = (type: string, options = {}) => {
             </Button>
 
             <Button
+                v-if="!rawMode"
                 size="sm"
                 variant="outline"
                 type="button"
@@ -142,6 +170,7 @@ const isActive = (type: string, options = {}) => {
             </Button>
 
             <Button
+                v-if="!rawMode"
                 size="sm"
                 variant="outline"
                 type="button"
@@ -152,7 +181,7 @@ const isActive = (type: string, options = {}) => {
                 <LucideUnderline />
             </Button>
 
-            <div class="dropdown">
+            <div v-if="!rawMode" class="dropdown">
                 <Button size="sm" variant="outline" type="button" title="Titres (# Titre)">Titres</Button>
                 <Card class="dropdown-content">
                     <Button
@@ -169,11 +198,20 @@ const isActive = (type: string, options = {}) => {
                 </Card>
             </div>
 
-            <Button size="sm" variant="outline" type="button" @click="setLink" :class="{ 'is-active': isActive('link') }" title="Lien ([texte](url))">
+            <Button
+                v-if="!rawMode"
+                size="sm"
+                variant="outline"
+                type="button"
+                @click="setLink"
+                :class="{ 'is-active': isActive('link') }"
+                title="Lien ([texte](url))"
+            >
                 <LucideLink />
             </Button>
 
             <Button
+                v-if="!rawMode"
                 size="sm"
                 variant="outline"
                 type="button"
@@ -185,6 +223,7 @@ const isActive = (type: string, options = {}) => {
             </Button>
 
             <Button
+                v-if="!rawMode"
                 size="sm"
                 variant="outline"
                 type="button"
@@ -195,9 +234,30 @@ const isActive = (type: string, options = {}) => {
                 <span class="font-mono">```</span>
                 <Code />
             </Button>
+
+            <Button
+                size="sm"
+                :variant="rawMode ? 'default' : 'outline'"
+                type="button"
+                @click="toggleRawMode"
+                :title="rawMode ? 'Mode visuel' : 'Mode Markdown brut'"
+                class="ml-auto"
+            >
+                <FileCode />
+                <span class="ml-1">{{ rawMode ? 'Visuel' : 'Markdown' }}</span>
+            </Button>
         </div>
 
-        <EditorContent :editor="editor" class="editor-content" />
+        <EditorContent v-if="!rawMode" :editor="editor" class="editor-content" />
+
+        <textarea
+            v-else
+            v-model="rawContent"
+            class="raw-markdown-editor"
+            :placeholder="placeholder"
+            :disabled="disabled"
+            @input="handleRawContentChange"
+        ></textarea>
     </Card>
 </template>
 
@@ -281,5 +341,17 @@ const isActive = (type: string, options = {}) => {
     color: var(--muted-foreground);
     pointer-events: none;
     height: 0;
+}
+
+.raw-markdown-editor {
+    width: 100%;
+    min-height: 150px;
+    padding: 1rem;
+    font-family: monospace;
+    border: none;
+    outline: none;
+    resize: vertical;
+    background-color: inherit;
+    color: inherit;
 }
 </style>

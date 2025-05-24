@@ -5,7 +5,7 @@ import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
-import { Bold, Code, Italic, Link as LucideLink, Underline as LucideUnderline, Strikethrough } from 'lucide-vue-next';
+import { Bold, Code, Italic, Link as LucideLink, Strikethrough, Underline as LucideUnderline } from 'lucide-vue-next';
 import { Markdown } from 'tiptap-markdown';
 import { onBeforeUnmount, ref, watch } from 'vue';
 
@@ -268,6 +268,11 @@ const isActive = (type: string, options = {}) => {
     padding: 0.15rem 0.25rem;
     border-radius: 0.25rem;
     font-family: monospace;
+}
+
+.ProseMirror a {
+    color: rgb(247, 142, 87);
+    text-decoration: underline;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {

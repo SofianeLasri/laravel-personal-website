@@ -211,7 +211,7 @@ interface SSRFullCreation extends SSRSimplifiedCreation {
         name: string;
         url: string | null;
         picture: SSRPicture | null;
-    };
+    }[];
 }
 
 interface SSRTechnology {

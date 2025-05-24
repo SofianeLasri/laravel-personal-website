@@ -68,6 +68,38 @@ if (props.creation.screenshots.length > 0) {
                         </div>
                     </section>
 
+                    <section id="people" class="mt-16 flex flex-col gap-8" v-if="creation.people.length > 0">
+                        <ContentSectionTitle>Personnes impliquées</ContentSectionTitle>
+                        <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
+                            <div
+                                class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 p-2 outline-1 outline-gray-200"
+                                v-for="person in creation.people"
+                                :key="person.id"
+                            >
+                                <div
+                                    class="flex size-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full lg:size-16"
+                                    v-if="person.picture"
+                                >
+                                    <picture class="h-full w-full flex-1">
+                                        <source :srcset="person.picture.webp.small" type="image/webp" />
+                                        <img
+                                            :src="person.picture.avif.small"
+                                            alt="Logo of the project"
+                                            class="h-full w-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    </picture>
+                                </div>
+                                <div class="flex w-full flex-col justify-center gap-1">
+                                    <div class="text-design-system-title text-sm lg:text-base">{{ person.name }}</div>
+                                    <div class="w-full justify-center text-xs lg:text-sm" v-if="person.url">
+                                        <a :href="person.url" class="text-primary hover:underline">{{ person.url }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <section id="technologies" class="mt-16 flex flex-col gap-8" v-if="creation.technologies.length > 0">
                         <ContentSectionTitle>Technologies utilisées</ContentSectionTitle>
                         <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">

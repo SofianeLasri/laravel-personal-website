@@ -10,6 +10,7 @@ import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
+import { User } from 'lucide-vue-next';
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -79,11 +80,8 @@ if (props.creation.screenshots.length > 0) {
                                 v-for="person in creation.people"
                                 :key="person.id"
                             >
-                                <div
-                                    class="flex size-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full lg:size-16"
-                                    v-if="person.picture"
-                                >
-                                    <picture class="h-full w-full flex-1">
+                                <div class="flex size-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full lg:size-16">
+                                    <picture class="h-full w-full flex-1" v-if="person.picture">
                                         <source :srcset="person.picture.webp.small" type="image/webp" />
                                         <img
                                             :src="person.picture.avif.small"
@@ -92,6 +90,7 @@ if (props.creation.screenshots.length > 0) {
                                             loading="lazy"
                                         />
                                     </picture>
+                                    <User v-else class="text-design-system-paragraph size-4" />
                                 </div>
                                 <div class="flex w-full flex-col justify-center gap-1">
                                     <div class="text-design-system-title text-sm lg:text-base">{{ person.name }}</div>

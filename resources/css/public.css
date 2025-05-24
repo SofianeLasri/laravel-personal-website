@@ -107,6 +107,10 @@
         @apply text-design-system-paragraph mt-8 mb-4 text-xl font-bold;
     }
 
+    h4 {
+        @apply text-design-system-paragraph mt-8 mb-4 text-lg font-bold;
+    }
+
     a {
         @apply text-design-system-primary underline;
     }

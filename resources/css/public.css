@@ -100,18 +100,38 @@
     /* Markdown view shouldn't have h1 title !*/
     h1,
     h2 {
-        @apply text-design-system-title mt-8 mb-4 text-2xl font-bold;
+        @apply text-design-system-title mb-8 text-2xl font-bold;
     }
 
     h3 {
-        @apply text-design-system-paragraph mt-8 mb-3 text-xl font-bold;
+        @apply text-design-system-paragraph mb-6 text-xl font-bold;
     }
 
     h4 {
-        @apply text-design-system-paragraph mt-8 mb-2 text-lg font-bold;
+        @apply text-design-system-paragraph mb-3 text-lg font-bold;
+    }
+
+    h1:not(:first-child), h2:not(:first-child) {
+        @apply mt-8;
+    }
+
+    h3:not(:first-child), h4:not(:first-child) {
+        @apply mt-6;
     }
 
     a {
         @apply text-design-system-primary underline;
+    }
+
+    p:not(:last-child) {
+        @apply mb-4;
+    }
+
+    ul {
+        @apply list-disc list-inside mb-4;
+    }
+
+    ul li {
+        @apply mb-2;
     }
 }

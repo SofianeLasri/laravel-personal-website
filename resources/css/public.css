@@ -104,11 +104,11 @@
     }
 
     h3 {
-        @apply text-design-system-paragraph mt-8 mb-4 text-xl font-bold;
+        @apply text-design-system-paragraph mt-8 mb-3 text-xl font-bold;
     }
 
     h4 {
-        @apply text-design-system-paragraph mt-8 mb-4 text-lg font-bold;
+        @apply text-design-system-paragraph mt-8 mb-2 text-lg font-bold;
     }
 
     a {

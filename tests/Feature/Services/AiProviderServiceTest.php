@@ -21,7 +21,7 @@ class AiProviderServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    private array $sampleResponse = [
+    private array $sampleOpenAiResponse = [
         'id' => 'chat_1',
         'object' => 'chat.completion',
         'created' => 1739718124,
@@ -57,11 +57,30 @@ class AiProviderServiceTest extends TestCase
         'system_fingerprint' => 'system-1',
     ];
 
-    public function test_prompt_with_pictures_sends_correct_request()
+    private array $sampleAnthropicResponse = [
+        'id' => 'msg_1',
+        'type' => 'message',
+        'role' => 'assistant',
+        'model' => 'claude-sonnet-4-20250514',
+        'content' => [
+            [
+                'type' => 'text',
+                'text' => "{\n  \"message\": \"Why don't scientists trust atoms? Because they make up everything!\"\n}",
+            ],
+        ],
+        'stop_reason' => 'end_turn',
+        'stop_sequence' => null,
+        'usage' => [
+            'input_tokens' => 33,
+            'output_tokens' => 20,
+        ],
+    ];
+
+    public function test_prompt_with_pictures_sends_correct_request_openai()
     {
         Storage::fake('public');
         Http::fake([
-            'https://api.test-provider.com' => Http::response(json_encode($this->sampleResponse)),
+            'https://api.openai.com/v1/chat/completions' => Http::response(json_encode($this->sampleOpenAiResponse)),
         ]);
 
         $mockTranscodingService = Mockery::mock(ImageTranscodingService::class);
@@ -69,11 +88,11 @@ class AiProviderServiceTest extends TestCase
             ->andReturn('transcoded-image-content');
         App::instance(ImageTranscodingService::class, $mockTranscodingService);
 
-        Config::set('ai-provider.selected-provider', 'test-provider');
-        Config::set('ai-provider.providers.test-provider', [
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
             'api-key' => 'test-api-key',
-            'url' => 'https://api.test-provider.com',
-            'model' => 'test-model',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
             'max-tokens' => 100,
         ]);
 
@@ -89,17 +108,73 @@ class AiProviderServiceTest extends TestCase
         $this->assertEquals(['message' => "Why don't scientists trust atoms? Because they make up everything!"], $response);
     }
 
-    public function test_prompt_sends_correct_request()
+    public function test_prompt_with_pictures_sends_correct_request_anthropic()
     {
+        Storage::fake('public');
         Http::fake([
-            'https://api.test-provider.com' => Http::response(json_encode($this->sampleResponse)),
+            'https://api.anthropic.com/v1/messages' => Http::response(json_encode($this->sampleAnthropicResponse)),
         ]);
 
-        Config::set('ai-provider.selected-provider', 'test-provider');
-        Config::set('ai-provider.providers.test-provider', [
+        $mockTranscodingService = Mockery::mock(ImageTranscodingService::class);
+        $mockTranscodingService->shouldReceive('transcode')
+            ->andReturn('transcoded-image-content');
+        App::instance(ImageTranscodingService::class, $mockTranscodingService);
+
+        Config::set('ai-provider.selected-provider', 'anthropic');
+        Config::set('ai-provider.providers.anthropic', [
             'api-key' => 'test-api-key',
-            'url' => 'https://api.test-provider.com',
-            'model' => 'test-model',
+            'url' => 'https://api.anthropic.com/v1/messages',
+            'model' => 'claude-sonnet-4-20250514',
+            'max-tokens' => 100,
+        ]);
+
+        $Picture = Picture::factory()->create();
+        $service = new AiProviderService;
+
+        $response = $service->promptWithPictures(
+            'You are a helpful assistant.',
+            'Describe this image.',
+            $Picture
+        );
+
+        $this->assertEquals(['message' => "Why don't scientists trust atoms? Because they make up everything!"], $response);
+    }
+
+    public function test_prompt_sends_correct_request_openai()
+    {
+        Http::fake([
+            'https://api.openai.com/v1/chat/completions' => Http::response(json_encode($this->sampleOpenAiResponse)),
+        ]);
+
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
+            'api-key' => 'test-api-key',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
+            'max-tokens' => 100,
+        ]);
+
+        $service = new AiProviderService;
+
+        $response = $service->prompt(
+            'You are a helpful assistant.',
+            'Tell me a joke.'
+        );
+
+        $this->assertEquals(['message' => "Why don't scientists trust atoms? Because they make up everything!"], $response);
+    }
+
+    public function test_prompt_sends_correct_request_anthropic()
+    {
+        Http::fake([
+            'https://api.anthropic.com/v1/messages' => Http::response(json_encode($this->sampleAnthropicResponse)),
+        ]);
+
+        Config::set('ai-provider.selected-provider', 'anthropic');
+        Config::set('ai-provider.providers.anthropic', [
+            'api-key' => 'test-api-key',
+            'url' => 'https://api.anthropic.com/v1/messages',
+            'model' => 'claude-sonnet-4-20250514',
             'max-tokens' => 100,
         ]);
 
@@ -117,13 +192,21 @@ class AiProviderServiceTest extends TestCase
     {
         Storage::fake('public');
         Http::fake([
-            'https://api.test-provider.com' => Http::response(json_encode($this->sampleResponse)),
+            'https://api.openai.com/v1/chat/completions' => Http::response(json_encode($this->sampleOpenAiResponse)),
         ]);
 
         $mockTranscodingService = Mockery::mock(ImageTranscodingService::class);
         $mockTranscodingService->shouldReceive('transcode')
             ->andReturn(null);
         App::instance(ImageTranscodingService::class, $mockTranscodingService);
+
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
+            'api-key' => 'test-api-key',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
+            'max-tokens' => 100,
+        ]);
 
         $Picture = Picture::factory()->create();
         $service = new AiProviderService;
@@ -172,17 +255,17 @@ class AiProviderServiceTest extends TestCase
         );
     }
 
-    public function test_prompt_handles_api_failure()
+    public function test_prompt_handles_api_failure_openai()
     {
         Http::fake([
-            'https://api.test-provider.com' => Http::response('Error', 500),
+            'https://api.openai.com/v1/chat/completions' => Http::response('Error', 500),
         ]);
 
-        Config::set('ai-provider.selected-provider', 'test-provider');
-        Config::set('ai-provider.providers.test-provider', [
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
             'api-key' => 'test-api-key',
-            'url' => 'https://api.test-provider.com',
-            'model' => 'test-model',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
             'max-tokens' => 100,
         ]);
 
@@ -196,17 +279,41 @@ class AiProviderServiceTest extends TestCase
         );
     }
 
-    public function test_prompt_handles_connection_exception()
+    public function test_prompt_handles_api_failure_anthropic()
+    {
+        Http::fake([
+            'https://api.anthropic.com/v1/messages' => Http::response('Error', 500),
+        ]);
+
+        Config::set('ai-provider.selected-provider', 'anthropic');
+        Config::set('ai-provider.providers.anthropic', [
+            'api-key' => 'test-api-key',
+            'url' => 'https://api.anthropic.com/v1/messages',
+            'model' => 'claude-sonnet-4-20250514',
+            'max-tokens' => 100,
+        ]);
+
+        $service = new AiProviderService;
+
+        $this->expectException(RuntimeException::class);
+
+        $service->prompt(
+            'You are a helpful assistant.',
+            'Tell me a joke.'
+        );
+    }
+
+    public function test_prompt_handles_connection_exception_openai()
     {
         Http::fake(function () {
             throw new ConnectionException('Connection failed');
         });
 
-        Config::set('ai-provider.selected-provider', 'test-provider');
-        Config::set('ai-provider.providers.test-provider', [
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
             'api-key' => 'test-api-key',
-            'url' => 'https://api.test-provider.com',
-            'model' => 'test-model',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
             'max-tokens' => 100,
         ]);
 
@@ -221,7 +328,32 @@ class AiProviderServiceTest extends TestCase
         );
     }
 
-    public function test_prompt_handles_malformed_api_response_missing_choices()
+    public function test_prompt_handles_connection_exception_anthropic()
+    {
+        Http::fake(function () {
+            throw new ConnectionException('Connection failed');
+        });
+
+        Config::set('ai-provider.selected-provider', 'anthropic');
+        Config::set('ai-provider.providers.anthropic', [
+            'api-key' => 'test-api-key',
+            'url' => 'https://api.anthropic.com/v1/messages',
+            'model' => 'claude-sonnet-4-20250514',
+            'max-tokens' => 100,
+        ]);
+
+        $service = new AiProviderService;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to call AI provider API');
+
+        $service->prompt(
+            'You are a helpful assistant.',
+            'Tell me a joke.'
+        );
+    }
+
+    public function test_prompt_handles_malformed_api_response_missing_choices_openai()
     {
         $malformedResponse = [
             'id' => 'chat_1',
@@ -229,14 +361,14 @@ class AiProviderServiceTest extends TestCase
         ];
 
         Http::fake([
-            'https://api.test-provider.com' => Http::response(json_encode($malformedResponse)),
+            'https://api.openai.com/v1/chat/completions' => Http::response(json_encode($malformedResponse)),
         ]);
 
-        Config::set('ai-provider.selected-provider', 'test-provider');
-        Config::set('ai-provider.providers.test-provider', [
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
             'api-key' => 'test-api-key',
-            'url' => 'https://api.test-provider.com',
-            'model' => 'test-model',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
             'max-tokens' => 100,
         ]);
 
@@ -251,7 +383,37 @@ class AiProviderServiceTest extends TestCase
         );
     }
 
-    public function test_prompt_handles_malformed_api_response_missing_message()
+    public function test_prompt_handles_malformed_api_response_missing_content_anthropic()
+    {
+        $malformedResponse = [
+            'id' => 'msg_1',
+            'type' => 'message',
+        ];
+
+        Http::fake([
+            'https://api.anthropic.com/v1/messages' => Http::response(json_encode($malformedResponse)),
+        ]);
+
+        Config::set('ai-provider.selected-provider', 'anthropic');
+        Config::set('ai-provider.providers.anthropic', [
+            'api-key' => 'test-api-key',
+            'url' => 'https://api.anthropic.com/v1/messages',
+            'model' => 'claude-sonnet-4-20250514',
+            'max-tokens' => 100,
+        ]);
+
+        $service = new AiProviderService;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to get response from AI provider');
+
+        $service->prompt(
+            'You are a helpful assistant.',
+            'Tell me a joke.'
+        );
+    }
+
+    public function test_prompt_handles_malformed_api_response_missing_message_openai()
     {
         $malformedResponse = [
             'id' => 'chat_1',
@@ -264,14 +426,14 @@ class AiProviderServiceTest extends TestCase
         ];
 
         Http::fake([
-            'https://api.test-provider.com' => Http::response(json_encode($malformedResponse)),
+            'https://api.openai.com/v1/chat/completions' => Http::response(json_encode($malformedResponse)),
         ]);
 
-        Config::set('ai-provider.selected-provider', 'test-provider');
-        Config::set('ai-provider.providers.test-provider', [
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
             'api-key' => 'test-api-key',
-            'url' => 'https://api.test-provider.com',
-            'model' => 'test-model',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
             'max-tokens' => 100,
         ]);
 
@@ -286,7 +448,7 @@ class AiProviderServiceTest extends TestCase
         );
     }
 
-    public function test_prompt_handles_malformed_api_response_missing_content()
+    public function test_prompt_handles_malformed_api_response_missing_content_openai()
     {
         $malformedResponse = [
             'id' => 'chat_1',
@@ -302,14 +464,14 @@ class AiProviderServiceTest extends TestCase
         ];
 
         Http::fake([
-            'https://api.test-provider.com' => Http::response(json_encode($malformedResponse)),
+            'https://api.openai.com/v1/chat/completions' => Http::response(json_encode($malformedResponse)),
         ]);
 
-        Config::set('ai-provider.selected-provider', 'test-provider');
-        Config::set('ai-provider.providers.test-provider', [
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
             'api-key' => 'test-api-key',
-            'url' => 'https://api.test-provider.com',
-            'model' => 'test-model',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
             'max-tokens' => 100,
         ]);
 
@@ -324,7 +486,7 @@ class AiProviderServiceTest extends TestCase
         );
     }
 
-    public function test_prompt_handles_invalid_json_in_content()
+    public function test_prompt_handles_invalid_json_in_content_openai()
     {
         $responseWithInvalidJson = [
             'id' => 'chat_1',
@@ -346,14 +508,53 @@ class AiProviderServiceTest extends TestCase
         ];
 
         Http::fake([
-            'https://api.test-provider.com' => Http::response(json_encode($responseWithInvalidJson)),
+            'https://api.openai.com/v1/chat/completions' => Http::response(json_encode($responseWithInvalidJson)),
         ]);
 
-        Config::set('ai-provider.selected-provider', 'test-provider');
-        Config::set('ai-provider.providers.test-provider', [
+        Config::set('ai-provider.selected-provider', 'openai');
+        Config::set('ai-provider.providers.openai', [
             'api-key' => 'test-api-key',
-            'url' => 'https://api.test-provider.com',
-            'model' => 'test-model',
+            'url' => 'https://api.openai.com/v1/chat/completions',
+            'model' => 'gpt-4o-mini',
+            'max-tokens' => 100,
+        ]);
+
+        $service = new AiProviderService;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('AI provider returned invalid JSON content');
+
+        $service->prompt(
+            'You are a helpful assistant.',
+            'Tell me a joke.'
+        );
+    }
+
+    public function test_prompt_handles_invalid_json_in_content_anthropic()
+    {
+        $responseWithInvalidJson = [
+            'id' => 'msg_1',
+            'type' => 'message',
+            'role' => 'assistant',
+            'model' => 'claude-sonnet-4-20250514',
+            'content' => [
+                [
+                    'type' => 'text',
+                    'text' => 'This is not valid JSON content',
+                ],
+            ],
+            'stop_reason' => 'end_turn',
+        ];
+
+        Http::fake([
+            'https://api.anthropic.com/v1/messages' => Http::response(json_encode($responseWithInvalidJson)),
+        ]);
+
+        Config::set('ai-provider.selected-provider', 'anthropic');
+        Config::set('ai-provider.providers.anthropic', [
+            'api-key' => 'test-api-key',
+            'url' => 'https://api.anthropic.com/v1/messages',
+            'model' => 'claude-sonnet-4-20250514',
             'max-tokens' => 100,
         ]);
 

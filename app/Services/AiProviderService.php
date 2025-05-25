@@ -56,51 +56,13 @@ class AiProviderService
         }
 
         $selectedProvider = config('ai-provider.selected-provider');
+        $providerConfig = config('ai-provider.providers.'.$selectedProvider);
 
-        $picturesArray = array_map(fn (string $transcodedPicture) => [
-            'type' => 'image_url',
-            'image_url' => [
-                'url' => 'data:image/jpeg;base64,'.base64_encode($transcodedPicture),
-            ],
-        ], $transcodedPictures);
+        if ($selectedProvider === 'anthropic') {
+            return $this->callAnthropicApi($providerConfig, $systemRole, $prompt, $transcodedPictures);
+        }
 
-        $requestBody = [
-            'headers' => [
-                'Authorization' => 'Bearer '.config('ai-provider.providers.'.$selectedProvider.'.api-key'),
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ],
-            'json' => [
-                'model' => config('ai-provider.providers.'.$selectedProvider.'.model'),
-                'messages' => [
-                    [
-                        'role' => 'system',
-                        'content' => [
-                            [
-                                'type' => 'text',
-                                'text' => $systemRole,
-                            ],
-                        ],
-                    ],
-                    [
-                        'role' => 'user',
-                        'content' => [
-                            [
-                                'type' => 'text',
-                                'text' => $prompt,
-                            ],
-                            ...$picturesArray,
-                        ],
-                    ],
-                ],
-                'max_tokens' => config('ai-provider.providers.'.$selectedProvider.'.max-tokens'),
-                'response_format' => [
-                    'type' => 'json_object',
-                ],
-            ],
-        ];
-
-        return $this->callApi(config('ai-provider.providers.'.$selectedProvider.'.url'), $requestBody);
+        return $this->callOpenAiApi($providerConfig, $systemRole, $prompt, $transcodedPictures);
     }
 
     /**
@@ -113,8 +75,45 @@ class AiProviderService
     public function prompt(string $systemRole, string $prompt): array
     {
         $selectedProvider = config('ai-provider.selected-provider');
+        $providerConfig = config('ai-provider.providers.'.$selectedProvider);
 
-        $requestBody = ['model' => config('ai-provider.providers.'.$selectedProvider.'.model'),
+        if ($selectedProvider === 'anthropic') {
+            return $this->callAnthropicApi($providerConfig, $systemRole, $prompt);
+        }
+
+        return $this->callOpenAiApi($providerConfig, $systemRole, $prompt);
+    }
+
+    /**
+     * Call OpenAI API
+     *
+     * @param  array<string, mixed>  $providerConfig  The provider configuration
+     * @param  string  $systemRole  The system role
+     * @param  string  $prompt  The user prompt
+     * @param  array<string>  $transcodedPictures  Base64 encoded pictures (optional)
+     * @return array<string, mixed> The response from the AI provider
+     */
+    private function callOpenAiApi(array $providerConfig, string $systemRole, string $prompt, array $transcodedPictures = []): array
+    {
+        $userContent = [
+            [
+                'type' => 'text',
+                'text' => $prompt,
+            ],
+        ];
+
+        if (! empty($transcodedPictures)) {
+            $picturesArray = array_map(fn (string $transcodedPicture) => [
+                'type' => 'image_url',
+                'image_url' => [
+                    'url' => 'data:image/jpeg;base64,'.base64_encode($transcodedPicture),
+                ],
+            ], $transcodedPictures);
+            $userContent = array_merge($userContent, $picturesArray);
+        }
+
+        $requestBody = [
+            'model' => $providerConfig['model'],
             'messages' => [
                 [
                     'role' => 'system',
@@ -127,50 +126,32 @@ class AiProviderService
                 ],
                 [
                     'role' => 'user',
-                    'content' => [
-                        [
-                            'type' => 'text',
-                            'text' => $prompt,
-                        ],
-                    ],
+                    'content' => $userContent,
                 ],
             ],
-            'max_tokens' => config('ai-provider.providers.'.$selectedProvider.'.max-tokens'),
+            'max_tokens' => $providerConfig['max-tokens'],
             'response_format' => [
                 'type' => 'json_object',
             ],
         ];
 
-        return $this->callApi(config('ai-provider.providers.'.$selectedProvider.'.url'), $requestBody);
-    }
-
-    /**
-     * Call the AI provider API
-     *
-     * @param  string  $url  The URL of the AI provider API
-     * @param  array<string, mixed>  $requestBody  The request body to send to the AI provider API
-     * @return array<string, mixed> The response from the AI provider
-     */
-    private function callApi(string $url, array $requestBody): array
-    {
-        $selectedProvider = config('ai-provider.selected-provider');
-
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer '.config('ai-provider.providers.'.$selectedProvider.'.api-key'),
+                'Authorization' => 'Bearer '.$providerConfig['api-key'],
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post($url, $requestBody);
+            ])->post($providerConfig['url'], $requestBody);
         } catch (ConnectionException $e) {
-            Log::error('Failed to call AI provider API', [
+            Log::error('Failed to call OpenAI API', [
                 'exception' => $e,
             ]);
             throw new RuntimeException('Failed to call AI provider API');
         }
+
         $result = $response->json();
 
         if (! isset($result['choices'][0]['message']['content'])) {
-            Log::error('Failed to get response from AI provider', [
+            Log::error('Failed to get response from OpenAI', [
                 'response' => $result,
             ]);
             throw new RuntimeException('Failed to get response from AI provider');
@@ -179,8 +160,85 @@ class AiProviderService
         $decodedContent = json_decode($result['choices'][0]['message']['content'], true);
 
         if (! is_array($decodedContent)) {
-            Log::error('AI provider returned invalid JSON content', [
+            Log::error('OpenAI returned invalid JSON content', [
                 'content' => $result['choices'][0]['message']['content'],
+            ]);
+            throw new RuntimeException('AI provider returned invalid JSON content');
+        }
+
+        return $decodedContent;
+    }
+
+    /**
+     * Call Anthropic API
+     *
+     * @param  array<string, mixed>  $providerConfig  The provider configuration
+     * @param  string  $systemRole  The system role
+     * @param  string  $prompt  The user prompt
+     * @param  array<string>  $transcodedPictures  Base64 encoded pictures (optional)
+     * @return array<string, mixed> The response from the AI provider
+     */
+    private function callAnthropicApi(array $providerConfig, string $systemRole, string $prompt, array $transcodedPictures = []): array
+    {
+        $userContent = [
+            [
+                'type' => 'text',
+                'text' => $prompt,
+            ],
+        ];
+
+        if (! empty($transcodedPictures)) {
+            $picturesArray = array_map(fn (string $transcodedPicture) => [
+                'type' => 'image',
+                'source' => [
+                    'type' => 'base64',
+                    'media_type' => 'image/jpeg',
+                    'data' => base64_encode($transcodedPicture),
+                ],
+            ], $transcodedPictures);
+            $userContent = array_merge($userContent, $picturesArray);
+        }
+
+        $requestBody = [
+            'model' => $providerConfig['model'],
+            'max_tokens' => $providerConfig['max-tokens'],
+            'system' => $systemRole,
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => $userContent,
+                ],
+            ],
+        ];
+
+        try {
+            $response = Http::withHeaders([
+                'x-api-key' => $providerConfig['api-key'],
+                'anthropic-version' => '2023-06-01',
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post($providerConfig['url'], $requestBody);
+        } catch (ConnectionException $e) {
+            Log::error('Failed to call Anthropic API', [
+                'exception' => $e,
+            ]);
+            throw new RuntimeException('Failed to call AI provider API');
+        }
+
+        $result = $response->json();
+
+        if (! isset($result['content'][0]['text'])) {
+            Log::error('Failed to get response from Anthropic', [
+                'response' => $result,
+            ]);
+            throw new RuntimeException('Failed to get response from AI provider');
+        }
+
+        $decodedContent = json_decode($result['content'][0]['text'], true);
+
+        if (! is_array($decodedContent)) {
+            Log::error('Anthropic returned invalid JSON content', [
+                'content' => $result['content'][0]['text'],
             ]);
             throw new RuntimeException('AI provider returned invalid JSON content');
         }

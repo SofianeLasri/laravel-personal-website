@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Services\AiProviderService;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -28,7 +29,6 @@ class TranslateToEnglishJob implements ShouldQueue
             return;
         }
 
-        // Check if English translation already exists
         $existingEnglishTranslation = $translationKey->translations()
             ->where('locale', 'en')
             ->first();
@@ -42,7 +42,6 @@ class TranslateToEnglishJob implements ShouldQueue
             return;
         }
 
-        // Get French translation
         $frenchTranslation = $translationKey->translations()
             ->where('locale', 'fr')
             ->first();
@@ -66,7 +65,6 @@ class TranslateToEnglishJob implements ShouldQueue
                 throw new RuntimeException('Invalid response format from AI service');
             }
 
-            // Create English translation
             Translation::create([
                 'translation_key_id' => $translationKey->id,
                 'locale' => 'en',
@@ -79,7 +77,7 @@ class TranslateToEnglishJob implements ShouldQueue
                 'english_text' => $response['message'],
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to translate to English', [
                 'key' => $translationKey->key,
                 'french_text' => $frenchTranslation->text,

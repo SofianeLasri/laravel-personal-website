@@ -171,7 +171,6 @@
       <path value="$PROJECT_DIR$/vendor/phootwork/lang" />
       <path value="$PROJECT_DIR$/vendor/phootwork/collection" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php81" />
-      <path value="$PROJECT_DIR$/vendor/php-monsters/laravel-accept-language-middleware" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

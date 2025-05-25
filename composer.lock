@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "63347b78df2806735a61f5fb512e3c10",
+    "content-hash": "4cf80398be30f83a3ae4ae2a218cefbe",
     "packages": [
         {
             "name": "brick/math",
@@ -2897,68 +2897,6 @@
                 }
             ],
             "time": "2025-05-08T08:14:37+00:00"
-        },
-        {
-            "name": "php-monsters/laravel-accept-language-middleware",
-            "version": "12.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-monsters/laravel-accept-language-middleware.git",
-                "reference": "bb887aba3cf788e6afa25ea5b4cf828ea28402d2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-monsters/laravel-accept-language-middleware/zipball/bb887aba3cf788e6afa25ea5b4cf828ea28402d2",
-                "reference": "bb887aba3cf788e6afa25ea5b4cf828ea28402d2",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/contracts": "^12.0",
-                "illuminate/http": "^12.0",
-                "illuminate/support": "^12.0",
-                "php": "^8.3"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^10.0",
-                "phpunit/phpunit": "^11.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "PhpMonsters\\LaravelAcceptLanguageMiddleware\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Aboozar Ghaffari",
-                    "email": "abooazr.ghf@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Laravel middleware for setting application locale based on HTTP Accept-Language header",
-            "homepage": "https://github.com/php-monsters/laravel-accept-language-middleware",
-            "keywords": [
-                "accept-language",
-                "http-language",
-                "language-header",
-                "laravel",
-                "laravel middleware"
-            ],
-            "support": {
-                "issues": "https://github.com/php-monsters/laravel-accept-language-middleware/issues",
-                "source": "https://github.com/php-monsters/laravel-accept-language-middleware/tree/12.0.1"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/samuraee",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-03-03T06:24:24+00:00"
         },
         {
             "name": "phpoption/phpoption",

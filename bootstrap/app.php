@@ -4,6 +4,7 @@ use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleDashboardInertiaRequests;
 use App\Http\Middleware\HandlePublicInertiaRequests;
 use App\Http\Middleware\RestrictRegistration;
+use App\Http\Middleware\SetLocaleFromAcceptLanguage;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -24,12 +25,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->web(append: [
+            SetLocaleFromAcceptLanguage::class,
             HandleAppearance::class,
             HandlePublicInertiaRequests::class,
             HandleDashboardInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SaveRequestMiddleware::class,
-            \PhpMonsters\LaravelAcceptLanguageMiddleware\Middleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

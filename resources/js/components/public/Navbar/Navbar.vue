@@ -3,6 +3,7 @@ import BarStaggeredRegular from '@/components/font-awesome/BarStaggeredRegular.v
 import NavBrand from '@/components/public/Navbar/NavBrand.vue';
 import NavMenuItem from '@/components/public/Navbar/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/Navbar/NavSearchBar.vue';
+import SearchModal from '@/components/public/SearchModal.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import { usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -12,6 +13,7 @@ const currentUrl = computed(() => new URL(page.props.ziggy.location));
 const currentPath = computed(() => currentUrl.value.href);
 
 const isMenuOpen = ref(false);
+const isSearchModalOpen = ref(false);
 const hoveredItemIndex = ref(null);
 const indicatorPosition = ref(0);
 const indicatorVisible = ref(false);
@@ -41,6 +43,14 @@ const toggleMenu = () => {
 
 const closeMenu = () => {
     isMenuOpen.value = false;
+};
+
+const openSearchModal = () => {
+    isSearchModalOpen.value = true;
+};
+
+const closeSearchModal = () => {
+    isSearchModalOpen.value = false;
 };
 
 const handleEscKey = (event: KeyboardEvent) => {
@@ -106,7 +116,7 @@ onUnmounted(() => {
     <div class="navbar z-10 container flex content-center justify-between px-4 py-16">
         <NavBrand />
         <div class="flex flex-nowrap items-center justify-center gap-4">
-            <NavSearchBar class="hidden md:flex" />
+            <NavSearchBar class="hidden md:flex" @click="openSearchModal" />
             <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
                 <span class="xs:block hidden">Menu</span>
                 <BarStaggeredRegular class="xs:relative absolute size-4 fill-white" />
@@ -164,4 +174,7 @@ onUnmounted(() => {
             </div>
         </div>
     </Transition>
+
+    <!-- Search Modal -->
+    <SearchModal :isOpen="isSearchModalOpen" @close="closeSearchModal" />
 </template>

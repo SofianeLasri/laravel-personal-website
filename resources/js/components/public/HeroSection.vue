@@ -72,7 +72,7 @@ onMounted(() => {
                 >
             </h1>
             <div class="flex flex-col items-start gap-8 self-stretch">
-                <div class="inline-flex items-center gap-2 py-12 xl:py-0">
+                <div class="flex flex-wrap items-center gap-2 py-12 xl:py-0">
                     <BlackLinkButton :href="route('public.cv')" title="CV" target="_blank">
                         {{ t('home.hero.download_cv') }}
                     </BlackLinkButton>
@@ -80,41 +80,39 @@ onMounted(() => {
                         <div class="absolute flex h-4 fill-black" v-html="link.icon_svg"></div>
                     </LightLinkButton>
                 </div>
-                <div class="flex flex-col items-center gap-4 self-stretch sm:flex-row sm:flex-wrap">
-                    <div class="flex flex-col items-start gap-4 sm:flex-row">
-                        <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
-                            <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
-                                {{ animatedYearsOfExperience }}
-                            </div>
-                            <div class="text-design-system-paragraph self-stretch text-base font-normal sm:leading-5">
-                                {{ t('home.hero.years_experience') }}
-                            </div>
-                            <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
+                <div class="flex flex-wrap items-center gap-4 self-stretch">
+                    <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
+                        <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
+                            {{ animatedYearsOfExperience }}
                         </div>
-                        <div class="hidden items-center self-stretch py-8 sm:flex">
-                            <div class="bg-border w-px self-stretch" />
+                        <div class="text-design-system-paragraph self-stretch text-base font-normal sm:leading-5">
+                            {{ t('home.hero.years_experience') }}
                         </div>
-                        <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
-                            <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
-                                {{ animatedDevelopmentCreationsCount }}
-                            </div>
-                            <div class="text-design-system-paragraph self-stretch text-base font-normal sm:leading-5">
-                                {{ t('home.hero.projects_done') }}
-                            </div>
-                            <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
+                        <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
+                    </div>
+                    <div class="hidden items-center self-stretch py-8 sm:flex">
+                        <div class="bg-border w-px self-stretch" />
+                    </div>
+                    <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
+                        <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
+                            {{ animatedDevelopmentCreationsCount }}
                         </div>
-                        <div class="hidden items-center self-stretch py-8 sm:flex">
-                            <div class="bg-border w-px self-stretch" />
+                        <div class="text-design-system-paragraph self-stretch text-base font-normal sm:leading-5">
+                            {{ t('home.hero.projects_done') }}
                         </div>
-                        <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
-                            <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
-                                {{ animatedTechnologiesCount }}
-                            </div>
-                            <div class="text-design-system-paragraph self-stretch text-base leading-5 font-normal">
-                                {{ t('home.hero.frameworks_mastered') }}
-                            </div>
-                            <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
+                        <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
+                    </div>
+                    <div class="hidden items-center self-stretch py-8 sm:flex">
+                        <div class="bg-border w-px self-stretch" />
+                    </div>
+                    <div class="relative inline-flex w-32 flex-col items-center justify-center gap-1 rounded-2xl p-2">
+                        <div class="text-design-system-title justify-center self-stretch text-center text-6xl font-bold">
+                            {{ animatedTechnologiesCount }}
                         </div>
+                        <div class="text-design-system-paragraph self-stretch text-base leading-5 font-normal">
+                            {{ t('home.hero.frameworks_mastered') }}
+                        </div>
+                        <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                     </div>
                     <LaravelCertification class="h-40" />
                 </div>

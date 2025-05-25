@@ -83,8 +83,7 @@ class SearchController extends Controller
                 'technologies',
                 'people',
                 'features.titleTranslationKey.translations',
-            ])
-            ->where('featured', true); // Only show featured creations in search
+            ]);
 
         // Text search
         if (! empty($query)) {
@@ -110,14 +109,12 @@ class SearchController extends Controller
             });
         }
 
-        // Filter by tags
         if (! empty($tagIds)) {
             $creationsQuery->whereHas('tags', function ($tagQuery) use ($tagIds) {
                 $tagQuery->whereIn('tags.id', $tagIds);
             });
         }
 
-        // Filter by technologies
         if (! empty($technologyIds)) {
             $creationsQuery->whereHas('technologies', function ($techQuery) use ($technologyIds) {
                 $techQuery->whereIn('technologies.id', $technologyIds);
@@ -125,13 +122,11 @@ class SearchController extends Controller
         }
 
         $creations = $creationsQuery
-            ->orderBy('featured', 'desc')
             ->orderBy('ended_at', 'desc')
             ->orderBy('started_at', 'desc')
             ->limit(20)
             ->get();
 
-        // Transform to simplified format using the service
         return $creations->map(function ($creation) {
             return $this->publicControllersService->formatCreationForSSRShort($creation);
         })->toArray();

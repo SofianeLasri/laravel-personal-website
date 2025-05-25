@@ -111,11 +111,13 @@
         @apply text-design-system-paragraph mb-3 text-lg font-bold;
     }
 
-    h1:not(:first-child), h2:not(:first-child) {
+    h1:not(:first-child),
+    h2:not(:first-child) {
         @apply mt-8;
     }
 
-    h3:not(:first-child), h4:not(:first-child) {
+    h3:not(:first-child),
+    h4:not(:first-child) {
         @apply mt-6;
     }
 
@@ -128,7 +130,7 @@
     }
 
     ul {
-        @apply list-disc list-inside mb-4;
+        @apply mb-4 list-inside list-disc;
     }
 
     ul li {

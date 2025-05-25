@@ -2,7 +2,9 @@
 import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import { SSRSimplifiedCreation, SSRTechnology, Tag } from '@/types';
+import { router } from '@inertiajs/vue3';
 import axios from 'axios';
+import debounce from 'lodash.debounce';
 import { X } from 'lucide-vue-next';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
@@ -14,7 +16,6 @@ const emit = defineEmits<{
     close: [];
 }>();
 
-// Refs
 const searchInput = ref<HTMLInputElement | null>(null);
 const searchQuery = ref('');
 const selectedTags = ref<number[]>([]);
@@ -25,16 +26,13 @@ const availableTechnologies = ref<SSRTechnology[]>([]);
 const isLoading = ref(false);
 const showFilters = ref(false);
 
-// Search cache
 const searchCache = ref<Map<string, any>>(new Map());
 
-// Focus management
 const focusSearchInput = async () => {
     await nextTick();
     searchInput.value?.focus();
 };
 
-// Watch for modal open
 watch(
     () => props.isOpen,
     (isOpen) => {
@@ -68,7 +66,6 @@ const hasActiveFilters = computed(() => {
     return selectedTags.value.length > 0 || selectedTechnologies.value.length > 0;
 });
 
-// Methods
 const closeModal = () => {
     emit('close');
 };
@@ -106,7 +103,6 @@ const loadFilters = async () => {
 const performSearch = async () => {
     const key = searchKey.value;
 
-    // Check cache first
     if (searchCache.value.has(key)) {
         searchResults.value = searchCache.value.get(key);
         return;
@@ -130,7 +126,6 @@ const performSearch = async () => {
 
         searchResults.value = response.data.results;
 
-        // Cache the results
         searchCache.value.set(key, response.data.results);
     } catch (error) {
         console.error('Search failed:', error);
@@ -164,19 +159,17 @@ const clearFilters = () => {
 };
 
 const goToProject = (slug: string) => {
-    window.location.href = route('public.projects.show', { slug });
+    closeModal();
+    router.visit(route('public.projects.show', { slug }));
 };
 
-// Watchers
 watch(
     [searchQuery, selectedTags, selectedTechnologies],
-    () => {
+    debounce(() => {
         performSearch();
-    },
-    { debounce: 300 },
+    }, 300),
 );
 
-// Lifecycle
 onMounted(() => {
     document.addEventListener('keydown', handleEscape);
 });

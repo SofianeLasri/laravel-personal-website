@@ -25,6 +25,8 @@ const availableTags = ref<Tag[]>([]);
 const availableTechnologies = ref<SSRTechnology[]>([]);
 const isLoading = ref(false);
 const showFilters = ref(false);
+const showAllTags = ref(false);
+const showAllTechnologies = ref(false);
 
 const searchCache = ref<Map<string, any>>(new Map());
 
@@ -88,6 +90,8 @@ const resetSearch = () => {
     selectedTechnologies.value = [];
     searchResults.value = [];
     showFilters.value = false;
+    showAllTags.value = false;
+    showAllTechnologies.value = false;
 };
 
 const loadFilters = async () => {
@@ -217,6 +221,7 @@ onUnmounted(() => {
                                     type="text"
                                     placeholder="Rechercher des projets, technologies, collaborateurs..."
                                     v-model="searchQuery"
+                                    maxlength="255"
                                     class="w-full border-none bg-transparent py-4 pr-4 text-lg focus:outline-none"
                                     data-form-type="query"
                                 />
@@ -239,14 +244,23 @@ onUnmounted(() => {
 
                         <!-- Filters section -->
                         <Transition name="slide-down">
-                            <div v-if="showFilters" class="border-b bg-gray-50 p-6">
+                            <div v-if="showFilters" class="max-h-80 overflow-y-auto border-b bg-gray-50 p-6">
                                 <div class="flex flex-col gap-6">
                                     <!-- Tags -->
                                     <div>
-                                        <h3 class="text-design-system-title mb-3 text-sm font-semibold">Tags</h3>
+                                        <div class="mb-3 flex items-center justify-between">
+                                            <h3 class="text-design-system-title text-sm font-semibold">Tags</h3>
+                                            <button
+                                                v-if="filteredTags.length > 12"
+                                                @click="showAllTags = !showAllTags"
+                                                class="text-primary text-xs font-medium hover:underline"
+                                            >
+                                                {{ showAllTags ? 'Voir moins' : `Voir tous (${filteredTags.length})` }}
+                                            </button>
+                                        </div>
                                         <div class="flex flex-wrap gap-2">
                                             <button
-                                                v-for="tag in filteredTags.slice(0, 12)"
+                                                v-for="tag in showAllTags ? filteredTags : filteredTags.slice(0, 12)"
                                                 :key="tag.id"
                                                 @click="toggleTag(tag.id)"
                                                 class="rounded-full border px-3 py-1 text-sm transition-colors"
@@ -263,10 +277,19 @@ onUnmounted(() => {
 
                                     <!-- Technologies -->
                                     <div>
-                                        <h3 class="text-design-system-title mb-3 text-sm font-semibold">Technologies</h3>
+                                        <div class="mb-3 flex items-center justify-between">
+                                            <h3 class="text-design-system-title text-sm font-semibold">Technologies</h3>
+                                            <button
+                                                v-if="filteredTechnologies.length > 12"
+                                                @click="showAllTechnologies = !showAllTechnologies"
+                                                class="text-primary text-xs font-medium hover:underline"
+                                            >
+                                                {{ showAllTechnologies ? 'Voir moins' : `Voir tous (${filteredTechnologies.length})` }}
+                                            </button>
+                                        </div>
                                         <div class="flex flex-wrap gap-2">
                                             <button
-                                                v-for="tech in filteredTechnologies.slice(0, 12)"
+                                                v-for="tech in showAllTechnologies ? filteredTechnologies : filteredTechnologies.slice(0, 12)"
                                                 :key="tech.id"
                                                 @click="toggleTechnology(tech.id)"
                                                 class="flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors"

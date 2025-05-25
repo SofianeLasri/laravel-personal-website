@@ -17,7 +17,8 @@ class AiProviderService
      *
      * @param  string  $systemRole  The system role to send to the AI provider. E.g. "You are a helpful assistant."
      * @param  string  $prompt  The prompt to send to the AI provider
-     * @return array The response from the AI provider.
+     * @param  Picture  ...$pictures  The pictures to send to the AI provider
+     * @return array<string, mixed> The response from the AI provider.
      */
     public function promptWithPictures(string $systemRole, string $prompt, Picture ...$pictures): array
     {
@@ -25,7 +26,23 @@ class AiProviderService
 
         $transcodedPictures = [];
         foreach ($pictures as $picture) {
+            if ($picture->path_original === null) {
+                Log::error('Picture has no original path', [
+                    'picture' => $picture,
+                ]);
+                throw new RuntimeException('Picture has no original path');
+            }
+
             $picturePath = Storage::disk('public')->get($picture->path_original);
+
+            if ($picturePath === null) {
+                Log::error('Failed to get picture content from storage', [
+                    'picture' => $picture,
+                    'path' => $picture->path_original,
+                ]);
+                throw new RuntimeException('Failed to get picture content from storage');
+            }
+
             $transcodedPicture = $transcodingService->transcode($picturePath, OptimizedPicture::MEDIUM_SIZE, 'jpeg');
 
             if (! $transcodedPicture) {
@@ -86,6 +103,13 @@ class AiProviderService
         return $this->callApi(config('ai-provider.providers.'.$selectedProvider.'.url'), $requestBody);
     }
 
+    /**
+     * Prompt the AI provider with text only
+     *
+     * @param  string  $systemRole  The system role to send to the AI provider
+     * @param  string  $prompt  The prompt to send to the AI provider
+     * @return array<string, mixed> The response from the AI provider
+     */
     public function prompt(string $systemRole, string $prompt): array
     {
         $selectedProvider = config('ai-provider.selected-provider');
@@ -124,8 +148,8 @@ class AiProviderService
      * Call the AI provider API
      *
      * @param  string  $url  The URL of the AI provider API
-     * @param  array  $requestBody  The request body to send to the AI provider API
-     * @return array The response from the AI provider
+     * @param  array<string, mixed>  $requestBody  The request body to send to the AI provider API
+     * @return array<string, mixed> The response from the AI provider
      */
     private function callApi(string $url, array $requestBody): array
     {
@@ -152,6 +176,15 @@ class AiProviderService
             throw new RuntimeException('Failed to get response from AI provider');
         }
 
-        return json_decode($result['choices'][0]['message']['content'], true);
+        $decodedContent = json_decode($result['choices'][0]['message']['content'], true);
+
+        if (! is_array($decodedContent)) {
+            Log::error('AI provider returned invalid JSON content', [
+                'content' => $result['choices'][0]['message']['content'],
+            ]);
+            throw new RuntimeException('AI provider returned invalid JSON content');
+        }
+
+        return $decodedContent;
     }
 }

@@ -137,6 +137,40 @@ class AiProviderServiceTest extends TestCase
         );
     }
 
+    public function test_prompt_with_pictures_handles_null_path_original()
+    {
+        Storage::fake('public');
+
+        $picture = Picture::factory()->create(['path_original' => null]);
+        $service = new AiProviderService;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Picture has no original path');
+
+        $service->promptWithPictures(
+            'You are a helpful assistant.',
+            'Describe this image.',
+            $picture
+        );
+    }
+
+    public function test_prompt_with_pictures_handles_storage_failure()
+    {
+        Storage::fake('public');
+
+        $picture = Picture::factory()->create(['path_original' => 'non-existent-file.jpg']);
+        $service = new AiProviderService;
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to get picture content from storage');
+
+        $service->promptWithPictures(
+            'You are a helpful assistant.',
+            'Describe this image.',
+            $picture
+        );
+    }
+
     public function test_prompt_handles_api_failure()
     {
         Http::fake([

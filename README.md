@@ -170,18 +170,13 @@ docker-compose exec app npm run format
 
 ### Production
 
+Pour un déploiement avec Portainer (ou autre outil de gestion Docker), utiliser le docker compose de production :
+
 ```bash
-# Optimisation pour la production
-docker-compose exec app php artisan optimize
-
-# Cache des routes, configs, vues
-docker-compose exec app php artisan route:cache
-docker-compose exec app php artisan config:cache
-docker-compose exec app php artisan view:cache
-
-# Build frontend optimisé
-docker-compose exec app npm run build:ssr
+docker-compose -f docker-compose.production.yml up -d
 ```
+
+Notez cependant l'absence de MariaDB dans ce fichier, la base de données étant gérée séparément sur mon serveur.
 
 ## 🗂️ Structure du projet
 
@@ -229,31 +224,11 @@ docker-compose exec app npm run build:ssr
 - **Traitement en arrière-plan** via queues Laravel
 - **CDN ready** avec support de disques multiples
 
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! Veuillez suivre ces étapes :
-
-1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Commiter vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Pousser vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
-
-### Standards de code
-
-- **PHP** : PSR-12, analyse PHPStan niveau 5
-- **TypeScript/Vue** : ESLint + Prettier
-- **Tests** : Couverture minimale de 80%
-- **Commits** : Messages descriptifs en français
-
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
 ## 📞 Contact
 
 **Sofiane Lasri**
 - Site web : [sofianelasri.fr](https://sofianelasri.fr)
+- LinkedIn : [Sofiane Lasri](https://www.linkedin.com/in/sofiane-lasri-trienpont/)
 - GitHub : [@SofianeLasri](https://github.com/SofianeLasri)
 
 ---
@@ -274,4 +249,3 @@ Le projet inclut :
 - **Codecov** pour la couverture de tests
 - **GitHub Actions** pour les tests automatisés
 - **Laravel Pail** pour le monitoring en temps réel
-- **Wakatime** pour le suivi du temps de développement

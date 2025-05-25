@@ -3,6 +3,7 @@
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleDashboardInertiaRequests;
 use App\Http\Middleware\HandlePublicInertiaRequests;
+use App\Http\Middleware\RestrictRegistration;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance']);
+
+        $middleware->alias([
+            'restrict.registration' => RestrictRegistration::class,
+        ]);
 
         $middleware->web(append: [
             HandleAppearance::class,

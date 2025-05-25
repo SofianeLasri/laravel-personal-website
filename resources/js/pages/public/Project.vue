@@ -8,9 +8,9 @@ import HorizontalNavbar from '@/components/public/Ui/HorizontalNavbar.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import { User } from 'lucide-vue-next';
 import { ref } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
-import { User } from 'lucide-vue-next';
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];

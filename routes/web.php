@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ProjectsController;
+use App\Http\Controllers\Public\SearchController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -32,6 +33,10 @@ Route::name('public.')->group(function () {
     Route::get('/projects/{slug}', ProjectController::class)
         ->where('slug', '[A-Za-z0-9\-]+')
         ->name('projects.show');
+
+    // Search routes
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
+    Route::get('/search/filters', [SearchController::class, 'filters'])->name('search.filters');
 });
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {

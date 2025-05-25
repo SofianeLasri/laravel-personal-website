@@ -10,7 +10,7 @@ return [
             'max-tokens' => env('OPENAI_MAX_TOKENS', 256),
         ],
         'anthropic' => [
-            'url' => env('ANTHROPIC_URL', 'https://api.anthropic.com/v1/complete'),
+            'url' => env('ANTHROPIC_URL', 'https://api.anthropic.com/v1/messages'),
             'api-key' => env('ANTHROPIC_API_KEY'),
             'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-20250514'),
             'max-tokens' => env('ANTHROPIC_MAX_TOKENS', 256),

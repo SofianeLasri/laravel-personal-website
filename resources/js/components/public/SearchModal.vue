@@ -187,6 +187,8 @@ onUnmounted(() => {
                 v-if="isOpen"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/25 backdrop-blur-sm"
                 @click="handleBackdropClick"
+                role="dialog"
+                aria-labelledby="searchModalTitle"
             >
                 <div
                     class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur mx-4 w-full max-w-4xl overflow-hidden rounded-3xl p-2"
@@ -195,7 +197,7 @@ onUnmounted(() => {
                         <!-- Header with search input -->
                         <div class="flex flex-col gap-4 border-b p-6">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-design-system-title text-2xl font-bold">Recherche</h2>
+                                <h2 class="text-design-system-title text-2xl font-bold" id="searchModalTitle">Recherche</h2>
                                 <button
                                     @click="closeModal"
                                     class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"

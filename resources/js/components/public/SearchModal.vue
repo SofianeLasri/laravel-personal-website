@@ -341,7 +341,7 @@ onUnmounted(() => {
                                         v-for="project in searchResults"
                                         :key="project.id"
                                         @click="goToProject(project.slug)"
-                                        class="group flex items-start gap-4 rounded-lg border bg-white p-4 text-left transition-all hover:bg-gray-50 hover:shadow-md"
+                                        class="group flex cursor-pointer items-start gap-4 rounded-lg border bg-white p-4 text-left transition-all hover:bg-gray-50 hover:shadow-md"
                                     >
                                         <!-- Project logo -->
                                         <div

@@ -20,17 +20,17 @@
         </div>
 
         <div v-else-if="!isEditing && !translation" class="py-4 text-center">
-            <div class="text-muted-foreground mb-2 text-sm">No {{ locale.toUpperCase() }} translation</div>
+            <div class="text-muted-foreground mb-2 text-sm">Aucune traduction {{ locale.toUpperCase() === 'FR' ? 'française' : 'anglaise' }}</div>
             <Button v-if="canTranslate" variant="outline" size="sm" @click="$emit('translate')">
                 <LanguagesIcon class="mr-2 h-4 w-4" />
-                Auto-translate
+                Traduire automatiquement
             </Button>
         </div>
 
         <div v-if="isEditing" class="space-y-2">
             <Textarea
                 v-model="editText"
-                :placeholder="`Enter ${locale.toUpperCase()} translation...`"
+                :placeholder="`Saisir la traduction ${locale.toUpperCase() === 'FR' ? 'française' : 'anglaise'}...`"
                 class="min-h-20 text-sm"
                 @keydown.ctrl.enter="saveEdit"
                 @keydown.esc="cancelEdit"
@@ -38,14 +38,14 @@
             <div class="flex gap-2">
                 <Button size="sm" @click="saveEdit" :disabled="!editText.trim()">
                     <CheckIcon class="mr-1 h-4 w-4" />
-                    Save
+                    Enregistrer
                 </Button>
                 <Button variant="ghost" size="sm" @click="cancelEdit">
                     <XIcon class="mr-1 h-4 w-4" />
-                    Cancel
+                    Annuler
                 </Button>
             </div>
-            <div class="text-muted-foreground text-xs">Ctrl+Enter to save, Esc to cancel</div>
+            <div class="text-muted-foreground text-xs">Ctrl+Entrée pour enregistrer, Échap pour annuler</div>
         </div>
     </div>
 </template>

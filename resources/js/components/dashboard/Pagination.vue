@@ -1,11 +1,11 @@
 <template>
     <div class="flex items-center justify-between">
-        <div class="text-muted-foreground text-sm">Showing {{ startItem }} to {{ endItem }} of {{ total }} results</div>
+        <div class="text-muted-foreground text-sm">Affichage de {{ startItem }} à {{ endItem }} sur {{ total }} résultats</div>
 
         <div class="flex items-center space-x-2">
             <Button variant="outline" size="sm" :disabled="currentPage <= 1" @click="$emit('navigate', currentPage - 1)">
                 <ChevronLeftIcon class="h-4 w-4" />
-                Previous
+                Précédent
             </Button>
 
             <div class="flex items-center space-x-1">
@@ -24,7 +24,7 @@
             </div>
 
             <Button variant="outline" size="sm" :disabled="currentPage >= lastPage" @click="$emit('navigate', currentPage + 1)">
-                Next
+                Suivant
                 <ChevronRightIcon class="h-4 w-4" />
             </Button>
         </div>

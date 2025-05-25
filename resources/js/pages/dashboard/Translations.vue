@@ -6,19 +6,19 @@
             <!-- Stats Cards -->
             <div class="grid auto-rows-min gap-4 md:grid-cols-4">
                 <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
-                    <h3 class="text-muted-foreground text-sm font-medium">Total Keys</h3>
+                    <h3 class="text-muted-foreground text-sm font-medium">Total des clés</h3>
                     <p class="text-2xl font-bold">{{ stats.total_keys }}</p>
                 </div>
                 <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
-                    <h3 class="text-muted-foreground text-sm font-medium">French Translations</h3>
+                    <h3 class="text-muted-foreground text-sm font-medium">Traductions françaises</h3>
                     <p class="text-2xl font-bold text-blue-600">{{ stats.french_translations }}</p>
                 </div>
                 <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
-                    <h3 class="text-muted-foreground text-sm font-medium">English Translations</h3>
+                    <h3 class="text-muted-foreground text-sm font-medium">Traductions anglaises</h3>
                     <p class="text-2xl font-bold text-green-600">{{ stats.english_translations }}</p>
                 </div>
                 <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
-                    <h3 class="text-muted-foreground text-sm font-medium">Missing English</h3>
+                    <h3 class="text-muted-foreground text-sm font-medium">Anglaises manquantes</h3>
                     <p class="text-destructive text-2xl font-bold">{{ stats.missing_english }}</p>
                 </div>
             </div>
@@ -30,18 +30,18 @@
                         <div class="flex flex-1 flex-col gap-4 sm:flex-row">
                             <!-- Search -->
                             <div class="max-w-md flex-1">
-                                <Input v-model="searchQuery" placeholder="Search translations..." @input="debouncedSearch" />
+                                <Input v-model="searchQuery" placeholder="Rechercher des traductions..." @input="debouncedSearch" />
                             </div>
 
                             <!-- Locale Filter -->
                             <Select v-model="localeFilter">
                                 <SelectTrigger class="w-40">
-                                    <SelectValue placeholder="All locales" />
+                                    <SelectValue placeholder="Toutes les langues" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All locales</SelectItem>
-                                    <SelectItem value="fr">French only</SelectItem>
-                                    <SelectItem value="en">English only</SelectItem>
+                                    <SelectItem value="all">Toutes les langues</SelectItem>
+                                    <SelectItem value="fr">Français uniquement</SelectItem>
+                                    <SelectItem value="en">Anglais uniquement</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -50,11 +50,11 @@
                         <div class="flex gap-2">
                             <Button variant="outline" @click="translateBatch('missing')" :disabled="isTranslating">
                                 <LanguagesIcon class="mr-2 h-4 w-4" />
-                                Translate Missing
+                                Traduire manquantes
                             </Button>
                             <Button variant="outline" @click="translateBatch('all')" :disabled="isTranslating">
                                 <RefreshCwIcon class="mr-2 h-4 w-4" />
-                                Retranslate All
+                                Retraduire toutes
                             </Button>
                         </div>
                     </div>
@@ -65,9 +65,9 @@
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead class="w-64">Key</TableHead>
-                                <TableHead>French Text</TableHead>
-                                <TableHead>English Text</TableHead>
+                                <TableHead class="w-64">Clé</TableHead>
+                                <TableHead>Texte français</TableHead>
+                                <TableHead>Texte anglais</TableHead>
                                 <TableHead class="w-32">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -248,14 +248,14 @@ async function updateTranslation(translation: Translation, newText: string) {
             // Successfully updated - update the translation in the current data
             translation.text = newText;
         } else {
-            alert('Failed to update translation');
+            alert('Échec de la mise à jour de la traduction');
         }
     } catch (error) {
         console.error('Failed to update translation:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
             alert(error.response.data.message);
         } else {
-            alert('Failed to update translation');
+            alert('Échec de la mise à jour de la traduction');
         }
     }
 }
@@ -267,16 +267,16 @@ async function translateSingle(translationKey: TranslationKey) {
         const response = await axios.post(route('dashboard.api.translations.translate-single', translationKey.id), {});
 
         if (response.data.success) {
-            alert('Translation job queued successfully');
+            alert('Tâche de traduction mise en file d\'attente avec succès');
         } else {
-            alert(response.data.message || 'Failed to queue translation');
+            alert(response.data.message || 'Échec de la mise en file d\'attente de la traduction');
         }
     } catch (error) {
         console.error('Failed to translate:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
             alert(error.response.data.message);
         } else {
-            alert('Failed to queue translation');
+            alert('Échec de la mise en file d\'attente de la traduction');
         }
     } finally {
         isTranslating.value = false;
@@ -292,16 +292,16 @@ async function translateBatch(mode: 'missing' | 'all') {
         });
 
         if (response.data.success) {
-            alert(`Queued ${response.data.jobs_dispatched || 0} translation jobs`);
+            alert(`${response.data.jobs_dispatched || 0} tâches de traduction mises en file d'attente`);
         } else {
-            alert(response.data.message || 'Failed to queue translations');
+            alert(response.data.message || 'Échec de la mise en file d\'attente des traductions');
         }
     } catch (error) {
         console.error('Failed to batch translate:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
             alert(error.response.data.message);
         } else {
-            alert('Failed to queue translations');
+            alert('Échec de la mise en file d\'attente des traductions');
         }
     } finally {
         isTranslating.value = false;

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(docker-compose exec:*)"
+    ],
+    "deny": []
+  }
+}

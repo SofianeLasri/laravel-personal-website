@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\ExperiencePageController;
+use App\Http\Controllers\Admin\PicturePageController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Public\HomeController;
@@ -62,6 +63,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
 
     Route::get('/social-media-links', SocialMediaLinkPageController::class)
         ->name('social-media-links.index');
+
+    Route::get('/pictures', PicturePageController::class)
+        ->name('pictures.index');
 
     Route::name('api.')->prefix('api')->group(function () {
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();

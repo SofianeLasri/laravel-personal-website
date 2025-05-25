@@ -155,3 +155,6 @@ Most models use pivot tables for many-to-many relationships. Draft entities mirr
 
 ### File Storage
 Uploaded files are stored in `storage/app/public/uploads/` with automatic optimization generating multiple variants.
+
+## Local Development
+Usage of docker for local development is strongly recommended. All the required dependencies are included in the `docker-compose.yml` file. Run tests and build commands inside the container.

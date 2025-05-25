@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BarStaggeredRegular from '@/components/font-awesome/BarStaggeredRegular.vue';
+import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
 import NavBrand from '@/components/public/Navbar/NavBrand.vue';
 import NavMenuItem from '@/components/public/Navbar/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/Navbar/NavSearchBar.vue';
@@ -47,6 +48,7 @@ const closeMenu = () => {
 
 const openSearchModal = () => {
     isSearchModalOpen.value = true;
+    closeMenu();
 };
 
 const closeSearchModal = () => {
@@ -136,16 +138,16 @@ onUnmounted(() => {
             <div class="flex-grow-1 cursor-pointer" @click="closeMenu"></div>
             <div class="bg-background motion-preset-slide-left flex w-full max-w-lg flex-shrink-0 flex-col items-start border-l py-16 pr-8">
                 <div class="flex w-full flex-col gap-12">
-                    <BlackButton
-                        class="self-end"
-                        @click="closeMenu"
-                        :aria-expanded="isMenuOpen"
-                        aria-controls="fullscreen-menu"
-                        aria-label="Fermer le menu"
-                    >
-                        <span>Fermer</span>
-                        <BarStaggeredRegular class="size-4 fill-white" />
-                    </BlackButton>
+                    <div class="flex items-center justify-end gap-4">
+                        <BlackButton class="md:hidden" @click="openSearchModal" aria-label="Ouvrir la recherche">
+                            <span>Rechercher</span>
+                            <MagnifyingGlassRegular class="size-4 fill-white" />
+                        </BlackButton>
+                        <BlackButton @click="closeMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" aria-label="Fermer le menu">
+                            <span>Fermer</span>
+                            <BarStaggeredRegular class="size-4 fill-white" />
+                        </BlackButton>
+                    </div>
 
                     <div class="flex flex-col gap-8">
                         <div class="pl-12">

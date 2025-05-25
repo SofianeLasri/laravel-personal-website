@@ -49,11 +49,21 @@ class SearchController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $query = $request->input('q', '');
-        $tagIds = array_filter((array) $request->input('tags', []));
-        $technologyIds = array_filter((array) $request->input('technologies', []));
+        $validated = $request->validate([
+            'q' => 'nullable|string|max:255|min:1',
+            'tags' => 'nullable|array|max:20',
+            'tags.*' => 'integer|exists:tags,id|min:1',
+            'technologies' => 'nullable|array|max:20',
+            'technologies.*' => 'integer|exists:technologies,id|min:1',
+        ]);
 
-        // Create cache key
+        $query = trim($validated['q'] ?? '');
+        $tagIds = array_filter((array) ($validated['tags'] ?? []), 'is_numeric');
+        $technologyIds = array_filter((array) ($validated['technologies'] ?? []), 'is_numeric');
+
+        $tagIds = array_map('intval', $tagIds);
+        $technologyIds = array_map('intval', $technologyIds);
+
         $cacheKey = 'search.'.md5($query.implode(',', $tagIds).implode(',', $technologyIds));
 
         $results = Cache::remember($cacheKey, 300, function () use ($query, $tagIds, $technologyIds) {

@@ -30,6 +30,10 @@ php artisan test tests/Feature/Services/PublicControllersServiceTest.php
 
 # Run with coverage
 php artisan test --coverage
+
+# Docker commands (recommended for local development)
+docker exec laravel.test php artisan test
+docker exec laravel.test php artisan test tests/Feature/Services/PublicControllersServiceTest.php
 ```
 
 ### Code Quality
@@ -43,6 +47,10 @@ php artisan test --coverage
 # Format/lint frontend code
 npm run format
 npm run lint
+
+# Docker commands (recommended for local development)
+docker exec laravel.test ./vendor/bin/phpstan analyse
+docker exec laravel.test ./vendor/bin/pint
 ```
 
 ### Build Commands
@@ -81,7 +89,11 @@ Both applications are served from the same Laravel backend but have completely s
 - **UploadedFilesService**: Manages file uploads and storage
 
 ### Translation System
-Custom translation system using `TranslationKey` and `Translation` models instead of Laravel's built-in i18n. Keys are managed through the admin interface.
+**Dual Translation Architecture**:
+1. **Custom Translation System**: Uses `TranslationKey` and `Translation` models for dynamic content managed through the admin interface (creation descriptions, feature titles, etc.)
+2. **Static Translation System**: Traditional Laravel i18n files in `/lang` directory for static UI text, used by Vue components via `useTranslation()` composable
+
+**Translation Fallback**: The `PublicControllersService` implements automatic fallback from current locale to fallback locale, ensuring translations are always available.
 
 ### Image Optimization Pipeline
 Sophisticated image handling with automatic transcoding to modern formats:
@@ -159,5 +171,21 @@ Uploaded files are stored in `storage/app/public/uploads/` with automatic optimi
 ## Local Development
 Usage of docker for local development is strongly recommended. All the required dependencies are included in the `docker-compose.yml` file. Run tests and build commands inside the container.
 
-## Public app static translations
-Static translations for the public app are given by the Laravel controllers in the `translations` property, and usable in the frontend via `useTranslation()`. The translations are stored in the `/lang` directory.
+## Translation Implementation Details
+
+### Static UI Translations
+- Files located in `/lang/{locale}/` (e.g., `projects.php`, `navigation.php`, `search.php`)
+- Passed to Vue components via Laravel controllers in the `translations` property
+- Used in Vue with `useTranslation()` composable: `t('navigation.home')`
+- Automatic fallback: current locale → fallback locale → empty string
+
+### Dynamic Content Translations
+- Managed through `TranslationKey` and `Translation` models
+- Admin interface allows managing translations for different locales
+- `PublicControllersService` handles retrieval with automatic fallback logic
+- Used for creation descriptions, feature titles, experience details, etc.
+
+### Adding New Static Translations
+1. Add translation keys to appropriate files in `/lang/en/` and `/lang/fr/`
+2. Include translation group in controller's `translations` array
+3. Use `t('group.key')` in Vue components with `useTranslation()` composable

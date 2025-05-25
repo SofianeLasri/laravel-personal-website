@@ -6,6 +6,7 @@ use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
+use App\Models\Translation;
 use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -256,8 +257,16 @@ class PublicControllersServiceTest extends TestCase
 
             $this->assertEquals($feature->id, $resultFeature['id']);
 
-            $featureName = $feature->titleTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
-            $featureDescription = $feature->descriptionTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
+            $currentLocale = app()->getLocale();
+            $fallbackLocale = config('app.fallback_locale');
+
+            $titleTranslation = $feature->titleTranslationKey->translations->firstWhere('locale', $currentLocale)
+                ?? $feature->titleTranslationKey->translations->firstWhere('locale', $fallbackLocale);
+            $descriptionTranslation = $feature->descriptionTranslationKey->translations->firstWhere('locale', $currentLocale)
+                ?? $feature->descriptionTranslationKey->translations->firstWhere('locale', $fallbackLocale);
+
+            $featureName = $titleTranslation ? $titleTranslation->text : '';
+            $featureDescription = $descriptionTranslation ? $descriptionTranslation->text : '';
 
             $this->assertEquals($featureName, $resultFeature['title']);
             $this->assertEquals($featureDescription, $resultFeature['description']);
@@ -278,7 +287,12 @@ class PublicControllersServiceTest extends TestCase
             $this->assertEquals($screenshot->id, $resultScreenshot['id']);
 
             if ($screenshot->captionTranslationKey) {
-                $caption = $screenshot->captionTranslationKey->translations->firstWhere('locale', app()->getLocale())->text;
+                $currentLocale = app()->getLocale();
+                $fallbackLocale = config('app.fallback_locale');
+
+                $captionTranslation = $screenshot->captionTranslationKey->translations->firstWhere('locale', $currentLocale)
+                    ?? $screenshot->captionTranslationKey->translations->firstWhere('locale', $fallbackLocale);
+                $caption = $captionTranslation ? $captionTranslation->text : '';
                 $this->assertEquals($caption, $resultScreenshot['caption']);
             } else {
                 $this->assertEmpty($resultScreenshot['caption']);
@@ -299,5 +313,175 @@ class PublicControllersServiceTest extends TestCase
             $this->assertEquals($person->url, $resultPerson['url']);
             $this->assertEquals($person->picture->filename, $resultPerson['picture']['filename']);
         }
+    }
+
+    #[Test]
+    public function test_translation_fallback_when_current_locale_translation_missing()
+    {
+        app()->setLocale('es'); // Set a locale that doesn't have translations
+        config(['app.fallback_locale' => 'en']);
+
+        $technology = Technology::factory()->create();
+
+        // Create only English translation, no Spanish
+        $technology->descriptionTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $technology->descriptionTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English description',
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatTechnologyForSSR($technology);
+
+        $this->assertEquals('English description', $result['description']);
+    }
+
+    #[Test]
+    public function test_translation_uses_current_locale_when_available()
+    {
+        app()->setLocale('fr');
+        config(['app.fallback_locale' => 'en']);
+
+        $technology = Technology::factory()->create();
+
+        // Create both French and English translations
+        $technology->descriptionTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $technology->descriptionTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English description',
+        ]);
+        Translation::factory()->create([
+            'translation_key_id' => $technology->descriptionTranslationKey->id,
+            'locale' => 'fr',
+            'text' => 'Description française',
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatTechnologyForSSR($technology);
+
+        $this->assertEquals('Description française', $result['description']);
+    }
+
+    #[Test]
+    public function test_translation_returns_empty_when_no_translation_available()
+    {
+        app()->setLocale('es');
+        config(['app.fallback_locale' => 'en']);
+
+        $technology = Technology::factory()->create();
+
+        // Remove all translations
+        $technology->descriptionTranslationKey->translations()->delete();
+
+        $service = new PublicControllersService;
+        $result = $service->formatTechnologyForSSR($technology);
+
+        $this->assertEquals('', $result['description']);
+    }
+
+    #[Test]
+    public function test_creation_translation_fallback_for_short_description()
+    {
+        app()->setLocale('es');
+        config(['app.fallback_locale' => 'en']);
+
+        $creation = Creation::factory()->create();
+
+        // Create only English translation for short description
+        $creation->shortDescriptionTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $creation->shortDescriptionTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English short description',
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRShort($creation);
+
+        $this->assertEquals('English short description', $result['shortDescription']);
+    }
+
+    #[Test]
+    public function test_creation_translation_fallback_for_full_description()
+    {
+        app()->setLocale('es');
+        config(['app.fallback_locale' => 'en']);
+
+        $creation = Creation::factory()->create();
+
+        // Create only English translation for full description
+        $creation->fullDescriptionTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $creation->fullDescriptionTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English full description',
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertEquals('English full description', $result['fullDescription']);
+    }
+
+    #[Test]
+    public function test_experience_translation_fallback()
+    {
+        app()->setLocale('es');
+        config(['app.fallback_locale' => 'en']);
+
+        $experience = Experience::factory()->create();
+
+        // Create only English translations
+        $experience->titleTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $experience->titleTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English title',
+        ]);
+
+        $experience->shortDescriptionTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $experience->shortDescriptionTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English short description',
+        ]);
+
+        $experience->fullDescriptionTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $experience->fullDescriptionTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English full description',
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getExperiences();
+
+        $this->assertEquals('English title', $result[0]['title']);
+        $this->assertEquals('English short description', $result[0]['shortDescription']);
+        $this->assertEquals('English full description', $result[0]['fullDescription']);
+    }
+
+    #[Test]
+    public function test_technology_experience_translation_fallback()
+    {
+        app()->setLocale('es');
+        config(['app.fallback_locale' => 'en']);
+
+        $techExperience = TechnologyExperience::factory()->create();
+
+        // Create only English translation
+        $techExperience->descriptionTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $techExperience->descriptionTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English tech experience description',
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getTechnologyExperiences();
+
+        $this->assertEquals('English tech experience description', $result[0]['description']);
     }
 }

@@ -13,6 +13,7 @@ use App\Models\Picture;
 use App\Models\Screenshot;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
+use App\Models\Translation;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -20,6 +21,8 @@ use Illuminate\Support\Str;
 class PublicControllersService
 {
     private string $locale;
+
+    private string $fallbackLocale;
 
     private const DEVELOPMENT_TYPES = [
         CreationType::PORTFOLIO,
@@ -36,6 +39,7 @@ class PublicControllersService
     public function __construct()
     {
         $this->locale = app()->getLocale();
+        $this->fallbackLocale = config('app.fallback_locale');
         $this->creationCountByTechnology = $this->calcCreationCountByTechnology();
     }
 
@@ -171,8 +175,7 @@ class PublicControllersService
      */
     public function formatCreationForSSRShort(Creation $creation): array
     {
-        $shortDescriptionTranslation = $creation->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-        $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
+        $shortDescription = $this->getTranslationWithFallback($creation->shortDescriptionTranslationKey->translations);
 
         return [
             'id' => $creation->id,
@@ -220,18 +223,14 @@ class PublicControllersService
     {
         $response = $this->formatCreationForSSRShort($creation);
 
-        $fullDescriptionTranslation = $creation->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-        $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
+        $fullDescription = $this->getTranslationWithFallback($creation->fullDescriptionTranslationKey->translations);
 
         $response['fullDescription'] = $fullDescription;
         $response['externalUrl'] = $creation->external_url;
         $response['sourceCodeUrl'] = $creation->source_code_url;
         $response['features'] = $creation->features->map(function (Feature $feature) {
-            $titleTranslation = $feature->titleTranslationKey->translations->where('locale', $this->locale)->first();
-            $title = $titleTranslation ? $titleTranslation->text : '';
-
-            $descriptionTranslation = $feature->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
-            $description = $descriptionTranslation ? $descriptionTranslation->text : '';
+            $title = $this->getTranslationWithFallback($feature->titleTranslationKey->translations);
+            $description = $this->getTranslationWithFallback($feature->descriptionTranslationKey->translations);
 
             $picture = $feature->picture ? $this->formatPictureForSSR($feature->picture) : null;
 
@@ -244,11 +243,9 @@ class PublicControllersService
         })->toArray();
 
         $response['screenshots'] = $creation->screenshots->map(function (Screenshot $screenshot) {
-
             $caption = '';
             if ($screenshot->captionTranslationKey) {
-                $captionTranslation = $screenshot->captionTranslationKey->translations->where('locale', $this->locale)->first();
-                $caption = $captionTranslation ? $captionTranslation->text : '';
+                $caption = $this->getTranslationWithFallback($screenshot->captionTranslationKey->translations);
             }
 
             return [
@@ -330,8 +327,7 @@ class PublicControllersService
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
-        $descriptionTranslation = $technology->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
-        $description = $descriptionTranslation ? $descriptionTranslation->text : '';
+        $description = $this->getTranslationWithFallback($technology->descriptionTranslationKey->translations);
 
         return [
             'id' => $technology->id,
@@ -363,8 +359,7 @@ class PublicControllersService
 
         return $experiences->map(function (TechnologyExperience $experience) {
             $technologyId = $experience->technology->id;
-            $descriptionTranslation = $experience->descriptionTranslationKey->translations->where('locale', $this->locale)->first();
-            $description = $descriptionTranslation ? $descriptionTranslation->text : '';
+            $description = $this->getTranslationWithFallback($experience->descriptionTranslationKey->translations);
 
             return [
                 'id' => $experience->id,
@@ -404,12 +399,9 @@ class PublicControllersService
         $experiences = Experience::all()->withRelationshipAutoloading();
 
         return $experiences->map(function (Experience $experience) {
-            $titleTranslation = $experience->titleTranslationKey->translations->where('locale', $this->locale)->first();
-            $title = $titleTranslation ? $titleTranslation->text : '';
-            $shortDescriptionTranslation = $experience->shortDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-            $shortDescription = $shortDescriptionTranslation ? $shortDescriptionTranslation->text : '';
-            $fullDescriptionTranslation = $experience->fullDescriptionTranslationKey->translations->where('locale', $this->locale)->first();
-            $fullDescription = $fullDescriptionTranslation ? $fullDescriptionTranslation->text : '';
+            $title = $this->getTranslationWithFallback($experience->titleTranslationKey->translations);
+            $shortDescription = $this->getTranslationWithFallback($experience->shortDescriptionTranslationKey->translations);
+            $fullDescription = $this->getTranslationWithFallback($experience->fullDescriptionTranslationKey->translations);
 
             return [
                 'id' => $experience->id,
@@ -430,6 +422,29 @@ class PublicControllersService
                 'endedAtFormatted' => $this->formatDate($experience->ended_at),
             ];
         });
+    }
+
+    /**
+     * Get a translation with fallback to the fallback locale.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, Translation>  $translations  Collection of translations
+     * @return string The translation text or empty string if not found
+     */
+    private function getTranslationWithFallback(\Illuminate\Database\Eloquent\Collection $translations): string
+    {
+        $translation = $translations->where('locale', $this->locale)->first();
+        if ($translation && isset($translation->text)) {
+            return $translation->text;
+        }
+
+        if ($this->locale !== $this->fallbackLocale) {
+            $fallbackTranslation = $translations->where('locale', $this->fallbackLocale)->first();
+            if ($fallbackTranslation && isset($fallbackTranslation->text)) {
+                return $fallbackTranslation->text;
+            }
+        }
+
+        return '';
     }
 
     /**

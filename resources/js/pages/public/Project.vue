@@ -90,7 +90,7 @@ if (props.creation.screenshots.length > 0) {
                                             loading="lazy"
                                         />
                                     </picture>
-                                    <User v-else class="text-design-system-paragraph size-4" />
+                                    <User v-else class="text-design-system-paragraph size-6" />
                                 </div>
                                 <div class="flex w-full flex-col justify-center gap-1">
                                     <div class="text-design-system-title text-sm lg:text-base">{{ person.name }}</div>

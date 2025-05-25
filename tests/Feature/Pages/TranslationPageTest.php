@@ -2,18 +2,25 @@
 
 namespace Tests\Feature\Pages;
 
+use App\Http\Controllers\Admin\TranslationPageController;
+use App\Jobs\TranslateToEnglishJob;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia as Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 
+#[CoversClass(TranslationPageController::class)]
 class TranslationPageTest extends TestCase
 {
     use ActsAsUser, RefreshDatabase;
 
+    #[Test]
     public function test_translations_index_page_renders_correctly()
     {
         $user = User::factory()->create();
@@ -41,6 +48,7 @@ class TranslationPageTest extends TestCase
             );
     }
 
+    #[Test]
     public function test_translations_index_with_search()
     {
         $user = User::factory()->create();
@@ -62,6 +70,7 @@ class TranslationPageTest extends TestCase
             );
     }
 
+    #[Test]
     public function test_translations_index_with_locale_filter()
     {
         $user = User::factory()->create();
@@ -85,6 +94,7 @@ class TranslationPageTest extends TestCase
             );
     }
 
+    #[Test]
     public function test_update_translation()
     {
         $user = User::factory()->create();
@@ -112,6 +122,7 @@ class TranslationPageTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_update_translation_requires_text()
     {
         $user = User::factory()->create();
@@ -131,6 +142,7 @@ class TranslationPageTest extends TestCase
             ->assertJsonValidationErrors(['text']);
     }
 
+    #[Test]
     public function test_translations_index_with_pagination()
     {
         $user = User::factory()->create();
@@ -153,6 +165,7 @@ class TranslationPageTest extends TestCase
             );
     }
 
+    #[Test]
     public function test_translations_index_search_by_text_content()
     {
         $user = User::factory()->create();
@@ -177,6 +190,7 @@ class TranslationPageTest extends TestCase
 
     public function test_translate_single_fails_when_no_french_translation()
     {
+        Queue::fake();
         $user = User::factory()->create();
 
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
@@ -190,10 +204,14 @@ class TranslationPageTest extends TestCase
                 'success' => false,
                 'message' => 'No French translation found to translate from',
             ]);
+
+        Queue::assertNothingPushed();
     }
 
+    #[Test]
     public function test_translate_batch_with_no_french_translations()
     {
+        Queue::fake();
         $user = User::factory()->create();
 
         // Create keys with no French translations
@@ -210,8 +228,11 @@ class TranslationPageTest extends TestCase
                 'success' => true,
                 'jobs_dispatched' => 0,
             ]);
+
+        Queue::assertNothingPushed();
     }
 
+    #[Test]
     public function test_translations_index_with_empty_search()
     {
         $user = User::factory()->create();
@@ -230,6 +251,7 @@ class TranslationPageTest extends TestCase
             );
     }
 
+    #[Test]
     public function test_translations_index_with_nonexistent_search()
     {
         $user = User::factory()->create();
@@ -248,6 +270,7 @@ class TranslationPageTest extends TestCase
             );
     }
 
+    #[Test]
     public function test_translation_stats_calculation()
     {
         $user = User::factory()->create();
@@ -277,8 +300,10 @@ class TranslationPageTest extends TestCase
             );
     }
 
+    #[Test]
     public function test_translate_batch_mode_all_deletes_existing_english()
     {
+        Queue::fake();
         $user = User::factory()->create();
 
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
@@ -300,5 +325,8 @@ class TranslationPageTest extends TestCase
         $this->assertDatabaseMissing('translations', [
             'id' => $existingEnglish->id,
         ]);
+
+        // Verify job was queued
+        Queue::assertPushed(TranslateToEnglishJob::class, 1);
     }
 }

@@ -10,13 +10,17 @@ use App\Services\AiProviderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 
+#[CoversClass(TranslateToEnglishJob::class)]
 class TranslateToEnglishJobTest extends TestCase
 {
     use ActsAsUser, RefreshDatabase;
 
+    #[Test]
     public function test_job_creates_english_translation_from_french()
     {
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
@@ -46,6 +50,7 @@ class TranslateToEnglishJobTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_job_skips_if_english_translation_already_exists()
     {
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
@@ -62,6 +67,7 @@ class TranslateToEnglishJobTest extends TestCase
         $this->assertCount(1, $key->translations()->where('locale', 'en')->get());
     }
 
+    #[Test]
     public function test_job_skips_if_no_french_translation_exists()
     {
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
@@ -76,6 +82,7 @@ class TranslateToEnglishJobTest extends TestCase
         $this->assertCount(0, $key->translations()->where('locale', 'en')->get());
     }
 
+    #[Test]
     public function test_job_handles_nonexistent_translation_key()
     {
         $mockAiService = Mockery::mock(AiProviderService::class);
@@ -88,6 +95,7 @@ class TranslateToEnglishJobTest extends TestCase
         $this->assertTrue(true);
     }
 
+    #[Test]
     public function test_translate_single_endpoint_queues_job()
     {
         Queue::fake();
@@ -110,6 +118,7 @@ class TranslateToEnglishJobTest extends TestCase
         });
     }
 
+    #[Test]
     public function test_translate_single_fails_if_english_already_exists()
     {
         $user = User::factory()->create();
@@ -128,6 +137,7 @@ class TranslateToEnglishJobTest extends TestCase
             ]);
     }
 
+    #[Test]
     public function test_translate_batch_missing_mode()
     {
         Queue::fake();
@@ -154,6 +164,7 @@ class TranslateToEnglishJobTest extends TestCase
         Queue::assertPushed(TranslateToEnglishJob::class, 1);
     }
 
+    #[Test]
     public function test_translate_batch_all_mode()
     {
         Queue::fake();

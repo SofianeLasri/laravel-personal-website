@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import { useTranslation } from '@/composables/useTranslation';
+
+const { t } = useTranslation();
 
 defineProps({
     placeholder: {
@@ -22,7 +25,7 @@ const handleClick = () => {
             <MagnifyingGlassRegular class="absolute size-4 fill-white" />
         </BlackButton>
         <div class="w-full py-2 pr-4 text-left text-gray-600">
-            {{ placeholder }}
+            {{ t('navigation.search_placeholder') }}
         </div>
     </button>
 </template>

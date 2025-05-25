@@ -5,6 +5,7 @@ import ProjectFilter from '@/components/public/ProjectFilter.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import HorizontalNavbar from '@/components/public/Ui/HorizontalNavbar.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRSimplifiedCreation, SSRTechnology } from '@/types';
 import { Head } from '@inertiajs/vue3';
@@ -17,6 +18,8 @@ const props = defineProps<{
     creations: SSRSimplifiedCreation[];
     technologies: SSRTechnology[];
 }>();
+
+const { t } = useTranslation();
 
 const containerKey = computed(() => {
     return `${activeTab.value}-${selectedFrameworks.value.join('-')}-${selectedLibraries.value.join('-')}-${selectedGameEngines.value.join('-')}-${selectedLanguages.value.join('-')}`;
@@ -128,9 +131,9 @@ onBeforeUnmount(() => {
 });
 
 const navItems = [
-    { id: 'development', label: 'Développement' },
-    { id: 'games', label: 'Jeux vidéos' },
-    { id: 'source-engine', label: 'Source Engine' },
+    { id: 'development', label: t('projects.development') },
+    { id: 'games', label: t('projects.games') },
+    { id: 'source-engine', label: t('projects.source_engine') },
 ];
 
 const tabToCreationTypes = {
@@ -207,7 +210,7 @@ const handleLanguageFilterChange = (ids: number[]) => {
 </script>
 
 <template>
-    <Head title="Projets" />
+    <Head :title="t('projects.page_title')" />
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
@@ -216,9 +219,9 @@ const handleLanguageFilterChange = (ids: number[]) => {
         <div class="relative z-10 container mt-16 mb-16 px-4">
             <div class="mb-12 flex">
                 <div class="flex flex-1 flex-col gap-6">
-                    <HeroSectionTitle>Projects</HeroSectionTitle>
+                    <HeroSectionTitle>{{ t('projects.title') }}</HeroSectionTitle>
                     <SectionParagraph>
-                        Retrouvez tous mes projets et créations passés, allant du mapmaking sur Source Engine au développement web. :)
+                        {{ t('projects.description') }}
                     </SectionParagraph>
                 </div>
                 <div class="hidden flex-1 xl:block"></div>
@@ -232,19 +235,19 @@ const handleLanguageFilterChange = (ids: number[]) => {
                 <div v-if="activeTab !== 'source-engine'" class="w-full space-y-6 lg:w-72">
                     <template v-if="activeTab === 'development'">
                         <ProjectFilter
-                            name="Framework"
+                            :name="t('projects.framework')"
                             :technologies="frameworks"
                             :initial-selected-filters="selectedFrameworks"
                             @filter-change="handleFrameworkFilterChange"
                         />
                         <ProjectFilter
-                            name="Librairies"
+                            :name="t('projects.libraries')"
                             :technologies="libraries"
                             :initial-selected-filters="selectedLibraries"
                             @filter-change="handleLibraryFilterChange"
                         />
                         <ProjectFilter
-                            name="Langages"
+                            :name="t('projects.languages')"
                             :technologies="languages"
                             :initial-selected-filters="selectedLanguages"
                             @filter-change="handleLanguageFilterChange"
@@ -253,7 +256,7 @@ const handleLanguageFilterChange = (ids: number[]) => {
 
                     <template v-else-if="activeTab === 'games'">
                         <ProjectFilter
-                            name="Moteurs de jeu"
+                            :name="t('projects.game_engines')"
                             :technologies="gameEngines"
                             :initial-selected-filters="selectedGameEngines"
                             @filter-change="handleGameEngineFilterChange"
@@ -272,7 +275,7 @@ const handleLanguageFilterChange = (ids: number[]) => {
                                 </div>
 
                                 <div v-if="filteredCreations.length === 0" class="col-span-full py-12 text-center">
-                                    <p class="text-lg text-gray-500">Aucun projet ne correspond à vos critères.</p>
+                                    <p class="text-lg text-gray-500">{{ t('projects.no_projects') }}</p>
                                 </div>
                             </div>
                         </div>

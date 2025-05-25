@@ -20,6 +20,12 @@ class ProjectController extends Controller
 
         return Inertia::render('public/Project', [
             'locale' => app()->getLocale(),
+            'translations' => [
+                'project' => __('project'),
+                'navigation' => __('navigation'),
+                'footer' => __('footer'),
+                'search' => __('search'),
+            ],
             'socialMediaLinks' => SocialMediaLink::all(),
             'creation' => $this->service->formatCreationForSSRFull($creation),
         ]);

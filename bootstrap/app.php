@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleDashboardInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SaveRequestMiddleware::class,
+            \PhpMonsters\LaravelAcceptLanguageMiddleware\Middleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

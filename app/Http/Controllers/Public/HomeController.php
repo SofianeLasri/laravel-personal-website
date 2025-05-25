@@ -22,6 +22,10 @@ class HomeController extends Controller
             'locale' => app()->getLocale(),
             'translations' => [
                 'home' => __('home'),
+                'navigation' => __('navigation'),
+                'footer' => __('footer'),
+                'career' => __('career'),
+                'search' => __('search'),
             ],
             'socialMediaLinks' => SocialMediaLink::all(),
             'yearsOfExperience' => $developmentStats['yearsOfExperience'],

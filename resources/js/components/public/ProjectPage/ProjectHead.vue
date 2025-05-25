@@ -2,11 +2,14 @@
 import LightShape from '@/components/public/LightShape.vue';
 import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
 import WhiteLinkButton from '@/components/public/Ui/Button/WhiteLinkButton.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { SSRFullCreation } from '@/types';
 
 defineProps<{
     creation: SSRFullCreation;
 }>();
+
+const { t } = useTranslation();
 </script>
 <template>
     <div class="flex items-center justify-between gap-8 xl:gap-32">
@@ -16,18 +19,23 @@ defineProps<{
                     <div class="bg-gray-0 flex size-24 items-center justify-center gap-2.5 overflow-hidden rounded-lg border p-4">
                         <picture class="flex-1">
                             <source :srcset="creation.logo.webp.small" type="image/webp" />
-                            <img :src="creation.logo.avif.small" alt="Logo of the project" class="h-full w-full object-cover" loading="eager" />
+                            <img
+                                :src="creation.logo.avif.small"
+                                :alt="t('project.project_logo_alt')"
+                                class="h-full w-full object-cover"
+                                loading="eager"
+                            />
                         </picture>
                     </div>
                     <div class="flex flex-col items-end" v-if="creation.endedAt">
-                        <div class="text-design-system-paragraph justify-center font-medium">Réalisé en</div>
+                        <div class="text-design-system-paragraph justify-center font-medium">{{ t('project.created_in') }}</div>
                         <div class="text-design-system-paragraph justify-center text-2xl font-bold">
                             {{ new Date(creation.endedAt).getFullYear() }}
                         </div>
                     </div>
                     <div class="flex flex-col items-end" v-else>
-                        <div class="text-design-system-paragraph justify-center font-medium">Réalisation</div>
-                        <div class="text-design-system-paragraph justify-center text-2xl font-bold">En cours</div>
+                        <div class="text-design-system-paragraph justify-center font-medium">{{ t('project.realization') }}</div>
+                        <div class="text-design-system-paragraph justify-center text-2xl font-bold">{{ t('project.ongoing') }}</div>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2 self-stretch">
@@ -43,8 +51,8 @@ defineProps<{
                 </div>
             </div>
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <BlackLinkButton v-if="creation.externalUrl" :href="creation.externalUrl"> Visiter le site internet </BlackLinkButton>
-                <WhiteLinkButton v-if="creation.sourceCodeUrl" :href="creation.sourceCodeUrl"> Code source </WhiteLinkButton>
+                <BlackLinkButton v-if="creation.externalUrl" :href="creation.externalUrl"> {{ t('project.visit_website') }} </BlackLinkButton>
+                <WhiteLinkButton v-if="creation.sourceCodeUrl" :href="creation.sourceCodeUrl"> {{ t('project.source_code') }} </WhiteLinkButton>
             </div>
         </div>
         <div class="relative hidden lg:block">
@@ -57,7 +65,12 @@ defineProps<{
                 >
                     <picture class="h-full w-full">
                         <source :srcset="creation.coverImage.webp.large" type="image/webp" />
-                        <img :src="creation.coverImage.avif.large" alt="Project cover" class="h-full w-full object-cover" loading="eager" />
+                        <img
+                            :src="creation.coverImage.avif.large"
+                            :alt="t('project.project_cover_alt')"
+                            class="h-full w-full object-cover"
+                            loading="eager"
+                        />
                     </picture>
                 </div>
             </div>

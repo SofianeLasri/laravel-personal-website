@@ -22,6 +22,9 @@ class ProjectsController extends Controller
             'locale' => $locale,
             'translations' => [
                 'projects' => __('projects'),
+                'navigation' => __('navigation'),
+                'footer' => __('footer'),
+                'search' => __('search'),
             ],
             'socialMediaLinks' => SocialMediaLink::all(),
             'creations' => $this->service->getCreations(),

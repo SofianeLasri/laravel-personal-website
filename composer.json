@@ -9,14 +9,15 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-imagick": "*",
         "inertiajs/inertia-laravel": "^2.0",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
         "laravel/octane": "^2.8",
         "laravel/tinker": "^2.10.1",
+        "php-monsters/laravel-accept-language-middleware": "^12.0",
         "sl-projects/laravel-request-logger": "^1.0",
-        "tightenco/ziggy": "^2.4",
-      "ext-imagick": "*"
+        "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
         "brianium/paratest": "^7.8",

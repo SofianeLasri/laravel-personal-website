@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { SSRSimplifiedCreation, SSRTechnology, Tag } from '@/types';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -11,6 +12,8 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 const props = defineProps<{
     isOpen: boolean;
 }>();
+
+const { t } = useTranslation();
 
 const emit = defineEmits<{
     close: [];
@@ -201,11 +204,11 @@ onUnmounted(() => {
                         <!-- Header with search input -->
                         <div class="flex flex-col gap-4 border-b p-6">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-design-system-title text-2xl font-bold" id="searchModalTitle">Recherche</h2>
+                                <h2 class="text-design-system-title text-2xl font-bold" id="searchModalTitle">{{ t('search.search') }}</h2>
                                 <button
                                     @click="closeModal"
                                     class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
-                                    aria-label="Fermer la recherche"
+                                    :aria-label="t('search.close_search')"
                                 >
                                     <X class="h-5 w-5" />
                                 </button>
@@ -219,7 +222,7 @@ onUnmounted(() => {
                                 <input
                                     ref="searchInput"
                                     type="text"
-                                    placeholder="Rechercher des projets, technologies, collaborateurs..."
+                                    :placeholder="t('search.search_placeholder')"
                                     v-model="searchQuery"
                                     maxlength="255"
                                     class="w-full border-none bg-transparent py-4 pr-4 text-lg focus:outline-none"
@@ -233,11 +236,11 @@ onUnmounted(() => {
                                     @click="showFilters = !showFilters"
                                     class="text-design-system-paragraph flex items-center gap-2 text-sm font-medium transition-colors hover:text-gray-900"
                                 >
-                                    {{ showFilters ? 'Masquer les filtres' : 'Afficher les filtres' }}
+                                    {{ showFilters ? t('search.hide_filters') : t('search.show_filters') }}
                                     <span class="transform transition-transform" :class="{ 'rotate-180': showFilters }"> ▼ </span>
                                 </button>
                                 <button v-if="hasActiveFilters" @click="clearFilters" class="text-primary text-sm font-medium hover:underline">
-                                    Effacer les filtres
+                                    {{ t('search.clear_filters') }}
                                 </button>
                             </div>
                         </div>
@@ -249,13 +252,13 @@ onUnmounted(() => {
                                     <!-- Tags -->
                                     <div>
                                         <div class="mb-3 flex items-center justify-between">
-                                            <h3 class="text-design-system-title text-sm font-semibold">Tags</h3>
+                                            <h3 class="text-design-system-title text-sm font-semibold">{{ t('search.tags') }}</h3>
                                             <button
                                                 v-if="filteredTags.length > 12"
                                                 @click="showAllTags = !showAllTags"
                                                 class="text-primary text-xs font-medium hover:underline"
                                             >
-                                                {{ showAllTags ? 'Voir moins' : `Voir tous (${filteredTags.length})` }}
+                                                {{ showAllTags ? t('search.see_less') : `${t('search.see_all')} (${filteredTags.length})` }}
                                             </button>
                                         </div>
                                         <div class="flex flex-wrap gap-2">
@@ -278,13 +281,17 @@ onUnmounted(() => {
                                     <!-- Technologies -->
                                     <div>
                                         <div class="mb-3 flex items-center justify-between">
-                                            <h3 class="text-design-system-title text-sm font-semibold">Technologies</h3>
+                                            <h3 class="text-design-system-title text-sm font-semibold">{{ t('search.technologies') }}</h3>
                                             <button
                                                 v-if="filteredTechnologies.length > 12"
                                                 @click="showAllTechnologies = !showAllTechnologies"
                                                 class="text-primary text-xs font-medium hover:underline"
                                             >
-                                                {{ showAllTechnologies ? 'Voir moins' : `Voir tous (${filteredTechnologies.length})` }}
+                                                {{
+                                                    showAllTechnologies
+                                                        ? t('search.see_less')
+                                                        : `${t('search.see_all')} (${filteredTechnologies.length})`
+                                                }}
                                             </button>
                                         </div>
                                         <div class="flex flex-wrap gap-2">
@@ -312,28 +319,27 @@ onUnmounted(() => {
                         <div class="flex-1 overflow-y-auto p-6">
                             <!-- Loading state -->
                             <div v-if="isLoading" class="flex items-center justify-center py-12">
-                                <div class="text-design-system-paragraph">Recherche en cours...</div>
+                                <div class="text-design-system-paragraph">{{ t('search.searching') }}</div>
                             </div>
 
                             <!-- No query state -->
                             <div v-else-if="!searchQuery && !hasActiveFilters" class="flex flex-col items-center justify-center py-12 text-center">
                                 <MagnifyingGlassRegular class="mb-4 h-12 w-12 fill-gray-400" />
-                                <h3 class="text-design-system-title mb-2 text-lg font-semibold">Commencez votre recherche</h3>
-                                <p class="text-design-system-paragraph">Tapez des mots-clés ou utilisez les filtres pour trouver des projets.</p>
+                                <h3 class="text-design-system-title mb-2 text-lg font-semibold">{{ t('search.start_search') }}</h3>
+                                <p class="text-design-system-paragraph">{{ t('search.start_search_description') }}</p>
                             </div>
 
                             <!-- No results -->
                             <div v-else-if="searchResults.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
-                                <div class="text-design-system-paragraph mb-2 text-lg font-semibold">Aucun résultat trouvé</div>
-                                <p class="text-design-system-paragraph">Essayez d'autres mots-clés ou ajustez vos filtres.</p>
+                                <div class="text-design-system-paragraph mb-2 text-lg font-semibold">{{ t('search.no_results') }}</div>
+                                <p class="text-design-system-paragraph">{{ t('search.no_results_description') }}</p>
                             </div>
 
                             <!-- Results -->
                             <div v-else>
                                 <div class="text-design-system-paragraph mb-4 text-sm">
-                                    {{ searchResults.length }} résultat{{ searchResults.length > 1 ? 's' : '' }} trouvé{{
-                                        searchResults.length > 1 ? 's' : ''
-                                    }}
+                                    {{ searchResults.length }} {{ searchResults.length > 1 ? t('search.results') : t('search.result') }}
+                                    {{ searchResults.length > 1 ? t('search.found_plural') : t('search.found_singular') }}
                                 </div>
 
                                 <div class="grid gap-4 md:grid-cols-2">
@@ -351,7 +357,7 @@ onUnmounted(() => {
                                                 <source :srcset="project.logo.webp.small" type="image/webp" />
                                                 <img
                                                     :src="project.logo.avif.small"
-                                                    :alt="`Logo de ${project.name}`"
+                                                    :alt="t('search.project_logo_alt', { name: project.name })"
                                                     class="h-full w-full object-cover"
                                                     loading="lazy"
                                                 />

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import Logo from '@/components/public/Logo.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { SocialMediaLink } from '@/types';
 import { Link } from '@inertiajs/vue3';
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];
 }>();
+
+const { t } = useTranslation();
 </script>
 
 <template>
@@ -20,8 +23,8 @@ defineProps<{
                     <div class="flex flex-col gap-4">
                         <Logo class="h-8" />
                         <div class="flex flex-col justify-start">
-                            <div class="text-xl font-bold text-black">Sofiane Lasri</div>
-                            <div class="text-design-system-paragraph text-base font-normal">Développeur Full-Stack</div>
+                            <div class="text-xl font-bold text-black">{{ t('footer.name') }}</div>
+                            <div class="text-design-system-paragraph text-base font-normal">{{ t('footer.title') }}</div>
                         </div>
                     </div>
 
@@ -29,23 +32,23 @@ defineProps<{
                     <div class="flex flex-col justify-start gap-8 sm:flex-row md:justify-end md:gap-16">
                         <!-- Colonne Portfolio -->
                         <div class="flex flex-col justify-start gap-4">
-                            <div class="text-xl font-bold text-black">Portfolio.</div>
+                            <div class="text-xl font-bold text-black">{{ t('footer.portfolio') }}</div>
                             <ul class="text-design-system-paragraph text-base font-normal">
                                 <li class="mb-2 list-none">
-                                    <Link :href="route('public.home')" title="Accueil">Accueil</Link>
+                                    <Link :href="route('public.home')" :title="t('footer.home')">{{ t('footer.home') }}</Link>
                                 </li>
                                 <li class="mb-2 list-none">
-                                    <Link :href="route('public.projects')" title="Mes projets">Projets</Link>
+                                    <Link :href="route('public.projects')" :title="t('footer.projects')">{{ t('footer.projects') }}</Link>
                                 </li>
                                 <li class="mb-2 list-none">
-                                    <a href="/about" title="À propos de moi">À propos</a>
+                                    <a href="/about" :title="t('footer.about_me')">{{ t('footer.about_me') }}</a>
                                 </li>
                             </ul>
                         </div>
 
                         <!-- Colonne Me retrouver -->
                         <div class="flex flex-col justify-start gap-4">
-                            <div class="text-xl font-bold text-black">Me retrouver.</div>
+                            <div class="text-xl font-bold text-black">{{ t('footer.find_me') }}</div>
                             <ul class="text-design-system-paragraph text-base font-normal">
                                 <li class="mb-2 list-none" v-for="link in socialMediaLinks" :key="link.id">
                                     <a :href="link.url" :title="link.name" target="_blank">
@@ -65,7 +68,7 @@ defineProps<{
         <!-- Copyright -->
         <div class="flex w-full flex-col items-center justify-start gap-2.5">
             <div class="container flex h-12 items-center justify-center px-4 text-center md:justify-start md:px-0 md:text-left">
-                <div class="text-sm text-white md:text-base">2025 - Sofiane Lasri-Trienpont, développé sur Laravel.</div>
+                <div class="text-sm text-white md:text-base">{{ t('footer.copyright') }}</div>
             </div>
         </div>
     </div>

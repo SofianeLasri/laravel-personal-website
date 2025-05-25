@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { useTranslation } from '@/composables/useTranslation';
 import { SSRExperience } from '@/types';
 
 defineProps<{
     experience: SSRExperience;
 }>();
+
+const { t } = useTranslation();
 
 const emit = defineEmits(['click']);
 </script>
@@ -25,7 +28,7 @@ const emit = defineEmits(['click']);
             </div>
             <div class="justify-center self-stretch text-sm font-medium text-gray-300">
                 {{ experience.startedAtFormatted }} -
-                {{ experience.endedAtFormatted || "Aujourd'hui" }}
+                {{ experience.endedAtFormatted || t('career.today') }}
             </div>
         </div>
     </div>

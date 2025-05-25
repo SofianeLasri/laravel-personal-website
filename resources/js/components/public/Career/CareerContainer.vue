@@ -10,6 +10,7 @@ import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
 import WhiteLinkButtonSm from '@/components/public/Ui/Button/WhiteLinkButtonSm.vue';
 import Cube from '@/components/shapes/cube.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { SSRExperience } from '@/types';
 import { computed, onMounted, ref, watch } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
@@ -17,6 +18,8 @@ import VueMarkdown from 'vue-markdown-render';
 const props = defineProps<{
     experience: SSRExperience[];
 }>();
+
+const { t } = useTranslation();
 
 const selectedType = ref<'emploi' | 'formation'>('formation');
 const selectedExperienceId = ref<number | null>(null);
@@ -81,7 +84,7 @@ onMounted(() => {
 
 const formatPeriod = (startDateFormatted: string, endDateFormatted: string | null) => {
     if (!endDateFormatted) {
-        return `${startDateFormatted} - Aujourd'hui`;
+        return `${startDateFormatted} - ${t('career.today')}`;
     }
     return `${startDateFormatted} - ${endDateFormatted}`;
 };
@@ -109,20 +112,20 @@ const getTechnologies = (technologies: any) => {
         >
             <BlackButton v-if="selectedType === 'formation'" class="rounded-lg">
                 <GraduationCapSolid class="h-4 fill-white" />
-                <span>Éducation</span>
+                <span>{{ t('career.education') }}</span>
             </BlackButton>
             <WhiteButton v-else class="rounded-lg" @click="changeType('formation')">
                 <GraduationCapSolid class="h-4 fill-black" />
-                <span>Éducation</span>
+                <span>{{ t('career.education') }}</span>
             </WhiteButton>
 
             <BlackButton v-if="selectedType === 'emploi'" class="rounded-lg">
                 <BriefcaseSolid class="h-4 fill-white" />
-                <span>Professionnel</span>
+                <span>{{ t('career.professional') }}</span>
             </BlackButton>
             <WhiteButton v-else class="rounded-lg" @click="changeType('emploi')">
                 <BriefcaseSolid class="h-4 fill-black" />
-                <span>Professionnel</span>
+                <span>{{ t('career.professional') }}</span>
             </WhiteButton>
         </div>
 
@@ -140,7 +143,7 @@ const getTechnologies = (technologies: any) => {
                                 new Date(yearGroup.experiences[0].endedAt).getFullYear() !== parseInt(yearGroup.year)
                             "
                         >
-                            - {{ yearGroup.experiences[0].endedAt ? new Date(yearGroup.experiences[0].endedAt).getFullYear() : "Aujourd'hui" }}
+                            - {{ yearGroup.experiences[0].endedAt ? new Date(yearGroup.experiences[0].endedAt).getFullYear() : t('career.today') }}
                         </template>
                     </div>
 
@@ -190,7 +193,7 @@ const getTechnologies = (technologies: any) => {
                                     <div class="text-design-system-title text-sm lg:text-base">{{ selectedExperience.organizationName }}</div>
                                 </div>
                                 <WhiteLinkButtonSm v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
-                                    <span>Voir le site internet</span>
+                                    <span>{{ t('career.visit_website') }}</span>
                                     <ArrowUpRightRegular class="h-4 fill-black" />
                                 </WhiteLinkButtonSm>
                             </div>
@@ -211,12 +214,12 @@ const getTechnologies = (technologies: any) => {
                         class="outline-border z-10 flex grow flex-col items-start justify-start gap-6 self-stretch rounded-2xl bg-white p-4 outline-1 lg:gap-8 lg:p-8"
                     >
                         <div class="flex flex-col gap-3 self-stretch lg:gap-4">
-                            <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">Description</h3>
+                            <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">{{ t('career.description') }}</h3>
                             <vue-markdown class="markdown-view text-sm lg:text-base" :source="selectedExperience.fullDescription" />
                         </div>
 
                         <div v-if="selectedExperience.technologies" class="flex flex-col items-start justify-start gap-3 self-stretch lg:gap-4">
-                            <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">Technologies utilisées</h3>
+                            <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">{{ t('career.technologies_used') }}</h3>
 
                             <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                                 <TechnologyCard
@@ -240,7 +243,7 @@ const getTechnologies = (technologies: any) => {
                     class="outline-border action-container-inner-shadow flex w-full items-center justify-center rounded-2xl bg-white p-4 outline-1 lg:p-8"
                 >
                     <p class="text-design-system-paragraph text-center text-base lg:text-lg">
-                        Veuillez sélectionner une expérience pour voir les détails
+                        {{ t('career.select_experience') }}
                     </p>
                 </div>
             </div>

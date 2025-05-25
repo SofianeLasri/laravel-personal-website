@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ActiveButton from '@/components/public/Ui/Button/ActiveButton.vue';
 import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
+import { useTranslation } from '@/composables/useTranslation';
 import { SSRTechnology } from '@/types';
 import { ref, watch } from 'vue';
 
@@ -9,6 +10,8 @@ const props = defineProps<{
     technologies: SSRTechnology[];
     initialSelectedFilters?: number[];
 }>();
+
+const { t } = useTranslation();
 
 const emit = defineEmits<{
     (e: 'filter-change', value: number[]): void;
@@ -87,7 +90,9 @@ const toggleFilter = (techId: number) => {
                     </WhiteButton>
                 </template>
 
-                <div v-if="technologies.length === 0" class="w-full px-3 py-2 text-center text-gray-500">Aucune technologie disponible</div>
+                <div v-if="technologies.length === 0" class="w-full px-3 py-2 text-center text-gray-500">
+                    {{ t('projects.no_technology_available') }}
+                </div>
             </div>
         </div>
     </div>

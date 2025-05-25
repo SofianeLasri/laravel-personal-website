@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\PicturePageController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
+use App\Http\Controllers\Admin\TranslationPageController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ProjectsController;
@@ -72,6 +73,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     Route::get('/pictures', PicturePageController::class)
         ->name('pictures.index');
 
+    Route::get('/translations', [TranslationPageController::class, 'index'])
+        ->name('translations.index');
+
     Route::name('api.')->prefix('api')->group(function () {
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
@@ -113,6 +117,13 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('creation-drafts.technologies');
         Route::get('technologies/{technology}/check-associations', [TechnologyController::class, 'checkAssociations'])
             ->name('technologies.check-associations');
+
+        Route::put('translations/{translation}', [TranslationPageController::class, 'update'])
+            ->name('translations.update');
+        Route::post('translations/{translationKey}/translate', [TranslationPageController::class, 'translateSingle'])
+            ->name('translations.translate-single');
+        Route::post('translations/translate-batch', [TranslationPageController::class, 'translateBatch'])
+            ->name('translations.translate-batch');
     });
 
     require __DIR__.'/settings.php';

@@ -158,3 +158,6 @@ Uploaded files are stored in `storage/app/public/uploads/` with automatic optimi
 
 ## Local Development
 Usage of docker for local development is strongly recommended. All the required dependencies are included in the `docker-compose.yml` file. Run tests and build commands inside the container.
+
+## Public app static translations
+Static translations for the public app are given by the Laravel controllers in the `translations` property, and usable in the frontend via `useTranslation()`. The translations are stored in the `/lang` directory.

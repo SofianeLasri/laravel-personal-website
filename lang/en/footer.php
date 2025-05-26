@@ -6,6 +6,7 @@ return [
     'portfolio' => 'Portfolio.',
     'home' => 'Home',
     'projects' => 'Projects',
+    'certifications-career' => 'Certifications  & Career',
     'about_me' => 'About me',
     'find_me' => 'Find me.',
     'copyright' => '2025 - Sofiane Lasri-Trienpont, developed on Laravel.',

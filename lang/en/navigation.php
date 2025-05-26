@@ -5,6 +5,7 @@ return [
     'home' => 'Home',
     'projects' => 'Projects',
     'about' => 'About',
+    'certifications-career' => 'Certifications  & Career',
     'portfolio' => 'Portfolio.',
 
     // Mobile menu

@@ -41,6 +41,11 @@ const { t } = useTranslation();
                                     <Link :href="route('public.projects')" :title="t('footer.projects')">{{ t('footer.projects') }}</Link>
                                 </li>
                                 <li class="mb-2 list-none">
+                                    <Link :href="route('public.certifications-career')" :title="t('footer.certifications-career')">{{
+                                        t('footer.certifications-career')
+                                    }}</Link>
+                                </li>
+                                <li class="mb-2 list-none">
                                     <a href="/about" :title="t('footer.about_me')">{{ t('footer.about_me') }}</a>
                                 </li>
                             </ul>

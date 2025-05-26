@@ -5,7 +5,10 @@
       "Bash(docker-compose exec:*)",
       "Bash(php artisan test:*)",
       "Bash(docker exec:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(grep:*)",
+      "Bash(npm run lint)",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   }

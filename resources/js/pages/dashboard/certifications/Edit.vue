@@ -11,7 +11,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import axios from 'axios';
 import { Loader2 } from 'lucide-vue-next';
 import { useForm } from 'vee-validate';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
 import * as z from 'zod';
 
@@ -43,6 +43,9 @@ interface Props {
 
 const props = defineProps<Props>();
 
+// État local
+const isSubmitting = ref(false);
+
 // Mode édition ou création
 const isEditing = computed(() => !!props.certification);
 
@@ -66,7 +69,12 @@ const formSchema = toTypedSchema(
         score: z.string().min(1, 'Le score est requis'),
         date: z.string().min(1, 'La date est requise'),
         link: z.string().url('Veuillez entrer une URL valide'),
-        picture_id: z.number().min(1, 'Veuillez sélectionner une image'),
+        picture_id: z
+            .number()
+            .nullable()
+            .refine((val) => val !== null && val > 0, {
+                message: 'Veuillez sélectionner une image',
+            }),
     }),
 );
 
@@ -79,12 +87,14 @@ const form = useForm({
         score: props.certification?.score || '',
         date: props.certification?.date ? props.certification.date.split('T')[0] : '',
         link: props.certification?.link || '',
-        picture_id: props.certification?.picture_id || 0,
+        picture_id: props.certification?.picture_id || null,
     },
 });
 
 // Fonction de soumission
 const onSubmit = form.handleSubmit(async (values) => {
+    isSubmitting.value = true;
+
     try {
         if (isEditing.value) {
             // Mise à jour
@@ -105,18 +115,19 @@ const onSubmit = form.handleSubmit(async (values) => {
             // Erreurs de validation
             const errors = error.response.data.errors;
             Object.keys(errors).forEach((field) => {
-                form.setFieldError(field, errors[field][0]);
+                // Type assertion to ensure field is a valid form field name
+                const fieldName = field as keyof typeof values;
+                if (fieldName in values) {
+                    form.setFieldError(fieldName, errors[field][0]);
+                }
             });
         } else {
             toast.error('Erreur lors de la sauvegarde');
         }
+    } finally {
+        isSubmitting.value = false;
     }
 });
-
-// Gestion de la sélection d'image
-const handlePictureSelected = (pictureId: number) => {
-    form.setFieldValue('picture_id', pictureId);
-};
 </script>
 
 <template>
@@ -186,15 +197,11 @@ const handlePictureSelected = (pictureId: number) => {
                 </FormField>
 
                 <!-- Sélection d'image -->
-                <FormField v-slot="{}" name="picture_id">
+                <FormField v-slot="{ componentField }" name="picture_id">
                     <FormItem>
                         <FormLabel>Image de la certification</FormLabel>
                         <FormControl>
-                            <PictureInput
-                                :pictures="pictures"
-                                :selected-picture-id="form.values.picture_id"
-                                @picture-selected="handlePictureSelected"
-                            />
+                            <PictureInput v-bind="componentField" :model-value="props.certification?.picture_id ?? undefined" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -203,8 +210,8 @@ const handlePictureSelected = (pictureId: number) => {
                 <!-- Boutons d'action -->
                 <div class="flex justify-end space-x-4">
                     <Button type="button" variant="outline" @click="router.visit(route('dashboard.certifications.index'))"> Annuler </Button>
-                    <Button type="submit" :disabled="form.isSubmitting">
-                        <Loader2 v-if="form.isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
+                    <Button type="submit" :disabled="isSubmitting">
+                        <Loader2 v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
                         {{ isEditing ? 'Mettre à jour' : 'Créer' }}
                     </Button>
                 </div>

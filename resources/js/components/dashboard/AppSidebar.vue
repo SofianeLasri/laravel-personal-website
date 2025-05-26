@@ -5,7 +5,7 @@ import NavUser from '@/components/dashboard/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Briefcase, Brush, Code, Folder, Image as ImageIcon, Languages, LayoutGrid, LinkIcon } from 'lucide-vue-next';
+import { Award, BookOpen, Briefcase, Brush, Code, Folder, Image as ImageIcon, Languages, LayoutGrid, LinkIcon } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -42,6 +42,11 @@ const mainNavItems: NavItem[] = [
         title: 'Expériences',
         href: route('dashboard.experiences.index', undefined, false),
         icon: Briefcase,
+    },
+    {
+        title: 'Certifications',
+        href: route('dashboard.certifications.index', undefined, false),
+        icon: Award,
     },
     {
         title: 'Réseaux sociaux',

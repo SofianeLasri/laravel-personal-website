@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Api\CertificationController;
 use App\Http\Controllers\Admin\Api\CreationController;
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\Api\SocialMediaLinkController;
 use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
+use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\PicturePageController;
@@ -67,6 +69,16 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('edit');
     });
 
+    Route::name('certifications.')->prefix('certifications')->group(function () {
+        Route::get('/', [CertificationPageController::class, 'listPage'])
+            ->name('index');
+        Route::get('/create', [CertificationPageController::class, 'editPage'])
+            ->name('create');
+        Route::get('/{id}/edit', [CertificationPageController::class, 'editPage'])
+            ->whereNumber('id')
+            ->name('edit');
+    });
+
     Route::get('/social-media-links', SocialMediaLinkPageController::class)
         ->name('social-media-links.index');
 
@@ -81,6 +93,7 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
         Route::apiResource('pictures', PictureController::class)->except('update');
         Route::apiResources([
+            'certifications' => CertificationController::class,
             'creations' => CreationController::class,
             'creation-drafts' => CreationDraftController::class,
             'experiences' => ExperienceController::class,

@@ -267,16 +267,16 @@ async function translateSingle(translationKey: TranslationKey) {
         const response = await axios.post(route('dashboard.api.translations.translate-single', translationKey.id), {});
 
         if (response.data.success) {
-            alert('Tâche de traduction mise en file d\'attente avec succès');
+            alert("Tâche de traduction mise en file d'attente avec succès");
         } else {
-            alert(response.data.message || 'Échec de la mise en file d\'attente de la traduction');
+            alert(response.data.message || "Échec de la mise en file d'attente de la traduction");
         }
     } catch (error) {
         console.error('Failed to translate:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
             alert(error.response.data.message);
         } else {
-            alert('Échec de la mise en file d\'attente de la traduction');
+            alert("Échec de la mise en file d'attente de la traduction");
         }
     } finally {
         isTranslating.value = false;
@@ -294,14 +294,14 @@ async function translateBatch(mode: 'missing' | 'all') {
         if (response.data.success) {
             alert(`${response.data.jobs_dispatched || 0} tâches de traduction mises en file d'attente`);
         } else {
-            alert(response.data.message || 'Échec de la mise en file d\'attente des traductions');
+            alert(response.data.message || "Échec de la mise en file d'attente des traductions");
         }
     } catch (error) {
         console.error('Failed to batch translate:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
             alert(error.response.data.message);
         } else {
-            alert('Échec de la mise en file d\'attente des traductions');
+            alert("Échec de la mise en file d'attente des traductions");
         }
     } finally {
         isTranslating.value = false;

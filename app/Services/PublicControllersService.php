@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\CreationType;
 use App\Enums\ExperienceType;
 use App\Enums\TechnologyType;
+use App\Models\Certification;
 use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\Feature;
@@ -466,5 +467,172 @@ class PublicControllersService
         $month = Str::ucfirst($date->translatedFormat('F'));
 
         return $month.' '.$date->format('Y');
+    }
+
+    /**
+     * Get all certifications for SSR.
+     * Returns a SSRCertification TypeScript type compatible array.
+     *
+     * @return Collection<int, array{
+     *     id: int,
+     *     name: string,
+     *     level: string|null,
+     *     score: string|null,
+     *     date: string,
+     *     dateFormatted: string,
+     *     link: string|null,
+     *     picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null
+     * }>
+     */
+    public function getCertifications(): Collection
+    {
+        $certifications = Certification::with('picture')->orderBy('date', 'desc')->get();
+
+        return $certifications->map(function (Certification $certification) {
+            return $this->formatCertificationForSSR($certification);
+        });
+    }
+
+    /**
+     * Get experiences filtered by type for SSR.
+     * Returns a SSRExperience TypeScript type compatible array.
+     *
+     * @param  ExperienceType  $type  The experience type to filter by
+     * @return Collection<int, array{
+     *     id: int,
+     *     title: string,
+     *     organizationName: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     location: string,
+     *     websiteUrl: string|null,
+     *     shortDescription: string,
+     *     fullDescription: string,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>,
+     *     type: ExperienceType,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string,
+     *     endedAtFormatted: string|null
+     * }>
+     */
+    public function getExperiencesByType(ExperienceType $type): Collection
+    {
+        $experiences = Experience::where('type', $type)
+            ->with([
+                'titleTranslationKey.translations',
+                'shortDescriptionTranslationKey.translations',
+                'fullDescriptionTranslationKey.translations',
+                'logo',
+                'technologies.descriptionTranslationKey.translations',
+            ])
+            ->orderBy('started_at', 'desc')
+            ->get();
+
+        return $experiences->map(function (Experience $experience) {
+            return $this->formatExperienceForSSR($experience);
+        });
+    }
+
+    /**
+     * Get all data needed for the certifications career page.
+     * Returns a SSRCertificationsCareerData TypeScript type compatible array.
+     *
+     * @return array{
+     *     certifications: Collection<int, array{id: int, name: string, level: string|null, score: string|null, date: string, dateFormatted: string, link: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
+     *     educationExperiences: Collection<int, array{id: int, title: string, organizationName: string, logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null, location: string, websiteUrl: string|null, shortDescription: string, fullDescription: string, technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>, type: ExperienceType, startedAt: string, endedAt: string|null, startedAtFormatted: string, endedAtFormatted: string|null}>,
+     *     workExperiences: Collection<int, array{id: int, title: string, organizationName: string, logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null, location: string, websiteUrl: string|null, shortDescription: string, fullDescription: string, technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>, type: ExperienceType, startedAt: string, endedAt: string|null, startedAtFormatted: string, endedAtFormatted: string|null}>
+     * }
+     */
+    public function getCertificationsCareerData(): array
+    {
+        return [
+            'certifications' => $this->getCertifications(),
+            'educationExperiences' => $this->getExperiencesByType(ExperienceType::FORMATION),
+            'workExperiences' => $this->getExperiencesByType(ExperienceType::EMPLOI),
+        ];
+    }
+
+    /**
+     * Format the Certification model for Server-Side Rendering (SSR).
+     * Returns a SSRCertification TypeScript type compatible array.
+     *
+     * @param  Certification  $certification  The certification to format
+     * @return array{
+     *     id: int,
+     *     name: string,
+     *     level: string|null,
+     *     score: string|null,
+     *     date: string,
+     *     dateFormatted: string,
+     *     link: string|null,
+     *     picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null
+     * }
+     */
+    public function formatCertificationForSSR(Certification $certification): array
+    {
+        $date = Carbon::parse($certification->date);
+        $dateFormatted = $this->formatDate($date);
+
+        return [
+            'id' => $certification->id,
+            'name' => $certification->name,
+            'level' => $certification->level,
+            'score' => $certification->score,
+            'date' => $date->format('Y-m-d'),
+            'dateFormatted' => $dateFormatted ?? '',
+            'link' => $certification->link,
+            'picture' => ($certification->picture instanceof Picture) ? $this->formatPictureForSSR($certification->picture) : null,
+        ];
+    }
+
+    /**
+     * Format the Experience model for Server-Side Rendering (SSR).
+     * Returns a SSRExperience TypeScript type compatible array.
+     *
+     * @param  Experience  $experience  The experience to format
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     organizationName: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     location: string,
+     *     websiteUrl: string|null,
+     *     shortDescription: string,
+     *     fullDescription: string,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>,
+     *     type: ExperienceType,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string,
+     *     endedAtFormatted: string|null
+     * }
+     */
+    public function formatExperienceForSSR(Experience $experience): array
+    {
+        $title = $this->getTranslationWithFallback($experience->titleTranslationKey->translations);
+        $shortDescription = $this->getTranslationWithFallback($experience->shortDescriptionTranslationKey->translations);
+        $fullDescription = $this->getTranslationWithFallback($experience->fullDescriptionTranslationKey->translations);
+
+        $startedAtFormatted = $this->formatDate($experience->started_at);
+        $endedAtFormatted = $this->formatDate($experience->ended_at);
+
+        return [
+            'id' => $experience->id,
+            'title' => $title,
+            'organizationName' => $experience->organization_name,
+            'logo' => ($experience->logo instanceof Picture) ? $this->formatPictureForSSR($experience->logo) : null,
+            'location' => $experience->location,
+            'websiteUrl' => $experience->website_url,
+            'shortDescription' => $shortDescription,
+            'fullDescription' => $fullDescription,
+            'technologies' => $experience->technologies->map(function (Technology $technology) {
+                return $this->formatTechnologyForSSR($technology);
+            })->toArray(),
+            'type' => $experience->type,
+            'startedAt' => $experience->started_at->toDateString(),
+            'endedAt' => $experience->ended_at?->toDateString(),
+            'startedAtFormatted' => $startedAtFormatted ?? '',
+            'endedAtFormatted' => $endedAtFormatted,
+        ];
     }
 }

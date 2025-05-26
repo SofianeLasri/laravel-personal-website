@@ -1,0 +1,54 @@
+<script setup lang="ts">
+import { useTranslation } from '@/composables/useTranslation';
+import { SSRExperience } from '@/types';
+
+const { t } = useTranslation();
+
+defineProps<{
+    experience: SSRExperience;
+}>();
+
+const formatPeriod = (startDate: string, endDate: string | null) => {
+    if (endDate) {
+        return `${startDate} - ${endDate}`;
+    }
+    return `${startDate} - ${t('career.today')}`;
+};
+</script>
+
+<template>
+    <a
+        :href="experience.websiteUrl ? experience.websiteUrl : '#'"
+        :class="{ 'pointer-events-none': !experience.websiteUrl }"
+        class="flex gap-4 rounded-2xl transition-transform hover:scale-105"
+        target="_blank"
+        rel="noopener noreferrer"
+    >
+        <div
+            class="flex size-20 flex-shrink-0 items-center justify-center gap-2.5 rounded-lg border bg-white p-3 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] md:p-4"
+        >
+            <picture v-if="experience.logo">
+                <source :srcset="experience.logo.avif.medium" type="image/avif" />
+                <source :srcset="experience.logo.webp.medium" type="image/webp" />
+                <img
+                    :src="experience.logo.webp.medium"
+                    :alt="`Logo ${experience.organizationName}`"
+                    class="h-full w-full object-contain"
+                    loading="lazy"
+                />
+            </picture>
+            <div v-else class="flex h-full w-full items-center justify-center rounded bg-gray-200">
+                <span class="text-center text-xs text-gray-500">{{ experience.organizationName }}</span>
+            </div>
+        </div>
+        <div class="flex flex-1 flex-col gap-4">
+            <div class="flex flex-col gap-px">
+                <div class="text-design-system-title justify-center text-base font-bold">{{ experience.title }}</div>
+                <div class="text-design-system-paragraph justify-center text-sm font-semibold">{{ experience.organizationName }}</div>
+            </div>
+            <div class="text-design-system-paragraph justify-center text-sm font-normal">
+                {{ formatPeriod(experience.startedAtFormatted, experience.endedAtFormatted) }}
+            </div>
+        </div>
+    </a>
+</template>

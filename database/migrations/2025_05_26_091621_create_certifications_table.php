@@ -12,11 +12,11 @@ return new class extends Migration
         Schema::create('certifications', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('level');
-            $table->string('score');
+            $table->string('level')->nullable();
+            $table->string('score')->nullable();
             $table->date('date');
-            $table->string('link');
-            $table->foreignIdFor(Picture::class)->constrained('pictures');
+            $table->string('link')->nullable();
+            $table->foreignIdFor(Picture::class)->nullable()->constrained('pictures');
         });
     }
 

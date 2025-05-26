@@ -233,9 +233,9 @@ interface SSRExperience {
     id: number;
     title: string;
     organizationName: string;
-    logo: SSRPicture;
+    logo: SSRPicture | null;
     location: string;
-    websiteUrl: string;
+    websiteUrl: string | null;
     shortDescription: string;
     fullDescription: string;
     technologies: SSRTechnology[];
@@ -277,6 +277,23 @@ interface SSRPicture {
         large: string;
         full: string;
     };
+}
+
+interface SSRCertification {
+    id: number;
+    name: string;
+    level: string | null;
+    score: string | null;
+    date: string;
+    dateFormatted: string;
+    link: string | null;
+    picture: SSRPicture | null;
+}
+
+interface SSRCertificationsCareerData {
+    certifications: SSRCertification[];
+    educationExperiences: SSRExperience[];
+    workExperiences: SSRExperience[];
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

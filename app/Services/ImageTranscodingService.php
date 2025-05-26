@@ -58,10 +58,10 @@ class ImageTranscodingService
             }
 
             return match ($codec) {
-                'jpeg' => $image->encode(new JpegEncoder(quality: 85))->toString(),
-                'webp' => $image->encode(new WebpEncoder(quality: 85))->toString(),
+                'jpeg' => $image->encode(new JpegEncoder)->toString(),
+                'webp' => $image->encode(new WebpEncoder)->toString(),
                 'png' => $image->encode(new PngEncoder)->toString(),
-                default => $image->encode(new AvifEncoder(quality: 85))->toString(),
+                default => $image->encode(new AvifEncoder)->toString(),
             };
         } catch (RuntimeException $exception) {
             Log::error('Failed to transcode image', [

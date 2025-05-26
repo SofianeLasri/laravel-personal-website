@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Api\CertificationController;
 use App\Http\Controllers\Admin\Api\CreationController;
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
@@ -81,6 +82,7 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
         Route::apiResource('pictures', PictureController::class)->except('update');
         Route::apiResources([
+            'certifications' => CertificationController::class,
             'creations' => CreationController::class,
             'creation-drafts' => CreationDraftController::class,
             'experiences' => ExperienceController::class,

@@ -26,7 +26,7 @@ const linkGap = 12;
 const routes = [
     { path: route('public.home'), name: t('navigation.home'), index: 0 },
     { path: route('public.projects'), name: t('navigation.projects'), index: 1 },
-    /*{ path: '#', name: 'Parcours professionnel & scolaire', index: 2 },*/
+    { path: route('public.certifications-career'), name: 'Certifications  & Parcours', index: 2 },
     { path: '#', name: t('navigation.about'), index: 2 },
 ];
 

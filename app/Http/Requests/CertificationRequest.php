@@ -13,7 +13,7 @@ class CertificationRequest extends FormRequest
             'score' => ['required'],
             'date' => ['required', 'date'],
             'link' => ['required'],
-            'picture_id' => ['required', 'exists:pictures'], //
+            'picture_id' => ['required', 'exists:pictures,id'],
         ];
     }
 

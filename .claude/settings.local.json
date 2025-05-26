@@ -8,7 +8,8 @@
       "Bash(mkdir:*)",
       "Bash(grep:*)",
       "Bash(npm run lint)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(./vendor/bin/phpstan analyse)"
     ],
     "deny": []
   }

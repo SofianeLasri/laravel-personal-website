@@ -15,6 +15,7 @@ class CertificationFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
+            'level' => $this->faker->randomElement(['Beginner', 'Intermediate', 'Advanced', 'Expert']),
             'score' => $this->faker->word(),
             'date' => Carbon::now(),
             'link' => $this->faker->word(),

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Api\SocialMediaLinkController;
 use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
+use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\PicturePageController;
@@ -64,6 +65,16 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::get('/create', [ExperiencePageController::class, 'editPage'])
             ->name('create');
         Route::get('/{id}/edit', [ExperiencePageController::class, 'editPage'])
+            ->whereNumber('id')
+            ->name('edit');
+    });
+
+    Route::name('certifications.')->prefix('certifications')->group(function () {
+        Route::get('/', [CertificationPageController::class, 'listPage'])
+            ->name('index');
+        Route::get('/create', [CertificationPageController::class, 'editPage'])
+            ->name('create');
+        Route::get('/{id}/edit', [CertificationPageController::class, 'editPage'])
             ->whereNumber('id')
             ->name('edit');
     });

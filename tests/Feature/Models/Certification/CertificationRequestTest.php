@@ -27,6 +27,7 @@ class CertificationRequestTest extends TestCase
 
         $data = [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => '2024-05-15',
             'link' => 'https://laravel.com/certification',
@@ -55,12 +56,31 @@ class CertificationRequestTest extends TestCase
     }
 
     #[Test]
+    public function it_fails_when_level_is_missing()
+    {
+        Picture::factory()->create();
+
+        $data = [
+            'name' => 'Laravel Certified Developer',
+            'score' => '850/1000',
+            'date' => '2024-05-15',
+            'link' => 'https://laravel.com/certification',
+            'picture_id' => 1,
+        ];
+
+        $validator = Validator::make($data, $this->rules());
+        $this->assertFalse($validator->passes());
+        $this->assertTrue($validator->errors()->has('level'));
+    }
+
+    #[Test]
     public function it_fails_when_score_is_missing()
     {
         Picture::factory()->create();
 
         $data = [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'date' => '2024-05-15',
             'link' => 'https://laravel.com/certification',
             'picture_id' => 1,
@@ -78,6 +98,7 @@ class CertificationRequestTest extends TestCase
 
         $data = [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'link' => 'https://laravel.com/certification',
             'picture_id' => 1,
@@ -95,6 +116,7 @@ class CertificationRequestTest extends TestCase
 
         $data = [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => 'invalid-date',
             'link' => 'https://laravel.com/certification',
@@ -113,6 +135,7 @@ class CertificationRequestTest extends TestCase
 
         $data = [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => '2024-05-15',
             'picture_id' => 1,
@@ -128,6 +151,7 @@ class CertificationRequestTest extends TestCase
     {
         $data = [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => '2024-05-15',
             'link' => 'https://laravel.com/certification',
@@ -143,6 +167,7 @@ class CertificationRequestTest extends TestCase
     {
         $data = [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => '2024-05-15',
             'link' => 'https://laravel.com/certification',

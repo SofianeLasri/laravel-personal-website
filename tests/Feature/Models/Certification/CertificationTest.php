@@ -21,6 +21,7 @@ class CertificationTest extends TestCase
 
         $certification = Certification::create([
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => '2024-05-15',
             'link' => 'https://laravel.com/certification',
@@ -30,6 +31,7 @@ class CertificationTest extends TestCase
         $this->assertDatabaseHas('certifications', [
             'id' => $certification->id,
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => '2024-05-15 00:00:00',
             'link' => 'https://laravel.com/certification',
@@ -90,6 +92,7 @@ class CertificationTest extends TestCase
 
         $expected = [
             'name',
+            'level',
             'score',
             'date',
             'link',

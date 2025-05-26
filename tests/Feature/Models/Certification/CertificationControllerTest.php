@@ -34,6 +34,7 @@ class CertificationControllerTest extends TestCase
 
         $data = [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => '2024-05-15',
             'link' => 'https://laravel.com/certification',
@@ -44,6 +45,7 @@ class CertificationControllerTest extends TestCase
 
         $response->assertCreated()
             ->assertJsonPath('name', 'Laravel Certified Developer')
+            ->assertJsonPath('level', 'Advanced')
             ->assertJsonPath('score', '850/1000')
             ->assertJsonPath('date', '2024-05-15T00:00:00.000000Z')
             ->assertJsonPath('link', 'https://laravel.com/certification')
@@ -51,6 +53,7 @@ class CertificationControllerTest extends TestCase
 
         $this->assertDatabaseHas('certifications', [
             'name' => 'Laravel Certified Developer',
+            'level' => 'Advanced',
             'score' => '850/1000',
             'date' => '2024-05-15 00:00:00',
             'link' => 'https://laravel.com/certification',
@@ -83,6 +86,7 @@ class CertificationControllerTest extends TestCase
 
         $data = [
             'name' => 'Updated Laravel Certification',
+            'level' => 'Expert',
             'score' => '950/1000',
             'date' => '2024-06-15',
             'link' => 'https://updated-laravel.com/certification',
@@ -98,6 +102,7 @@ class CertificationControllerTest extends TestCase
         $this->assertDatabaseHas('certifications', [
             'id' => $certification->id,
             'name' => 'Updated Laravel Certification',
+            'level' => 'Expert',
             'score' => '950/1000',
             'date' => '2024-06-15 00:00:00',
             'link' => 'https://updated-laravel.com/certification',
@@ -128,6 +133,7 @@ class CertificationControllerTest extends TestCase
     {
         $data = [
             'name' => '',
+            'level' => '',
             'score' => '',
             'date' => 'invalid-date',
             'link' => '',
@@ -137,7 +143,7 @@ class CertificationControllerTest extends TestCase
         $response = $this->postJson(route('dashboard.api.certifications.store'), $data);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'score', 'date', 'link', 'picture_id']);
+            ->assertJsonValidationErrors(['name', 'level', 'score', 'date', 'link', 'picture_id']);
     }
 
     #[Test]
@@ -147,6 +153,7 @@ class CertificationControllerTest extends TestCase
 
         $data = [
             'name' => '',
+            'level' => '',
             'score' => '',
             'date' => 'invalid-date',
             'link' => '',
@@ -156,6 +163,6 @@ class CertificationControllerTest extends TestCase
         $response = $this->putJson(route('dashboard.api.certifications.update', $certification), $data);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'score', 'date', 'link', 'picture_id']);
+            ->assertJsonValidationErrors(['name', 'level', 'score', 'date', 'link', 'picture_id']);
     }
 }

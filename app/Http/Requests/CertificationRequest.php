@@ -10,6 +10,7 @@ class CertificationRequest extends FormRequest
     {
         return [
             'name' => ['required'],
+            'level' => ['required'],
             'score' => ['required'],
             'date' => ['required', 'date'],
             'link' => ['required'],

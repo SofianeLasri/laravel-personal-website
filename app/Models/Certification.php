@@ -14,6 +14,7 @@ class Certification extends Model
 
     protected $fillable = [
         'name',
+        'level',
         'score',
         'date',
         'link',

@@ -84,15 +84,13 @@ if (props.creation.screenshots.length > 0) {
                                 :key="person.id"
                             >
                                 <div class="flex size-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full lg:size-16">
-                                    <picture class="h-full w-full flex-1" v-if="person.picture">
-                                        <source :srcset="person.picture.webp.small" type="image/webp" />
-                                        <img
-                                            :src="person.picture.avif.small"
-                                            :alt="t('project.project_logo_alt')"
-                                            class="h-full w-full object-cover"
-                                            loading="lazy"
-                                        />
-                                    </picture>
+                                    <img
+                                        v-if="person.picture"
+                                        :src="person.picture.webp.small"
+                                        :alt="t('project.project_logo_alt')"
+                                        class="h-full w-full object-cover"
+                                        loading="lazy"
+                                    />
                                     <User v-else class="text-design-system-paragraph size-6" />
                                 </div>
                                 <div class="flex w-full flex-col justify-center gap-1">

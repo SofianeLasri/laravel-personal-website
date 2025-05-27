@@ -17,15 +17,12 @@ const { t } = useTranslation();
             <div class="flex flex-col gap-6 self-stretch">
                 <div class="inline-flex justify-between self-stretch">
                     <div class="bg-gray-0 flex size-24 items-center justify-center gap-2.5 overflow-hidden rounded-lg border p-4">
-                        <picture class="flex-1">
-                            <source :srcset="creation.logo.webp.small" type="image/webp" />
-                            <img
-                                :src="creation.logo.avif.small"
-                                :alt="t('project.project_logo_alt')"
-                                class="h-full w-full object-cover"
-                                loading="eager"
-                            />
-                        </picture>
+                        <img
+                            :src="creation.logo.webp.small"
+                            :alt="t('project.project_logo_alt')"
+                            class="h-full w-full object-cover"
+                            loading="eager"
+                        />
                     </div>
                     <div class="flex flex-col items-end" v-if="creation.endedAt">
                         <div class="text-design-system-paragraph justify-center font-medium">{{ t('project.created_in') }}</div>

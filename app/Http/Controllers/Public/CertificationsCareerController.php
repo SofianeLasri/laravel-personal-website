@@ -20,6 +20,7 @@ class CertificationsCareerController extends Controller
                 'navigation' => __('navigation'),
                 'footer' => __('footer'),
                 'career' => __('career'),
+                'search' => __('search'),
             ],
             'certifications' => $careerData['certifications'],
             'educationExperiences' => $careerData['educationExperiences'],

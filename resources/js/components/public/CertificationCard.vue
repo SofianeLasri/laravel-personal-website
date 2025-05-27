@@ -18,16 +18,13 @@ defineProps<{
         rel="noopener noreferrer"
     >
         <div class="flex items-center justify-center">
-            <picture v-if="certification.picture">
-                <source :srcset="certification.picture.avif.medium" type="image/avif" />
-                <source :srcset="certification.picture.webp.medium" type="image/webp" />
-                <img
-                    :src="certification.picture.webp.medium"
-                    :alt="`${t('career.certifications')} ${certification.name}`"
-                    class="size-32 object-contain"
-                    loading="lazy"
-                />
-            </picture>
+            <img
+                v-if="certification.picture"
+                :src="certification.picture.webp.medium"
+                :alt="`${t('career.certifications')} ${certification.name}`"
+                class="size-32 object-contain"
+                loading="eager"
+            />
             <div v-else class="flex size-32 items-center justify-center rounded-lg bg-gray-200">
                 <span class="text-sm text-gray-500">{{ t('career.certifications') }}</span>
             </div>

@@ -27,16 +27,13 @@ const formatPeriod = (startDate: string, endDate: string | null) => {
         <div
             class="flex size-20 flex-shrink-0 items-center justify-center gap-2.5 rounded-lg border bg-white p-3 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] md:p-4"
         >
-            <picture v-if="experience.logo">
-                <source :srcset="experience.logo.avif.medium" type="image/avif" />
-                <source :srcset="experience.logo.webp.medium" type="image/webp" />
-                <img
-                    :src="experience.logo.webp.medium"
-                    :alt="`Logo ${experience.organizationName}`"
-                    class="h-full w-full object-contain"
-                    loading="lazy"
-                />
-            </picture>
+            <img
+                v-if="experience.logo"
+                :src="experience.logo.webp.medium"
+                :alt="`Logo ${experience.organizationName}`"
+                class="h-full w-full object-contain"
+                loading="eager"
+            />
             <div v-else class="flex h-full w-full items-center justify-center rounded bg-gray-200">
                 <span class="text-center text-xs text-gray-500">{{ experience.organizationName }}</span>
             </div>

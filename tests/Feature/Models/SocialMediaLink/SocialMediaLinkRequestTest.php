@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\SocialMediaLink;
+namespace Tests\Feature\Models\SocialMediaLink;
 
 use App\Http\Requests\SocialMediaLinkRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;

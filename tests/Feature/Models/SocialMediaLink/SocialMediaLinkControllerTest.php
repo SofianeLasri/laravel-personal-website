@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\SocialMediaLink;
+namespace Tests\Feature\Models\SocialMediaLink;
 
 use App\Http\Controllers\Admin\Api\SocialMediaLinkController;
 use App\Models\SocialMediaLink;

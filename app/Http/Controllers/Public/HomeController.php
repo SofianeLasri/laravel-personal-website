@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\SocialMediaLink;
 use App\Models\Technology;
 use App\Services\PublicControllersService;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,7 +16,6 @@ class HomeController extends Controller
 
     public function __invoke(): Response
     {
-        Log::debug('Locale: '.app()->getLocale());
         $developmentStats = $this->service->getDevelopmentStats();
 
         return Inertia::render('public/Home', [

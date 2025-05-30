@@ -1,85 +1,36 @@
 name: laravel-personal-website
 
 services:
-  traefik:
-    image: traefik:v3.4
-    command:
-      - "--log.level=DEBUG"
-      - "--providers.docker=true"
-      - "--providers.swarm.exposedbydefault=false"
-    ports:
-      - "${DOCKER_APP_PORT:-1006}:80"
-    networks:
-      - app-network
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      labels:
-        - "traefik.enable=false"
-
   app:
     build:
       context: .
       dockerfile: production.Dockerfile
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.laravel-personal-website.rule=PathPrefix(`/`)"
-      - "traefik.http.services.laravel-personal-website.loadbalancer.server.port=8000"
-    networks:
-      - app-network
     restart: unless-stopped
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 1
-        order: start-first
-        failure_action: rollback
-        delay: 10s
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
+    working_dir: /app
+    entrypoint: ["docker-init/entrypoint-production.sh"]
+    ports:
+      - "${DOCKER_APP_PORT:-80}:8000"
     env_file:
       - stack.env
     volumes:
       - app-data:/app/storage
     depends_on:
       - redis
+    networks:
+      - app-network
+    mem_limit: 2g
 
   redis:
     image: redis:alpine
+    restart: unless-stopped
     networks:
       - app-network
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: on-failure
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
     volumes:
       - redis-data:/data
 
 networks:
   app-network:
-    driver: overlay
-    attachable: true
-    name: app-network
+    driver: bridge
 
 volumes:
   app-data:

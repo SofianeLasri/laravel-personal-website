@@ -14,7 +14,7 @@ const emit = defineEmits(['click']);
 <template>
     <div class="flex cursor-pointer items-start justify-start gap-4 self-stretch rounded-2xl bg-white p-2 shadow-lg" @click="emit('click')">
         <div class="outline-border flex size-20 shrink-0 items-center justify-center rounded-xl bg-white p-2 outline-1">
-            <picture class="h-full w-full">
+            <picture class="flex h-full w-full items-center justify-center">
                 <source :srcset="experience.logo.webp.thumbnail" type="image/webp" />
                 <img :src="experience.logo.avif.thumbnail" :alt="experience.title" class="object-contain" loading="lazy" />
             </picture>

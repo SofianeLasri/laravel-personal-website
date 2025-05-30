@@ -7,7 +7,6 @@ services:
       dockerfile: production.Dockerfile
     restart: unless-stopped
     working_dir: /app
-    entrypoint: ["docker-init/entrypoint-production.sh"]
     ports:
       - "${DOCKER_APP_PORT:-80}:8000"
     env_file:

@@ -14,6 +14,17 @@ return [
     'languages' => 'Languages',
     'game_engines' => 'Game Engines',
 
+    // Creation types
+    'types' => [
+        'portfolio' => 'Portfolio',
+        'game' => 'Game',
+        'library' => 'Library',
+        'website' => 'Website',
+        'tool' => 'Tool',
+        'map' => 'Map',
+        'other' => 'Other',
+    ],
+
     // Empty state
     'no_projects' => 'No projects match your criteria.',
     'no_technology_available' => 'No technology available',

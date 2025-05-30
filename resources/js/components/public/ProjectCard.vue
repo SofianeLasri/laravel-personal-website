@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useTranslation } from '@/composables/useTranslation';
 import { SSRSimplifiedCreation } from '@/types';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps<{
     creation: SSRSimplifiedCreation;
 }>();
+
+const { t } = useTranslation();
 
 const startYear = new Date(props.creation.startedAt).getFullYear();
 const endYear = props.creation.endedAt ? new Date(props.creation.endedAt).getFullYear() : null;
@@ -48,7 +51,7 @@ if (startYear && endYear) {
                         {{ creation.name }}
                     </Link>
                     <div class="text-design-system-paragraph justify-center text-sm font-semibold" lang="fr">
-                        {{ creation.type }}
+                        {{ t(`projects.types.${creation.type}`) }}
                     </div>
                 </div>
                 <div class="text-design-system-paragraph justify-center text-sm font-normal">

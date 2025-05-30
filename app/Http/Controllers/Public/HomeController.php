@@ -26,6 +26,9 @@ class HomeController extends Controller
                 'footer' => __('footer'),
                 'career' => __('career'),
                 'search' => __('search'),
+                'projects' => [
+                    'types' => __('projects.types'),
+                ],
             ],
             'socialMediaLinks' => SocialMediaLink::all(),
             'yearsOfExperience' => $developmentStats['yearsOfExperience'],

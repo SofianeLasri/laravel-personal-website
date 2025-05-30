@@ -22,6 +22,7 @@ class ProjectController extends Controller
             'locale' => app()->getLocale(),
             'translations' => [
                 'project' => __('project'),
+                'projects' => __('projects'),
                 'navigation' => __('navigation'),
                 'footer' => __('footer'),
                 'search' => __('search'),

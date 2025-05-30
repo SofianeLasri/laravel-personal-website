@@ -40,7 +40,7 @@ const { t } = useTranslation();
                         {{ creation.name }}
                     </div>
                     <div class="text-design-system-paragraph justify-center self-stretch text-xl font-bold">
-                        {{ creation.type }}
+                        {{ t(`projects.types.${creation.type}`) }}
                     </div>
                 </div>
                 <div class="text-design-system-paragraph justify-center self-stretch text-xl font-normal">

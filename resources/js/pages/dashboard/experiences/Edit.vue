@@ -491,7 +491,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                 <div class="py-4">
                     <div class="relative mb-4">
                         <Search class="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
-                        <Input v-model="searchTechQuery" placeholder="Rechercher une technologie..." class="pl-8" />
+                        <Input v-model="searchTechQuery" placeholder="Rechercher une technologie..." class="pl-8" data-form-type="other" />
                     </div>
 
                     <ScrollArea class="h-[300px]">

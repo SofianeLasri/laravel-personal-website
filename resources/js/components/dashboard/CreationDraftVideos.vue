@@ -251,7 +251,7 @@ watch(
                     <CardContent class="p-4">
                         <div class="flex items-start justify-between">
                             <div class="min-w-0 flex-1">
-                                <h3 class="truncate text-sm font-medium">{{ video.filename }}</h3>
+                                <h3 class="truncate text-sm font-medium">{{ video.name }}</h3>
                                 <p class="text-muted-foreground mt-1 text-xs">ID Bunny: {{ video.bunny_video_id }}</p>
                             </div>
                             <div class="ml-2 flex flex-shrink-0 space-x-1">

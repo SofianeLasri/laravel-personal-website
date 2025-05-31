@@ -185,7 +185,8 @@ interface SocialMediaLink {
 
 interface Video {
     id: number;
-    filename: string;
+    name: string;
+    path: string;
     cover_picture_id: number;
     bunny_video_id: string;
     created_at: string;

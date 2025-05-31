@@ -63,6 +63,7 @@ const technologyTypes = [
     { value: 'framework', label: 'Framework' },
     { value: 'library', label: 'Bibliothèque' },
     { value: 'language', label: 'Langage' },
+    { value: 'game_engine', label: 'Moteur de jeu' },
     { value: 'other', label: 'Autre' },
 ];
 

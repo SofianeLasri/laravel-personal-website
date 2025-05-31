@@ -351,7 +351,8 @@ class PublicControllersService
      *          medium: string,
      *          large: string,
      *          full: string,},
-     *  }
+     *     },
+     *     libraryId: string,
      * }
      */
     public function formatVideoForSSR(Video $video): array
@@ -364,6 +365,7 @@ class PublicControllersService
             'bunnyVideoId' => $video->bunny_video_id,
             'name' => $video->name,
             'coverPicture' => $this->formatPictureForSSR($coverPicture),
+            'libraryId' => config('services.bunny.stream_library_id'),
         ];
     }
 

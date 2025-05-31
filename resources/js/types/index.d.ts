@@ -276,6 +276,7 @@ interface SSRVideo {
     bunnyVideoId: string;
     name: string;
     coverPicture: SSRPicture;
+    libraryId: string;
 }
 
 interface SSRPicture {

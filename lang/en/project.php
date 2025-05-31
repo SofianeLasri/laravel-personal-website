@@ -8,6 +8,7 @@ return [
     'key_features' => 'Key Features',
     'people_involved' => 'People Involved',
     'technologies_used' => 'Technologies Used',
+    'videos' => 'Videos',
     'screenshots' => 'Screenshots',
 
     // Project head

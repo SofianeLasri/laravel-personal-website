@@ -8,6 +8,7 @@ return [
     'key_features' => 'Fonctionnalités clés',
     'people_involved' => 'Personnes impliquées',
     'technologies_used' => 'Technologies utilisées',
+    'videos' => 'Vidéos',
     'screenshots' => 'Capture d\'écrans',
 
     // Project head

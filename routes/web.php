@@ -110,8 +110,6 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         ]);
 
         // Routes spécifiques pour les vidéos
-        Route::post('videos/upload', [VideoController::class, 'upload'])
-            ->name('videos.upload');
         Route::get('videos/{video}/metadata', [VideoController::class, 'metadata'])
             ->name('videos.metadata');
         Route::get('videos/{video}/status', [VideoController::class, 'status'])

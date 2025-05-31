@@ -103,7 +103,7 @@ const uploadVideo = async () => {
         formData.append('cover_picture_id', newVideoCoverPictureId.value.toString());
 
         // Upload de la vidéo
-        const uploadResponse = await axios.post(route('dashboard.api.videos.upload'), formData, {
+        const uploadResponse = await axios.post(route('dashboard.api.videos.store'), formData, {
             onUploadProgress: (progressEvent) => {
                 if (progressEvent.total) {
                     uploadProgress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total);

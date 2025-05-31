@@ -12,6 +12,7 @@ use App\Models\Picture;
 use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\Translation;
+use App\Models\Video;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -477,5 +478,57 @@ class CreationDraftControllerTest extends TestCase
         $response->assertOk()
             ->assertJsonCount(3)
             ->assertJsonPath('0.id', $technologies[0]->id);
+    }
+
+    #[Test]
+    public function test_attach_video()
+    {
+        $draft = CreationDraft::factory()->create();
+        $video = Video::factory()->create();
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.attach-video', ['creation_draft' => $draft]), [
+            'video_id' => $video->id,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('video.id', $video->id);
+
+        $this->assertDatabaseHas('creation_draft_video', [
+            'creation_draft_id' => $draft->id,
+            'video_id' => $video->id,
+        ]);
+    }
+
+    #[Test]
+    public function test_detach_video()
+    {
+        $draft = CreationDraft::factory()->create();
+        $video = Video::factory()->create();
+        $draft->videos()->attach($video);
+
+        $response = $this->postJson(route('dashboard.api.creation-drafts.detach-video', ['creation_draft' => $draft]), [
+            'video_id' => $video->id,
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseMissing('creation_draft_video', [
+            'creation_draft_id' => $draft->id,
+            'video_id' => $video->id,
+        ]);
+    }
+
+    #[Test]
+    public function test_get_videos()
+    {
+        $draft = CreationDraft::factory()->create();
+        $videos = Video::factory()->count(3)->create();
+        $draft->videos()->attach($videos);
+
+        $response = $this->getJson(route('dashboard.api.creation-drafts.videos', ['creation_draft' => $draft]));
+
+        $response->assertOk()
+            ->assertJsonCount(3)
+            ->assertJsonPath('0.id', $videos[0]->id);
     }
 }

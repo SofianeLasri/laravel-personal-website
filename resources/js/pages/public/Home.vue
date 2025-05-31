@@ -6,7 +6,6 @@ import LightShape from '@/components/public/LightShape.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
 import TechnologyExperiencesContainer from '@/components/public/Technology/TechnologyExperiencesContainer.vue';
-import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
@@ -14,6 +13,7 @@ import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRExperience, SSRSimplifiedCreation, SSRTechnologyExperience } from '@/types';
 import { Head } from '@inertiajs/vue3';
+import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
 
 const { t } = useTranslation();
 
@@ -94,10 +94,10 @@ defineProps<{
                         <ProjectCard v-for="creation in laravelCreations" :key="creation.id" :creation="creation" />
                     </ProjectSlider>
                     <div>
-                        <BlackButton>
+                        <BlackLinkButton :href="route('public.projects')">
                             <span>{{ t('home.laravel-section.view_other_projects') }}</span>
                             <ArrowUpRightRegular class="h-4 fill-white" />
-                        </BlackButton>
+                        </BlackLinkButton>
                     </div>
                 </div>
             </section>

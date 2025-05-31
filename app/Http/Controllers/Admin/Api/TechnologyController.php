@@ -26,7 +26,7 @@ class TechnologyController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:technologies,name'],
-            'type' => ['required', 'string', 'in:framework,library,language,other'],
+            'type' => ['required', 'string', 'in:framework,library,language,game_engine,other'],
             'svg_icon' => ['required', 'string'],
             'locale' => ['required', 'string', 'in:en,fr'],
             'description' => ['required', 'string'],

@@ -9,7 +9,6 @@ use App\Models\Video;
 use App\Services\BunnyStreamService;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Visibility;
@@ -34,11 +33,8 @@ class VideoController extends Controller
     public function store(VideoUploadRequest $request): JsonResponse
     {
         try {
-            DB::beginTransaction();
-
             $uploadedFile = $request->file('video');
             $name = $request->input('name', $uploadedFile->getClientOriginalName());
-            $coverPictureId = $request->input('cover_picture_id');
 
             $relativeFilePath = Storage::disk('local')->putFile('videos', $uploadedFile, Visibility::PRIVATE);
             $absoluteFilePath = Storage::path($relativeFilePath);
@@ -46,49 +42,35 @@ class VideoController extends Controller
             $uploadedVideoData = $this->bunnyStreamService->uploadVideo($name, $absoluteFilePath);
 
             if (! $uploadedVideoData) {
-                DB::rollBack();
-
                 return response()->json([
-                    'message' => 'Erreur lors de l\'upload de la vidéo vers Bunny Stream.',
+                    'message' => 'Failed to upload video to Bunny Stream.',
                 ], 500);
             }
-
-            $video = Video::create([
-                'name' => $name,
-                'path' => $relativeFilePath,
-                'cover_picture_id' => $coverPictureId,
-                'bunny_video_id' => $uploadedVideoData['guid'],
-            ]);
-
-            DB::commit();
-
-            Log::info('Video uploaded successfully', [
-                'video_id' => $video->id,
-                'bunny_video_id' => $uploadedVideoData['guid'],
-                'path' => $relativeFilePath,
-            ]);
-
-            return response()->json($video->load('coverPicture'), 201);
-
         } catch (Exception $e) {
-            DB::rollBack();
-
             Log::error('Error uploading video', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
-                'message' => 'Erreur lors de l\'upload de la vidéo: '.$e->getMessage(),
+                'message' => 'Error while uploading video: '.$e->getMessage(),
             ], 500);
         }
+
+        $coverPictureId = $request->input('cover_picture_id');
+        $video = Video::create([
+            'name' => $name,
+            'path' => $relativeFilePath,
+            'cover_picture_id' => $coverPictureId,
+            'bunny_video_id' => $uploadedVideoData['guid'],
+        ]);
+
+        return response()->json($video->load('coverPicture'), 201);
     }
 
-    public function show(int $videoId)
+    public function show(int $videoId): JsonResponse
     {
         $video = Video::with('coverPicture')->findOrFail($videoId);
-
-        // Enrichir avec les données de Bunny Stream
         $bunnyVideoData = $this->bunnyStreamService->getVideo($video->bunny_video_id);
 
         $response = $video->toArray();
@@ -122,16 +104,12 @@ class VideoController extends Controller
     {
         if (! Video::where('id', $videoId)->exists()) {
             return response()->json([
-                'message' => 'Vidéo non trouvée.',
+                'message' => 'Video not found.',
             ], 404);
         }
 
         try {
             $video = Video::findOrFail($videoId);
-
-            DB::beginTransaction();
-
-            // Supprimer de Bunny Stream
             $deletionSuccess = $this->bunnyStreamService->deleteVideo($video->bunny_video_id);
 
             if (! $deletionSuccess) {
@@ -141,10 +119,7 @@ class VideoController extends Controller
                 ]);
             }
 
-            // Supprimer de la base de données
             $video->delete();
-
-            DB::commit();
 
             Log::info('Video deleted', [
                 'video_id' => $videoId,
@@ -155,15 +130,13 @@ class VideoController extends Controller
             return response()->noContent();
 
         } catch (Exception $e) {
-            DB::rollBack();
-
             Log::error('Error deleting video', [
                 'video_id' => $videoId,
                 'error' => $e->getMessage(),
             ]);
 
             return response()->json([
-                'message' => 'Erreur lors de la suppression de la vidéo: '.$e->getMessage(),
+                'message' => 'Error while deleting video: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -179,7 +152,7 @@ class VideoController extends Controller
 
         if (! $metadata) {
             return response()->json([
-                'message' => 'Impossible de récupérer les métadonnées de la vidéo.',
+                'message' => 'Video metadata not found.',
             ], 404);
         }
 

@@ -10,9 +10,7 @@ class VideoRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'path' => ['required', 'string'],
             'cover_picture_id' => ['required', 'exists:pictures,id'],
-            'bunny_video_id' => ['required'],
         ];
     }
 

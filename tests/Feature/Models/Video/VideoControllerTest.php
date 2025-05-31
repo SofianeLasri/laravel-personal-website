@@ -182,9 +182,7 @@ class VideoControllerTest extends TestCase
 
         $updateData = [
             'name' => 'Updated Video',
-            'path' => 'videos/updated-video.mp4',
             'cover_picture_id' => $newPicture->id,
-            'bunny_video_id' => 'updated-bunny-12345',
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
@@ -213,15 +211,13 @@ class VideoControllerTest extends TestCase
 
         $updateData = [
             'name' => '',
-            'path' => '',
             'cover_picture_id' => 99999,
-            'bunny_video_id' => '',
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'path', 'cover_picture_id', 'bunny_video_id']);
+            ->assertJsonValidationErrors(['name', 'cover_picture_id']);
     }
 
     #[Test]
@@ -231,9 +227,7 @@ class VideoControllerTest extends TestCase
 
         $updateData = [
             'name' => 'Test Video',
-            'path' => 'videos/test-video.mp4',
             'cover_picture_id' => $picture->id,
-            'bunny_video_id' => 'bunny-12345',
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', 99999), $updateData);
@@ -269,9 +263,7 @@ class VideoControllerTest extends TestCase
 
         $updateData = [
             'name' => 'Updated Video',
-            'path' => 'videos/updated-video.mp4',
             'cover_picture_id' => $newPicture->id,
-            'bunny_video_id' => 'updated-bunny-12345',
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
@@ -280,8 +272,6 @@ class VideoControllerTest extends TestCase
 
         $responseData = $response->json();
         $this->assertEquals($updateData['name'], $responseData['name']);
-        $this->assertEquals($updateData['path'], $responseData['path']);
         $this->assertEquals($updateData['cover_picture_id'], $responseData['cover_picture_id']);
-        $this->assertEquals($updateData['bunny_video_id'], $responseData['bunny_video_id']);
     }
 }

@@ -26,17 +26,12 @@ class VideoController extends Controller
         return Video::with('coverPicture')->get();
     }
 
-    public function store(VideoRequest $request)
-    {
-        return Video::create($request->validated());
-    }
-
     /**
      * Upload a video file to Bunny Stream and store it in the database.
      *
      * @throws Throwable
      */
-    public function upload(VideoUploadRequest $request): JsonResponse
+    public function store(VideoUploadRequest $request)
     {
         try {
             DB::beginTransaction();

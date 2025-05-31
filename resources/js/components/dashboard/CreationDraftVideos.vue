@@ -240,7 +240,7 @@ watch(
                         <img
                             v-if="video.cover_picture"
                             :src="`/storage/${video.cover_picture.path_original}`"
-                            :alt="video.filename"
+                            :alt="video.name"
                             class="h-full w-full object-cover"
                         />
                         <div v-else class="flex h-full w-full items-center justify-center">
@@ -293,7 +293,7 @@ watch(
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem v-for="video in getAvailableVideos()" :key="video.id" :value="video.id.toString()">
-                                    {{ video.filename }}
+                                    {{ video.name }}
                                 </SelectItem>
                             </SelectContent>
                         </Select>

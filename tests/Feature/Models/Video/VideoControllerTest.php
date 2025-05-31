@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Models\Video;
 
-use App\Http\Controllers\Admin\VideoController;
+use App\Http\Controllers\Admin\Api\VideoController;
 use App\Models\Picture;
 use App\Models\Video;
 use App\Services\BunnyStreamService;

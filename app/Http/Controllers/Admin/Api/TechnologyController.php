@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Api;
 
+use App\Enums\TechnologyType;
 use App\Http\Controllers\Controller;
 use App\Models\Technology;
 use App\Models\Translation;
@@ -26,7 +27,7 @@ class TechnologyController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:technologies,name'],
-            'type' => ['required', 'string', 'in:framework,library,language,game_engine,other'],
+            'type' => ['required', 'string', 'in:' . implode(',', TechnologyType::values())],
             'svg_icon' => ['required', 'string'],
             'locale' => ['required', 'string', 'in:en,fr'],
             'description' => ['required', 'string'],
@@ -59,7 +60,7 @@ class TechnologyController extends Controller
     {
         $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
-            'type' => ['sometimes', 'string', 'in:framework,library,language,other'],
+            'type' => ['sometimes', 'string', 'in:' . implode(',', TechnologyType::values())],
             'svg_icon' => ['sometimes', 'string'],
             'locale' => ['required_with:description', 'string', 'in:en,fr'],
             'description' => ['sometimes', 'string'],

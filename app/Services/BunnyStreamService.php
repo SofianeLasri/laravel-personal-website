@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Corbpie\BunnyCdn\BunnyAPIStream;
 use Exception;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
 class BunnyStreamService
@@ -17,26 +16,25 @@ class BunnyStreamService
     }
 
     /**
-     * Upload une vidéo vers Bunny Stream
+     * Uploads a video to Bunny Stream. Makes both a video entry and uploads the file.
      *
-     * @return array|null Retourne les données de la vidéo ou null en cas d'erreur
+     * @param  string  $title  The name that will be shown in the Bunny Stream library.
+     * @param  string  $filePath  The path to the video file to be uploaded.
      */
-    public function uploadVideo(UploadedFile $file, ?string $title = null): ?array
+    public function uploadVideo(string $title, string $filePath): ?array
     {
         try {
-            // Créer une vidéo dans la bibliothèque
-            $videoData = $this->createVideo($title ?? $file->getClientOriginalName());
+            // Create video entry in Bunny Stream
+            $createdVideoData = $this->createVideo($title);
 
-            if (! $videoData) {
+            if (! empty($createdVideoData) && ! isset($createdVideoData['guid'])) {
                 Log::error('BunnyStreamService: Failed to create video entry');
 
                 return null;
             }
 
-            $videoId = $videoData['guid'];
-
-            // Upload du fichier vidéo
-            $uploadResult = $this->uploadVideoFile($videoId, $file);
+            $videoId = $createdVideoData['guid'];
+            $uploadResult = $this->uploadVideoFile($videoId, $filePath);
 
             if (! $uploadResult) {
                 Log::error('BunnyStreamService: Failed to upload video file', ['video_id' => $videoId]);
@@ -47,11 +45,11 @@ class BunnyStreamService
 
             Log::info('BunnyStreamService: Video uploaded successfully', ['video_id' => $videoId]);
 
-            return $videoData;
+            return $createdVideoData;
         } catch (Exception $e) {
             Log::error('BunnyStreamService: Error uploading video', [
                 'error' => $e->getMessage(),
-                'file' => $file->getClientOriginalName(),
+                'file_path' => $filePath,
             ]);
 
             return null;
@@ -59,7 +57,11 @@ class BunnyStreamService
     }
 
     /**
-     * Créer une entrée vidéo dans Bunny Stream
+     * Creates a video entry in Bunny Stream.
+     *
+     * **Note:** This method only creates the video entry and returns the GUID. The actual video file must be uploaded separately using `uploadVideoFile()`.
+     *
+     * @param  string  $title  The name that will be shown in the Bunny Stream library.
      */
     public function createVideo(string $title): ?array
     {
@@ -84,12 +86,17 @@ class BunnyStreamService
     }
 
     /**
-     * Upload le fichier vidéo vers une vidéo existante
+     * Uploads a video file to Bunny Stream. This method assumes that a video entry has already been created.
+     *
+     * **Note:** The video entry must be created first using `createVideo()`, which returns a GUID that is needed to upload the file.
+     *
+     * @param  string  $videoId  The GUID of the video entry created in Bunny Stream.
+     * @param  string  $filePath  The path to the video file to be uploaded.
      */
-    public function uploadVideoFile(string $videoId, UploadedFile $file): bool
+    public function uploadVideoFile(string $videoId, string $filePath): bool
     {
         try {
-            $response = $this->bunnyStream->uploadVideo($videoId, $file->getContent());
+            $response = $this->bunnyStream->uploadVideo($videoId, $filePath);
 
             if ($response && isset($response['success'])) {
                 if ($response['success']) {
@@ -104,16 +111,13 @@ class BunnyStreamService
             Log::error('BunnyStreamService: Error uploading video file', [
                 'error' => $e->getMessage(),
                 'video_id' => $videoId,
-                'file' => $file->getClientOriginalName(),
+                'file_path' => $filePath,
             ]);
 
             return false;
         }
     }
 
-    /**
-     * Récupérer les informations d'une vidéo
-     */
     public function getVideo(string $videoId): ?array
     {
         try {
@@ -135,7 +139,9 @@ class BunnyStreamService
     }
 
     /**
-     * Supprimer une vidéo de Bunny Stream
+     * Deletes a video from Bunny Stream.
+     *
+     * @param  string  $videoId  The GUID of the video to be deleted.
      */
     public function deleteVideo(string $videoId): bool
     {
@@ -161,7 +167,9 @@ class BunnyStreamService
     }
 
     /**
-     * Obtenir l'URL de lecture d'une vidéo
+     * Gets the playback URL for a video.
+     *
+     * @param  string  $videoId  The GUID of the video.
      */
     public function getPlaybackUrl(string $videoId): ?string
     {
@@ -171,14 +179,17 @@ class BunnyStreamService
             return null;
         }
 
-        // Format de l'URL de lecture Bunny Stream
         $libraryId = config('services.bunny.stream_library_id');
 
         return "https://iframe.mediadelivery.net/embed/{$libraryId}/{$videoId}";
     }
 
     /**
-     * Obtenir l'URL de la miniature d'une vidéo
+     * Gets the thumbnail URL for a video.
+     *
+     * @param  string  $videoId  The GUID of the video.
+     * @param  int  $width  Width of the thumbnail image.
+     * @param  int  $height  Height of the thumbnail image.
      */
     public function getThumbnailUrl(string $videoId, int $width = 1280, int $height = 720): ?string
     {
@@ -188,14 +199,15 @@ class BunnyStreamService
             return null;
         }
 
-        // Format de l'URL de miniature Bunny Stream
         $pullZone = config('services.bunny.stream_pull_zone');
 
         return "https://{$pullZone}.b-cdn.net/{$videoId}/thumbnail.jpg?width={$width}&height={$height}";
     }
 
     /**
-     * Vérifier si une vidéo est prête pour la lecture
+     * Checks if the video transcoding is complete.
+     *
+     * @param  string  $videoId  The GUID of the video.
      */
     public function isVideoReady(string $videoId): bool
     {
@@ -205,12 +217,13 @@ class BunnyStreamService
             return false;
         }
 
-        // Le statut "finished" indique que la vidéo est prête
         return isset($video['status']) && $video['status'] === 4; // 4 = Finished
     }
 
     /**
-     * Obtenir les métadonnées d'une vidéo (durée, résolution, etc.)
+     * Returns metadata for a video.
+     *
+     * @param  string  $videoId  The GUID of the video.
      */
     public function getVideoMetadata(string $videoId): ?array
     {

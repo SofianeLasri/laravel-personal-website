@@ -4,6 +4,7 @@ import CreationDraftPeople from '@/components/dashboard/CreationDraftPeople.vue'
 import CreationDraftScreenshots from '@/components/dashboard/CreationDraftScreenshots.vue';
 import CreationDraftTags from '@/components/dashboard/CreationDraftTags.vue';
 import CreationDraftTechnologies from '@/components/dashboard/CreationDraftTechnologies.vue';
+import CreationDraftVideos from '@/components/dashboard/CreationDraftVideos.vue';
 import Heading from '@/components/dashboard/Heading.vue';
 import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
 import MarkdownEditor from '@/components/dashboard/MarkdownEditor.vue';
@@ -512,6 +513,10 @@ onMounted(() => {
         <div v-if="currentCreationDraft?.id" class="border-border border-t">
             <div class="border-border border-t px-5 py-6">
                 <CreationDraftScreenshots :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
+            </div>
+
+            <div class="border-border border-t px-5 py-6">
+                <CreationDraftVideos :creation-draft-id="currentCreationDraft.id" />
             </div>
 
             <div class="border-border border-t px-5 py-6">

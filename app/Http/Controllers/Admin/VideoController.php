@@ -11,6 +11,9 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Visibility;
+use Throwable;
 
 class VideoController extends Controller
 {
@@ -29,7 +32,9 @@ class VideoController extends Controller
     }
 
     /**
-     * Upload une vidéo vers Bunny Stream et créer l'entrée en base
+     * Upload a video file to Bunny Stream and store it in the database.
+     *
+     * @throws Throwable
      */
     public function upload(VideoUploadRequest $request): JsonResponse
     {
@@ -37,13 +42,15 @@ class VideoController extends Controller
             DB::beginTransaction();
 
             $uploadedFile = $request->file('video');
-            $title = $request->input('title', $uploadedFile->getClientOriginalName());
+            $name = $request->input('name', $uploadedFile->getClientOriginalName());
             $coverPictureId = $request->input('cover_picture_id');
 
-            // Upload vers Bunny Stream
-            $videoData = $this->bunnyStreamService->uploadVideo($uploadedFile, $title);
+            $relativeFilePath = Storage::putFile('videos', $uploadedFile, Visibility::PRIVATE);
+            $absoluteFilePath = Storage::path($relativeFilePath);
 
-            if (! $videoData) {
+            $uploadedVideoData = $this->bunnyStreamService->uploadVideo($name, $absoluteFilePath);
+
+            if (! $uploadedVideoData) {
                 DB::rollBack();
 
                 return response()->json([
@@ -51,19 +58,19 @@ class VideoController extends Controller
                 ], 500);
             }
 
-            // Créer l'entrée en base de données
             $video = Video::create([
-                'filename' => $title,
+                'name' => $name,
+                'path' => $relativeFilePath,
                 'cover_picture_id' => $coverPictureId,
-                'bunny_video_id' => $videoData['guid'],
+                'bunny_video_id' => $uploadedVideoData['guid'],
             ]);
 
             DB::commit();
 
             Log::info('Video uploaded successfully', [
                 'video_id' => $video->id,
-                'bunny_video_id' => $videoData['guid'],
-                'filename' => $title,
+                'bunny_video_id' => $uploadedVideoData['guid'],
+                'path' => $relativeFilePath,
             ]);
 
             return response()->json($video->load('coverPicture'), 201);

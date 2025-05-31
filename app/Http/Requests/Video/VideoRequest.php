@@ -9,7 +9,8 @@ class VideoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'filename' => ['required'],
+            'name' => ['required', 'string'],
+            'path' => ['required', 'string'],
             'cover_picture_id' => ['required', 'exists:pictures,id'],
             'bunny_video_id' => ['required'],
         ];

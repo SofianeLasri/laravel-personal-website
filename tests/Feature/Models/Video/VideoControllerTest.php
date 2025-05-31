@@ -73,7 +73,8 @@ class VideoControllerTest extends TestCase
         $picture = Picture::factory()->create();
 
         $videoData = [
-            'filename' => 'test-video.mp4',
+            'name' => 'Test Video',
+            'path' => 'videos/test-video.mp4',
             'cover_picture_id' => $picture->id,
             'bunny_video_id' => 'bunny-12345',
         ];
@@ -83,7 +84,8 @@ class VideoControllerTest extends TestCase
         $response->assertCreated()
             ->assertJsonStructure([
                 'id',
-                'filename',
+                'name',
+                'path',
                 'cover_picture_id',
                 'bunny_video_id',
                 'created_at',
@@ -94,7 +96,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_video_validation_fails_with_missing_filename()
+    public function test_store_video_validation_fails_with_missing_name_path()
     {
         $picture = Picture::factory()->create();
 
@@ -106,7 +108,7 @@ class VideoControllerTest extends TestCase
         $response = $this->postJson(route('dashboard.api.videos.store'), $videoData);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors('filename');
+            ->assertJsonValidationErrors(['name', 'path']);
     }
 
     #[Test]
@@ -166,7 +168,8 @@ class VideoControllerTest extends TestCase
         $newPicture = Picture::factory()->create();
 
         $updateData = [
-            'filename' => 'updated-video.mp4',
+            'name' => 'Updated Video',
+            'path' => 'videos/updated-video.mp4',
             'cover_picture_id' => $newPicture->id,
             'bunny_video_id' => 'updated-bunny-12345',
         ];
@@ -176,7 +179,8 @@ class VideoControllerTest extends TestCase
         $response->assertOk()
             ->assertJsonStructure([
                 'id',
-                'filename',
+                'name',
+                'path',
                 'cover_picture_id',
                 'bunny_video_id',
                 'created_at',
@@ -195,7 +199,8 @@ class VideoControllerTest extends TestCase
         $video = Video::factory()->create();
 
         $updateData = [
-            'filename' => '',
+            'name' => '',
+            'path' => '',
             'cover_picture_id' => 99999,
             'bunny_video_id' => '',
         ];
@@ -203,7 +208,7 @@ class VideoControllerTest extends TestCase
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['filename', 'cover_picture_id', 'bunny_video_id']);
+            ->assertJsonValidationErrors(['name', 'path', 'cover_picture_id', 'bunny_video_id']);
     }
 
     #[Test]
@@ -212,7 +217,8 @@ class VideoControllerTest extends TestCase
         $picture = Picture::factory()->create();
 
         $updateData = [
-            'filename' => 'test-video.mp4',
+            'name' => 'Test Video',
+            'path' => 'videos/test-video.mp4',
             'cover_picture_id' => $picture->id,
             'bunny_video_id' => 'bunny-12345',
         ];
@@ -248,7 +254,8 @@ class VideoControllerTest extends TestCase
         $picture = Picture::factory()->create();
 
         $videoData = [
-            'filename' => 'test-video.mp4',
+            'name' => 'Test Video',
+            'path' => 'videos/test-video.mp4',
             'cover_picture_id' => $picture->id,
             'bunny_video_id' => 'bunny-12345',
         ];
@@ -258,7 +265,8 @@ class VideoControllerTest extends TestCase
         $response->assertCreated();
 
         $responseData = $response->json();
-        $this->assertEquals($videoData['filename'], $responseData['filename']);
+        $this->assertEquals($videoData['name'], $responseData['name']);
+        $this->assertEquals($videoData['path'], $responseData['path']);
         $this->assertEquals($videoData['cover_picture_id'], $responseData['cover_picture_id']);
         $this->assertEquals($videoData['bunny_video_id'], $responseData['bunny_video_id']);
     }
@@ -270,7 +278,8 @@ class VideoControllerTest extends TestCase
         $newPicture = Picture::factory()->create();
 
         $updateData = [
-            'filename' => 'updated-video.mp4',
+            'name' => 'Updated Video',
+            'path' => 'videos/updated-video.mp4',
             'cover_picture_id' => $newPicture->id,
             'bunny_video_id' => 'updated-bunny-12345',
         ];
@@ -280,7 +289,8 @@ class VideoControllerTest extends TestCase
         $response->assertOk();
 
         $responseData = $response->json();
-        $this->assertEquals($updateData['filename'], $responseData['filename']);
+        $this->assertEquals($updateData['name'], $responseData['name']);
+        $this->assertEquals($updateData['path'], $responseData['path']);
         $this->assertEquals($updateData['cover_picture_id'], $responseData['cover_picture_id']);
         $this->assertEquals($updateData['bunny_video_id'], $responseData['bunny_video_id']);
     }

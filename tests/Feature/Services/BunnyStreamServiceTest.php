@@ -7,6 +7,7 @@ use Corbpie\BunnyCdn\BunnyAPIStream;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -113,6 +114,8 @@ class BunnyStreamServiceTest extends TestCase
     #[Test]
     public function test_upload_video_success()
     {
+        Storage::fake('local');
+
         $createVideoData = $this->createVideoData;
         $uploadVideoData = $this->uploadVideoDataSuccess;
 
@@ -130,10 +133,11 @@ class BunnyStreamServiceTest extends TestCase
                 ->once();
         });
 
-        $file = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
+        $uploadedFile = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
+        Storage::fake()->putFileAs('videos', $uploadedFile, 'test-video.mp4');
 
         $service = app(BunnyStreamService::class);
-        $result = $service->uploadVideo($file);
+        $result = $service->uploadVideo('test-video.mp4', 'videos/test-video.mp4');
 
         $this->assertNotNull($result);
         $this->assertEquals('test-video-id', $result['guid']);
@@ -153,10 +157,11 @@ class BunnyStreamServiceTest extends TestCase
                 ->once();
         });
 
-        $file = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
+        $uploadedFile = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
+        Storage::fake()->putFileAs('videos', $uploadedFile, 'test-video.mp4');
 
         $service = app(BunnyStreamService::class);
-        $result = $service->uploadVideo($file);
+        $result = $service->uploadVideo('test-video.mp4', 'videos/test-video.mp4');
 
         $this->assertNull($result);
     }
@@ -189,10 +194,11 @@ class BunnyStreamServiceTest extends TestCase
                 ->once();
         });
 
-        $file = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
+        $uploadedFile = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
+        Storage::fake()->putFileAs('videos', $uploadedFile, 'test-video.mp4');
 
         $service = app(BunnyStreamService::class);
-        $result = $service->uploadVideo($file);
+        $result = $service->uploadVideo('test-video.mp4', 'videos/test-video.mp4');
 
         $this->assertNull($result);
     }
@@ -210,10 +216,11 @@ class BunnyStreamServiceTest extends TestCase
                 ->once();
         });
 
-        $file = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
+        $uploadedFile = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
+        Storage::fake()->putFileAs('videos', $uploadedFile, 'test-video.mp4');
 
         $service = app(BunnyStreamService::class);
-        $result = $service->uploadVideo($file);
+        $result = $service->uploadVideo('test-video.mp4', 'videos/test-video.mp4');
 
         $this->assertNull($result);
     }

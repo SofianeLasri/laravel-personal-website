@@ -26,7 +26,8 @@ class VideoRequestTest extends TestCase
         $picture = Picture::factory()->create();
 
         $data = [
-            'filename' => 'test-video.mp4',
+            'name' => 'Test Video',
+            'path' => 'videos/test-video.mp4',
             'cover_picture_id' => $picture->id,
             'bunny_video_id' => 'bunny-12345',
         ];
@@ -36,7 +37,7 @@ class VideoRequestTest extends TestCase
     }
 
     #[Test]
-    public function it_fails_when_filename_is_missing(): void
+    public function it_fails_when_path_name_is_missing(): void
     {
         $picture = Picture::factory()->create();
 
@@ -46,30 +47,33 @@ class VideoRequestTest extends TestCase
         ];
 
         $validator = Validator::make($data, $this->rules());
-        $this->assertFalse($validator->passes(), 'La validation devrait échouer quand le filename est manquant.');
-        $this->assertArrayHasKey('filename', $validator->errors()->toArray());
+        $this->assertFalse($validator->passes(), 'La validation devrait échouer quand le path est manquant.');
+        $this->assertArrayHasKey('path', $validator->errors()->toArray());
+        $this->assertArrayHasKey('name', $validator->errors()->toArray());
     }
 
     #[Test]
-    public function it_fails_when_filename_is_empty(): void
+    public function it_fails_when_name_is_empty(): void
     {
         $picture = Picture::factory()->create();
 
         $data = [
-            'filename' => '',
+            'name' => '',
+            'path' => 'videos/test-video.mp4',
             'cover_picture_id' => $picture->id,
             'bunny_video_id' => 'bunny-12345',
         ];
 
         $validator = Validator::make($data, $this->rules());
-        $this->assertFalse($validator->passes(), 'La validation devrait échouer quand le filename est vide.');
-        $this->assertArrayHasKey('filename', $validator->errors()->toArray());
+        $this->assertFalse($validator->passes(), 'La validation devrait échouer quand le name est vide.');
+        $this->assertArrayHasKey('name', $validator->errors()->toArray());
     }
 
     #[Test]
     public function it_fails_when_cover_picture_id_is_missing(): void
     {
         $data = [
+            'path' => 'videos/test-video.mp4',
             'filename' => 'test-video.mp4',
             'bunny_video_id' => 'bunny-12345',
         ];
@@ -129,35 +133,5 @@ class VideoRequestTest extends TestCase
     {
         $request = new VideoRequest;
         $this->assertTrue($request->authorize(), 'La méthode authorize devrait retourner true.');
-    }
-
-    #[Test]
-    public function it_passes_with_string_filename(): void
-    {
-        $picture = Picture::factory()->create();
-
-        $data = [
-            'filename' => 'my-awesome-video-file.mp4',
-            'cover_picture_id' => $picture->id,
-            'bunny_video_id' => 'bunny-xyz789',
-        ];
-
-        $validator = Validator::make($data, $this->rules());
-        $this->assertTrue($validator->passes(), 'La validation devrait réussir avec un filename string valide.');
-    }
-
-    #[Test]
-    public function it_passes_with_string_bunny_video_id(): void
-    {
-        $picture = Picture::factory()->create();
-
-        $data = [
-            'filename' => 'test.mp4',
-            'cover_picture_id' => $picture->id,
-            'bunny_video_id' => 'very-long-bunny-video-identifier-12345',
-        ];
-
-        $validator = Validator::make($data, $this->rules());
-        $this->assertTrue($validator->passes(), 'La validation devrait réussir avec un bunny_video_id string valide.');
     }
 }

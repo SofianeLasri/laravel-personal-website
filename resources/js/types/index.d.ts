@@ -183,6 +183,16 @@ interface SocialMediaLink {
     url: string;
 }
 
+interface Video {
+    id: number;
+    filename: string;
+    cover_picture_id: number;
+    bunny_video_id: string;
+    created_at: string;
+    updated_at: string;
+    cover_picture?: Picture;
+}
+
 // The following interfaces are used for the SSR (Server-Side Rendering) creation data
 // that is sent to the frontend through Inertia.js.
 interface SSRSimplifiedCreation {

@@ -9,6 +9,7 @@ use App\Models\Person;
 use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\Translation;
+use App\Models\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -222,5 +223,51 @@ class CreationDraftController extends Controller
     public function getTechnologies(CreationDraft $creationDraft): JsonResponse
     {
         return response()->json($creationDraft->technologies()->with(['descriptionTranslationKey.translations'])->get());
+    }
+
+    /**
+     * Attach a video to the creation draft.
+     */
+    public function attachVideo(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'video_id' => ['required', 'exists:videos,id'],
+        ]);
+
+        $videoId = $request->input('video_id');
+
+        if (! $creationDraft->videos()->where('videos.id', $videoId)->exists()) {
+            $creationDraft->videos()->attach($videoId);
+        }
+
+        return response()->json([
+            'message' => 'Video attached successfully',
+            'video' => Video::with('coverPicture')->find($videoId),
+        ]);
+    }
+
+    /**
+     * Detach a video from the creation draft.
+     */
+    public function detachVideo(Request $request, CreationDraft $creationDraft): JsonResponse
+    {
+        $request->validate([
+            'video_id' => ['required', 'exists:videos,id'],
+        ]);
+
+        $videoId = $request->input('video_id');
+        $creationDraft->videos()->detach($videoId);
+
+        return response()->json([
+            'message' => 'Video detached successfully',
+        ]);
+    }
+
+    /**
+     * Get all videos attached to the creation draft.
+     */
+    public function getVideos(CreationDraft $creationDraft): JsonResponse
+    {
+        return response()->json($creationDraft->videos()->with('coverPicture')->get());
     }
 }

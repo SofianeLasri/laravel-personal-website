@@ -11,7 +11,8 @@ return new class extends Migration
     {
         Schema::create('videos', function (Blueprint $table) {
             $table->id();
-            $table->string('filename');
+            $table->string('name');
+            $table->string('path');
             $table->foreignIdFor(Picture::class, 'cover_picture_id')->constrained('pictures');
             $table->string('bunny_video_id');
             $table->timestamps();

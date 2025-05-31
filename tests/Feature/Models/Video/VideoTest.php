@@ -21,11 +21,13 @@ class VideoTest extends TestCase
 
         $this->assertDatabaseHas('videos', [
             'id' => $video->id,
-            'filename' => $video->filename,
+            'name' => $video->name,
+            'path' => $video->path,
             'bunny_video_id' => $video->bunny_video_id,
         ]);
 
-        $this->assertNotNull($video->filename);
+        $this->assertNotNull($video->name);
+        $this->assertNotNull($video->path);
         $this->assertNotNull($video->bunny_video_id);
         $this->assertNotNull($video->cover_picture_id);
     }
@@ -46,7 +48,8 @@ class VideoTest extends TestCase
     public function test_video_has_fillable_attributes()
     {
         $expectedFillable = [
-            'filename',
+            'name',
+            'path',
             'cover_picture_id',
             'bunny_video_id',
         ];
@@ -62,7 +65,8 @@ class VideoTest extends TestCase
         $picture = Picture::factory()->create();
 
         $videoData = [
-            'filename' => 'test-video.mp4',
+            'name' => 'Test video',
+            'path' => 'videos/test-video.mp4',
             'cover_picture_id' => $picture->id,
             'bunny_video_id' => 'bunny-12345',
         ];
@@ -70,7 +74,8 @@ class VideoTest extends TestCase
         $video = Video::create($videoData);
 
         $this->assertDatabaseHas('videos', $videoData);
-        $this->assertEquals($videoData['filename'], $video->filename);
+        $this->assertEquals($videoData['name'], $video->name);
+        $this->assertEquals($videoData['path'], $video->path);
         $this->assertEquals($videoData['bunny_video_id'], $video->bunny_video_id);
         $this->assertEquals($videoData['cover_picture_id'], $video->cover_picture_id);
     }
@@ -82,7 +87,8 @@ class VideoTest extends TestCase
         $newPicture = Picture::factory()->create();
 
         $updateData = [
-            'filename' => 'updated-video.mp4',
+            'name' => 'Updated video name',
+            'path' => 'videos/updated-video.mp4',
             'bunny_video_id' => 'updated-bunny-12345',
             'cover_picture_id' => $newPicture->id,
         ];

@@ -14,7 +14,8 @@ class VideoFactory extends Factory
     public function definition(): array
     {
         return [
-            'filename' => $this->faker->word(),
+            'name' => $this->faker->word(),
+            'path' => $this->faker->filePath(),
             'bunny_video_id' => $this->faker->word(),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),

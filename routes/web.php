@@ -144,6 +144,13 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::get('technologies/{technology}/check-associations', [TechnologyController::class, 'checkAssociations'])
             ->name('technologies.check-associations');
 
+        Route::post('creation-drafts/{creation_draft}/attach-video', [CreationDraftController::class, 'attachVideo'])
+            ->name('creation-drafts.attach-video');
+        Route::post('creation-drafts/{creation_draft}/detach-video', [CreationDraftController::class, 'detachVideo'])
+            ->name('creation-drafts.detach-video');
+        Route::get('creation-drafts/{creation_draft}/videos', [CreationDraftController::class, 'getVideos'])
+            ->name('creation-drafts.videos');
+
         Route::put('translations/{translation}', [TranslationPageController::class, 'update'])
             ->name('translations.update');
         Route::post('translations/{translationKey}/translate', [TranslationPageController::class, 'translateSingle'])

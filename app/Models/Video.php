@@ -11,7 +11,8 @@ class Video extends Model
     use HasFactory;
 
     protected $fillable = [
-        'filename',
+        'name',
+        'path',
         'cover_picture_id',
         'bunny_video_id',
     ];

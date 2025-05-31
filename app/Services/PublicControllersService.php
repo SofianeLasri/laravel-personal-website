@@ -15,6 +15,7 @@ use App\Models\Screenshot;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
+use App\Models\Video;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -218,7 +219,8 @@ class PublicControllersService
      *     features: array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
      *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string}>,
      *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>,
-     *     people: array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>}
+     *     people: array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
+     *     videos: array<int, array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>}
      */
     public function formatCreationForSSRFull(Creation $creation): array
     {
@@ -271,6 +273,10 @@ class PublicControllersService
             ];
         })->toArray();
 
+        $response['videos'] = $creation->videos->map(function (Video $video) {
+            return $this->formatVideoForSSR($video);
+        })->toArray();
+
         return $response;
     }
 
@@ -317,6 +323,49 @@ class PublicControllersService
                 'large' => $picture->getUrl('large', 'webp'),
                 'full' => $picture->getUrl('full', 'webp'),
             ],
+        ];
+    }
+
+    /**
+     * Format the Video model for Server-Side Rendering (SSR).
+     * Returns a SSRVideo TypeScript type compatible array.
+     *
+     * @param  Video  $video  The video to format
+     * @return array{
+     *  id: int,
+     *  bunnyVideoId: string,
+     *  name: string,
+     *  coverPicture: array{
+     *      filename: string,
+     *      width: int|null,
+     *      height: int|null,
+     *      avif: array{
+     *          thumbnail: string,
+     *          small: string,
+     *          medium: string,
+     *          large: string,
+     *          full: string,},
+     *      webp: array{
+     *          thumbnail: string,
+     *          small: string,
+     *          medium: string,
+     *          large: string,
+     *          full: string,},
+     *     },
+     *     libraryId: string,
+     * }
+     */
+    public function formatVideoForSSR(Video $video): array
+    {
+        /** @var Picture $coverPicture */
+        $coverPicture = $video->coverPicture;
+
+        return [
+            'id' => $video->id,
+            'bunnyVideoId' => $video->bunny_video_id,
+            'name' => $video->name,
+            'coverPicture' => $this->formatPictureForSSR($coverPicture),
+            'libraryId' => config('services.bunny.stream_library_id'),
         ];
     }
 
@@ -620,7 +669,7 @@ class PublicControllersService
             'id' => $experience->id,
             'title' => $title,
             'organizationName' => $experience->organization_name,
-            'logo' => ($experience->logo instanceof Picture) ? $this->formatPictureForSSR($experience->logo) : null,
+            'logo' => $experience->logo ? $this->formatPictureForSSR($experience->logo) : null,
             'location' => $experience->location,
             'websiteUrl' => $experience->website_url,
             'shortDescription' => $shortDescription,

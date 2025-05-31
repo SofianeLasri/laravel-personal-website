@@ -11,6 +11,7 @@ use App\Models\Screenshot;
 use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\TranslationKey;
+use App\Models\Video;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -77,6 +78,14 @@ class CreationFactory extends Factory
         return $this->afterCreating(function (Creation $creation) use ($count) {
             $tags = Tag::factory()->count($count)->create();
             $creation->tags()->attach($tags);
+        });
+    }
+
+    public function withVideos(int $count = 2): static
+    {
+        return $this->afterCreating(function (Creation $creation) use ($count) {
+            $videos = Video::factory()->count($count)->create();
+            $creation->videos()->attach($videos);
         });
     }
 

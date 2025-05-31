@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3636b911c43f5a9b21f475bde816ab47",
+    "content-hash": "79086e9c5e398328dd1695aa30d9f9cd",
     "packages": [
         {
             "name": "brick/math",
@@ -134,6 +134,48 @@
                 }
             ],
             "time": "2024-02-09T16:56:22+00:00"
+        },
+        {
+            "name": "corbpie/bunny-cdn-api",
+            "version": "v1.9.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cp6/BunnyCDN-API.git",
+                "reference": "fed199ba500125f655f65752f625ddd81d6d8ae7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cp6/BunnyCDN-API/zipball/fed199ba500125f655f65752f625ddd81d6d8ae7",
+                "reference": "fed199ba500125f655f65752f625ddd81d6d8ae7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-ftp": "*",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Corbpie\\BunnyCdn\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "corbpie",
+                    "email": "contact@corbpie.com"
+                }
+            ],
+            "description": "Bunny net CDN API class for handling pull zones, storage zones, video streaming and DNS.",
+            "support": {
+                "issues": "https://github.com/cp6/BunnyCDN-API/issues",
+                "source": "https://github.com/cp6/BunnyCDN-API/tree/v1.9.7"
+            },
+            "time": "2024-05-14T13:02:35+00:00"
         },
         {
             "name": "dflydev/dot-access-data",

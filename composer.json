@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.2",
         "ext-imagick": "*",
+        "corbpie/bunny-cdn-api": "^1.9",
         "inertiajs/inertia-laravel": "^2.0",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Api\SocialMediaLinkController;
 use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
+use App\Http\Controllers\Admin\Api\VideoController;
 use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\ExperiencePageController;
@@ -105,7 +106,14 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             'tags' => TagController::class,
             'technologies' => TechnologyController::class,
             'technology-experiences' => TechnologyExperienceController::class,
+            'videos' => VideoController::class,
         ]);
+
+        // Routes spécifiques pour les vidéos
+        Route::get('videos/{video}/metadata', [VideoController::class, 'metadata'])
+            ->name('videos.metadata');
+        Route::get('videos/{video}/status', [VideoController::class, 'status'])
+            ->name('videos.status');
 
         Route::post('creation-drafts/{creation_draft}/attach-person', [CreationDraftController::class, 'attachPerson'])
             ->name('creation-drafts.attach-person');
@@ -133,6 +141,13 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('creation-drafts.technologies');
         Route::get('technologies/{technology}/check-associations', [TechnologyController::class, 'checkAssociations'])
             ->name('technologies.check-associations');
+
+        Route::post('creation-drafts/{creation_draft}/attach-video', [CreationDraftController::class, 'attachVideo'])
+            ->name('creation-drafts.attach-video');
+        Route::post('creation-drafts/{creation_draft}/detach-video', [CreationDraftController::class, 'detachVideo'])
+            ->name('creation-drafts.detach-video');
+        Route::get('creation-drafts/{creation_draft}/videos', [CreationDraftController::class, 'getVideos'])
+            ->name('creation-drafts.videos');
 
         Route::put('translations/{translation}', [TranslationPageController::class, 'update'])
             ->name('translations.update');

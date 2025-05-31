@@ -41,6 +41,7 @@ use Illuminate\Validation\ValidationException;
  * @property int|null $technologies_count
  * @property int|null $people_count
  * @property int|null $tags_count
+ * @property int|null $videos_count
  * @property-read Creation|null $originalCreation
  * @property-read Picture|null $logo
  * @property-read Picture|null $coverImage
@@ -51,6 +52,7 @@ use Illuminate\Validation\ValidationException;
  * @property-read Collection|Technology[] $technologies
  * @property-read Collection|Person[] $people
  * @property-read Collection|Tag[] $tags
+ * @property-read Collection|Video[] $videos
  */
 class CreationDraft extends Model
 {
@@ -164,6 +166,14 @@ class CreationDraft extends Model
         return $this->belongsToMany(Tag::class, 'creation_draft_tag');
     }
 
+    /**
+     * @return BelongsToMany<Video, $this>
+     */
+    public function videos(): BelongsToMany
+    {
+        return $this->belongsToMany(Video::class, 'creation_draft_video');
+    }
+
     public function getShortDescription(string $locale): string
     {
         if ($this->shortDescriptionTranslationKey) {
@@ -223,6 +233,7 @@ class CreationDraft extends Model
         $draft->technologies()->attach($creation->technologies()->pluck('technologies.id'));
         $draft->people()->attach($creation->people()->pluck('people.id'));
         $draft->tags()->attach($creation->tags()->pluck('tags.id'));
+        $draft->videos()->attach($creation->videos()->pluck('videos.id'));
 
         return $draft;
     }

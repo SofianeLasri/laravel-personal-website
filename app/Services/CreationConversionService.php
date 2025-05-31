@@ -98,6 +98,7 @@ class CreationConversionService
         $creation->technologies()->sync($draft->technologies);
         $creation->people()->sync($draft->people);
         $creation->tags()->sync($draft->tags);
+        $creation->videos()->sync($draft->videos);
     }
 
     private function createFeatures(CreationDraft $draft, Creation $creation): void

@@ -2,6 +2,7 @@
 import LightShape from '@/components/public/LightShape.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
 import ProjectScreenshotsContainer from '@/components/public/ProjectPage/ProjectScreenshotsContainer.vue';
+import ProjectVideoGallery from '@/components/public/ProjectPage/ProjectVideoGallery.vue';
 import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import HorizontalNavbar from '@/components/public/Ui/HorizontalNavbar.vue';
@@ -33,6 +34,9 @@ if (props.creation.people.length > 0) {
 }
 if (props.creation.technologies.length > 0) {
     sections.push({ id: 'technologies', label: t('project.technologies_used') });
+}
+if (props.creation.videos.length > 0) {
+    sections.push({ id: 'videos', label: t('project.videos') });
 }
 if (props.creation.screenshots.length > 0) {
     sections.push({ id: 'screenshots', label: t('project.screenshots') });
@@ -115,6 +119,11 @@ if (props.creation.screenshots.length > 0) {
                                 class="bg-gray-100"
                             />
                         </div>
+                    </section>
+
+                    <section id="videos" class="mt-16 flex flex-col gap-8" v-if="creation.videos.length > 0">
+                        <ContentSectionTitle>{{ t('project.videos') }}</ContentSectionTitle>
+                        <ProjectVideoGallery :videos="creation.videos" />
                     </section>
 
                     <section id="screenshots" class="mt-16 flex flex-col gap-8" v-if="creation.screenshots.length > 0">

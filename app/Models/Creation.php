@@ -37,6 +37,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $technologies_count
  * @property int|null $people_count
  * @property int|null $tags_count
+ * @property int|null $videos_count
  * @property int|null $drafts_count
  * @property-read Picture $logo
  * @property-read Picture $coverImage
@@ -47,6 +48,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection|Technology[] $technologies
  * @property-read Collection|Person[] $people
  * @property-read Collection|Tag[] $tags
+ * @property-read Collection|Video[] $videos
  * @property-read Collection|CreationDraft[] $drafts
  */
 class Creation extends Model
@@ -150,6 +152,14 @@ class Creation extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
+    }
+
+    /**
+     * @return BelongsToMany<Video, $this>
+     */
+    public function videos(): BelongsToMany
+    {
+        return $this->belongsToMany(Video::class);
     }
 
     /**

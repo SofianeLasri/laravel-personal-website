@@ -93,7 +93,7 @@ defineProps<{
                     <ProjectSlider :items="laravelCreations">
                         <ProjectCard v-for="creation in laravelCreations" :key="creation.id" :creation="creation" />
                     </ProjectSlider>
-                    <div>
+                    <div class="w-fit">
                         <BlackLinkButton :href="route('public.projects')">
                             <span>{{ t('home.laravel-section.view_other_projects') }}</span>
                             <ArrowUpRightRegular class="h-4 fill-white" />

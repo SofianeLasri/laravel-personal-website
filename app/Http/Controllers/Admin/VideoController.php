@@ -3,20 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\VideoRequest;
-use App\Http\Requests\VideoUploadRequest;
+use App\Http\Requests\Video\VideoRequest;
+use App\Http\Requests\Video\VideoUploadRequest;
 use App\Models\Video;
 use App\Services\BunnyStreamService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class VideoController extends Controller
 {
     public function __construct(
-        private BunnyStreamService $bunnyStreamService
+        private readonly BunnyStreamService $bunnyStreamService
     ) {}
 
     public function index()

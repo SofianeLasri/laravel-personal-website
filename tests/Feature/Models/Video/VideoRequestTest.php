@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Models\Video;
 
-use App\Http\Requests\VideoRequest;
+use App\Http\Requests\Video\VideoRequest;
 use App\Models\Picture;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;

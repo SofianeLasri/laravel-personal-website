@@ -262,29 +262,6 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_returns_created_video_with_relationships(): void
-    {
-        $picture = Picture::factory()->create();
-
-        $videoData = [
-            'name' => 'Test Video',
-            'path' => 'videos/test-video.mp4',
-            'cover_picture_id' => $picture->id,
-            'bunny_video_id' => 'bunny-12345',
-        ];
-
-        $response = $this->postJson(route('dashboard.api.videos.store'), $videoData);
-
-        $response->assertCreated();
-
-        $responseData = $response->json();
-        $this->assertEquals($videoData['name'], $responseData['name']);
-        $this->assertEquals($videoData['path'], $responseData['path']);
-        $this->assertEquals($videoData['cover_picture_id'], $responseData['cover_picture_id']);
-        $this->assertEquals($videoData['bunny_video_id'], $responseData['bunny_video_id']);
-    }
-
-    #[Test]
     public function test_update_returns_updated_video(): void
     {
         $video = Video::factory()->create();

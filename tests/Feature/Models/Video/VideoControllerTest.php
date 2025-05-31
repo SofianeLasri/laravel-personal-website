@@ -48,7 +48,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_index_with_videos()
+    public function test_index_with_videos(): void
     {
         $videos = Video::factory()->count(3)->create();
 
@@ -59,7 +59,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_index_without_videos()
+    public function test_index_without_videos(): void
     {
         $response = $this->getJson(route('dashboard.api.videos.index'));
 
@@ -68,7 +68,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_video_with_valid_data()
+    public function test_store_video_with_valid_data(): void
     {
         $picture = Picture::factory()->create();
 
@@ -96,7 +96,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_video_validation_fails_with_missing_name_path()
+    public function test_store_video_validation_fails_with_missing_name_path(): void
     {
         $picture = Picture::factory()->create();
 
@@ -112,7 +112,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_video_validation_fails_with_invalid_cover_picture_id()
+    public function test_store_video_validation_fails_with_invalid_cover_picture_id(): void
     {
         $videoData = [
             'filename' => 'test-video.mp4',
@@ -127,7 +127,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_video_validation_fails_with_missing_bunny_video_id()
+    public function test_store_video_validation_fails_with_missing_bunny_video_id(): void
     {
         $picture = Picture::factory()->create();
 
@@ -143,7 +143,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_show_video()
+    public function test_show_video(): void
     {
         $video = Video::factory()->create();
 
@@ -154,7 +154,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_show_video_not_found()
+    public function test_show_video_not_found(): void
     {
         $response = $this->getJson(route('dashboard.api.videos.show', 99999));
 
@@ -162,7 +162,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_update_video_with_valid_data()
+    public function test_update_video_with_valid_data(): void
     {
         $video = Video::factory()->create();
         $newPicture = Picture::factory()->create();
@@ -194,7 +194,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_update_video_validation_fails()
+    public function test_update_video_validation_fails(): void
     {
         $video = Video::factory()->create();
 
@@ -229,7 +229,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_destroy_video()
+    public function test_destroy_video(): void
     {
         $video = Video::factory()->create();
 
@@ -241,7 +241,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_destroy_video_not_found()
+    public function test_destroy_video_not_found(): void
     {
         $response = $this->deleteJson(route('dashboard.api.videos.destroy', 99999));
 
@@ -249,7 +249,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_returns_created_video_with_relationships()
+    public function test_store_returns_created_video_with_relationships(): void
     {
         $picture = Picture::factory()->create();
 
@@ -272,7 +272,7 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_update_returns_updated_video()
+    public function test_update_returns_updated_video(): void
     {
         $video = Video::factory()->create();
         $newPicture = Picture::factory()->create();

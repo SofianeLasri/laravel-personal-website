@@ -223,6 +223,7 @@ interface SSRFullCreation extends SSRSimplifiedCreation {
         url: string | null;
         picture: SSRPicture | null;
     }[];
+    videos: SSRVideo[];
 }
 
 interface SSRTechnology {
@@ -268,6 +269,13 @@ interface SSRScreenshot {
     id: number;
     picture: SSRPicture;
     caption: string | null;
+}
+
+interface SSRVideo {
+    id: number;
+    bunnyVideoId: string;
+    name: string;
+    coverPicture: SSRPicture;
 }
 
 interface SSRPicture {

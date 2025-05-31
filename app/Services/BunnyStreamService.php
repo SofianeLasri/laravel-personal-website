@@ -9,13 +9,8 @@ use Illuminate\Support\Facades\Log;
 
 class BunnyStreamService
 {
-    private BunnyAPIStream $bunnyStream;
-
-    public function __construct(?BunnyAPIStream $bunnyStream = null)
+    public function __construct(protected BunnyAPIStream $bunnyStream)
     {
-        $this->bunnyStream = $bunnyStream ?? new BunnyAPIStream;
-
-        // Configuration des clés API depuis l'environnement
         $this->bunnyStream->apiKey(config('services.bunny.stream_api_key'));
         $this->bunnyStream->streamLibraryAccessKey(config('services.bunny.stream_api_key'));
         $this->bunnyStream->setStreamLibraryId((int) config('services.bunny.stream_library_id'));
@@ -45,7 +40,6 @@ class BunnyStreamService
 
             if (! $uploadResult) {
                 Log::error('BunnyStreamService: Failed to upload video file', ['video_id' => $videoId]);
-                // Nettoyer la vidéo créée en cas d'échec d'upload
                 $this->deleteVideo($videoId);
 
                 return null;
@@ -97,8 +91,15 @@ class BunnyStreamService
         try {
             $response = $this->bunnyStream->uploadVideo($videoId, $file->getContent());
 
-            // La méthode uploadVideo retourne true en cas de succès
-            return $response === true;
+            if ($response && isset($response['success'])) {
+                if ($response['success']) {
+                    return true;
+                }
+
+                Log::warning('BunnyStreamService: Failed to upload video file', ['response' => $response]);
+            }
+
+            return false;
         } catch (Exception $e) {
             Log::error('BunnyStreamService: Error uploading video file', [
                 'error' => $e->getMessage(),
@@ -140,8 +141,15 @@ class BunnyStreamService
     {
         try {
             $response = $this->bunnyStream->deleteVideo($videoId);
+            if ($response && isset($response['success'])) {
+                if ($response['success']) {
+                    return true;
+                }
 
-            return $response === true;
+                Log::warning('BunnyStreamService: Failed to delete video', ['response' => $response]);
+            }
+
+            return false;
         } catch (Exception $e) {
             Log::error('BunnyStreamService: Error deleting video', [
                 'error' => $e->getMessage(),
@@ -149,30 +157,6 @@ class BunnyStreamService
             ]);
 
             return false;
-        }
-    }
-
-    /**
-     * Lister toutes les vidéos de la bibliothèque
-     */
-    public function listVideos(int $page = 1, int $itemsPerPage = 100): ?array
-    {
-        try {
-            $response = $this->bunnyStream->listVideos($page, $itemsPerPage);
-
-            if ($response && is_array($response)) {
-                return $response;
-            }
-
-            return null;
-        } catch (Exception $e) {
-            Log::error('BunnyStreamService: Error listing videos', [
-                'error' => $e->getMessage(),
-                'page' => $page,
-                'items_per_page' => $itemsPerPage,
-            ]);
-
-            return null;
         }
     }
 

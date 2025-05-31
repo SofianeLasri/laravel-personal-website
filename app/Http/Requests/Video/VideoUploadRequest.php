@@ -13,7 +13,7 @@ class VideoUploadRequest extends FormRequest
                 'required',
                 'file',
                 'mimes:mp4,avi,mov,wmv,flv,webm,mkv',
-                'max:'.(1024 * 1024 * 500), // 500MB max
+                'max:' . (1024 * 1024 * 1000), // 1000MB max
             ],
             'name' => ['nullable', 'string', 'max:255'],
             'cover_picture_id' => ['required', 'exists:pictures,id'],

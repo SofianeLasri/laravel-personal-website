@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SSRVideo } from '@/types';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { X } from 'lucide-vue-next';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
     video: SSRVideo | null;
@@ -90,7 +90,6 @@ onUnmounted(() => {
                             v-if="isOpen"
                             :src="iframeUrl"
                             class="h-full w-full"
-                            frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
                         />

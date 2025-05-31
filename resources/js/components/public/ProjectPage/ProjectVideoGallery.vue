@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { SSRVideo } from '@/types';
-import ProjectVideoModal from './ProjectVideoModal.vue';
-import { ref } from 'vue';
 import { Play } from 'lucide-vue-next';
+import { ref } from 'vue';
+import ProjectVideoModal from './ProjectVideoModal.vue';
 
-const props = defineProps<{
+defineProps<{
     videos: SSRVideo[];
 }>();
 

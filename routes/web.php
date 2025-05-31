@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\PicturePageController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Admin\TranslationPageController;
+use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Public\CertificationsCareerController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProjectController;
@@ -105,7 +106,16 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             'tags' => TagController::class,
             'technologies' => TechnologyController::class,
             'technology-experiences' => TechnologyExperienceController::class,
+            'videos' => VideoController::class,
         ]);
+
+        // Routes spécifiques pour les vidéos
+        Route::post('videos/upload', [VideoController::class, 'upload'])
+            ->name('videos.upload');
+        Route::get('videos/{video}/metadata', [VideoController::class, 'metadata'])
+            ->name('videos.metadata');
+        Route::get('videos/{video}/status', [VideoController::class, 'status'])
+            ->name('videos.status');
 
         Route::post('creation-drafts/{creation_draft}/attach-person', [CreationDraftController::class, 'attachPerson'])
             ->name('creation-drafts.attach-person');

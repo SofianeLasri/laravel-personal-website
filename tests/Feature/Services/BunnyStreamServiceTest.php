@@ -134,7 +134,7 @@ class BunnyStreamServiceTest extends TestCase
         });
 
         $uploadedFile = UploadedFile::fake()->create('test-video.mp4', 1000, 'video/mp4');
-        Storage::fake()->putFileAs('videos', $uploadedFile, 'test-video.mp4');
+        Storage::fake('local')->putFileAs('videos', $uploadedFile, 'test-video.mp4');
 
         $service = app(BunnyStreamService::class);
         $result = $service->uploadVideo('test-video.mp4', 'videos/test-video.mp4');

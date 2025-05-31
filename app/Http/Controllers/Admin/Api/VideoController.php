@@ -31,7 +31,7 @@ class VideoController extends Controller
      *
      * @throws Throwable
      */
-    public function store(VideoUploadRequest $request)
+    public function store(VideoUploadRequest $request): JsonResponse
     {
         try {
             DB::beginTransaction();
@@ -40,7 +40,7 @@ class VideoController extends Controller
             $name = $request->input('name', $uploadedFile->getClientOriginalName());
             $coverPictureId = $request->input('cover_picture_id');
 
-            $relativeFilePath = Storage::putFile('videos', $uploadedFile, Visibility::PRIVATE);
+            $relativeFilePath = Storage::disk('local')->putFile('videos', $uploadedFile, Visibility::PRIVATE);
             $absoluteFilePath = Storage::path($relativeFilePath);
 
             $uploadedVideoData = $this->bunnyStreamService->uploadVideo($name, $absoluteFilePath);

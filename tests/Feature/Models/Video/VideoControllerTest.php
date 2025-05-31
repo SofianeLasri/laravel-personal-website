@@ -8,6 +8,8 @@ use App\Models\Video;
 use App\Services\BunnyStreamService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -70,13 +72,38 @@ class VideoControllerTest extends TestCase
     #[Test]
     public function test_store_video_with_valid_data(): void
     {
+        Storage::fake('local');
+        $picture = Picture::factory()->create();
+
+        $response = $this->json('POST', route('dashboard.api.videos.store'), [
+            'video' => UploadedFile::fake()->create('video.mp4', 1024 * 1024 * 10, 'video/mp4'),
+            'name' => 'Test Video',
+            'cover_picture_id' => $picture->id,
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonStructure([
+                'id',
+                'name',
+                'path',
+                'cover_picture_id',
+                'bunny_video_id',
+                'created_at',
+                'updated_at',
+            ]);
+
+        Storage::disk('local')->assertExists($response->json('path'));
+    }
+
+    #[Test]
+    public function test_store_video_validation_succeed_with_missing_name(): void
+    {
+        Storage::fake('local');
         $picture = Picture::factory()->create();
 
         $videoData = [
-            'name' => 'Test Video',
-            'path' => 'videos/test-video.mp4',
+            'video' => UploadedFile::fake()->create('video.mp4', 1024 * 1024 * 10, 'video/mp4'),
             'cover_picture_id' => $picture->id,
-            'bunny_video_id' => 'bunny-12345',
         ];
 
         $response = $this->postJson(route('dashboard.api.videos.store'), $videoData);
@@ -91,31 +118,16 @@ class VideoControllerTest extends TestCase
                 'created_at',
                 'updated_at',
             ]);
-
-        $this->assertDatabaseHas('videos', $videoData);
-    }
-
-    #[Test]
-    public function test_store_video_validation_fails_with_missing_name_path(): void
-    {
-        $picture = Picture::factory()->create();
-
-        $videoData = [
-            'cover_picture_id' => $picture->id,
-            'bunny_video_id' => 'bunny-12345',
-        ];
-
-        $response = $this->postJson(route('dashboard.api.videos.store'), $videoData);
-
-        $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'path']);
     }
 
     #[Test]
     public function test_store_video_validation_fails_with_invalid_cover_picture_id(): void
     {
+        Storage::fake('local');
+
         $videoData = [
-            'filename' => 'test-video.mp4',
+            'video' => UploadedFile::fake()->create('video.mp4', 1024 * 1024 * 10, 'video/mp4'),
+            'name' => 'Test Video',
             'cover_picture_id' => 99999,
             'bunny_video_id' => 'bunny-12345',
         ];
@@ -127,19 +139,20 @@ class VideoControllerTest extends TestCase
     }
 
     #[Test]
-    public function test_store_video_validation_fails_with_missing_bunny_video_id(): void
+    public function test_store_video_validation_fails_with_missing_vide(): void
     {
         $picture = Picture::factory()->create();
 
         $videoData = [
-            'filename' => 'test-video.mp4',
+            'name' => 'Test Video',
             'cover_picture_id' => $picture->id,
+            'bunny_video_id' => 'bunny-12345',
         ];
 
         $response = $this->postJson(route('dashboard.api.videos.store'), $videoData);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors('bunny_video_id');
+            ->assertJsonValidationErrors('video');
     }
 
     #[Test]

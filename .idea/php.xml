@@ -175,6 +175,7 @@
       <path value="$PROJECT_DIR$/vendor/nyholm/psr7" />
       <path value="$PROJECT_DIR$/vendor/sentry/sentry" />
       <path value="$PROJECT_DIR$/vendor/sentry/sentry-laravel" />
+      <path value="$PROJECT_DIR$/vendor/platformcommunity/flysystem-bunnycdn" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

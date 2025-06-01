@@ -24,7 +24,7 @@ const { t } = useTranslation();
 const pageTitle = 'Projets - Portfolio Sofiane Lasri';
 const pageDescription = `Découvrez mes ${props.creations.length} projets.`;
 const pageKeywords = 'projets, portfolio, Sofiane Lasri, développement web, Laravel, Vue.js, réalisations, applications web';
-const pageUrl = window.location.href;
+const pageUrl = page.props.ziggy.location;
 const pageImage = '/opengraph-image-1200-630.jpg';
 
 const containerKey = computed(() => {

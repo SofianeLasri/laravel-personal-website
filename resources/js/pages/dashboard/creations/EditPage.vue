@@ -68,7 +68,7 @@ const showLocaleChangeDialog = ref(false);
 const pendingLocale = ref<string | null>(null);
 
 const getOriginalCreationId = (): number | null => {
-    const url = new URL(window.location.href);
+    const url = new URL(page.props.ziggy.location);
     const creationId = url.searchParams.get('creation-id');
     return creationId ? parseInt(creationId) : null;
 };
@@ -219,7 +219,7 @@ const onSubmit = handleSubmit(async (formValues) => {
             response = await axios.post(route('dashboard.api.creation-drafts.store'), payload);
             successMessage = 'Brouillon créé avec succès';
 
-            const url = new URL(window.location.href);
+            const url = new URL(page.props.ziggy.location);
             if (originalCreationId.value) {
                 url.searchParams.delete('creation-id');
             }
@@ -282,7 +282,7 @@ const publishDraft = async () => {
 };
 
 onMounted(() => {
-    const url = new URL(window.location.href);
+    const url = new URL(page.props.ziggy.location);
     const creationId = url.searchParams.get('creation-id');
 
     if (creationId && currentCreationDraft.value) {

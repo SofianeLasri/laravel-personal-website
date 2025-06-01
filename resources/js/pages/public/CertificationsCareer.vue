@@ -22,7 +22,7 @@ const props = defineProps<{
 const pageTitle = 'Parcours & Certifications - Sofiane Lasri';
 const pageDescription = `Découvrez le parcours professionnel et les certifications de Sofiane Lasri. ${props.certifications.length} certifications obtenues et ${props.workExperiences.length} expériences professionnelles en développement web.`;
 const pageKeywords = 'parcours, certifications, Sofiane Lasri, expérience professionnelle, formation, développeur web, carrière';
-const pageUrl = window.location.href;
+const pageUrl = page.props.ziggy.location;
 const pageImage = '/opengraph-image-1200-630.jpg';
 </script>
 

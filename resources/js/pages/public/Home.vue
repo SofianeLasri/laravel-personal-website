@@ -30,7 +30,7 @@ defineProps<{
 const pageTitle = 'Sofiane Lasri - Développeur Full Stack';
 const pageDescription = `Portfolio de Sofiane Lasri, développeur Full Stack.`;
 const pageKeywords = 'Sofiane Lasri, développeur web, Laravel, Vue.js, PHP, JavaScript, Full Stack, portfolio, développement web';
-const pageUrl = window.location.href;
+const pageUrl = page.props.ziggy.location;
 const pageImage = '/opengraph-image-1200-630.jpg';
 </script>
 

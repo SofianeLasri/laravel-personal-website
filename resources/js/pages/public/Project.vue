@@ -24,7 +24,7 @@ const { t } = useTranslation();
 const pageTitle = `${props.creation.name} - Projet de Sofiane Lasri`;
 const pageDescription = props.creation.shortDescription || 'Projet développé par Sofiane Lasri.';
 const pageKeywords = `Sofiane Lasri, ${props.creation.name}, projet, développement web, ${props.creation.technologies.map((tech) => tech.name).join(', ')}`;
-const pageUrl = window.location.href;
+const pageUrl = page.props.ziggy.location;
 const pageImage = props.creation.coverImage.jpg.large || '/opengraph-image-1200-630.jpg';
 const pageImageAlt = `Image de couverture du projet ${props.creation.name}`;
 

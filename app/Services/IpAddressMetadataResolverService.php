@@ -17,8 +17,8 @@ class IpAddressMetadataResolverService
      * This method has a fail tolerance. The only exception that is thrown is when the API server returns a 422 status code.
      * Server errors are logged and the method returns without throwing an exception.
      *
-     * @param  Collection  $ipAddresses  The IP addresses to resolve metadata for. Instances of IpAddress.
-     * @return array{array{status: 'success'|'fail', message?: string, countryCode?: string, lat?: float, lon?: float, query: string}} The resolved metadata for each IP address.
+     * @param  Collection<int, IpAddress>  $ipAddresses  The IP addresses to resolve metadata for. Instances of IpAddress.
+     * @return array<array{status: 'success'|'fail', message?: string, countryCode?: string, lat?: float, lon?: float, query: string}> The resolved metadata for each IP address.
      *
      * @throws ConnectionException
      */
@@ -32,10 +32,17 @@ class IpAddressMetadataResolverService
         if ($currentCallsCount >= $maxCallsPerMinute) {
             Log::info('Max calls per minute reached. Skipping metadata resolution.');
 
-            return [];
+            return $ipAddresses->map(function (IpAddress $ipAddress) {
+                return [
+                    'status' => 'fail',
+                    'message' => 'Max calls per minute reached',
+                    'query' => $ipAddress->ip,
+                ];
+            })->toArray();
         }
 
-        Cache::increment('services.ip-address-resolver.calls_count', 1, 60);
+        Cache::increment('services.ip-address-resolver.calls_count');
+        Cache::put('services.ip-address-resolver.calls_count', Cache::get('services.ip-address-resolver.calls_count', 0), 60);
 
         if ($ipAddresses->count() > $maxIpPerCall) {
             $ipAddresses = $ipAddresses->take($maxIpPerCall);
@@ -57,11 +64,23 @@ class IpAddressMetadataResolverService
             if ($response->serverError()) {
                 Log::info('The API server encountered an error while processing the request. Skipping metadata resolution.', $returnedError);
 
-                return [];
+                return $ipAddresses->map(function (IpAddress $ipAddress) {
+                    return [
+                        'status' => 'fail',
+                        'message' => 'Server error encountered',
+                        'query' => $ipAddress->ip,
+                    ];
+                })->toArray();
             }
             Log::error('The API server returned an unexpected status code. Skipping metadata resolution.', $returnedError);
 
-            return [];
+            return $ipAddresses->map(function (IpAddress $ipAddress) {
+                return [
+                    'status' => 'fail',
+                    'message' => 'Unexpected status code returned',
+                    'query' => $ipAddress->ip,
+                ];
+            })->toArray();
         }
 
         return $response->json();

@@ -8,3 +8,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('save:requests')->everyMinute();
+Schedule::command('process:user-agents')->hourly();
+Schedule::command('process:ip-adresses')->everyFiveMinutes();

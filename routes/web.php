@@ -25,6 +25,7 @@ use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ProjectsController;
 use App\Http\Controllers\Public\SearchController;
+use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -44,6 +45,9 @@ Route::name('public.')->group(function () {
     // Search routes
     Route::get('/search', [SearchController::class, 'search'])->name('search');
     Route::get('/search/filters', [SearchController::class, 'filters'])->name('search.filters');
+
+    // Sitemap
+    Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 });
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {

@@ -18,6 +18,8 @@ class ProjectsController extends Controller
 
         $technologies = Technology::all();
 
+        $creations = $this->service->getCreations();
+
         return inertia('public/Projects', [
             'locale' => $locale,
             'translations' => [
@@ -27,7 +29,7 @@ class ProjectsController extends Controller
                 'search' => __('search'),
             ],
             'socialMediaLinks' => SocialMediaLink::all(),
-            'creations' => $this->service->getCreations(),
+            'creations' => $creations,
             'technologies' => $technologies->map(function ($technology) {
                 return $this->service->formatTechnologyForSSR($technology);
             }),

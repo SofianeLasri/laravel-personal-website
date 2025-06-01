@@ -21,6 +21,13 @@ const props = defineProps<{
 
 const { t } = useTranslation();
 
+const pageTitle = `${props.creation.name} - Projet de Sofiane Lasri`;
+const pageDescription = props.creation.shortDescription || 'Projet développé par Sofiane Lasri.';
+const pageKeywords = `Sofiane Lasri, ${props.creation.name}, projet, développement web, ${props.creation.technologies.map((tech) => tech.name).join(', ')}`;
+const pageUrl = window.location.href;
+const pageImage = props.creation.coverImage.jpg.large || '/opengraph-image-1200-630.jpg';
+const pageImageAlt = `Image de couverture du projet ${props.creation.name}`;
+
 const activeSection = ref('description');
 const contentContainer = ref<HTMLElement | null>(null);
 
@@ -44,7 +51,27 @@ if (props.creation.screenshots.length > 0) {
 </script>
 
 <template>
-    <Head :title="t('project.page_title')" />
+    <Head :title="pageTitle">
+        <!-- SEO Meta Tags -->
+        <meta name="description" :content="pageDescription" />
+        <meta name="keywords" :content="pageKeywords" />
+        <meta name="robots" content="index, follow" />
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="article" />
+        <meta property="og:title" :content="pageTitle" />
+        <meta property="og:description" :content="pageDescription" />
+        <meta property="og:url" :content="pageUrl" />
+        <meta property="og:image" :content="pageImage" />
+        <meta property="og:image:alt" :content="pageImageAlt" />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="pageTitle" />
+        <meta name="twitter:description" :content="pageDescription" />
+        <meta name="twitter:image" :content="pageImage" />
+        <meta name="twitter:image:alt" :content="pageImageAlt" />
+    </Head>
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />

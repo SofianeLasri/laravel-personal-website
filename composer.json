@@ -19,7 +19,9 @@
         "platformcommunity/flysystem-bunnycdn": "*",
         "sentry/sentry-laravel": "^4.13",
         "sl-projects/laravel-request-logger": "^1.0",
-        "tightenco/ziggy": "^2.4"
+        "spatie/laravel-sitemap": "^7.3",
+        "tightenco/ziggy": "^2.4",
+        "verschuur/laravel-robotstxt": "^5.2"
     },
     "require-dev": {
         "brianium/paratest": "^7.8",

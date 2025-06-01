@@ -4,7 +4,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#F78E57" />
-        <meta property="og:type" content="website" />
+        <meta name="author" content="Sofiane Lasri">
+        
+        <!-- Favicon with theme support -->
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" media="(prefers-color-scheme: light)">
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)">
+        
+        <!-- Basic Open Graph for site -->
         <meta property="og:locale" content="{{ app()->getLocale() }}" />
         <meta property="og:locale:alternate" content="fr_FR" />
         <meta property="og:locale:alternate" content="en_GB" />

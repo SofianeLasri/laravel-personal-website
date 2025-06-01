@@ -18,6 +18,8 @@ class ProjectController extends Controller
         $creation = Creation::where('slug', $slug)->firstOrFail()
             ->withRelationshipAutoloading();
 
+        $formattedCreation = $this->service->formatCreationForSSRFull($creation);
+
         return Inertia::render('public/Project', [
             'locale' => app()->getLocale(),
             'translations' => [
@@ -28,7 +30,7 @@ class ProjectController extends Controller
                 'search' => __('search'),
             ],
             'socialMediaLinks' => SocialMediaLink::all(),
-            'creation' => $this->service->formatCreationForSSRFull($creation),
+            'creation' => $formattedCreation,
         ]);
     }
 }

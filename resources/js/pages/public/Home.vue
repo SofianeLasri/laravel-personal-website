@@ -17,7 +17,7 @@ import { Head } from '@inertiajs/vue3';
 
 const { t } = useTranslation();
 
-defineProps<{
+const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
     yearsOfExperience: number;
     developmentCreationsCount: number;
@@ -26,10 +26,36 @@ defineProps<{
     technologyExperiences: SSRTechnologyExperience[];
     experiences: SSRExperience[];
 }>();
+
+const pageTitle = 'Sofiane Lasri - Développeur Full Stack Laravel & Vue.js';
+const pageDescription = `Portfolio de Sofiane Lasri, développeur Full Stack avec ${props.yearsOfExperience} ans d'expérience. Spécialisé en Laravel, Vue.js, et développement web moderne. ${props.developmentCreationsCount} projets réalisés.`;
+const pageKeywords = 'Sofiane Lasri, développeur web, Laravel, Vue.js, PHP, JavaScript, Full Stack, portfolio, développement web';
+const pageUrl = window.location.href;
+const pageImage = '/favicon.svg';
 </script>
 
 <template>
-    <Head title="Accueil" />
+    <Head :title="pageTitle">
+        <!-- SEO Meta Tags -->
+        <meta name="description" :content="pageDescription" />
+        <meta name="keywords" :content="pageKeywords" />
+        <meta name="robots" content="index, follow" />
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website" />
+        <meta property="og:title" :content="pageTitle" />
+        <meta property="og:description" :content="pageDescription" />
+        <meta property="og:url" :content="pageUrl" />
+        <meta property="og:image" :content="pageImage" />
+        <meta property="og:image:alt" content="Logo Sofiane Lasri - Développeur Full Stack" />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="pageTitle" />
+        <meta name="twitter:description" :content="pageDescription" />
+        <meta name="twitter:image" :content="pageImage" />
+        <meta name="twitter:image:alt" content="Logo Sofiane Lasri - Développeur Full Stack" />
+    </Head>
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />

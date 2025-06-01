@@ -17,7 +17,7 @@ import { Head } from '@inertiajs/vue3';
 
 const { t } = useTranslation();
 
-const props = defineProps<{
+defineProps<{
     socialMediaLinks: SocialMediaLink[];
     yearsOfExperience: number;
     developmentCreationsCount: number;
@@ -27,11 +27,11 @@ const props = defineProps<{
     experiences: SSRExperience[];
 }>();
 
-const pageTitle = 'Sofiane Lasri - Développeur Full Stack Laravel & Vue.js';
-const pageDescription = `Portfolio de Sofiane Lasri, développeur Full Stack avec ${props.yearsOfExperience} ans d'expérience. Spécialisé en Laravel, Vue.js, et développement web moderne. ${props.developmentCreationsCount} projets réalisés.`;
+const pageTitle = 'Sofiane Lasri - Développeur Full Stack';
+const pageDescription = `Portfolio de Sofiane Lasri, développeur Full Stack.`;
 const pageKeywords = 'Sofiane Lasri, développeur web, Laravel, Vue.js, PHP, JavaScript, Full Stack, portfolio, développement web';
 const pageUrl = window.location.href;
-const pageImage = '/favicon.svg';
+const pageImage = '/opengraph-image-1200-630.jpg';
 </script>
 
 <template>
@@ -47,14 +47,14 @@ const pageImage = '/favicon.svg';
         <meta property="og:description" :content="pageDescription" />
         <meta property="og:url" :content="pageUrl" />
         <meta property="og:image" :content="pageImage" />
-        <meta property="og:image:alt" content="Logo Sofiane Lasri - Développeur Full Stack" />
+        <meta property="og:video:width" content="1200" />
+        <meta property="og:video:height" content="630" />
 
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" :content="pageTitle" />
         <meta name="twitter:description" :content="pageDescription" />
         <meta name="twitter:image" :content="pageImage" />
-        <meta name="twitter:image:alt" content="Logo Sofiane Lasri - Développeur Full Stack" />
     </Head>
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">

@@ -23,7 +23,7 @@ const pageTitle = 'Parcours & Certifications - Sofiane Lasri';
 const pageDescription = `Découvrez le parcours professionnel et les certifications de Sofiane Lasri. ${props.certifications.length} certifications obtenues et ${props.workExperiences.length} expériences professionnelles en développement web.`;
 const pageKeywords = 'parcours, certifications, Sofiane Lasri, expérience professionnelle, formation, développeur web, carrière';
 const pageUrl = window.location.href;
-const pageImage = '/favicon.svg';
+const pageImage = '/opengraph-image-1200-630.jpg';
 </script>
 
 <template>
@@ -39,14 +39,14 @@ const pageImage = '/favicon.svg';
         <meta property="og:description" :content="pageDescription" />
         <meta property="og:url" :content="pageUrl" />
         <meta property="og:image" :content="pageImage" />
-        <meta property="og:image:alt" content="Parcours professionnel Sofiane Lasri" />
+        <meta property="og:video:width" content="1200" />
+        <meta property="og:video:height" content="630" />
 
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" :content="pageTitle" />
         <meta name="twitter:description" :content="pageDescription" />
         <meta name="twitter:image" :content="pageImage" />
-        <meta name="twitter:image:alt" content="Parcours professionnel Sofiane Lasri" />
     </Head>
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">

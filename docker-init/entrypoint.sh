@@ -5,7 +5,7 @@ composer install
 php artisan key:generate
 
 npm install
-npm run build
+# npm run build
 
 echo "Migrating database..."
 php artisan migrate

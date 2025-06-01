@@ -1,8 +1,0 @@
-User-agent: *
-Disallow: /dashboard/
-Disallow: /login
-Disallow: /register
-Disallow: /password/
-Disallow: /email/
-
-Sitemap: /sitemap.xml

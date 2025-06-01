@@ -186,6 +186,7 @@
       <path value="$PROJECT_DIR$/vendor/spatie/crawler" />
       <path value="$PROJECT_DIR$/vendor/spatie/laravel-package-tools" />
       <path value="$PROJECT_DIR$/vendor/spatie/laravel-sitemap" />
+      <path value="$PROJECT_DIR$/vendor/verschuur/laravel-robotstxt" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

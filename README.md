@@ -224,6 +224,16 @@ Notez cependant l'absence de MariaDB dans ce fichier, la base de données étant
 - **Traitement en arrière-plan** via queues Laravel
 - **CDN ready** avec support de disques multiples
 
+### Enregistrement des requêtes pour les statistiques
+Usage du paquet `sl-projects/laravel-request-logger` pour enregistrer les requêtes HTTP à des fins statistiques et de monitoring. Les requêtes sont stockées dans la base de données et peuvent être visualisées dans le tableau de bord administrateur.
+
+### Support de BunnyCDN & Bunny Stream
+Le projet utilise BunnyCDN comme filesystem pour stocker les images et Bunny Stream pour la gestion des vidéos.
+
+Paquets :
+- `platformcommunity/flysystem-bunnycdn`: Intégration de BunnyCDN avec Laravel
+- `corbpie/bunny-cdn-api`: Utilisé pour Bunny Stream
+
 ## 📞 Contact
 
 **Sofiane Lasri**

@@ -81,12 +81,14 @@ Both applications are served from the same Laravel backend but have completely s
 - **Experience**: Professional work history with types (Work/Education/Project/Certification)
 - **Person**: Collaborators/team members linked to projects
 - **Picture**: Advanced image system with automatic AVIF/WebP optimization and 5 size variants
+- **Video**: Video content with Bunny CDN streaming integration, cover images, and creation relationships
 
 ### Key Services
 - **PublicControllersService**: Transforms and aggregates data for public pages (complex business logic)
 - **ImageTranscodingService**: Handles automatic image optimization with multiple formats
 - **CreationConversionService**: Converts drafts to published creations
 - **UploadedFilesService**: Manages file uploads and storage
+- **BunnyStreamService**: Video streaming service with Bunny CDN integration for upload, transcoding, and playback
 
 ### Translation System
 **Dual Translation Architecture**:
@@ -95,11 +97,20 @@ Both applications are served from the same Laravel backend but have completely s
 
 **Translation Fallback**: The `PublicControllersService` implements automatic fallback from current locale to fallback locale, ensuring translations are always available.
 
-### Image Optimization Pipeline
+### Media Processing Pipelines
+
+#### Image Optimization
 Sophisticated image handling with automatic transcoding to modern formats:
 - **Formats**: Original, AVIF, WebP
 - **Sizes**: thumbnail, small, medium, large, full
 - **Processing**: Queue-based using Intervention Image
+
+#### Video Streaming
+Professional video handling through Bunny CDN integration:
+- **Upload**: Direct upload to Bunny Stream with automatic transcoding
+- **Playback**: Iframe embedding with `https://iframe.mediadelivery.net/embed/{libraryId}/{videoId}`
+- **Thumbnails**: Dynamic thumbnail generation with custom dimensions
+- **Management**: Full CRUD operations with status tracking
 
 ## Frontend Structure
 
@@ -121,11 +132,12 @@ resources/js/components/
 - **Tailwind CSS 4**: Styling with motion and animation plugins
 - **Vee-validate + Zod**: Form validation
 - **PhotoSwipe**: Image gallery functionality
+- **Video Components**: Custom video gallery and modal components for Bunny Stream integration
 
 ## Development Patterns
 
 ### Draft-First Workflow
-All content editing happens on draft entities (`CreationDraft`, `CreationDraftFeature`, etc.) before being converted to published versions. This allows safe editing without affecting the live site.
+All content editing happens on draft entities (`CreationDraft`, `CreationDraftFeature`, `CreationDraftVideo`, etc.) before being converted to published versions. This allows safe editing without affecting the live site. Videos and media assets follow this same pattern with separate pivot tables for drafts vs. published content.
 
 ### Service-Layer Architecture
 Complex business logic is extracted into services rather than controllers or models. Services handle data transformation, aggregation, and complex operations.
@@ -166,7 +178,9 @@ Complex business logic is extracted into services rather than controllers or mod
 Most models use pivot tables for many-to-many relationships. Draft entities mirror published entity relationships but with separate pivot tables.
 
 ### File Storage
-Uploaded files are stored in `storage/app/public/uploads/` with automatic optimization generating multiple variants.
+- **Images**: Stored in `storage/app/public/uploads/` with automatic optimization generating multiple variants
+- **Videos**: Uploaded directly to Bunny Stream CDN with iframe embedding for playback
+- **CDN Integration**: BunnyCDN filesystem support for production deployments
 
 ## Local Development
 Usage of docker for local development is strongly recommended. All the required dependencies are included in the `docker-compose.yml` file. Run tests and build commands inside the container.
@@ -189,3 +203,16 @@ Usage of docker for local development is strongly recommended. All the required 
 1. Add translation keys to appropriate files in `/lang/en/` and `/lang/fr/`
 2. Include translation group in controller's `translations` array
 3. Use `t('group.key')` in Vue components with `useTranslation()` composable
+
+## Development Guidelines
+
+### Code Creation Policy
+- **ALWAYS prefer editing existing files** over creating new ones
+- **NEVER create files unless absolutely necessary** for achieving the goal
+- **NEVER proactively create documentation files** (*.md) or README files unless explicitly requested
+
+### Code Standards
+- Follow existing code patterns and conventions in the codebase
+- Use the established service-layer architecture for complex business logic
+- Maintain type safety across PHP (PHPDoc) and TypeScript implementations
+- Follow the draft-first workflow for all content management features

@@ -279,6 +279,7 @@ class PublicControllersServiceTest extends TestCase
                 $this->assertEquals($feature->picture->filename, $resultFeature['picture']['filename']);
                 $this->assertArrayHasKey('avif', $resultFeature['picture']);
                 $this->assertArrayHasKey('webp', $resultFeature['picture']);
+                $this->assertArrayHasKey('jpg', $resultFeature['picture']);
             } else {
                 $this->assertNull($resultFeature['picture']);
             }
@@ -306,6 +307,7 @@ class PublicControllersServiceTest extends TestCase
 
             $this->assertArrayHasKey('avif', $resultScreenshot['picture']);
             $this->assertArrayHasKey('webp', $resultScreenshot['picture']);
+            $this->assertArrayHasKey('jpg', $resultScreenshot['picture']);
         }
 
         foreach ($creation->people as $person) {
@@ -326,6 +328,7 @@ class PublicControllersServiceTest extends TestCase
             $this->assertEquals($video->coverPicture->filename, $resultVideo['coverPicture']['filename']);
             $this->assertArrayHasKey('avif', $resultVideo['coverPicture']);
             $this->assertArrayHasKey('webp', $resultVideo['coverPicture']);
+            $this->assertArrayHasKey('jpg', $resultVideo['coverPicture']);
         }
     }
 

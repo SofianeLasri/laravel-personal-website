@@ -297,6 +297,13 @@ interface SSRPicture {
         large: string;
         full: string;
     };
+    jpg: {
+        thumbnail: string;
+        small: string;
+        medium: string;
+        large: string;
+        full: string;
+    };
 }
 
 interface SSRCertification {

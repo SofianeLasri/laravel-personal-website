@@ -31,6 +31,7 @@ class OptimizePicturesCommand extends Command
 
         if ($totalCount === 0) {
             $this->info('All pictures are already optimized!');
+
             return;
         }
 
@@ -39,7 +40,7 @@ class OptimizePicturesCommand extends Command
         $bar = $this->output->createProgressBar($totalCount);
         $bar->start();
 
-        $chunkSize = max(1, (int)$this->option('chunk'));
+        $chunkSize = max(1, (int) $this->option('chunk'));
 
         $pictureIdsToOptimize->chunk($chunkSize)->each(function ($ids) use ($bar) {
             foreach ($ids as $id) {

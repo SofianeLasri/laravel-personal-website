@@ -71,7 +71,7 @@ class OptimizedPictureTest extends TestCase
     #[Test]
     public function it_defines_format_options_as_constants()
     {
-        $this->assertEquals(['avif', 'webp'], OptimizedPicture::FORMATS);
+        $this->assertEquals(['avif', 'webp', 'jpg'], OptimizedPicture::FORMATS);
     }
 
     #[Test]

@@ -13,8 +13,9 @@ import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRExperience, SSRSimplifiedCreation, SSRTechnologyExperience } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 
+const page = usePage();
 const { t } = useTranslation();
 
 defineProps<{

@@ -9,6 +9,7 @@ return [
     'certifications-career' => 'Certifications  & Parcours',
     'about_me' => 'À propos de moi',
     'find_me' => 'Me retrouver.',
+    'sitemap' => 'Plan du site',
     'copyright' => '2025 - Sofiane Lasri-Trienpont, développé sur Laravel.',
     'photo_alt' => 'Photo de Sofiane Lasri',
 ];

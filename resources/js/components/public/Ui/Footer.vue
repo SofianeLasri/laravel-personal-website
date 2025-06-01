@@ -48,6 +48,9 @@ const { t } = useTranslation();
                                 <li class="mb-2 list-none">
                                     <a href="/about" :title="t('footer.about_me')">{{ t('footer.about_me') }}</a>
                                 </li>
+                                <li class="mb-2 list-none">
+                                    <Link :href="route('public.sitemap')" :title="t('footer.sitemap')">{{ t('footer.sitemap') }}</Link>
+                                </li>
                             </ul>
                         </div>
 

@@ -27,7 +27,7 @@ const routes = [
     { path: route('public.home'), name: t('navigation.home'), index: 0 },
     { path: route('public.projects'), name: t('navigation.projects'), index: 1 },
     { path: route('public.certifications-career'), name: t('navigation.certifications-career'), index: 2 },
-    { path: '#', name: t('navigation.about'), index: 2 },
+    /*{ path: '#', name: t('navigation.about'), index: 2 },*/
 ];
 
 const activeIndex = computed(() => {

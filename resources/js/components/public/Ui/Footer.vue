@@ -45,9 +45,9 @@ const { t } = useTranslation();
                                         t('footer.certifications-career')
                                     }}</Link>
                                 </li>
-                                <li class="mb-2 list-none">
+                                <!--                                <li class="mb-2 list-none">
                                     <a href="/about" :title="t('footer.about_me')">{{ t('footer.about_me') }}</a>
-                                </li>
+                                </li>-->
                             </ul>
                         </div>
 

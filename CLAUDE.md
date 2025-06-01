@@ -216,3 +216,6 @@ Usage of docker for local development is strongly recommended. All the required 
 - Use the established service-layer architecture for complex business logic
 - Maintain type safety across PHP (PHPDoc) and TypeScript implementations
 - Follow the draft-first workflow for all content management features
+
+## Frontend Best Practices
+- Always use Axios instead of fetch or xhr since Inertia handle the csrf token

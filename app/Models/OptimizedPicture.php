@@ -50,6 +50,7 @@ class OptimizedPicture extends Model
     const FORMATS = [
         'avif',
         'webp',
+        'jpg',
     ];
 
     protected static function booted(): void

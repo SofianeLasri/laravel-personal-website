@@ -4,7 +4,6 @@ namespace Tests\Feature\Models\SocialMediaLink;
 
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;

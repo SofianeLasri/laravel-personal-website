@@ -50,7 +50,7 @@ class Picture extends Model
      * Get the optimized pictures for the picture.
      *
      * @param  string  $variant  thumbnail|small|medium|large|full
-     * @param  string  $format  avif|webp
+     * @param  string  $format  avif|webp|jpg
      */
     public function getOptimizedPicture(string $variant, string $format): ?OptimizedPicture
     {

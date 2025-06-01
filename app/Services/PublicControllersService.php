@@ -94,8 +94,8 @@ class PublicControllersService
      *      id: int,
      *      name: string,
      *      slug: string,
-     *      logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
-     *      coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *      logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *      coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
      *      startedAt: string,
      *      endedAt: string|null,
      *      startedAtFormatted: string|null,
@@ -135,8 +135,8 @@ class PublicControllersService
      *     id: int,
      *     name: string,
      *     slug: string,
-     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
      *     startedAt: string,
      *     endedAt: string|null,
      *     startedAtFormatted: string|null,
@@ -164,8 +164,8 @@ class PublicControllersService
      *     id: int,
      *     name: string,
      *     slug: string,
-     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
      *     startedAt: string,
      *     endedAt: string|null,
      *     startedAtFormatted: string|null,
@@ -301,6 +301,12 @@ class PublicControllersService
      *      medium: string,
      *      large: string,
      *      full: string,},
+     *  jpg: array{
+     *      thumbnail: string,
+     *      small: string,
+     *      medium: string,
+     *      large: string,
+     *      full: string,},
      * }
      */
     public function formatPictureForSSR(Picture $picture): array
@@ -322,6 +328,13 @@ class PublicControllersService
                 'medium' => $picture->getUrl('medium', 'webp'),
                 'large' => $picture->getUrl('large', 'webp'),
                 'full' => $picture->getUrl('full', 'webp'),
+            ],
+            'jpg' => [
+                'thumbnail' => $picture->getUrl('thumbnail', 'jpg'),
+                'small' => $picture->getUrl('small', 'jpg'),
+                'medium' => $picture->getUrl('medium', 'jpg'),
+                'large' => $picture->getUrl('large', 'jpg'),
+                'full' => $picture->getUrl('full', 'jpg'),
             ],
         ];
     }

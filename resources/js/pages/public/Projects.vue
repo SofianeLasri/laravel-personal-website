@@ -22,7 +22,7 @@ const props = defineProps<{
 const page = usePage();
 const { t } = useTranslation();
 
-const pageTitle = 'Projets - Portfolio Sofiane Lasri';
+const pageTitle = 'Projets - Sofiane Lasri';
 const pageDescription = `Découvrez mes ${props.creations.length} projets.`;
 const pageKeywords = 'projets, portfolio, Sofiane Lasri, développement web, Laravel, Vue.js, réalisations, applications web';
 const pageUrl = page.props.ziggy.location;

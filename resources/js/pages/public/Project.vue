@@ -22,7 +22,7 @@ const props = defineProps<{
 const page = usePage();
 const { t } = useTranslation();
 
-const pageTitle = `${props.creation.name} - Projet de Sofiane Lasri`;
+const pageTitle = `${props.creation.name} - Sofiane Lasri`;
 const pageDescription = props.creation.shortDescription || 'Projet développé par Sofiane Lasri.';
 const pageKeywords = `Sofiane Lasri, ${props.creation.name}, projet, développement web, ${props.creation.technologies.map((tech) => tech.name).join(', ')}`;
 const pageUrl = page.props.ziggy.location;

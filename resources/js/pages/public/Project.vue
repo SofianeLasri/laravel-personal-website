@@ -9,7 +9,7 @@ import HorizontalNavbar from '@/components/public/Ui/HorizontalNavbar.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { User } from 'lucide-vue-next';
 import { ref } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
@@ -19,6 +19,7 @@ const props = defineProps<{
     creation: SSRFullCreation;
 }>();
 
+const page = usePage();
 const { t } = useTranslation();
 
 const pageTitle = `${props.creation.name} - Projet de Sofiane Lasri`;

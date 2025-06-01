@@ -8,7 +8,7 @@ import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRSimplifiedCreation, SSRTechnology } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 type ProjectTab = 'development' | 'games' | 'source-engine';
@@ -19,6 +19,7 @@ const props = defineProps<{
     technologies: SSRTechnology[];
 }>();
 
+const page = usePage();
 const { t } = useTranslation();
 
 const pageTitle = 'Projets - Portfolio Sofiane Lasri';

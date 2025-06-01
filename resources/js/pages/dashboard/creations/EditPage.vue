@@ -28,7 +28,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, TranslationKey } from '@/types';
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
 import axios from 'axios';
 import slugify from 'slugify';
@@ -61,6 +61,7 @@ if (props.creationDraft) {
     currentCreationDraft.value = props.creationDraft;
 }
 
+const page = usePage();
 const locale = ref<'fr' | 'en'>('fr');
 const localeValue = computed(() => locale.value);
 

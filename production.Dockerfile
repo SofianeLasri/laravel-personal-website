@@ -12,27 +12,28 @@ RUN install-php-extensions \
     redis \
     pcntl \
     bcmath \
-    excimer \
+    excimer
+
+RUN apt-get update
 
 # Install MariaDB Client
-RUN apt-get update && apt-get install mariadb-client -y
+RUN apt-get install -y mariadb-client
 
-# Installation de Composer
+# Install Composer
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Installation de Nodejs et NPM
+# Install Nodejs and NPM
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh && \
     bash nodesource_setup.sh && \
     apt-get install -y nodejs
 
-# Installation de supervisor
+# Install supervisor
 RUN apt-get install -y supervisor
 COPY docker-init/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Configuration PHP
+# Setting PHP Configuration
 COPY docker-init/php.ini $PHP_INI_DIR/php.ini
 
-# Création du répertoire de travail
 WORKDIR /app
 
 COPY composer.json composer.lock /app/
@@ -44,19 +45,17 @@ RUN npm install
 COPY . /app/
 COPY stack.env /app/.env
 
-# Création des dossiers de cache
+# Create directories
 RUN mkdir -p /app/storage/framework/{sessions,views,cache}
 RUN chmod -R 775 /app/storage/framework
 
-# Finalisation de l'installation
 RUN composer dump-autoload --optimize
 RUN php artisan ziggy:generate
 RUN php artisan storage:link
 RUN npm run build:ssr
 
-# Copie du script d'entrypoint
+# Copy entrypoint script
 COPY docker-init/entrypoint-production.sh /app/docker-init/entrypoint.sh
 RUN chmod +x /app/docker-init/entrypoint.sh
 
-# Définition de l'entrypoint
 ENTRYPOINT ["/app/docker-init/entrypoint.sh"]

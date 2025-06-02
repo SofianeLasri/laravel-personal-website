@@ -1,6 +1,5 @@
 FROM dunglas/frankenphp
 
-ARG INSTALL_XDEBUG=false
 RUN install-php-extensions \
     ftp \
     bz2 \
@@ -12,10 +11,12 @@ RUN install-php-extensions \
     redis \
     pcntl \
     bcmath \
-    $( [ "$INSTALL_XDEBUG" = "true" ] && echo "xdebug" )
+    xdebug
+
+RUN apt-get update
 
 # Install MariaDB Client
-RUN apt-get update && apt-get install mariadb-client -y
+RUN apt-get install -y mariadb-client
 
 # Install Composer
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

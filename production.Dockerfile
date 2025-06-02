@@ -12,7 +12,10 @@ RUN install-php-extensions \
     redis \
     pcntl \
     bcmath \
-    excimer
+    excimer \
+
+# Install MariaDB Client
+RUN apt-get install -y mariadb-client
 
 # Installation de Composer
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

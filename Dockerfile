@@ -14,6 +14,9 @@ RUN install-php-extensions \
     bcmath \
     $( [ "$INSTALL_XDEBUG" = "true" ] && echo "xdebug" )
 
+# Install MariaDB Client
+RUN apt-get install -y mariadb-client
+
 # Install Composer
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

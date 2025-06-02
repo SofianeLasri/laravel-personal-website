@@ -15,7 +15,7 @@ RUN install-php-extensions \
     $( [ "$INSTALL_XDEBUG" = "true" ] && echo "xdebug" )
 
 # Install MariaDB Client
-RUN apt-get install -y mariadb-client
+RUN apt-get update && apt-get install mariadb-client -y
 
 # Install Composer
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

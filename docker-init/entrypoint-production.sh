@@ -8,6 +8,7 @@ php artisan migrate --force
 echo "Launching Supervisor..."
 service supervisor start
 supervisorctl start all
+service cron start
 
 echo "Running SSR..."
 php artisan inertia:start-ssr &

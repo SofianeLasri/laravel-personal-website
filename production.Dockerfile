@@ -35,7 +35,8 @@ COPY docker-init/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN apt-get install -y cron
 
 # Configure cron for Laravel
-RUN echo "* * * * * cd /app && php artisan schedule:run >> /dev/null 2>&1" | crontab -
+RUN echo "* * * * * php /app/php artisan schedule:run >> /var/log/cron.log 2>&1" >> /etc/crontab
+RUN touch /var/log/cron.log
 
 # Setting PHP Configuration
 COPY docker-init/php.ini $PHP_INI_DIR/php.ini

@@ -30,5 +30,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh && \
 RUN apt-get install -y supervisor
 COPY docker-init/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# Install crontab
+RUN apt-get install -y cron
+
+# Configure cron for Laravel
+RUN echo "* * * * * cd /app && php artisan schedule:run >> /dev/null 2>&1" | crontab -
+
 # Setting PHP Configuration
 COPY docker-init/php.ini $PHP_INI_DIR/php.ini

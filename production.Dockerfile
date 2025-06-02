@@ -41,6 +41,9 @@ RUN touch /var/log/cron.log
 # Setting PHP Configuration
 COPY docker-init/php.ini $PHP_INI_DIR/php.ini
 
+# Setting Caddy configuration
+COPY docker-init/production.caddyfile /etc/Caddyfile/Caddyfile.d/production.caddyfile
+
 WORKDIR /app
 
 COPY composer.json composer.lock /app/

@@ -1,0 +1,8 @@
+# Used to get the real client IP address
+# See https://github.com/dunglas/frankenphp/discussions/718#discussioncomment-9250960
+# The following ip is the docker host IP address for the production container
+{
+    servers {
+        trusted_proxies static 172.22.0.1/16
+    }
+}

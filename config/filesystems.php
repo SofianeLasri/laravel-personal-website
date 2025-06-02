@@ -68,6 +68,12 @@ return [
             'region' => env('BUNNYCDN_REGION', \PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNRegion::DEFAULT),
         ],
 
+        'bunnystorage' => [
+            'driver' => 'bunnystorage',
+            'storage_zone' => env('BUNNYSTORAGE_STORAGE_ZONE'),
+            'api_key' => env('BUNNYSTORAGE_API_KEY'),
+            'region' => env('BUNNYSTORAGE_REGION', \PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNRegion::DEFAULT),
+        ],
     ],
 
     /*

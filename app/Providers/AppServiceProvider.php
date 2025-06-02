@@ -49,5 +49,21 @@ class AppServiceProvider extends ServiceProvider
                 $config
             );
         });
+
+        Storage::extend('bunnystorage', function ($app, $config) {
+            $adapter = new BunnyCDNAdapter(
+                new BunnyCDNClient(
+                    $config['storage_zone'],
+                    $config['api_key'],
+                    $config['region']
+                )
+            );
+
+            return new FilesystemAdapter(
+                new Filesystem($adapter, $config),
+                $adapter,
+                $config
+            );
+        });
     }
 }

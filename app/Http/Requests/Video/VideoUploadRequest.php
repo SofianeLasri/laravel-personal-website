@@ -16,7 +16,7 @@ class VideoUploadRequest extends FormRequest
                 'max:'.(1024 * 1024 * 1000), // 1000MB max
             ],
             'name' => ['nullable', 'string', 'max:255'],
-            'cover_picture_id' => ['required', 'exists:pictures,id'],
+            'cover_picture_id' => ['nullable', 'sometimes', 'exists:pictures,id'],
         ];
     }
 

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('cover_picture_id')->references('id')->on('pictures');
 
             $table->enum('status', [VideoStatus::PENDING->value, VideoStatus::TRANSCODING->value, VideoStatus::READY->value, VideoStatus::ERROR->value])->default(VideoStatus::PENDING->value);
-            $table->enum('visibility', [VideoVisibility::Public->value, VideoVisibility::Private->value])->default(VideoVisibility::Private->value);
+            $table->enum('visibility', [VideoVisibility::PUBLIC->value, VideoVisibility::PRIVATE->value])->default(VideoVisibility::PRIVATE->value);
         });
     }
 

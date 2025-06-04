@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Video;
 
+use App\Enums\VideoVisibility;
 use Illuminate\Foundation\Http\FormRequest;
 
 class VideoRequest extends FormRequest
@@ -11,6 +12,7 @@ class VideoRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'cover_picture_id' => ['required', 'exists:pictures,id'],
+            'visibility' => ['required', 'in:'.implode(',', VideoVisibility::values())],
         ];
     }
 

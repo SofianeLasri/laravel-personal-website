@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\VideoStatus;
+use App\Enums\VideoVisibility;
 use App\Models\Picture;
 use App\Models\Video;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,6 +19,8 @@ class VideoFactory extends Factory
             'name' => $this->faker->word(),
             'path' => $this->faker->filePath(),
             'bunny_video_id' => $this->faker->word(),
+            'status' => $this->faker->randomElement(VideoStatus::cases()),
+            'visibility' => $this->faker->randomElement(VideoVisibility::cases()),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
 

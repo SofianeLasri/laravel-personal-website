@@ -52,6 +52,8 @@ class VideoTest extends TestCase
             'path',
             'cover_picture_id',
             'bunny_video_id',
+            'status',
+            'visibility',
         ];
 
         $video = new Video;

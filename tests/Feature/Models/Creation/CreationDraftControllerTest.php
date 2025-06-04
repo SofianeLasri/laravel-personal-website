@@ -200,7 +200,7 @@ class CreationDraftControllerTest extends TestCase
             ->hasScreenshots(3)
             ->create();
 
-        $response = $this->deleteJson(route('dashboard.api.creation-drafts.show', ['creation_draft' => $draft]));
+        $response = $this->deleteJson(route('dashboard.api.creation-drafts.destroy', ['creation_draft' => $draft]));
 
         $response->assertNoContent();
         $this->assertDatabaseMissing('creation_drafts', ['id' => $draft->id]);

@@ -484,7 +484,7 @@ class CreationDraftControllerTest extends TestCase
     public function test_attach_video()
     {
         $draft = CreationDraft::factory()->create();
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
 
         $response = $this->postJson(route('dashboard.api.creation-drafts.attach-video', ['creation_draft' => $draft]), [
             'video_id' => $video->id,

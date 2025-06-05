@@ -85,7 +85,7 @@ class VideoTest extends TestCase
     #[Test]
     public function test_video_can_be_updated()
     {
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
         $newPicture = Picture::factory()->create();
 
         $updateData = [

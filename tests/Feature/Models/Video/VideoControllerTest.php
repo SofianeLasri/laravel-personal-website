@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Models\Video;
 
-use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Models\Picture;
@@ -179,7 +178,7 @@ class VideoControllerTest extends TestCase
     #[Test]
     public function test_update_video_with_valid_data(): void
     {
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
         $newPicture = Picture::factory()->create();
 
         $updateData = [
@@ -262,10 +261,7 @@ class VideoControllerTest extends TestCase
     #[Test]
     public function test_update_returns_updated_video(): void
     {
-        $video = Video::factory()->create([
-            'status' => VideoStatus::READY,
-            'visibility' => VideoVisibility::PUBLIC,
-        ]);
+        $video = Video::factory()->readyAndPublic()->create();
         $newPicture = Picture::factory()->create();
 
         $updateData = [
@@ -286,10 +282,7 @@ class VideoControllerTest extends TestCase
     #[Test]
     public function test_cannot_change_visibility_to_public_if_video_is_not_transcoded()
     {
-        $video = Video::factory()->create([
-            'status' => VideoStatus::TRANSCODING,
-            'visibility' => VideoVisibility::PRIVATE,
-        ]);
+        $video = Video::factory()->transcodingAndPrivate()->create();
 
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), [
             'name' => $video->name,

@@ -27,4 +27,26 @@ class VideoFactory extends Factory
             'cover_picture_id' => Picture::factory(),
         ];
     }
+
+    /**
+     * @return Factory<Video>
+     */
+    public function readyAndPublic(): Factory
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => VideoStatus::READY,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+    }
+
+    /**
+     * @return Factory<Video>
+     */
+    public function transcodingAndPrivate(): Factory
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => VideoStatus::TRANSCODING,
+            'visibility' => VideoVisibility::PRIVATE,
+        ]);
+    }
 }

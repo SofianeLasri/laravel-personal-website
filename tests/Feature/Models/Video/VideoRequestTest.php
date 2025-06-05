@@ -76,7 +76,7 @@ class VideoRequestTest extends TestCase
             'path' => 'videos/test-video.mp4',
             'filename' => 'test-video.mp4',
             'bunny_video_id' => 'bunny-12345',
-            'visibility' => VideoVisibility::PUBLIC,
+            'visibility' => VideoVisibility::PUBLIC->value,
         ];
 
         $validator = Validator::make($data, $this->rules());

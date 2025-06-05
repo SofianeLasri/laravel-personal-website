@@ -31,6 +31,7 @@ const uploadProgress = ref(0);
 const editingVideo = ref<Video | null>(null);
 const editVideoName = ref('');
 const editVideoCoverPictureId = ref<number | undefined>(undefined);
+const editVideoVisibility = ref<'private' | 'public'>('private');
 
 const fetchVideos = async () => {
     if (!props.creationDraftId) return;
@@ -170,6 +171,7 @@ const openEditModal = (video: Video) => {
     editingVideo.value = video;
     editVideoName.value = video.name;
     editVideoCoverPictureId.value = video.cover_picture_id;
+    editVideoVisibility.value = video.visibility;
     isEditModalOpen.value = true;
 };
 
@@ -182,13 +184,6 @@ const updateVideo = async () => {
     error.value = null;
 
     try {
-        // Get current video data to preserve existing properties
-        const currentVideoResponse = await axios.get(
-            route('dashboard.api.videos.show', {
-                video: editingVideo.value.id,
-            }),
-        );
-
         await axios.put(
             route('dashboard.api.videos.update', {
                 video: editingVideo.value.id,
@@ -196,7 +191,7 @@ const updateVideo = async () => {
             {
                 name: editVideoName.value,
                 cover_picture_id: editVideoCoverPictureId.value,
-                visibility: currentVideoResponse.data.visibility || 'private',
+                visibility: editVideoVisibility.value,
             },
         );
 
@@ -226,6 +221,7 @@ const resetEditForm = () => {
     editingVideo.value = null;
     editVideoName.value = '';
     editVideoCoverPictureId.value = undefined;
+    editVideoVisibility.value = 'private';
 };
 
 const handleFileSelect = (event: Event) => {
@@ -249,6 +245,40 @@ const formatFileSize = (bytes: number): string => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+const getStatusLabel = (status: string): string => {
+    switch (status) {
+        case 'pending':
+            return 'En attente';
+        case 'transcoding':
+            return 'Transcodage en cours';
+        case 'ready':
+            return 'Prêt';
+        case 'error':
+            return 'Erreur';
+        default:
+            return status;
+    }
+};
+
+const getStatusColor = (status: string): string => {
+    switch (status) {
+        case 'pending':
+            return 'text-yellow-600';
+        case 'transcoding':
+            return 'text-blue-600';
+        case 'ready':
+            return 'text-green-600';
+        case 'error':
+            return 'text-red-600';
+        default:
+            return 'text-gray-600';
+    }
+};
+
+const canSetPublic = (status: string): boolean => {
+    return status === 'ready';
 };
 
 onMounted(() => {
@@ -310,7 +340,11 @@ watch(
                         <div class="flex items-start justify-between">
                             <div class="min-w-0 flex-1">
                                 <h3 class="truncate text-sm font-medium">{{ video.name }}</h3>
-                                <p class="text-muted-foreground mt-1 text-xs">ID Bunny: {{ video.bunny_video_id }}</p>
+                                <div class="mt-1 flex items-center gap-2 text-xs">
+                                    <span class="text-muted-foreground">ID Bunny: {{ video.bunny_video_id }}</span>
+                                    <span :class="getStatusColor(video.status)" class="font-medium"> • {{ getStatusLabel(video.status) }} </span>
+                                    <span class="text-muted-foreground"> • {{ video.visibility === 'public' ? 'Publique' : 'Privée' }} </span>
+                                </div>
                             </div>
                             <div class="ml-2 flex flex-shrink-0 space-x-1">
                                 <Button variant="ghost" size="icon" @click.stop="openEditModal(video)" title="Modifier la vidéo">
@@ -441,9 +475,37 @@ watch(
                         <p class="text-muted-foreground text-xs">L'image de couverture sera utilisée comme miniature pour la vidéo</p>
                     </div>
 
+                    <div class="space-y-2">
+                        <Label>Visibilité</Label>
+                        <Select v-model="editVideoVisibility" :disabled="loading">
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="private">Privée</SelectItem>
+                                <SelectItem value="public" :disabled="editingVideo && !canSetPublic(editingVideo.status)"> Publique </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p v-if="editingVideo && !canSetPublic(editingVideo.status)" class="text-muted-foreground text-xs">
+                            La vidéo doit être entièrement transcodée pour être rendue publique
+                        </p>
+                    </div>
+
                     <div v-if="editingVideo" class="space-y-2">
-                        <Label>Informations de la vidéo</Label>
+                        <Label>Statut et informations</Label>
                         <div class="space-y-1 text-sm">
+                            <p>
+                                <strong>Statut:</strong>
+                                <span :class="getStatusColor(editingVideo.status)" class="font-medium">
+                                    {{ getStatusLabel(editingVideo.status) }}
+                                </span>
+                            </p>
+                            <p>
+                                <strong>Visibilité actuelle:</strong>
+                                <span class="font-medium">
+                                    {{ editingVideo.visibility === 'public' ? 'Publique' : 'Privée' }}
+                                </span>
+                            </p>
                             <p><strong>ID Bunny:</strong> {{ editingVideo.bunny_video_id }}</p>
                             <p><strong>Créée le:</strong> {{ new Date(editingVideo.created_at).toLocaleDateString('fr-FR') }}</p>
                         </div>

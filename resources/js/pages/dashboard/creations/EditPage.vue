@@ -69,7 +69,12 @@ const showLocaleChangeDialog = ref(false);
 const pendingLocale = ref<string | null>(null);
 
 const getOriginalCreationId = (): number | null => {
-    const url = new URL(page.props.ziggy.location);
+    // To avoid errors on ssr
+    let url = new URL(page.props.ziggy.location);
+    if (window.location.href) {
+        url = new URL(window.location.href);
+    }
+
     const creationId = url.searchParams.get('creation-id');
     return creationId ? parseInt(creationId) : null;
 };

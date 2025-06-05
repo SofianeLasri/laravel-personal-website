@@ -80,8 +80,12 @@ class CreationDraftController extends Controller
             'featured' => $request->featured ?? false,
             'external_url' => $request->external_url,
             'source_code_url' => $request->source_code_url,
-            'original_creation_id' => $request->original_creation_id,
         ]);
+
+        if (! empty($request->original_creation_id)) {
+            $creationDraft->original_creation_id = $request->original_creation_id;
+            $creationDraft->save();
+        }
 
         if ($request->has('people')) {
             $creationDraft->people()->sync($request->people);

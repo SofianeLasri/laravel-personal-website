@@ -88,7 +88,7 @@ const attachVideo = async () => {
 };
 
 const uploadVideo = async () => {
-    if (!newVideoFile.value || !newVideoCoverPictureId.value || !props.creationDraftId) {
+    if (!newVideoFile.value || !props.creationDraftId) {
         return;
     }
 
@@ -100,7 +100,9 @@ const uploadVideo = async () => {
         const formData = new FormData();
         formData.append('video', newVideoFile.value);
         formData.append('name', newVideoName.value || newVideoFile.value.name);
-        formData.append('cover_picture_id', newVideoCoverPictureId.value.toString());
+        if (newVideoCoverPictureId.value) {
+            formData.append('cover_picture_id', newVideoCoverPictureId.value.toString());
+        }
 
         // Upload de la vidéo
         const uploadResponse = await axios.post(route('dashboard.api.videos.store'), formData, {
@@ -337,7 +339,7 @@ watch(
                     </div>
 
                     <div class="space-y-2">
-                        <Label>Image de couverture</Label>
+                        <Label>Image de couverture (optionnelle)</Label>
                         <PictureInput v-model="newVideoCoverPictureId" :disabled="loading" />
                     </div>
 
@@ -352,7 +354,7 @@ watch(
 
                 <DialogFooter>
                     <Button variant="outline" @click="isUploadModalOpen = false" :disabled="loading">Annuler</Button>
-                    <Button :disabled="!newVideoFile || !newVideoCoverPictureId || loading" @click="uploadVideo">
+                    <Button :disabled="!newVideoFile || loading" @click="uploadVideo">
                         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                         <Upload v-else class="mr-2 h-4 w-4" />
                         Uploader et ajouter

@@ -59,12 +59,21 @@ class VideoController extends Controller
             ], 500);
         }
 
+        $videoStatus = match ($uploadedVideoData['status']) {
+            3 => VideoStatus::TRANSCODING,
+            4 => VideoStatus::READY,
+            5, 6 => VideoStatus::ERROR,
+            default => VideoStatus::PENDING,
+        };
+
         $coverPictureId = $request->input('cover_picture_id');
         $video = Video::create([
             'name' => $name,
             'path' => $relativeFilePath,
             'cover_picture_id' => $coverPictureId,
             'bunny_video_id' => $uploadedVideoData['guid'],
+            'status' => $videoStatus,
+            'visibility' => VideoVisibility::PRIVATE,
         ]);
 
         return response()->json($video->load('coverPicture'), 201);

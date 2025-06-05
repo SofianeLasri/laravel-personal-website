@@ -70,17 +70,17 @@ class VideoRequestTest extends TestCase
     }
 
     #[Test]
-    public function it_fails_when_cover_picture_id_is_missing(): void
+    public function it_doesnt_fails_when_cover_picture_id_is_missing(): void
     {
         $data = [
             'path' => 'videos/test-video.mp4',
             'filename' => 'test-video.mp4',
             'bunny_video_id' => 'bunny-12345',
+            'visibility' => VideoVisibility::PUBLIC,
         ];
 
         $validator = Validator::make($data, $this->rules());
-        $this->assertFalse($validator->passes(), 'La validation devrait échouer quand cover_picture_id est manquant.');
-        $this->assertArrayHasKey('cover_picture_id', $validator->errors()->toArray());
+        $this->assertTrue($validator->passes());
     }
 
     #[Test]

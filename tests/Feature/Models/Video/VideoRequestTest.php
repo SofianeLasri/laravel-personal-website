@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models\Video;
 
+use App\Enums\VideoVisibility;
 use App\Http\Requests\Video\VideoRequest;
 use App\Models\Picture;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,9 +28,9 @@ class VideoRequestTest extends TestCase
 
         $data = [
             'name' => 'Test Video',
-            'path' => 'videos/test-video.mp4',
             'cover_picture_id' => $picture->id,
             'bunny_video_id' => 'bunny-12345',
+            'visibility' => VideoVisibility::PUBLIC->value,
         ];
 
         $validator = Validator::make($data, $this->rules());

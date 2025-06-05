@@ -150,7 +150,7 @@ class PublicControllersService
      */
     public function getCreations(): Collection
     {
-        $creations = Creation::all()->withRelationshipAutoloading()->sortByDesc('ended_at');
+        $creations = Creation::orderByRaw('ended_at IS NULL, ended_at DESC')->get()->withRelationshipAutoloading();
 
         return $creations->map(function (Creation $creation) {
             return $this->formatCreationForSSRShort($creation);

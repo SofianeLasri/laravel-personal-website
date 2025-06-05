@@ -23,7 +23,7 @@ const page = usePage();
 const { t } = useTranslation();
 
 const pageTitle = `${props.creation.name} - Sofiane Lasri`;
-const pageDescription = props.creation.shortDescription || 'Projet développé par Sofiane Lasri.';
+const pageDescription = props.creation.shortDescription;
 const pageKeywords = `Sofiane Lasri, ${props.creation.name}, projet, développement web, ${props.creation.technologies.map((tech) => tech.name).join(', ')}`;
 const pageUrl = page.props.ziggy.location;
 const pageImage = props.creation.coverImage.jpg.large || '/opengraph-image-1200-630.jpg';

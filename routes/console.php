@@ -10,6 +10,7 @@ Artisan::command('inspire', function () {
 Schedule::command('save:requests')->everyMinute();
 Schedule::command('process:user-agents')->hourly();
 Schedule::command('process:ip-adresses')->everyFiveMinutes();
+Schedule::command('check:pending-videos-status')->everyFiveMinutes();
 
 Schedule::command('backup:clean --disable-notifications')->daily()->at('01:00');
 Schedule::command('backup:run --disable-notifications')->daily()->at('01:30');

@@ -9,6 +9,7 @@ use App\Services\BunnyStreamService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CheckPendingVideosStatusCommand extends Command
 {
@@ -39,6 +40,14 @@ class CheckPendingVideosStatusCommand extends Command
 
                 if ($videoData['status'] == 4) {
                     $video->visibility = VideoVisibility::PUBLIC;
+
+                    $localVideoDeleted = Storage::disk('local')->delete($video->path);
+
+                    if ($localVideoDeleted) {
+                        $video->path = '';
+                    } else {
+                        Log::warning("Failed to delete local video file for {$video->id}.");
+                    }
                 }
 
                 $video->status = $videoStatus;

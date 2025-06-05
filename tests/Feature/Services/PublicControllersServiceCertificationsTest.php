@@ -10,8 +10,11 @@ use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+#[CoversClass(PublicControllersService::class)]
 class PublicControllersServiceCertificationsTest extends TestCase
 {
     use RefreshDatabase;
@@ -24,7 +27,8 @@ class PublicControllersServiceCertificationsTest extends TestCase
         $this->service = new PublicControllersService;
     }
 
-    public function test_get_certifications_returns_formatted_certifications()
+    #[Test]
+    public function test_get_certifications_returns_formatted_certifications(): void
     {
         $picture = Picture::factory()->create();
 
@@ -68,7 +72,8 @@ class PublicControllersServiceCertificationsTest extends TestCase
         $this->assertNull($secondCert['picture']);
     }
 
-    public function test_get_experiences_by_type_returns_filtered_experiences()
+    #[Test]
+    public function test_get_experiences_by_type_returns_filtered_experiences(): void
     {
         $picture = Picture::factory()->create();
 
@@ -106,7 +111,7 @@ class PublicControllersServiceCertificationsTest extends TestCase
             'ended_at' => null,
         ]);
 
-        $educationExperience = Experience::factory()->create([
+        Experience::factory()->create([
             'type' => ExperienceType::FORMATION,
             'title_translation_key_id' => $titleKey->id,
             'organization_name' => 'University',
@@ -132,7 +137,8 @@ class PublicControllersServiceCertificationsTest extends TestCase
         $this->assertIsArray($workExp['technologies']);
     }
 
-    public function test_get_certifications_career_data_returns_complete_data()
+    #[Test]
+    public function test_get_certifications_career_data_returns_complete_data(): void
     {
         $picture = Picture::factory()->create();
 
@@ -192,7 +198,8 @@ class PublicControllersServiceCertificationsTest extends TestCase
         $this->assertCount(1, $data['workExperiences']);
     }
 
-    public function test_format_certification_for_ssr_returns_correct_format()
+    #[Test]
+    public function test_format_certification_for_ssr_returns_correct_format(): void
     {
         $picture = Picture::factory()->create();
 
@@ -222,7 +229,8 @@ class PublicControllersServiceCertificationsTest extends TestCase
         $this->assertArrayHasKey('webp', $formatted['picture']);
     }
 
-    public function test_format_experience_for_ssr_returns_correct_format()
+    #[Test]
+    public function test_format_experience_for_ssr_returns_correct_format(): void
     {
         $picture = Picture::factory()->create();
 

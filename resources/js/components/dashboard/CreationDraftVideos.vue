@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Video } from '@/types';
 import axios from 'axios';
-import { FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
+import { Edit, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -22,11 +22,15 @@ const loading = ref(false);
 const error = ref<string | null>(null);
 const isSelectModalOpen = ref(false);
 const isUploadModalOpen = ref(false);
+const isEditModalOpen = ref(false);
 const selectedVideoId = ref<number | undefined>(undefined);
 const newVideoFile = ref<File | null>(null);
 const newVideoName = ref('');
 const newVideoCoverPictureId = ref<number | undefined>(undefined);
 const uploadProgress = ref(0);
+const editingVideo = ref<Video | null>(null);
+const editVideoName = ref('');
+const editVideoCoverPictureId = ref<number | undefined>(undefined);
 
 const fetchVideos = async () => {
     if (!props.creationDraftId) return;
@@ -162,6 +166,52 @@ const detachVideo = async (video: Video) => {
     }
 };
 
+const openEditModal = (video: Video) => {
+    editingVideo.value = video;
+    editVideoName.value = video.name;
+    editVideoCoverPictureId.value = video.cover_picture_id;
+    isEditModalOpen.value = true;
+};
+
+const updateVideo = async () => {
+    if (!editingVideo.value) {
+        return;
+    }
+
+    loading.value = true;
+    error.value = null;
+
+    try {
+        // Get current video data to preserve existing properties
+        const currentVideoResponse = await axios.get(
+            route('dashboard.api.videos.show', {
+                video: editingVideo.value.id,
+            }),
+        );
+
+        await axios.put(
+            route('dashboard.api.videos.update', {
+                video: editingVideo.value.id,
+            }),
+            {
+                name: editVideoName.value,
+                cover_picture_id: editVideoCoverPictureId.value,
+                visibility: currentVideoResponse.data.visibility || 'private',
+            },
+        );
+
+        await fetchVideos();
+        await fetchAllVideos();
+        resetEditForm();
+        isEditModalOpen.value = false;
+    } catch (err) {
+        error.value = 'Erreur lors de la mise à jour de la vidéo';
+        console.error(err);
+    } finally {
+        loading.value = false;
+    }
+};
+
 const resetSelectForm = () => {
     selectedVideoId.value = undefined;
 };
@@ -170,6 +220,12 @@ const resetUploadForm = () => {
     newVideoFile.value = null;
     newVideoName.value = '';
     newVideoCoverPictureId.value = undefined;
+};
+
+const resetEditForm = () => {
+    editingVideo.value = null;
+    editVideoName.value = '';
+    editVideoCoverPictureId.value = undefined;
 };
 
 const handleFileSelect = (event: Event) => {
@@ -257,6 +313,9 @@ watch(
                                 <p class="text-muted-foreground mt-1 text-xs">ID Bunny: {{ video.bunny_video_id }}</p>
                             </div>
                             <div class="ml-2 flex flex-shrink-0 space-x-1">
+                                <Button variant="ghost" size="icon" @click.stop="openEditModal(video)" title="Modifier la vidéo">
+                                    <Edit class="h-4 w-4" />
+                                </Button>
                                 <Button variant="ghost" size="icon" @click.stop="detachVideo(video)" title="Retirer de la création">
                                     <Trash2 class="h-4 w-4" />
                                 </Button>
@@ -358,6 +417,45 @@ watch(
                         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                         <Upload v-else class="mr-2 h-4 w-4" />
                         Uploader et ajouter
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        <!-- Modal d'édition -->
+        <Dialog v-model:open="isEditModalOpen">
+            <DialogContent class="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Modifier la vidéo</DialogTitle>
+                </DialogHeader>
+
+                <div class="space-y-4 py-4">
+                    <div class="space-y-2">
+                        <Label>Titre de la vidéo</Label>
+                        <Input v-model="editVideoName" placeholder="Titre de la vidéo" :disabled="loading" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <Label>Image de couverture</Label>
+                        <PictureInput v-model="editVideoCoverPictureId" :disabled="loading" />
+                        <p class="text-muted-foreground text-xs">L'image de couverture sera utilisée comme miniature pour la vidéo</p>
+                    </div>
+
+                    <div v-if="editingVideo" class="space-y-2">
+                        <Label>Informations de la vidéo</Label>
+                        <div class="space-y-1 text-sm">
+                            <p><strong>ID Bunny:</strong> {{ editingVideo.bunny_video_id }}</p>
+                            <p><strong>Créée le:</strong> {{ new Date(editingVideo.created_at).toLocaleDateString('fr-FR') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" @click="isEditModalOpen = false" :disabled="loading">Annuler</Button>
+                    <Button :disabled="!editVideoName.trim() || loading" @click="updateVideo">
+                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
+                        <Edit v-else class="mr-2 h-4 w-4" />
+                        Mettre à jour
                     </Button>
                 </DialogFooter>
             </DialogContent>

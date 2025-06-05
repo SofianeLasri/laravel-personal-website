@@ -52,6 +52,8 @@ class VideoTest extends TestCase
             'path',
             'cover_picture_id',
             'bunny_video_id',
+            'status',
+            'visibility',
         ];
 
         $video = new Video;
@@ -83,7 +85,7 @@ class VideoTest extends TestCase
     #[Test]
     public function test_video_can_be_updated()
     {
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
         $newPicture = Picture::factory()->create();
 
         $updateData = [

@@ -81,10 +81,18 @@ class CreationFactory extends Factory
         });
     }
 
-    public function withVideos(int $count = 2): static
+    public function withReadyVideos(int $count = 2): static
     {
         return $this->afterCreating(function (Creation $creation) use ($count) {
-            $videos = Video::factory()->count($count)->create();
+            $videos = Video::factory()->readyAndPublic()->count($count)->create();
+            $creation->videos()->attach($videos);
+        });
+    }
+
+    public function withTranscodingVideos(int $count = 2): static
+    {
+        return $this->afterCreating(function (Creation $creation) use ($count) {
+            $videos = Video::factory()->transcodingAndPrivate()->count($count)->create();
             $creation->videos()->attach($videos);
         });
     }

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\VideoStatus;
+use App\Enums\VideoVisibility;
 use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\Technology;
@@ -19,7 +21,7 @@ class PublicControllersServiceTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function test_get_creation_count_by_technology()
+    public function test_get_creation_count_by_technology(): void
     {
         Creation::factory()->withTechnologies(5)->count(3)->create();
 
@@ -30,7 +32,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_get_development_stats()
+    public function test_get_development_stats(): void
     {
         Creation::factory()->create([
             'started_at' => now()->subYears(2),
@@ -47,7 +49,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_get_laravel_creations()
+    public function test_get_laravel_creations(): void
     {
         $laravelTech = Technology::factory()->create([
             'name' => 'Laravel',
@@ -73,7 +75,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_get_laravel_creations_but_laravel_tech_doesnt_exists()
+    public function test_get_laravel_creations_but_laravel_tech_doesnt_exists(): void
     {
         Creation::factory()->count(3)->create([
             'type' => 'website',
@@ -86,7 +88,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_get_creations()
+    public function test_get_creations(): void
     {
         Creation::factory()->withTechnologies()->count(3)->create();
 
@@ -99,7 +101,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_format_technology_for_ssr()
+    public function test_format_technology_for_ssr(): void
     {
         $technology = Technology::factory()->create([
             'name' => 'Laravel',
@@ -120,7 +122,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_get_technology_experiences()
+    public function test_get_technology_experiences(): void
     {
         TechnologyExperience::factory()->count(3)->create();
 
@@ -131,7 +133,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_get_experiences()
+    public function test_get_experiences(): void
     {
         Experience::factory()->count(3)
             ->withTechnologies()
@@ -146,7 +148,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_format_date_with_string()
+    public function test_format_date_with_string(): void
     {
         $service = new PublicControllersService;
 
@@ -158,7 +160,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_format_date_with_carbon_object()
+    public function test_format_date_with_carbon_object(): void
     {
         $service = new PublicControllersService;
 
@@ -170,7 +172,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_format_date_returns_null_if_date_is_null()
+    public function test_format_date_returns_null_if_date_is_null(): void
     {
         $service = new PublicControllersService;
 
@@ -180,7 +182,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_format_creation_for_ssr_short()
+    public function test_format_creation_for_ssr_short(): void
     {
         $creation = Creation::factory()->create([
             'name' => 'Test Creation',
@@ -218,13 +220,14 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_format_creation_for_ssr_full()
+    public function test_format_creation_for_ssr_full(): void
     {
         $creation = Creation::factory()
             ->withFeatures(3)
             ->withScreenshots(4)
             ->withPeople(2)
-            ->withVideos(2)
+            ->withReadyVideos(2)
+            ->withTranscodingVideos(2)
             ->create([
                 'name' => 'Test Creation',
                 'type' => 'website',
@@ -236,7 +239,7 @@ class PublicControllersServiceTest extends TestCase
 
         $this->assertCount(3, $creation->features);
         $this->assertCount(4, $creation->screenshots);
-        $this->assertCount(2, $creation->videos);
+        $this->assertCount(4, $creation->videos);
 
         $featureWithoutPicture = $creation->features->first();
         $featureWithoutPicture->update(['picture_id' => null]);
@@ -253,7 +256,7 @@ class PublicControllersServiceTest extends TestCase
         $this->assertEquals($creation->source_code_url, $result['sourceCodeUrl']);
         $this->assertCount($creation->features->count(), $result['features']);
         $this->assertCount($creation->screenshots->count(), $result['screenshots']);
-        $this->assertCount($creation->videos->count(), $result['videos']);
+        $this->assertCount(2, $result['videos']);
 
         foreach ($creation->features as $feature) {
             $resultFeature = collect($result['features'])->firstWhere('id', $feature->id);
@@ -320,20 +323,24 @@ class PublicControllersServiceTest extends TestCase
         }
 
         foreach ($creation->videos as $video) {
-            $resultVideo = collect($result['videos'])->firstWhere('id', $video->id);
+            if ($video->status == VideoStatus::READY && $video->visibility == VideoVisibility::PUBLIC) {
+                $resultVideo = collect($result['videos'])->firstWhere('id', $video->id);
 
-            $this->assertEquals($video->id, $resultVideo['id']);
-            $this->assertEquals($video->bunny_video_id, $resultVideo['bunnyVideoId']);
-            $this->assertEquals($video->name, $resultVideo['name']);
-            $this->assertEquals($video->coverPicture->filename, $resultVideo['coverPicture']['filename']);
-            $this->assertArrayHasKey('avif', $resultVideo['coverPicture']);
-            $this->assertArrayHasKey('webp', $resultVideo['coverPicture']);
-            $this->assertArrayHasKey('jpg', $resultVideo['coverPicture']);
+                $this->assertEquals($video->id, $resultVideo['id']);
+                $this->assertEquals($video->bunny_video_id, $resultVideo['bunnyVideoId']);
+                $this->assertEquals($video->name, $resultVideo['name']);
+                $this->assertEquals($video->coverPicture->filename, $resultVideo['coverPicture']['filename']);
+                $this->assertArrayHasKey('avif', $resultVideo['coverPicture']);
+                $this->assertArrayHasKey('webp', $resultVideo['coverPicture']);
+                $this->assertArrayHasKey('jpg', $resultVideo['coverPicture']);
+            } else {
+                $this->assertArrayNotHasKey($video->id, collect($result['videos']));
+            }
         }
     }
 
     #[Test]
-    public function test_translation_fallback_when_current_locale_translation_missing()
+    public function test_translation_fallback_when_current_locale_translation_missing(): void
     {
         app()->setLocale('es'); // Set a locale that doesn't have translations
         config(['app.fallback_locale' => 'en']);
@@ -355,7 +362,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_translation_uses_current_locale_when_available()
+    public function test_translation_uses_current_locale_when_available(): void
     {
         app()->setLocale('fr');
         config(['app.fallback_locale' => 'en']);
@@ -382,7 +389,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_translation_returns_empty_when_no_translation_available()
+    public function test_translation_returns_empty_when_no_translation_available(): void
     {
         app()->setLocale('es');
         config(['app.fallback_locale' => 'en']);
@@ -399,7 +406,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_creation_translation_fallback_for_short_description()
+    public function test_creation_translation_fallback_for_short_description(): void
     {
         app()->setLocale('es');
         config(['app.fallback_locale' => 'en']);
@@ -421,7 +428,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_creation_translation_fallback_for_full_description()
+    public function test_creation_translation_fallback_for_full_description(): void
     {
         app()->setLocale('es');
         config(['app.fallback_locale' => 'en']);
@@ -443,7 +450,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_experience_translation_fallback()
+    public function test_experience_translation_fallback(): void
     {
         app()->setLocale('es');
         config(['app.fallback_locale' => 'en']);
@@ -481,7 +488,7 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_technology_experience_translation_fallback()
+    public function test_technology_experience_translation_fallback(): void
     {
         app()->setLocale('es');
         config(['app.fallback_locale' => 'en']);

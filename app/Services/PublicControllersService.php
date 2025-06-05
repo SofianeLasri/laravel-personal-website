@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Enums\CreationType;
 use App\Enums\ExperienceType;
 use App\Enums\TechnologyType;
+use App\Enums\VideoStatus;
+use App\Enums\VideoVisibility;
 use App\Models\Certification;
 use App\Models\Creation;
 use App\Models\Experience;
@@ -273,9 +275,12 @@ class PublicControllersService
             ];
         })->toArray();
 
-        $response['videos'] = $creation->videos->map(function (Video $video) {
-            return $this->formatVideoForSSR($video);
-        })->toArray();
+        $response['videos'] = $creation->videos
+            ->where('visibility', VideoVisibility::PUBLIC)
+            ->where('status', VideoStatus::READY)
+            ->map(function (Video $video) {
+                return $this->formatVideoForSSR($video);
+            })->toArray();
 
         return $response;
     }

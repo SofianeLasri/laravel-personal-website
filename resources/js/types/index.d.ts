@@ -192,6 +192,8 @@ interface Video {
     created_at: string;
     updated_at: string;
     cover_picture?: Picture;
+    status: 'pending' | 'transcoding' | 'ready' | 'error';
+    visibility: 'private' | 'public';
 }
 
 // The following interfaces are used for the SSR (Server-Side Rendering) creation data

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models\Video;
 
+use App\Enums\VideoVisibility;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Models\Picture;
 use App\Models\Video;
@@ -33,12 +34,14 @@ class VideoControllerTest extends TestCase
                         'title' => 'Test Video',
                         'size' => 123456,
                         'created_at' => now(),
+                        'status' => 1,
                     ],
                     'getVideo' => [
                         'guid' => 'bunny-12345',
                         'title' => 'Test Video',
                         'size' => 123456,
                         'created_at' => now(),
+                        'status' => 4,
                     ],
                     'deleteVideo' => true,
                     'getPlaybackUrl' => 'https://example.com/playback/bunny-12345',
@@ -177,12 +180,13 @@ class VideoControllerTest extends TestCase
     #[Test]
     public function test_update_video_with_valid_data(): void
     {
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
         $newPicture = Picture::factory()->create();
 
         $updateData = [
             'name' => 'Updated Video',
             'cover_picture_id' => $newPicture->id,
+            'visibility' => $video->visibility,
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
@@ -228,6 +232,7 @@ class VideoControllerTest extends TestCase
         $updateData = [
             'name' => 'Test Video',
             'cover_picture_id' => $picture->id,
+            'visibility' => VideoVisibility::PUBLIC,
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', 99999), $updateData);
@@ -258,12 +263,13 @@ class VideoControllerTest extends TestCase
     #[Test]
     public function test_update_returns_updated_video(): void
     {
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
         $newPicture = Picture::factory()->create();
 
         $updateData = [
             'name' => 'Updated Video',
             'cover_picture_id' => $newPicture->id,
+            'visibility' => VideoVisibility::PUBLIC,
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
@@ -273,5 +279,20 @@ class VideoControllerTest extends TestCase
         $responseData = $response->json();
         $this->assertEquals($updateData['name'], $responseData['name']);
         $this->assertEquals($updateData['cover_picture_id'], $responseData['cover_picture_id']);
+    }
+
+    #[Test]
+    public function test_cannot_change_visibility_to_public_if_video_is_not_transcoded()
+    {
+        $video = Video::factory()->transcodingAndPrivate()->create();
+
+        $response = $this->putJson(route('dashboard.api.videos.update', $video->id), [
+            'name' => $video->name,
+            'cover_picture_id' => $video->cover_picture_id,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+
+        $response->assertConflict() // 409
+            ->assertJson(['error' => 'Cannot set visibility to public until video is ready.']);
     }
 }

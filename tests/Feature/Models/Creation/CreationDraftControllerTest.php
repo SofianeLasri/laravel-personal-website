@@ -200,7 +200,7 @@ class CreationDraftControllerTest extends TestCase
             ->hasScreenshots(3)
             ->create();
 
-        $response = $this->deleteJson(route('dashboard.api.creation-drafts.show', ['creation_draft' => $draft]));
+        $response = $this->deleteJson(route('dashboard.api.creation-drafts.destroy', ['creation_draft' => $draft]));
 
         $response->assertNoContent();
         $this->assertDatabaseMissing('creation_drafts', ['id' => $draft->id]);
@@ -484,7 +484,7 @@ class CreationDraftControllerTest extends TestCase
     public function test_attach_video()
     {
         $draft = CreationDraft::factory()->create();
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
 
         $response = $this->postJson(route('dashboard.api.creation-drafts.attach-video', ['creation_draft' => $draft]), [
             'video_id' => $video->id,

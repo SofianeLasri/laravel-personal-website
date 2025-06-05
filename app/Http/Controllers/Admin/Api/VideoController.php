@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Api;
 
+use App\Enums\VideoStatus;
+use App\Enums\VideoVisibility;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Video\VideoRequest;
 use App\Http\Requests\Video\VideoUploadRequest;
@@ -57,12 +59,21 @@ class VideoController extends Controller
             ], 500);
         }
 
+        $videoStatus = match ($uploadedVideoData['status']) {
+            3 => VideoStatus::TRANSCODING,
+            4 => VideoStatus::READY,
+            5, 6 => VideoStatus::ERROR,
+            default => VideoStatus::PENDING,
+        };
+
         $coverPictureId = $request->input('cover_picture_id');
         $video = Video::create([
             'name' => $name,
             'path' => $relativeFilePath,
             'cover_picture_id' => $coverPictureId,
             'bunny_video_id' => $uploadedVideoData['guid'],
+            'status' => $videoStatus,
+            'visibility' => VideoVisibility::PRIVATE,
         ]);
 
         return response()->json($video->load('coverPicture'), 201);
@@ -91,13 +102,19 @@ class VideoController extends Controller
         return response()->json($response);
     }
 
-    public function update(VideoRequest $request, int $videoId)
+    public function update(VideoRequest $request, int $videoId): JsonResponse
     {
         $video = Video::findOrFail($videoId);
 
+        if ($request->input('visibility') == VideoVisibility::PUBLIC->value && $video->status !== VideoStatus::READY) {
+            return response()->json([
+                'error' => 'Cannot set visibility to public until video is ready.',
+            ], 409);
+        }
+
         $video->update($request->validated());
 
-        return $video->load('coverPicture');
+        return response()->json($video->load('coverPicture'));
     }
 
     public function destroy(int $videoId)

@@ -30,4 +30,13 @@ class Video extends Model
     {
         return $this->belongsTo(Picture::class, 'cover_picture_id');
     }
+
+    public function isReadyAndPublic(): bool
+    {
+        if ($this->status === VideoStatus::READY && $this->visibility === VideoVisibility::PUBLIC) {
+            return true;
+        }
+
+        return false;
+    }
 }

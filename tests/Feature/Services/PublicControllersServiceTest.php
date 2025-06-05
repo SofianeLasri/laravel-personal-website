@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\VideoStatus;
+use App\Enums\VideoVisibility;
 use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\Technology;
@@ -224,7 +226,8 @@ class PublicControllersServiceTest extends TestCase
             ->withFeatures(3)
             ->withScreenshots(4)
             ->withPeople(2)
-            ->withVideos(2)
+            ->withReadyVideos(2)
+            ->withTranscodingVideos(2)
             ->create([
                 'name' => 'Test Creation',
                 'type' => 'website',
@@ -236,7 +239,7 @@ class PublicControllersServiceTest extends TestCase
 
         $this->assertCount(3, $creation->features);
         $this->assertCount(4, $creation->screenshots);
-        $this->assertCount(2, $creation->videos);
+        $this->assertCount(4, $creation->videos);
 
         $featureWithoutPicture = $creation->features->first();
         $featureWithoutPicture->update(['picture_id' => null]);
@@ -253,7 +256,7 @@ class PublicControllersServiceTest extends TestCase
         $this->assertEquals($creation->source_code_url, $result['sourceCodeUrl']);
         $this->assertCount($creation->features->count(), $result['features']);
         $this->assertCount($creation->screenshots->count(), $result['screenshots']);
-        $this->assertCount($creation->videos->count(), $result['videos']);
+        $this->assertCount(2, $result['videos']);
 
         foreach ($creation->features as $feature) {
             $resultFeature = collect($result['features'])->firstWhere('id', $feature->id);
@@ -320,15 +323,19 @@ class PublicControllersServiceTest extends TestCase
         }
 
         foreach ($creation->videos as $video) {
-            $resultVideo = collect($result['videos'])->firstWhere('id', $video->id);
+            if ($video->status == VideoStatus::READY && $video->visibility == VideoVisibility::PUBLIC) {
+                $resultVideo = collect($result['videos'])->firstWhere('id', $video->id);
 
-            $this->assertEquals($video->id, $resultVideo['id']);
-            $this->assertEquals($video->bunny_video_id, $resultVideo['bunnyVideoId']);
-            $this->assertEquals($video->name, $resultVideo['name']);
-            $this->assertEquals($video->coverPicture->filename, $resultVideo['coverPicture']['filename']);
-            $this->assertArrayHasKey('avif', $resultVideo['coverPicture']);
-            $this->assertArrayHasKey('webp', $resultVideo['coverPicture']);
-            $this->assertArrayHasKey('jpg', $resultVideo['coverPicture']);
+                $this->assertEquals($video->id, $resultVideo['id']);
+                $this->assertEquals($video->bunny_video_id, $resultVideo['bunnyVideoId']);
+                $this->assertEquals($video->name, $resultVideo['name']);
+                $this->assertEquals($video->coverPicture->filename, $resultVideo['coverPicture']['filename']);
+                $this->assertArrayHasKey('avif', $resultVideo['coverPicture']);
+                $this->assertArrayHasKey('webp', $resultVideo['coverPicture']);
+                $this->assertArrayHasKey('jpg', $resultVideo['coverPicture']);
+            } else {
+                $this->assertArrayNotHasKey($video->id, collect($result['videos']));
+            }
         }
     }
 

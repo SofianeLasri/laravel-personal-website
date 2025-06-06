@@ -118,14 +118,10 @@ class PublicControllersService
         $developmentCreations = Creation::whereIn('type', self::DEVELOPMENT_TYPES)
             ->whereHas('technologies', function ($query) use ($laravel) {
                 $query->where('technologies.id', $laravel->id);
-            })->get()->withRelationshipAutoloading();
+            })->orderByRaw('(ended_at IS NULL) DESC, ended_at DESC')->get()->withRelationshipAutoloading();
 
-        $creations = $developmentCreations->map(function (Creation $creation) {
+        return $developmentCreations->map(function (Creation $creation) {
             return $this->formatCreationForSSRShort($creation);
-        });
-
-        return $creations->sortByDesc(function ($creation) {
-            return $creation['endedAt'] ?? now();
         });
     }
 
@@ -150,7 +146,7 @@ class PublicControllersService
      */
     public function getCreations(): Collection
     {
-        $creations = Creation::orderByRaw('ended_at IS NULL, ended_at DESC')->get()->withRelationshipAutoloading();
+        $creations = Creation::orderByRaw('(ended_at IS NULL) DESC, ended_at DESC')->get()->withRelationshipAutoloading();
 
         return $creations->map(function (Creation $creation) {
             return $this->formatCreationForSSRShort($creation);

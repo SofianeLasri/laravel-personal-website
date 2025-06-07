@@ -39,3 +39,6 @@ RUN touch /var/log/cron.log
 
 # Setting PHP Configuration
 COPY docker-init/php.ini $PHP_INI_DIR/php.ini
+
+# Setting Imagick Configuration
+COPY docker-init/imagick-policy.xml /etc/ImageMagick-6/policy.xml

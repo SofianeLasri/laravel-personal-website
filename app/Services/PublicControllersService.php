@@ -33,6 +33,7 @@ class PublicControllersService
         CreationType::LIBRARY,
         CreationType::TOOL,
         CreationType::WEBSITE,
+        CreationType::OTHER,
     ];
 
     /**

@@ -65,7 +65,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
         <div class="relative z-10 container flex flex-col gap-16 px-4 pb-16" lang="fr-FR">
             <div class="flex flex-col gap-8">
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                    <div class="bg-primary z-1 hidden aspect-square w-full flex-shrink-0 items-end justify-end overflow-hidden rounded-2xl xl:flex">
+                    <div class="bg-primary z-1 flex aspect-square w-full flex-shrink-0 items-end justify-end overflow-hidden rounded-2xl">
                         <img class="h-full" src="/resources/images/public/big-head-geneva-may-2025.avif" alt="Photo de Sofiane Lasri" />
                     </div>
                     <div class="flex flex-col gap-8">

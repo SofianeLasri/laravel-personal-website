@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\PicturePageController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Admin\TranslationPageController;
+use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CertificationsCareerController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProjectController;
@@ -35,6 +36,7 @@ Route::name('public.')->group(function () {
     })->name('cv');
 
     Route::get('/', HomeController::class)->name('home');
+    Route::get('/about', AboutController::class)->name('about');
     Route::get('/projects', ProjectsController::class)->name('projects');
     Route::get('/projects/{slug}', ProjectController::class)
         ->where('slug', '[A-Za-z0-9\-]+')

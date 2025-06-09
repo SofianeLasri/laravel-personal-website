@@ -13,7 +13,6 @@ class SitemapController extends Controller
     {
         $sitemap = Sitemap::create();
 
-        // Add static public routes
         $sitemap->add(Url::create(route('public.home'))
             ->setLastModificationDate(now())
             ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
@@ -29,12 +28,16 @@ class SitemapController extends Controller
             ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
             ->setPriority(0.8));
 
-        // Add all published projects
+        $sitemap->add(Url::create(route('public.about'))
+            ->setLastModificationDate(now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+            ->setPriority(0.7));
+
         Creation::all()->each(function (Creation $creation) use ($sitemap) {
             $sitemap->add(Url::create(route('public.projects.show', $creation->slug))
                 ->setLastModificationDate($creation->updated_at)
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
-                ->setPriority(0.7));
+                ->setPriority(0.6));
         });
 
         return $sitemap->toResponse(request());

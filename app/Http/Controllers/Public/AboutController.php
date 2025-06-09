@@ -17,6 +17,7 @@ class AboutController extends Controller
                 'about' => __('about'),
                 'navigation' => __('navigation'),
                 'footer' => __('footer'),
+                'search' => __('search'),
             ],
             'socialMediaLinks' => SocialMediaLink::all(),
         ]);

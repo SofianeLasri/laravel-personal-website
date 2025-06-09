@@ -2,7 +2,7 @@
 
 return [
     'page_title' => 'Projets',
-    'title' => 'Projects',
+    'title' => 'Projets',
     'description' => 'Retrouvez tous mes projets et créations passés, allant du mapmaking sur Source Engine au développement web. :)',
 
     // Filter categories

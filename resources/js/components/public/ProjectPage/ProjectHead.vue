@@ -46,6 +46,12 @@ const { t } = useTranslation();
                 <div class="text-design-system-paragraph justify-center self-stretch text-xl font-normal">
                     {{ creation.shortDescription }}
                 </div>
+                <div class="flex flex-col gap-1 self-stretch">
+                    <div class="text-design-system-paragraph justify-center text-sm font-medium">{{ t('project.period') }}</div>
+                    <div class="text-design-system-paragraph justify-center text-base font-normal">
+                        {{ creation.startedAtFormatted }}{{ creation.endedAt ? ' - ' + creation.endedAtFormatted : ' - ' + t('project.ongoing') }}
+                    </div>
+                </div>
             </div>
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <BlackLinkButton v-if="creation.externalUrl" :href="creation.externalUrl"> {{ t('project.visit_website') }} </BlackLinkButton>

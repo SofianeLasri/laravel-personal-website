@@ -14,6 +14,7 @@ return [
     // Project head
     'created_in' => 'Created in',
     'realization' => 'Realization',
+    'period' => 'Period',
     'ongoing' => 'Ongoing',
     'visit_website' => 'Visit the website',
     'source_code' => 'Source code',

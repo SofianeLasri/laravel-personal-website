@@ -4,12 +4,29 @@ import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
 import WhiteLinkButton from '@/components/public/Ui/Button/WhiteLinkButton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRFullCreation } from '@/types';
+import { computed } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     creation: SSRFullCreation;
 }>();
 
 const { t } = useTranslation();
+
+const formattedPeriod = computed(() => {
+    const startDate = new Date(props.creation.startedAt);
+
+    if (!props.creation.endedAt) {
+        return `${props.creation.startedAtFormatted} - ${t('project.ongoing')}`;
+    }
+
+    const endDate = new Date(props.creation.endedAt);
+
+    if (startDate.getFullYear() === endDate.getFullYear() && startDate.getMonth() === endDate.getMonth()) {
+        return props.creation.startedAtFormatted;
+    }
+
+    return `${props.creation.startedAtFormatted} - ${props.creation.endedAtFormatted}`;
+});
 </script>
 <template>
     <div class="flex items-center justify-between gap-8 xl:gap-32">
@@ -49,7 +66,7 @@ const { t } = useTranslation();
                 <div class="flex flex-col gap-1 self-stretch">
                     <div class="text-design-system-paragraph justify-center text-sm font-medium">{{ t('project.period') }}</div>
                     <div class="text-design-system-paragraph justify-center text-base font-normal">
-                        {{ creation.startedAtFormatted }}{{ creation.endedAt ? ' - ' + creation.endedAtFormatted : ' - ' + t('project.ongoing') }}
+                        {{ formattedPeriod }}
                     </div>
                 </div>
             </div>

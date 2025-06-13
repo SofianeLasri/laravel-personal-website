@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Enums\TechnologyType;
 use App\Http\Controllers\Controller;
 use App\Models\SocialMediaLink;
-use App\Models\Technology;
+use App\Models\TechnologyExperience;
 use App\Services\PublicControllersService;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -33,7 +33,7 @@ class HomeController extends Controller
             'socialMediaLinks' => SocialMediaLink::all(),
             'yearsOfExperience' => $developmentStats['yearsOfExperience'],
             'developmentCreationsCount' => $developmentStats['count'],
-            'masteredFrameworksCount' => Technology::where('type', TechnologyType::FRAMEWORK)->count(),
+            'masteredFrameworksCount' => TechnologyExperience::join('technologies', 'technologies.id', '=', 'technology_experiences.technology_id')->where('technologies.type', TechnologyType::FRAMEWORK)->count(),
             'laravelCreations' => $this->service->getLaravelCreations(),
             'technologyExperiences' => $this->service->getTechnologyExperiences(),
             'experiences' => $this->service->getExperiences(),

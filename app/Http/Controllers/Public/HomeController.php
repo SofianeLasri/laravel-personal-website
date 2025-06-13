@@ -17,6 +17,8 @@ class HomeController extends Controller
     public function __invoke(): Response
     {
         $developmentStats = $this->service->getDevelopmentStats();
+        // Laravel + tech with experience texts
+        $masteredFrameworksCount = 1 + TechnologyExperience::join('technologies', 'technologies.id', '=', 'technology_experiences.technology_id')->where('technologies.type', TechnologyType::FRAMEWORK)->count();
 
         return Inertia::render('public/Home', [
             'locale' => app()->getLocale(),
@@ -33,7 +35,7 @@ class HomeController extends Controller
             'socialMediaLinks' => SocialMediaLink::all(),
             'yearsOfExperience' => $developmentStats['yearsOfExperience'],
             'developmentCreationsCount' => $developmentStats['count'],
-            'masteredFrameworksCount' => TechnologyExperience::join('technologies', 'technologies.id', '=', 'technology_experiences.technology_id')->where('technologies.type', TechnologyType::FRAMEWORK)->count(),
+            'masteredFrameworksCount' => $masteredFrameworksCount,
             'laravelCreations' => $this->service->getLaravelCreations(),
             'technologyExperiences' => $this->service->getTechnologyExperiences(),
             'experiences' => $this->service->getExperiences(),

@@ -69,14 +69,4 @@ class Feature extends Model
     {
         return $this->belongsTo(Picture::class);
     }
-
-    public function getTitle(string $locale): string
-    {
-        return Translation::trans($this->titleTranslationKey->key, $locale);
-    }
-
-    public function getDescription(string $locale): string
-    {
-        return Translation::trans($this->descriptionTranslationKey->key, $locale);
-    }
 }

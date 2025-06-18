@@ -76,13 +76,14 @@ class ScreenshotTest extends TestCase
             'caption_translation_key_id' => $captionKey->id,
         ]);
 
-        $this->assertEquals('Légende en français', $screenshot->getCaption('fr'));
-        $this->assertEquals('Caption in English', $screenshot->getCaption('en'));
+        $this->assertEquals($captionKey->id, $screenshot->captionTranslationKey->id);
+        $this->assertEquals('Légende en français', $screenshot->captionTranslationKey->translations->where('locale', 'fr')->first()->text);
+        $this->assertEquals('Caption in English', $screenshot->captionTranslationKey->translations->where('locale', 'en')->first()->text);
 
         $screenshotWithoutCaption = Screenshot::factory()->create([
             'caption_translation_key_id' => null,
         ]);
 
-        $this->assertEquals('', $screenshotWithoutCaption->getCaption('fr'));
+        $this->assertNull($screenshotWithoutCaption->captionTranslationKey);
     }
 }

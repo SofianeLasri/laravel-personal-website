@@ -79,7 +79,8 @@ class TechnologyTest extends TestCase
             'description_translation_key_id' => $descKey->id,
         ]);
 
-        $this->assertEquals('Un framework PHP', $technology->getDescription('fr'));
-        $this->assertEquals('A PHP framework', $technology->getDescription('en'));
+        $this->assertEquals($descKey->id, $technology->descriptionTranslationKey->id);
+        $this->assertEquals('Un framework PHP', $technology->descriptionTranslationKey->translations->where('locale', 'fr')->first()->text);
+        $this->assertEquals('A PHP framework', $technology->descriptionTranslationKey->translations->where('locale', 'en')->first()->text);
     }
 }

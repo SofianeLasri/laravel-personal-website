@@ -44,14 +44,4 @@ class TranslationKey extends Model
     {
         return $this->hasMany(Translation::class);
     }
-
-    public static function findByKey(string $key): ?self
-    {
-        return self::where('key', $key)->first();
-    }
-
-    public static function findOrCreateByKey(string $key): self
-    {
-        return self::firstOrCreate(['key' => $key]);
-    }
 }

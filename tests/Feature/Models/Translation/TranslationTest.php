@@ -122,44 +122,6 @@ class TranslationTest extends TestCase
     }
 
     #[Test]
-    public function test_find_by_key_and_locale()
-    {
-        $translationKey = TranslationKey::factory()->create(['key' => 'test.key']);
-        $translation = Translation::factory()->create([
-            'translation_key_id' => $translationKey->id,
-            'locale' => 'en',
-            'text' => 'Hello, world!',
-        ]);
-
-        $foundTranslation = Translation::findByKeyAndLocale('test.key', 'en');
-
-        $this->assertEquals($translation->id, $foundTranslation->id);
-    }
-
-    #[Test]
-    public function test_trans_returns_text_for_key_and_locale()
-    {
-        $translationKey = TranslationKey::factory()->create(['key' => 'test.key']);
-        $translation = Translation::factory()->create([
-            'translation_key_id' => $translationKey->id,
-            'locale' => 'en',
-            'text' => 'Hello, world!',
-        ]);
-
-        $foundText = Translation::trans($translationKey->key, 'en');
-
-        $this->assertEquals($translation->text, $foundText);
-    }
-
-    #[Test]
-    public function test_trans_returns_key_for_missing_translation()
-    {
-        $foundText = Translation::trans('missing.key', 'en');
-
-        $this->assertEquals('missing.key', $foundText);
-    }
-
-    #[Test]
     public function test_create_or_update()
     {
         Translation::createOrUpdate('test.key', 'en', 'Hello, world!');

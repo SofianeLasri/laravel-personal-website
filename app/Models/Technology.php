@@ -68,9 +68,4 @@ class Technology extends Model
     {
         return $this->belongsToMany(CreationDraft::class, 'creation_draft_technology', 'technology_id', 'creation_draft_id');
     }
-
-    public function getDescription(string $locale): string
-    {
-        return Translation::trans($this->descriptionTranslationKey->key, $locale);
-    }
 }

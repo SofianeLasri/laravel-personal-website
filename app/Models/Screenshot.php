@@ -57,13 +57,4 @@ class Screenshot extends Model
     {
         return $this->belongsTo(TranslationKey::class, 'caption_translation_key_id');
     }
-
-    public function getCaption(string $locale): string
-    {
-        if ($this->captionTranslationKey) {
-            return $this->captionTranslationKey->translations()->where('locale', $locale)->value('text');
-        }
-
-        return '';
-    }
 }

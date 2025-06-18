@@ -31,6 +31,7 @@ use Illuminate\Validation\ValidationException;
  * @property int|null $original_creation_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $original_creations_count
  * @property int|null $logos_count
  * @property int|null $cover_images_count
@@ -172,24 +173,6 @@ class CreationDraft extends Model
     public function videos(): BelongsToMany
     {
         return $this->belongsToMany(Video::class, 'creation_draft_video');
-    }
-
-    public function getShortDescription(string $locale): string
-    {
-        if ($this->shortDescriptionTranslationKey) {
-            return Translation::trans($this->shortDescriptionTranslationKey->key, $locale);
-        }
-
-        return '';
-    }
-
-    public function getFullDescription(string $locale): string
-    {
-        if ($this->fullDescriptionTranslationKey) {
-            return Translation::trans($this->fullDescriptionTranslationKey->key, $locale);
-        }
-
-        return '';
     }
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $icon_svg
  * @property string $name
  * @property string $url
+ * @property mixed $use_factory
  */
 class SocialMediaLink extends Model
 {

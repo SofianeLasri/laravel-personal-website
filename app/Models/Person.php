@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $picture_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $pictures_count
  * @property int|null $creations_count
  * @property int|null $creation_drafts_count

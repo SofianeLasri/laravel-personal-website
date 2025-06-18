@@ -14,8 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $translation_key_id
  * @property string $locale
  * @property string $text
+ * @property mixed $use_factory
  * @property mixed $key
- * @property int|null $translation_keys_count
+ * @property int $translation_keys_count
  * @property-read TranslationKey $translationKey
  */
 class Translation extends Model
@@ -77,44 +78,6 @@ class Translation extends Model
     }
 
     /**
-     * Find a translation by key and locale.
-     *
-     * @param  string  $key  Example: 'auth.failed'
-     * @param  string  $locale  'en' or 'fr'
-     */
-    public static function findByKeyAndLocale(string $key, string $locale): ?self
-    {
-        $translationKey = TranslationKey::findByKey($key);
-
-        if (! $translationKey) {
-            return null;
-        }
-
-        return self::where('translation_key_id', $translationKey->id)
-            ->where('locale', $locale)
-            ->first();
-    }
-
-    /**
-     * Replication of the Laravel trans helper function.
-     * Returns the translation for the given key and locale.
-     * If the translation does not exist, the key is returned.
-     *
-     * @param  string  $key  Example: 'auth.failed'
-     * @param  string  $locale  'en' or 'fr'
-     */
-    public static function trans(string $key, string $locale): string
-    {
-        $translation = self::findByKeyAndLocale($key, $locale);
-
-        if (! $translation) {
-            return $key;
-        }
-
-        return $translation->text;
-    }
-
-    /**
      * Create or update a translation.
      *
      * @param  string|TranslationKey  $key  The key string or the TranslationKey instance.
@@ -124,7 +87,7 @@ class Translation extends Model
     public static function createOrUpdate(string|TranslationKey $key, string $locale, string $text): self
     {
         if (is_string($key)) {
-            $translationKey = TranslationKey::findOrCreateByKey($key);
+            $translationKey = TranslationKey::firstOrCreate(['key' => $key]);
         } else {
             $translationKey = $key;
         }

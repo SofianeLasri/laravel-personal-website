@@ -5,7 +5,6 @@ namespace Tests\Feature\Models\Feature;
 use App\Models\CreationDraft as Creation;
 use App\Models\CreationDraftFeature as Feature;
 use App\Models\Picture;
-use App\Models\Translation;
 use App\Models\TranslationKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -56,32 +55,5 @@ class CreationDraftFeatureTest extends TestCase
 
         $featureWithoutPicture = Feature::factory()->create(['picture_id' => null]);
         $this->assertNull($featureWithoutPicture->picture);
-    }
-
-    #[Test]
-    public function it_can_get_translated_title_and_description()
-    {
-        $titleKey = TranslationKey::factory()->create(['key' => 'feature.title.test']);
-        $descKey = TranslationKey::factory()->create(['key' => 'feature.description.test']);
-
-        Translation::factory()->create([
-            'translation_key_id' => $titleKey->id,
-            'locale' => 'fr',
-            'text' => 'Titre en français',
-        ]);
-
-        Translation::factory()->create([
-            'translation_key_id' => $descKey->id,
-            'locale' => 'fr',
-            'text' => 'Description en français',
-        ]);
-
-        $feature = Feature::factory()->create([
-            'title_translation_key_id' => $titleKey->id,
-            'description_translation_key_id' => $descKey->id,
-        ]);
-
-        $this->assertEquals('Titre en français', $feature->getTitle('fr'));
-        $this->assertEquals('Description en français', $feature->getDescription('fr'));
     }
 }

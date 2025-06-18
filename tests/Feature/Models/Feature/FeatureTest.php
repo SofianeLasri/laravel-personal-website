@@ -81,7 +81,9 @@ class FeatureTest extends TestCase
             'description_translation_key_id' => $descKey->id,
         ]);
 
-        $this->assertEquals('Titre en français', $feature->getTitle('fr'));
-        $this->assertEquals('Description en français', $feature->getDescription('fr'));
+        $this->assertEquals($feature->titleTranslationKey->id, $titleKey->id);
+        $this->assertEquals($feature->descriptionTranslationKey->id, $descKey->id);
+        $this->assertEquals('Titre en français', $feature->titleTranslationKey->translations->where('locale', 'fr')->first()->text);
+        $this->assertEquals('Description en français', $feature->descriptionTranslationKey->translations->where('locale', 'fr')->first()->text);
     }
 }

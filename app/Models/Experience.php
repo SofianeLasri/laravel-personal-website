@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $title_translation_key_id
  * @property string $organization_name
- * @property int|null $logo_id
+ * @property int $logo_id
  * @property ExperienceType $type
  * @property string $location
  * @property string|null $website_url
@@ -25,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $ended_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $title_translation_keys_count
  * @property int|null $short_description_translation_keys_count
  * @property int|null $full_description_translation_keys_count
@@ -101,25 +102,5 @@ class Experience extends Model
     public function technologies(): BelongsToMany
     {
         return $this->belongsToMany(Technology::class);
-    }
-
-    public function getTitle(string $locale): string
-    {
-        return Translation::trans($this->titleTranslationKey->key, $locale);
-    }
-
-    public function getShortDescription(string $locale): string
-    {
-        return Translation::trans($this->shortDescriptionTranslationKey->key, $locale);
-    }
-
-    public function getFullDescription(string $locale): string
-    {
-        return Translation::trans($this->fullDescriptionTranslationKey->key, $locale);
-    }
-
-    public function isOngoing(): bool
-    {
-        return $this->ended_at === null;
     }
 }

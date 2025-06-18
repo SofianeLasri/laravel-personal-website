@@ -169,14 +169,4 @@ class Creation extends Model
     {
         return $this->hasMany(CreationDraft::class, 'original_creation_id', 'id');
     }
-
-    public function getShortDescription(string $locale): string
-    {
-        return Translation::trans($this->shortDescriptionTranslationKey->key, $locale);
-    }
-
-    public function getFullDescription(string $locale): string
-    {
-        return Translation::trans($this->fullDescriptionTranslationKey->key, $locale);
-    }
 }

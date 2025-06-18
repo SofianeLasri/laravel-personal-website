@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property int $id
  * @property string $key
- * @property int|null $translations_count
+ * @property mixed $use_factory
+ * @property int $translations_count
  * @property-read Translation[]|Collection $translations
  */
 class TranslationKey extends Model
@@ -42,15 +43,5 @@ class TranslationKey extends Model
     public function translations(): HasMany
     {
         return $this->hasMany(Translation::class);
-    }
-
-    public static function findByKey(string $key): ?self
-    {
-        return self::where('key', $key)->first();
-    }
-
-    public static function findOrCreateByKey(string $key): self
-    {
-        return self::firstOrCreate(['key' => $key]);
     }
 }

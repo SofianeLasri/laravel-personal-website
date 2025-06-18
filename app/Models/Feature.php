@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $picture_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $creations_count
  * @property int|null $title_translation_keys_count
  * @property int|null $description_translation_keys_count
@@ -67,15 +68,5 @@ class Feature extends Model
     public function picture(): BelongsTo
     {
         return $this->belongsTo(Picture::class);
-    }
-
-    public function getTitle(string $locale): string
-    {
-        return Translation::trans($this->titleTranslationKey->key, $locale);
-    }
-
-    public function getDescription(string $locale): string
-    {
-        return Translation::trans($this->descriptionTranslationKey->key, $locale);
     }
 }

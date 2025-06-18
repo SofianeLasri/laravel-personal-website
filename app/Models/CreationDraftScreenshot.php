@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $caption_translation_key_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $creation_drafts_count
  * @property int|null $pictures_count
  * @property int|null $caption_translation_keys_count
@@ -55,14 +56,5 @@ class CreationDraftScreenshot extends Model
     public function captionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'caption_translation_key_id');
-    }
-
-    public function getCaption(string $locale): string
-    {
-        if (! $this->captionTranslationKey) {
-            return '';
-        }
-
-        return $this->captionTranslationKey->translations()->where('locale', $locale)->value('text');
     }
 }

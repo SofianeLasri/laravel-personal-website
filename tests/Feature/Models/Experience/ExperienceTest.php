@@ -50,15 +50,6 @@ class ExperienceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_create_an_ongoing_experience()
-    {
-        $experience = Experience::factory()->ongoing()->create();
-
-        $this->assertNull($experience->ended_at);
-        $this->assertTrue($experience->isOngoing());
-    }
-
-    #[Test]
     public function it_can_have_technologies()
     {
         $experience = Experience::factory()->create();
@@ -121,8 +112,9 @@ class ExperienceTest extends TestCase
             'title_translation_key_id' => $titleKey->id,
         ]);
 
-        $this->assertEquals('Développeur Full-Stack', $experience->getTitle('fr'));
-        $this->assertEquals('Full-Stack Developer', $experience->getTitle('en'));
+        $this->assertEquals($titleKey->id, $experience->titleTranslationKey->id);
+        $this->assertEquals('Développeur Full-Stack', $experience->titleTranslationKey->translations->where('locale', 'fr')->first()->text);
+        $this->assertEquals('Full-Stack Developer', $experience->titleTranslationKey->translations->where('locale', 'en')->first()->text);
     }
 
     #[Test]
@@ -160,11 +152,13 @@ class ExperienceTest extends TestCase
             'full_description_translation_key_id' => $fullDescKey->id,
         ]);
 
-        $this->assertEquals('Développement d\'applications web', $experience->getShortDescription('fr'));
-        $this->assertEquals('Web applications development', $experience->getShortDescription('en'));
+        $this->assertEquals($shortDescKey->id, $experience->shortDescriptionTranslationKey->id);
+        $this->assertEquals('Développement d\'applications web', $experience->shortDescriptionTranslationKey->translations->where('locale', 'fr')->first()->text);
+        $this->assertEquals('Web applications development', $experience->shortDescriptionTranslationKey->translations->where('locale', 'en')->first()->text);
 
-        $this->assertEquals('Développement de plusieurs applications web', $experience->getFullDescription('fr'));
-        $this->assertEquals('Development of several web applications', $experience->getFullDescription('en'));
+        $this->assertEquals($fullDescKey->id, $experience->fullDescriptionTranslationKey->id);
+        $this->assertEquals('Développement de plusieurs applications web', $experience->fullDescriptionTranslationKey->translations->where('locale', 'fr')->first()->text);
+        $this->assertEquals('Development of several web applications', $experience->fullDescriptionTranslationKey->translations->where('locale', 'en')->first()->text);
     }
 
     #[Test]

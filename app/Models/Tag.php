@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property string $slug
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $creations_count
  * @property int|null $creation_drafts_count
  * @property-read Collection|Creation[] $creations

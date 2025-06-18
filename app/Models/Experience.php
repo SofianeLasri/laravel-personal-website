@@ -103,24 +103,4 @@ class Experience extends Model
     {
         return $this->belongsToMany(Technology::class);
     }
-
-    public function getTitle(string $locale): string
-    {
-        return Translation::trans($this->titleTranslationKey->key, $locale);
-    }
-
-    public function getShortDescription(string $locale): string
-    {
-        return Translation::trans($this->shortDescriptionTranslationKey->key, $locale);
-    }
-
-    public function getFullDescription(string $locale): string
-    {
-        return Translation::trans($this->fullDescriptionTranslationKey->key, $locale);
-    }
-
-    public function isOngoing(): bool
-    {
-        return $this->ended_at === null;
-    }
 }

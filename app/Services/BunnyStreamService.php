@@ -180,14 +180,13 @@ class BunnyStreamService
     public function deleteVideo(string $videoId): bool
     {
         try {
-            $response = $this->bunnyStream->deleteVideo($videoId);
-            if ($response && isset($response['success'])) {
-                if ($response['success']) {
-                    return true;
-                }
-
-                Log::warning('BunnyStreamService: Failed to delete video', ['response' => $response]);
+            /** @var array{success:bool,message:string|null,statusCode:int} $bunnyReponse */
+            $bunnyReponse = $this->bunnyStream->deleteVideo($videoId);
+            if ($bunnyReponse['success']) {
+                return true;
             }
+
+            Log::warning('BunnyStreamService: Failed to delete video', ['response' => $bunnyReponse]);
 
             return false;
         } catch (Exception $e) {

@@ -44,7 +44,7 @@ class Certification extends Model
     }
 
     /**
-     * @return BelongsTo<Certification, $this>
+     * @return BelongsTo<Picture, $this>
      */
     public function picture(): BelongsTo
     {

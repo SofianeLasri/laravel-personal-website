@@ -275,18 +275,6 @@ class BunnyStreamServiceTest extends TestCase
     #[Test]
     public function test_get_playback_url()
     {
-        $videoData = $this->getVideoData;
-
-        $this->mock(BunnyAPIStream::class, function (MockInterface $mock) use ($videoData) {
-            $mock->shouldReceive('apiKey')->with('test-api-key')->once();
-            $mock->shouldReceive('streamLibraryAccessKey')->with('test-api-key')->once();
-            $mock->shouldReceive('setStreamLibraryId')->with(12345)->once();
-            $mock->shouldReceive('getVideo')
-                ->with('test-video-id')
-                ->andReturn($videoData)
-                ->once();
-        });
-
         $service = app(BunnyStreamService::class);
         $url = $service->getPlaybackUrl('test-video-id');
 

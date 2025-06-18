@@ -7,6 +7,7 @@ use Corbpie\BunnyCdn\BunnyAPIStream;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Mockery\MockInterface;
@@ -206,6 +207,8 @@ class BunnyStreamServiceTest extends TestCase
     #[Test]
     public function test_upload_video_with_exception()
     {
+        Log::shouldReceive('error')->twice();
+
         $this->mock(BunnyAPIStream::class, function (MockInterface $mock) {
             $mock->shouldReceive('apiKey')->with('test-api-key')->once();
             $mock->shouldReceive('streamLibraryAccessKey')->with('test-api-key')->once();
@@ -250,6 +253,32 @@ class BunnyStreamServiceTest extends TestCase
     }
 
     #[Test]
+    public function test_get_video_with_exception()
+    {
+        Log::shouldReceive('error')
+            ->with('BunnyStreamService: Error getting video', [
+                'error' => 'Test exception',
+                'video_id' => 'test-video-id',
+            ])
+            ->once();
+
+        $this->mock(BunnyAPIStream::class, function (MockInterface $mock) {
+            $mock->shouldReceive('apiKey')->with('test-api-key')->once();
+            $mock->shouldReceive('streamLibraryAccessKey')->with('test-api-key')->once();
+            $mock->shouldReceive('setStreamLibraryId')->with(12345)->once();
+            $mock->shouldReceive('getVideo')
+                ->with('test-video-id')
+                ->andThrow(new Exception('Test exception'))
+                ->once();
+        });
+
+        $service = app(BunnyStreamService::class);
+        $result = $service->getVideo('test-video-id');
+
+        $this->assertNull($result);
+    }
+
+    #[Test]
     public function test_delete_video_success()
     {
         $this->mock(BunnyAPIStream::class, function (MockInterface $mock) {
@@ -270,6 +299,32 @@ class BunnyStreamServiceTest extends TestCase
         $result = $service->deleteVideo('test-video-id');
 
         $this->assertTrue($result);
+    }
+
+    #[Test]
+    public function test_delete_video_with_exception()
+    {
+        Log::shouldReceive('error')
+            ->with('BunnyStreamService: Error deleting video', [
+                'error' => 'Test exception',
+                'video_id' => 'test-video-id',
+            ])
+            ->once();
+
+        $this->mock(BunnyAPIStream::class, function (MockInterface $mock) {
+            $mock->shouldReceive('apiKey')->with('test-api-key')->once();
+            $mock->shouldReceive('streamLibraryAccessKey')->with('test-api-key')->once();
+            $mock->shouldReceive('setStreamLibraryId')->with(12345)->once();
+            $mock->shouldReceive('deleteVideo')
+                ->with('test-video-id')
+                ->andThrow(new Exception('Test exception'))
+                ->once();
+        });
+
+        $service = app(BunnyStreamService::class);
+        $result = $service->deleteVideo('test-video-id');
+
+        $this->assertFalse($result);
     }
 
     #[Test]
@@ -300,6 +355,32 @@ class BunnyStreamServiceTest extends TestCase
         $url = $service->getThumbnailUrl('test-video-id', 1280, 720);
 
         $this->assertEquals('https://test-pull-zone.b-cdn.net/test-video-id/thumbnail.jpg?width=1280&height=720', $url);
+    }
+
+    #[Test]
+    public function test_get_thumbnail_url_returns_null_when_video_not_found()
+    {
+        Log::shouldReceive('error')
+            ->with('BunnyStreamService: Error getting video', [
+                'error' => 'Video not found',
+                'video_id' => 'test-video-id',
+            ])
+            ->once();
+
+        $this->mock(BunnyAPIStream::class, function (MockInterface $mock) {
+            $mock->shouldReceive('apiKey')->with('test-api-key')->once();
+            $mock->shouldReceive('streamLibraryAccessKey')->with('test-api-key')->once();
+            $mock->shouldReceive('setStreamLibraryId')->with(12345)->once();
+            $mock->shouldReceive('getVideo')
+                ->with('test-video-id')
+                ->andThrow(new Exception('Video not found'))
+                ->once();
+        });
+
+        $service = app(BunnyStreamService::class);
+        $url = $service->getThumbnailUrl('test-video-id', 1280, 720);
+
+        $this->assertNull($url);
     }
 
     #[Test]
@@ -345,6 +426,32 @@ class BunnyStreamServiceTest extends TestCase
     }
 
     #[Test]
+    public function test_is_video_ready_returns_false_when_video_not_found()
+    {
+        Log::shouldReceive('error')
+            ->with('BunnyStreamService: Error getting video', [
+                'error' => 'Video not found',
+                'video_id' => 'test-video-id',
+            ])
+            ->once();
+
+        $this->mock(BunnyAPIStream::class, function (MockInterface $mock) {
+            $mock->shouldReceive('apiKey')->with('test-api-key')->once();
+            $mock->shouldReceive('streamLibraryAccessKey')->with('test-api-key')->once();
+            $mock->shouldReceive('setStreamLibraryId')->with(12345)->once();
+            $mock->shouldReceive('getVideo')
+                ->with('test-video-id')
+                ->andThrow(new Exception('Video not found'))
+                ->once();
+        });
+
+        $service = app(BunnyStreamService::class);
+        $result = $service->isVideoReady('test-video-id');
+
+        $this->assertFalse($result);
+    }
+
+    #[Test]
     public function test_get_video_metadata()
     {
         $videoData = $this->getVideoData;
@@ -369,5 +476,58 @@ class BunnyStreamServiceTest extends TestCase
         $this->assertEquals(500000, $metadata['size']);
         $this->assertEquals(4, $metadata['status']);
         $this->assertEquals('2023-12-01T12:00:00Z', $metadata['created_at']);
+    }
+
+    #[Test]
+    public function test_get_video_metadata_returns_null_when_video_not_found()
+    {
+        Log::shouldReceive('error')
+            ->with('BunnyStreamService: Error getting video', [
+                'error' => 'Video not found',
+                'video_id' => 'test-video-id',
+            ])
+            ->once();
+
+        $this->mock(BunnyAPIStream::class, function (MockInterface $mock) {
+            $mock->shouldReceive('apiKey')->with('test-api-key')->once();
+            $mock->shouldReceive('streamLibraryAccessKey')->with('test-api-key')->once();
+            $mock->shouldReceive('setStreamLibraryId')->with(12345)->once();
+            $mock->shouldReceive('getVideo')
+                ->with('test-video-id')
+                ->andThrow(new Exception('Video not found'))
+                ->once();
+        });
+
+        $service = app(BunnyStreamService::class);
+        $metadata = $service->getVideoMetadata('test-video-id');
+
+        $this->assertNull($metadata);
+    }
+
+    #[Test]
+    public function test_upload_video_file_with_exception()
+    {
+        Log::shouldReceive('error')
+            ->with('BunnyStreamService: Error uploading video file', [
+                'error' => 'Test exception',
+                'video_id' => 'test-video-id',
+                'file_path' => 'videos/test-video.mp4',
+            ])
+            ->once();
+
+        $this->mock(BunnyAPIStream::class, function (MockInterface $mock) {
+            $mock->shouldReceive('apiKey')->with('test-api-key')->once();
+            $mock->shouldReceive('streamLibraryAccessKey')->with('test-api-key')->once();
+            $mock->shouldReceive('setStreamLibraryId')->with(12345)->once();
+            $mock->shouldReceive('uploadVideo')
+                ->with('test-video-id', 'videos/test-video.mp4')
+                ->andThrow(new Exception('Test exception'))
+                ->once();
+        });
+
+        $service = app(BunnyStreamService::class);
+        $result = $service->uploadVideoFile('test-video-id', 'videos/test-video.mp4');
+
+        $this->assertFalse($result);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\CreationDraftFeature;
 use App\Models\CreationDraftScreenshot;
 use App\Models\Feature;
 use App\Models\Person;
+use App\Models\Picture;
 use App\Models\Screenshot;
 use App\Models\Tag;
 use App\Models\Technology;
@@ -61,6 +62,30 @@ class CreationDraftTest extends TestCase
 
         $this->assertNull($creationDraft->logo);
         $this->assertNull($creationDraft->coverImage);
+    }
+
+    #[Test]
+    public function it_can_have_logo()
+    {
+        $logo = Picture::factory()->create();
+        $creationDraft = CreationDraft::factory()->create([
+            'logo_id' => $logo->id,
+        ]);
+
+        $this->assertNotNull($creationDraft->logo);
+        $this->assertEquals($logo->id, $creationDraft->logo->id);
+    }
+
+    #[Test]
+    public function it_can_have_cover_image()
+    {
+        $cover = Picture::factory()->create();
+        $creationDraft = CreationDraft::factory()->create([
+            'cover_image_id' => $cover->id,
+        ]);
+
+        $this->assertNotNull($creationDraft->coverImage);
+        $this->assertEquals($cover->id, $creationDraft->coverImage->id);
     }
 
     #[Test]
@@ -149,7 +174,7 @@ class CreationDraftTest extends TestCase
             'short_description_translation_key_id' => $shortDescKey->id,
         ]);
 
-        $this->assertEquals('Description courte du brouillon', $creationDraft->getShortDescription('fr'));
+        $this->assertEquals($shortDescKey->id, $creationDraft->shortDescriptionTranslationKey->id);
     }
 
     #[Test]
@@ -166,27 +191,7 @@ class CreationDraftTest extends TestCase
             'full_description_translation_key_id' => $fullDescKey->id,
         ]);
 
-        $this->assertEquals('Description complète du brouillon', $creationDraft->getFullDescription('fr'));
-    }
-
-    #[Test]
-    public function get_short_descriptions_returns_empty_string_if_not_relation()
-    {
-        $creationDraft = CreationDraft::factory()->create([
-            'short_description_translation_key_id' => null,
-        ]);
-
-        $this->assertEquals('', $creationDraft->getShortDescription('fr'));
-    }
-
-    #[Test]
-    public function get_full_descriptions_returns_empty_string_if_not_relation()
-    {
-        $creationDraft = CreationDraft::factory()->create([
-            'full_description_translation_key_id' => null,
-        ]);
-
-        $this->assertEquals('', $creationDraft->getFullDescription('fr'));
+        $this->assertEquals($fullDescKey->id, $creationDraft->fullDescriptionTranslationKey->id);
     }
 
     #[Test]

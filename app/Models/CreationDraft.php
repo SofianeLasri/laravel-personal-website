@@ -175,24 +175,6 @@ class CreationDraft extends Model
         return $this->belongsToMany(Video::class, 'creation_draft_video');
     }
 
-    public function getShortDescription(string $locale): string
-    {
-        if ($this->shortDescriptionTranslationKey) {
-            return Translation::trans($this->shortDescriptionTranslationKey->key, $locale);
-        }
-
-        return '';
-    }
-
-    public function getFullDescription(string $locale): string
-    {
-        if ($this->fullDescriptionTranslationKey) {
-            return Translation::trans($this->fullDescriptionTranslationKey->key, $locale);
-        }
-
-        return '';
-    }
-
     /**
      * Create a draft from an existing creation
      */

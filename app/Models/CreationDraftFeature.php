@@ -22,8 +22,8 @@ use Illuminate\Support\Carbon;
  * @property int $description_translation_keys_count
  * @property int|null $pictures_count
  * @property-read CreationDraft|null $creationDraft
- * @property-read TranslationKey|null $titleTranslationKey
- * @property-read TranslationKey|null $descriptionTranslationKey
+ * @property-read TranslationKey $titleTranslationKey
+ * @property-read TranslationKey $descriptionTranslationKey
  * @property-read Picture|null $picture
  */
 class CreationDraftFeature extends Model
@@ -68,23 +68,5 @@ class CreationDraftFeature extends Model
     public function picture(): BelongsTo
     {
         return $this->belongsTo(Picture::class);
-    }
-
-    public function getTitle(string $locale): string
-    {
-        if (! $this->titleTranslationKey) {
-            return '';
-        }
-
-        return Translation::trans($this->titleTranslationKey->key, $locale);
-    }
-
-    public function getDescription(string $locale): string
-    {
-        if (! $this->descriptionTranslationKey) {
-            return '';
-        }
-
-        return Translation::trans($this->descriptionTranslationKey->key, $locale);
     }
 }

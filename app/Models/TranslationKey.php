@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property int $id
  * @property string $key
- * @property int|null $translations_count
+ * @property mixed $use_factory
+ * @property int $translations_count
  * @property-read Translation[]|Collection $translations
  */
 class TranslationKey extends Model

@@ -14,8 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $translation_key_id
  * @property string $locale
  * @property string $text
+ * @property mixed $use_factory
  * @property mixed $key
- * @property int|null $translation_keys_count
+ * @property int $translation_keys_count
  * @property-read TranslationKey $translationKey
  */
 class Translation extends Model

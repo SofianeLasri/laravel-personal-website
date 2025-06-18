@@ -31,6 +31,7 @@ use Illuminate\Validation\ValidationException;
  * @property int|null $original_creation_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $original_creations_count
  * @property int|null $logos_count
  * @property int|null $cover_images_count

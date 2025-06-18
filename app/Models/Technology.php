@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\TechnologyType;
 use Database\Factories\TechnologyFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,17 +19,13 @@ use Illuminate\Support\Carbon;
  * @property int $description_translation_key_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $creations_count
  * @property int|null $description_translation_keys_count
  * @property int|null $creation_drafts_count
  * @property-read Collection|Creation[] $creations
  * @property-read TranslationKey $descriptionTranslationKey
  * @property-read Collection|CreationDraft[] $creationDrafts
- *
- * @method static Builder|Technology framework()
- * @method static Builder|Technology library()
- * @method static Builder|Technology language()
- * @method static Builder|Technology other()
  */
 class Technology extends Model
 {

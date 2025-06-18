@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
  * @property string|null $path_original
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $optimized_pictures_count
  * @property-read Collection|OptimizedPicture[] $optimizedPictures
  */

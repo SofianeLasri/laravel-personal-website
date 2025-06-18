@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
  * @property string $variant
  * @property string $path
  * @property string $format
+ * @property mixed $use_factory
  * @property int|null $pictures_count
  * @property-read Picture $picture
  */

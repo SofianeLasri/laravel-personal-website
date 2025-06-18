@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $technology_id
  * @property int $description_translation_key_id
+ * @property mixed $use_factory
  * @property int|null $technologies_count
  * @property int|null $description_translation_keys_count
  * @property-read Technology $technology

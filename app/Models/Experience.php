@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $title_translation_key_id
  * @property string $organization_name
- * @property int|null $logo_id
+ * @property int $logo_id
  * @property ExperienceType $type
  * @property string $location
  * @property string|null $website_url
@@ -25,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $ended_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $title_translation_keys_count
  * @property int|null $short_description_translation_keys_count
  * @property int|null $full_description_translation_keys_count

@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $caption_translation_key_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property mixed $use_factory
  * @property int|null $creations_count
  * @property int|null $pictures_count
  * @property int|null $caption_translation_keys_count

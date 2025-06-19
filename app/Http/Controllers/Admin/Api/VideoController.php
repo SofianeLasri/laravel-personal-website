@@ -11,6 +11,7 @@ use App\Models\Video;
 use App\Services\BunnyStreamService;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Visibility;
@@ -22,9 +23,9 @@ class VideoController extends Controller
         private readonly BunnyStreamService $bunnyStreamService
     ) {}
 
-    public function index()
+    public function index(): JsonResponse
     {
-        return Video::with('coverPicture')->get();
+        return response()->json(Video::with('coverPicture')->get());
     }
 
     /**
@@ -39,6 +40,11 @@ class VideoController extends Controller
             $name = $request->input('name', $uploadedFile->getClientOriginalName());
 
             $relativeFilePath = Storage::disk('local')->putFile('videos', $uploadedFile, Visibility::PRIVATE);
+            if ($relativeFilePath === false) {
+                return response()->json([
+                    'message' => 'Failed to store video file.',
+                ], 500);
+            }
             $absoluteFilePath = Storage::path($relativeFilePath);
 
             $uploadedVideoData = $this->bunnyStreamService->uploadVideo($name, $absoluteFilePath);
@@ -88,11 +94,11 @@ class VideoController extends Controller
 
         if ($bunnyVideoData) {
             $response['bunny_data'] = [
-                'status' => $bunnyVideoData['status'] ?? null,
-                'duration' => $bunnyVideoData['length'] ?? null,
-                'width' => $bunnyVideoData['width'] ?? null,
-                'height' => $bunnyVideoData['height'] ?? null,
-                'size' => $bunnyVideoData['storageSize'] ?? null,
+                'status' => $bunnyVideoData['status'],
+                'duration' => $bunnyVideoData['length'],
+                'width' => $bunnyVideoData['width'],
+                'height' => $bunnyVideoData['height'],
+                'size' => $bunnyVideoData['storageSize'],
                 'playback_url' => $this->bunnyStreamService->getPlaybackUrl($video->bunny_video_id),
                 'thumbnail_url' => $this->bunnyStreamService->getThumbnailUrl($video->bunny_video_id),
                 'is_ready' => $this->bunnyStreamService->isVideoReady($video->bunny_video_id),
@@ -117,7 +123,7 @@ class VideoController extends Controller
         return response()->json($video->load('coverPicture'));
     }
 
-    public function destroy(int $videoId)
+    public function destroy(int $videoId): JsonResponse|Response
     {
         if (! Video::where('id', $videoId)->exists()) {
             return response()->json([

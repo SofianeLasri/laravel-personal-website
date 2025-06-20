@@ -33,7 +33,7 @@ use Inertia\Inertia;
 
 Route::name('public.')->group(function () {
     Route::get('/cv-pdf', function () {
-        return Inertia::location('https://1drv.ms/b/s!Atk178NpnuLmhJoiwLEN2FRww-mGcA?e=I1kL8w');
+        return Inertia::location('https://cloud.sl-projects.com/index.php/s/zCdQQKSEoGSSE8X');
     })->name('cv');
 
     Route::get('/', HomeController::class)->name('home');

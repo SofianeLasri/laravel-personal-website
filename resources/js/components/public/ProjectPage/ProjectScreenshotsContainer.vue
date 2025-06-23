@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import ExpandSolid from '@/components/font-awesome/ExpandSolid.vue';
 import { SSRScreenshot } from '@/types';
-import PhotoSwipeLightbox from 'photoswipe/lightbox';
 import PhotoSwipeDynamicCaption from 'photoswipe-dynamic-caption-plugin';
-import 'photoswipe/style.css';
 import 'photoswipe-dynamic-caption-plugin/photoswipe-dynamic-caption-plugin.css';
+import PhotoSwipeLightbox from 'photoswipe/lightbox';
+import 'photoswipe/style.css';
 import { onMounted } from 'vue';
 
 defineProps<{

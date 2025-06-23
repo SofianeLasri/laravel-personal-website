@@ -101,6 +101,21 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     Route::get('/request-logs', [RequestLogController::class, 'index'])
         ->name('request-logs.index');
 
+    Route::name('data-management.')->prefix('data-management')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\DataManagementController::class, 'index'])
+            ->name('index');
+        Route::post('/export', [\App\Http\Controllers\Admin\DataManagementController::class, 'export'])
+            ->name('export');
+        Route::post('/upload', [\App\Http\Controllers\Admin\DataManagementController::class, 'uploadImportFile'])
+            ->name('upload');
+        Route::post('/import', [\App\Http\Controllers\Admin\DataManagementController::class, 'import'])
+            ->name('import');
+        Route::post('/metadata', [\App\Http\Controllers\Admin\DataManagementController::class, 'getImportMetadata'])
+            ->name('metadata');
+        Route::delete('/cancel', [\App\Http\Controllers\Admin\DataManagementController::class, 'cancelImport'])
+            ->name('cancel');
+    });
+
     Route::name('api.')->prefix('api')->group(function () {
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();

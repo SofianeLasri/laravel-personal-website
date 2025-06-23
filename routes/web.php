@@ -107,6 +107,10 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('index');
         Route::post('/export', [DataManagementController::class, 'export'])
             ->name('export');
+        Route::get('/export/{requestId}/status', [DataManagementController::class, 'exportStatus'])
+            ->name('export-status');
+        Route::get('/export/{requestId}/download', [DataManagementController::class, 'downloadExport'])
+            ->name('download');
         Route::post('/upload', [DataManagementController::class, 'uploadImportFile'])
             ->name('upload');
         Route::post('/import', [DataManagementController::class, 'import'])

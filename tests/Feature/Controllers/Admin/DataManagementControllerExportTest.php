@@ -28,6 +28,7 @@ class DataManagementControllerExportTest extends TestCase
         parent::setUp();
         $this->loginAsAdmin();
         Storage::fake('public');
+        Storage::fake('local');
     }
 
     #[Test]
@@ -55,10 +56,10 @@ class DataManagementControllerExportTest extends TestCase
         $exportService = new WebsiteExportService;
         $zipPath = $exportService->exportWebsite();
 
-        $this->assertFileExists($zipPath);
+        $this->assertTrue(Storage::fileExists($zipPath));
 
         $zip = new ZipArchive;
-        $this->assertTrue($zip->open($zipPath) === true);
+        $this->assertTrue($zip->open(Storage::path($zipPath)) === true);
 
         $this->assertNotFalse($zip->locateName('export-metadata.json'));
         $this->assertNotFalse($zip->locateName('database/technologies.json'));
@@ -79,7 +80,7 @@ class DataManagementControllerExportTest extends TestCase
 
         $zip->close();
 
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
     #[Test]
@@ -88,15 +89,15 @@ class DataManagementControllerExportTest extends TestCase
         $exportService = new WebsiteExportService;
         $zipPath = $exportService->exportWebsite();
 
-        $this->assertFileExists($zipPath);
+        $this->assertTrue(Storage::fileExists($zipPath));
 
         $zip = new ZipArchive;
-        $this->assertTrue($zip->open($zipPath) === true);
+        $this->assertTrue($zip->open(Storage::path($zipPath)) === true);
 
         $this->assertNotFalse($zip->locateName('export-metadata.json'));
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
     #[Test]
@@ -105,10 +106,10 @@ class DataManagementControllerExportTest extends TestCase
         $exportService = new WebsiteExportService;
         $zipPath = $exportService->exportWebsite();
 
-        $this->assertFileExists($zipPath);
+        $this->assertTrue(Storage::fileExists($zipPath));
 
         $zip = new ZipArchive;
-        $this->assertTrue($zip->open($zipPath) === true);
+        $this->assertTrue($zip->open(Storage::path($zipPath)) === true);
 
         $expectedTables = $exportService->getExportTables();
 
@@ -120,7 +121,7 @@ class DataManagementControllerExportTest extends TestCase
         }
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
     #[Test]
@@ -143,10 +144,10 @@ class DataManagementControllerExportTest extends TestCase
         $exportService = new WebsiteExportService;
         $zipPath = $exportService->exportWebsite();
 
-        $this->assertFileExists($zipPath);
+        $this->assertTrue(Storage::fileExists($zipPath));
 
         $zip = new ZipArchive;
-        $this->assertTrue($zip->open($zipPath) === true);
+        $this->assertTrue($zip->open(Storage::path($zipPath)) === true);
 
         $this->assertNotFalse($zip->locateName('files/uploads/images/test1.jpg'));
         $this->assertNotFalse($zip->locateName('files/uploads/images/subfolder/test2.jpg'));
@@ -157,7 +158,7 @@ class DataManagementControllerExportTest extends TestCase
         $this->assertEquals('pdf content', $zip->getFromName('files/uploads/documents/test.pdf'));
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
     #[Test]
@@ -171,10 +172,10 @@ class DataManagementControllerExportTest extends TestCase
         $exportService = new WebsiteExportService;
         $zipPath = $exportService->exportWebsite();
 
-        $this->assertFileExists($zipPath);
+        $this->assertTrue(Storage::fileExists($zipPath));
 
         $zip = new ZipArchive;
-        $this->assertTrue($zip->open($zipPath) === true);
+        $this->assertTrue($zip->open(Storage::path($zipPath)) === true);
 
         $technologiesJson = $zip->getFromName('database/technologies.json');
         $this->assertNotFalse($technologiesJson);
@@ -188,26 +189,7 @@ class DataManagementControllerExportTest extends TestCase
         $this->assertEquals('framework', $exportedTechnology['type']);
 
         $zip->close();
-        unlink($zipPath);
-    }
-
-    #[Test]
-    public function test_export_handles_service_failure_gracefully(): void
-    {
-        $this->mock(WebsiteExportService::class, function ($mock) {
-            $mock->shouldReceive('exportWebsite')
-                ->once()
-                ->andThrow(new \RuntimeException('Export failed'));
-            $mock->shouldReceive('cleanupOldExports')->never();
-        });
-
-        $response = $this
-            ->post('/dashboard/data-management/export');
-
-        $response->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
-        $response->assertJson([
-            'message' => 'Export failed: Export failed',
-        ]);
+        Storage::delete($zipPath);
     }
 
     #[Test]

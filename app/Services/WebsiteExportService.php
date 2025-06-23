@@ -2,8 +2,12 @@
 
 namespace App\Services;
 
+use Exception;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\FilesystemException;
 use RuntimeException;
 use ZipArchive;
 
@@ -64,41 +68,34 @@ class WebsiteExportService
      * @return string The path to the generated ZIP file
      *
      * @throws RuntimeException If export fails
+     * @throws FilesystemException
      */
     public function exportWebsite(): string
     {
         $timestamp = now()->format('Y-m-d_H-i-s');
         $fileName = "website-export-{$timestamp}.zip";
-        $tempPath = storage_path("app/temp/{$fileName}");
-
-        // Ensure temp directory exists
-        if (! file_exists(dirname($tempPath))) {
-            mkdir(dirname($tempPath), 0755, true);
-        }
+        $tempFullPath = Storage::disk('local')->path("temp/{$fileName}");
+        Log::debug("temps full path: $tempFullPath");
+        Storage::makeDirectory('temp');
 
         $zip = new ZipArchive;
 
-        if ($zip->open($tempPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        if ($zip->open($tempFullPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new RuntimeException('Cannot create ZIP file');
         }
 
         try {
-            // Export database
             $this->exportDatabase($zip);
-
-            // Export public storage files
             $this->exportFiles($zip);
-
-            // Add export metadata
             $this->addExportMetadata($zip);
 
             $zip->close();
 
-            return $tempPath;
-        } catch (\Exception $e) {
+            return "temp/{$fileName}";
+        } catch (Exception $e) {
             $zip->close();
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
+            if (file_exists($tempFullPath)) {
+                unlink($tempFullPath);
             }
             throw new RuntimeException('Export failed: '.$e->getMessage(), 0, $e);
         }
@@ -146,15 +143,11 @@ class WebsiteExportService
     /**
      * Get all files recursively from a disk.
      *
-     * @param  \Illuminate\Contracts\Filesystem\Filesystem  $disk
      * @return array<string>
      */
-    private function getAllFiles($disk, string $directory): array
+    private function getAllFiles(Filesystem $disk, string $directory): array
     {
-        $files = [];
-        $allFiles = $disk->allFiles($directory);
-
-        return $allFiles;
+        return $disk->allFiles($directory);
     }
 
     /**
@@ -193,7 +186,7 @@ class WebsiteExportService
     {
         try {
             return DB::getSchemaBuilder()->hasTable($table);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -216,22 +209,22 @@ class WebsiteExportService
      */
     public function cleanupOldExports(int $keepDays = 7): int
     {
-        $tempPath = storage_path('app/temp');
-
-        if (! is_dir($tempPath)) {
+        if (! Storage::directoryExists('temp')) {
             return 0;
         }
 
-        $files = glob($tempPath.'/website-export-*.zip');
         $deleted = 0;
-        $cutoffTime = time() - ($keepDays * 24 * 60 * 60);
+        $cutoffTime = now()->subDays($keepDays)->timestamp;
 
-        if ($files !== false) {
-            foreach ($files as $file) {
-                if (filemtime($file) < $cutoffTime) {
-                    unlink($file);
-                    $deleted++;
-                }
+        $files = Storage::allFiles('temp');
+        $exportFiles = array_filter($files, function ($file) {
+            return str_contains($file, 'website-export-') && str_ends_with($file, '.zip');
+        });
+
+        foreach ($exportFiles as $file) {
+            if (Storage::lastModified($file) < $cutoffTime) {
+                Storage::delete($file);
+                $deleted++;
             }
         }
 

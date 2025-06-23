@@ -145,7 +145,7 @@ class DataManagementController extends Controller
     public function uploadImportFile(Request $request): JsonResponse
     {
         $request->validate([
-            'import_file' => 'required|file|mimes:zip|max:102400', // 100MB max
+            'import_file' => 'required|file|mimes:zip',
         ]);
 
         $file = $request->file('import_file');

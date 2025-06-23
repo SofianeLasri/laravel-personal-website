@@ -85,10 +85,10 @@ Both applications are served from the same Laravel backend but have completely s
 
 ### Key Services
 - **PublicControllersService**: Transforms and aggregates data for public pages (complex business logic)
-- **ImageTranscodingService**: Handles automatic image optimization with multiple formats
-- **CreationConversionService**: Converts drafts to published creations
-- **UploadedFilesService**: Manages file uploads and storage
-- **BunnyStreamService**: Video streaming service with Bunny CDN integration for upload, transcoding, and playback
+- **ImageTranscodingService**: Handles automatic image optimization with multiple formats (includes Imagick resource limit safety checks)
+- **CreationConversionService**: Converts drafts to published creations with relationship synchronization
+- **UploadedFilesService**: Manages file uploads and storage, dispatches background optimization jobs
+- **BunnyStreamService**: Video streaming service with Bunny CDN integration for upload, transcoding, and playback (two-phase upload with error recovery)
 
 ### Translation System
 **Dual Translation Architecture**:
@@ -219,3 +219,13 @@ Usage of docker for local development is strongly recommended. All the required 
 
 ## Frontend Best Practices
 - Always use Axios instead of fetch or xhr since Inertia handle the csrf token
+
+## Queue Jobs and Background Processing
+- **Image Optimization**: `PictureJob` handles automatic image transcoding to AVIF/WebP with 5 size variants
+- **Error Recovery**: Services implement comprehensive error handling with cleanup (e.g., failed video uploads delete video entries)
+- **Resource Management**: ImageTranscodingService includes safety checks against Imagick memory limits
+
+## Theme System
+- **Dual Theme Support**: Both public and dashboard applications support light/dark/system themes
+- **SSR Compatible**: Theme detection works with server-side rendering via inline scripts
+- **Persistence**: Theme preferences stored in localStorage with cookie fallback

@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
+use App\Http\Controllers\Admin\DataManagementController;
 use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\PicturePageController;
 use App\Http\Controllers\Admin\RequestLogController;
@@ -100,6 +101,21 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
 
     Route::get('/request-logs', [RequestLogController::class, 'index'])
         ->name('request-logs.index');
+
+    Route::name('data-management.')->prefix('data-management')->group(function () {
+        Route::get('/', [DataManagementController::class, 'index'])
+            ->name('index');
+        Route::post('/export', [DataManagementController::class, 'export'])
+            ->name('export');
+        Route::post('/upload', [DataManagementController::class, 'uploadImportFile'])
+            ->name('upload');
+        Route::post('/import', [DataManagementController::class, 'import'])
+            ->name('import');
+        Route::post('/metadata', [DataManagementController::class, 'getImportMetadata'])
+            ->name('metadata');
+        Route::delete('/cancel', [DataManagementController::class, 'cancelImport'])
+            ->name('cancel');
+    });
 
     Route::name('api.')->prefix('api')->group(function () {
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();

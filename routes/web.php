@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
+use App\Http\Controllers\Admin\DataManagementController;
 use App\Http\Controllers\Admin\ExperiencePageController;
 use App\Http\Controllers\Admin\PicturePageController;
 use App\Http\Controllers\Admin\RequestLogController;
@@ -102,17 +103,17 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         ->name('request-logs.index');
 
     Route::name('data-management.')->prefix('data-management')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\DataManagementController::class, 'index'])
+        Route::get('/', [DataManagementController::class, 'index'])
             ->name('index');
-        Route::post('/export', [\App\Http\Controllers\Admin\DataManagementController::class, 'export'])
+        Route::post('/export', [DataManagementController::class, 'export'])
             ->name('export');
-        Route::post('/upload', [\App\Http\Controllers\Admin\DataManagementController::class, 'uploadImportFile'])
+        Route::post('/upload', [DataManagementController::class, 'uploadImportFile'])
             ->name('upload');
-        Route::post('/import', [\App\Http\Controllers\Admin\DataManagementController::class, 'import'])
+        Route::post('/import', [DataManagementController::class, 'import'])
             ->name('import');
-        Route::post('/metadata', [\App\Http\Controllers\Admin\DataManagementController::class, 'getImportMetadata'])
+        Route::post('/metadata', [DataManagementController::class, 'getImportMetadata'])
             ->name('metadata');
-        Route::delete('/cancel', [\App\Http\Controllers\Admin\DataManagementController::class, 'cancelImport'])
+        Route::delete('/cancel', [DataManagementController::class, 'cancelImport'])
             ->name('cancel');
     });
 

@@ -5,7 +5,20 @@ import NavUser from '@/components/dashboard/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { Award, BookOpen, Briefcase, Brush, Code, Folder, Image as ImageIcon, Languages, LayoutGrid, LinkIcon, Logs } from 'lucide-vue-next';
+import {
+    Award,
+    BookOpen,
+    Briefcase,
+    Brush,
+    Code,
+    Folder,
+    FolderOutput,
+    Image as ImageIcon,
+    Languages,
+    LayoutGrid,
+    LinkIcon,
+    Logs,
+} from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -67,6 +80,11 @@ const mainNavItems: NavItem[] = [
         title: 'Requêtes',
         href: route('dashboard.request-logs.index', undefined, false),
         icon: Logs,
+    },
+    {
+        title: 'Export/Import',
+        href: route('dashboard.data-management.index', undefined, false),
+        icon: FolderOutput,
     },
 ];
 

@@ -63,7 +63,7 @@ class WebsiteImportService
      * Import website data from a ZIP file.
      *
      * @param  string  $zipPath  Path to the export ZIP file
-     * @return array Import statistics
+     * @return array<string, mixed> Import statistics
      *
      * @throws RuntimeException If import fails
      */
@@ -133,7 +133,7 @@ class WebsiteImportService
         $hasDatabaseFiles = false;
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $fileName = $zip->getNameIndex($i);
-            if (str_starts_with($fileName, 'database/')) {
+            if ($fileName !== false && str_starts_with($fileName, 'database/')) {
                 $hasDatabaseFiles = true;
                 break;
             }
@@ -191,7 +191,7 @@ class WebsiteImportService
     /**
      * Import database tables from the ZIP file.
      *
-     * @return array Statistics about imported data
+     * @return array<string, int> Statistics about imported data
      *
      * @throws RuntimeException
      */
@@ -255,7 +255,7 @@ class WebsiteImportService
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $fileName = $zip->getNameIndex($i);
 
-            if (str_starts_with($fileName, 'files/')) {
+            if ($fileName !== false && str_starts_with($fileName, 'files/')) {
                 $relativePath = substr($fileName, 6); // Remove 'files/' prefix
 
                 if (! empty($relativePath) && ! str_ends_with($fileName, '/')) {
@@ -324,6 +324,8 @@ class WebsiteImportService
 
     /**
      * Get import metadata from a ZIP file without importing.
+     *
+     * @return array<string, mixed>|null
      */
     public function getImportMetadata(string $zipPath): ?array
     {
@@ -350,7 +352,7 @@ class WebsiteImportService
     /**
      * Validate an export file before import.
      *
-     * @return array Validation results
+     * @return array<string, mixed> Validation results
      */
     public function validateImportFile(string $zipPath): array
     {

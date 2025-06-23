@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\WebsiteExportService;
 use App\Services\WebsiteImportService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Controller for managing website data export and import functionality.
@@ -25,7 +28,7 @@ class DataManagementController extends Controller
     /**
      * Display the data management page.
      */
-    public function index()
+    public function index(): InertiaResponse
     {
         return Inertia::render('dashboard/DataManagement', [
             'exportTables' => $this->exportService->getExportTables(),
@@ -36,7 +39,7 @@ class DataManagementController extends Controller
     /**
      * Export website data to a ZIP file.
      */
-    public function export()
+    public function export(): BinaryFileResponse|JsonResponse
     {
         try {
             $zipPath = $this->exportService->exportWebsite();
@@ -57,15 +60,27 @@ class DataManagementController extends Controller
     /**
      * Upload and validate an import file.
      */
-    public function uploadImportFile(Request $request)
+    public function uploadImportFile(Request $request): JsonResponse
     {
         $request->validate([
             'import_file' => 'required|file|mimes:zip|max:102400', // 100MB max
         ]);
 
         $file = $request->file('import_file');
+        if (! $file) {
+            throw ValidationException::withMessages([
+                'import_file' => ['No file uploaded'],
+            ]);
+        }
+
         $fileName = 'import-'.now()->format('Y-m-d_H-i-s').'.zip';
         $path = $file->storeAs('temp', $fileName);
+        if ($path === false) {
+            throw ValidationException::withMessages([
+                'import_file' => ['Failed to store file'],
+            ]);
+        }
+
         $fullPath = Storage::path($path);
 
         // Validate the import file
@@ -88,7 +103,7 @@ class DataManagementController extends Controller
     /**
      * Import website data from uploaded file.
      */
-    public function import(Request $request)
+    public function import(Request $request): JsonResponse
     {
         $request->validate([
             'file_path' => 'required|string',
@@ -124,7 +139,7 @@ class DataManagementController extends Controller
     /**
      * Get import file metadata.
      */
-    public function getImportMetadata(Request $request)
+    public function getImportMetadata(Request $request): JsonResponse
     {
         $request->validate([
             'file_path' => 'required|string',
@@ -153,7 +168,7 @@ class DataManagementController extends Controller
     /**
      * Cancel an import by deleting the uploaded file.
      */
-    public function cancelImport(Request $request)
+    public function cancelImport(Request $request): JsonResponse
     {
         $request->validate([
             'file_path' => 'required|string',

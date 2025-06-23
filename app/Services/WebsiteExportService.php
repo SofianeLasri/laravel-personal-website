@@ -137,7 +137,9 @@ class WebsiteExportService
 
         foreach ($files as $file) {
             $content = $publicDisk->get($file);
-            $zip->addFromString("files/{$file}", $content);
+            if ($content !== null) {
+                $zip->addFromString("files/{$file}", $content);
+            }
         }
     }
 
@@ -168,7 +170,10 @@ class WebsiteExportService
             'files_count' => $this->countExportedFiles(),
         ];
 
-        $zip->addFromString('export-metadata.json', json_encode($metadata, JSON_PRETTY_PRINT));
+        $metadataJson = json_encode($metadata, JSON_PRETTY_PRINT);
+        if ($metadataJson !== false) {
+            $zip->addFromString('export-metadata.json', $metadataJson);
+        }
     }
 
     /**
@@ -221,10 +226,12 @@ class WebsiteExportService
         $deleted = 0;
         $cutoffTime = time() - ($keepDays * 24 * 60 * 60);
 
-        foreach ($files as $file) {
-            if (filemtime($file) < $cutoffTime) {
-                unlink($file);
-                $deleted++;
+        if ($files !== false) {
+            foreach ($files as $file) {
+                if (filemtime($file) < $cutoffTime) {
+                    unlink($file);
+                    $deleted++;
+                }
             }
         }
 

@@ -145,7 +145,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
             <section class="flex flex-col items-center gap-16" id="career-section">
                 <div class="flex">
                     <div class="relative flex flex-1 flex-col gap-8">
-                        <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[0px] right-[-64px]" />
+                        <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[0px] right-[-64px] hidden lg:block" />
                         <HeroSectionTitle>{{ t('home.career.title') }}</HeroSectionTitle>
                         <SectionParagraph>
                             {{ t('home.career.description') }}

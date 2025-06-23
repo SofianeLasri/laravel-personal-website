@@ -204,7 +204,6 @@ class DataManagementController extends Controller
         try {
             $stats = $this->importService->importWebsite($fullPath);
 
-            // Clean up the imported file
             Storage::delete($filePath);
 
             return response()->json([

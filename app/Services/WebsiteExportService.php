@@ -25,7 +25,7 @@ class WebsiteExportService
      */
     private array $exportTables = [
         // Core reference tables (no dependencies)
-        'users',
+        // 'users',
         'translation_keys',
         'technologies',
         'people',

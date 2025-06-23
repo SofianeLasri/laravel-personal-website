@@ -4,8 +4,10 @@ namespace App\Services;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
+use Throwable;
 use ZipArchive;
 
 /**
@@ -22,7 +24,7 @@ class WebsiteImportService
      */
     private array $importTables = [
         // Core reference tables (no dependencies)
-        'users',
+        // 'users',
         'translation_keys',
         'technologies',
         'people',
@@ -69,6 +71,7 @@ class WebsiteImportService
      */
     public function importWebsite(string $zipPath): array
     {
+        set_time_limit(3600);
         if (! file_exists($zipPath)) {
             throw new RuntimeException('Import file does not exist');
         }
@@ -86,33 +89,27 @@ class WebsiteImportService
             'import_date' => now()->toISOString(),
         ];
 
-        DB::beginTransaction();
-
         try {
-            // Validate export structure
+            DB::beginTransaction();
             $this->validateExportStructure($zip);
-
-            // Clear existing data
             $this->clearExistingData();
 
-            // Import database
             $dbStats = $this->importDatabase($zip);
             $stats['tables_imported'] = $dbStats['tables'];
             $stats['records_imported'] = $dbStats['records'];
-
-            // Import files
             $stats['files_imported'] = $this->importFiles($zip);
 
-            // Reset auto-increment values
             $this->resetAutoIncrements();
 
             DB::commit();
             $zip->close();
 
             return $stats;
-        } catch (Exception $e) {
+        } catch (Exception|Throwable $e) {
             DB::rollBack();
             $zip->close();
+            Log::error('Import failed');
+            Log::error($e->getMessage(), $e->getTrace());
             throw new RuntimeException('Import failed: '.$e->getMessage(), 0, $e);
         }
     }
@@ -154,7 +151,7 @@ class WebsiteImportService
         $connection = DB::connection();
         $driver = $connection->getDriverName();
 
-        if ($driver === 'mysql') {
+        if (in_array($driver, ['mysql', 'mariadb'])) {
             DB::statement('SET FOREIGN_KEY_CHECKS = 0');
         } elseif ($driver === 'sqlite') {
             DB::statement('PRAGMA foreign_keys = OFF');

@@ -185,7 +185,7 @@ const handleImport = async () => {
     // Simulate progress
     const progressInterval = setInterval(() => {
         if (importProgress.value < 90) {
-            importProgress.value += 5;
+            importProgress.value += 1;
         }
     }, 300);
 

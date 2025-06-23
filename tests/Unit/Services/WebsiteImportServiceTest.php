@@ -4,12 +4,17 @@ namespace Tests\Unit\Services;
 
 use App\Models\Picture;
 use App\Models\Technology;
+use App\Models\User;
 use App\Services\WebsiteImportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 use Tests\TestCase;
 use ZipArchive;
 
+#[CoversClass(WebsiteImportService::class)]
 class WebsiteImportServiceTest extends TestCase
 {
     use RefreshDatabase;
@@ -23,6 +28,7 @@ class WebsiteImportServiceTest extends TestCase
         Storage::fake('public');
     }
 
+    #[Test]
     public function test_get_import_tables_returns_correct_tables(): void
     {
         $tables = $this->importService->getImportTables();
@@ -33,12 +39,12 @@ class WebsiteImportServiceTest extends TestCase
         $this->assertContains('creations', $tables);
         $this->assertContains('pictures', $tables);
 
-        // Verify order - core tables should come before pivot tables
         $usersIndex = array_search('users', $tables);
         $creationTechnologyIndex = array_search('creation_technology', $tables);
         $this->assertLessThan($creationTechnologyIndex, $usersIndex);
     }
 
+    #[Test]
     public function test_validate_import_file_accepts_valid_zip(): void
     {
         $zipPath = $this->createValidZipFile();
@@ -52,6 +58,7 @@ class WebsiteImportServiceTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_validate_import_file_rejects_invalid_zip(): void
     {
         $zipPath = $this->createInvalidZipFile();
@@ -64,6 +71,7 @@ class WebsiteImportServiceTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_validate_import_file_handles_nonexistent_file(): void
     {
         $result = $this->importService->validateImportFile('/nonexistent/file.zip');
@@ -72,6 +80,7 @@ class WebsiteImportServiceTest extends TestCase
         $this->assertContains('File does not exist', $result['errors']);
     }
 
+    #[Test]
     public function test_get_import_metadata_returns_correct_data(): void
     {
         $zipPath = $this->createValidZipFile();
@@ -87,6 +96,7 @@ class WebsiteImportServiceTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_get_import_metadata_handles_invalid_file(): void
     {
         $metadata = $this->importService->getImportMetadata('/nonexistent/file.zip');
@@ -94,28 +104,23 @@ class WebsiteImportServiceTest extends TestCase
         $this->assertNull($metadata);
     }
 
+    #[Test]
     public function test_import_website_replaces_existing_data(): void
     {
-        // Create existing data
-        $existingTech = Technology::factory()->create(['name' => 'Existing Tech']);
-        $existingPicture = Picture::factory()->create(['filename' => 'existing.jpg']);
+        Technology::factory()->create(['name' => 'Existing Tech']);
+        Picture::factory()->create(['filename' => 'existing.jpg']);
 
         $this->assertDatabaseHas('technologies', ['name' => 'Existing Tech']);
         $this->assertDatabaseHas('pictures', ['filename' => 'existing.jpg']);
 
-        // Import new data
         $zipPath = $this->createValidZipFile();
         $stats = $this->importService->importWebsite($zipPath);
 
-        // Verify old data was removed
         $this->assertDatabaseMissing('technologies', ['name' => 'Existing Tech']);
         $this->assertDatabaseMissing('pictures', ['filename' => 'existing.jpg']);
-
-        // Verify new data was imported
         $this->assertDatabaseHas('technologies', ['name' => 'Imported Tech']);
         $this->assertDatabaseHas('pictures', ['filename' => 'imported.jpg']);
 
-        // Verify stats
         $this->assertIsArray($stats);
         $this->assertArrayHasKey('tables_imported', $stats);
         $this->assertArrayHasKey('records_imported', $stats);
@@ -124,40 +129,33 @@ class WebsiteImportServiceTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_import_website_restores_files(): void
     {
-        // Create existing files
         Storage::disk('public')->put('existing-file.txt', 'existing content');
         $this->assertTrue(Storage::disk('public')->exists('existing-file.txt'));
 
-        // Import new files
         $zipPath = $this->createValidZipFileWithFiles();
         $stats = $this->importService->importWebsite($zipPath);
 
-        // Verify old files were removed
         $this->assertFalse(Storage::disk('public')->exists('existing-file.txt'));
-
-        // Verify new files were imported
         $this->assertTrue(Storage::disk('public')->exists('uploads/imported-file.txt'));
         $this->assertEquals('imported content', Storage::disk('public')->get('uploads/imported-file.txt'));
-
-        // Verify files count in stats
         $this->assertEquals(1, $stats['files_imported']);
 
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_import_website_preserves_file_structure(): void
     {
         $zipPath = $this->createZipFileWithNestedFiles();
-        $stats = $this->importService->importWebsite($zipPath);
+        $this->importService->importWebsite($zipPath);
 
-        // Verify nested file structure is preserved
         $this->assertTrue(Storage::disk('public')->exists('uploads/images/test1.jpg'));
         $this->assertTrue(Storage::disk('public')->exists('uploads/images/subfolder/test2.jpg'));
         $this->assertTrue(Storage::disk('public')->exists('documents/test.pdf'));
 
-        // Verify content
         $this->assertEquals('image1', Storage::disk('public')->get('uploads/images/test1.jpg'));
         $this->assertEquals('image2', Storage::disk('public')->get('uploads/images/subfolder/test2.jpg'));
         $this->assertEquals('pdf content', Storage::disk('public')->get('documents/test.pdf'));
@@ -165,6 +163,7 @@ class WebsiteImportServiceTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_import_website_handles_empty_database(): void
     {
         $zipPath = $this->createValidZipFileEmptyDatabase();
@@ -176,33 +175,34 @@ class WebsiteImportServiceTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_import_website_handles_missing_tables(): void
     {
-        // Create a ZIP file with only some tables
         $zipPath = $this->createPartialZipFile();
         $stats = $this->importService->importWebsite($zipPath);
 
-        // Should not fail if some tables are missing
         $this->assertIsArray($stats);
         $this->assertArrayHasKey('tables_imported', $stats);
 
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_import_website_throws_exception_on_invalid_file(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Import file does not exist');
 
         $this->importService->importWebsite('/nonexistent/file.zip');
     }
 
+    #[Test]
     public function test_import_website_throws_exception_on_corrupted_zip(): void
     {
         $corruptedZip = tempnam(sys_get_temp_dir(), 'corrupted').'.zip';
         file_put_contents($corruptedZip, 'not a zip file');
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Cannot open ZIP file');
 
         $this->importService->importWebsite($corruptedZip);
@@ -210,11 +210,12 @@ class WebsiteImportServiceTest extends TestCase
         unlink($corruptedZip);
     }
 
+    #[Test]
     public function test_import_website_handles_invalid_json_data(): void
     {
         $zipPath = $this->createZipFileWithInvalidJson();
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid JSON data for table');
 
         $this->importService->importWebsite($zipPath);
@@ -222,72 +223,64 @@ class WebsiteImportServiceTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_import_website_restores_relationships(): void
     {
         $zipPath = $this->createZipFileWithRelationships();
-        $stats = $this->importService->importWebsite($zipPath);
+        $this->importService->importWebsite($zipPath);
 
-        // Verify entities were imported
         $this->assertDatabaseHas('technologies', ['name' => 'Laravel']);
         $this->assertDatabaseHas('translation_keys', ['key' => 'technology.laravel.description']);
 
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_import_website_resets_auto_increments(): void
     {
-        // Create existing data with high IDs
         Technology::factory()->create(['id' => 100, 'name' => 'High ID Tech']);
 
         $zipPath = $this->createValidZipFile();
-        $stats = $this->importService->importWebsite($zipPath);
+        $this->importService->importWebsite($zipPath);
 
-        // Verify new data starts from ID 1
         $technology = Technology::first();
         $this->assertEquals(1, $technology->id);
 
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_import_website_skips_users_table_in_production(): void
     {
-        // Temporarily set environment to production
         $originalEnv = app()->environment();
         app()->instance('env', 'production');
 
         try {
-            // Create existing user
-            $existingUser = \App\Models\User::factory()->create(['email' => 'existing@example.com']);
+            User::factory()->create(['email' => 'existing@example.com']);
 
             $zipPath = $this->createZipFileWithUsers();
-            $stats = $this->importService->importWebsite($zipPath);
+            $this->importService->importWebsite($zipPath);
 
-            // Verify existing user was not removed
             $this->assertDatabaseHas('users', ['email' => 'existing@example.com']);
-
-            // Verify imported user was not added
             $this->assertDatabaseMissing('users', ['email' => 'imported@example.com']);
 
             unlink($zipPath);
         } finally {
-            // Restore original environment
             app()->instance('env', $originalEnv);
         }
     }
 
+    #[Test]
     public function test_import_website_transaction_rollback_on_failure(): void
     {
-        // Create existing data
-        $existingTech = Technology::factory()->create(['name' => 'Existing Tech']);
+        Technology::factory()->create(['name' => 'Existing Tech']);
 
-        // Create a ZIP file that will cause an error during import
         $zipPath = $this->createZipFileWithInvalidJson();
 
         try {
             $this->importService->importWebsite($zipPath);
             $this->fail('Expected RuntimeException was not thrown');
-        } catch (\RuntimeException $e) {
-            // Verify transaction was rolled back - existing data should still be there
+        } catch (RuntimeException $e) {
             $this->assertDatabaseHas('technologies', ['name' => 'Existing Tech']);
         }
 
@@ -449,10 +442,7 @@ class WebsiteImportServiceTest extends TestCase
             'files_count' => 0,
         ];
         $zip->addFromString('export-metadata.json', json_encode($metadata));
-
-        // Only add some tables
         $zip->addFromString('database/technologies.json', json_encode([]));
-        // Missing other expected tables
 
         $zip->close();
 

@@ -2,18 +2,23 @@
 
 namespace Tests\Feature\Controllers\Admin;
 
+use App\Http\Controllers\Admin\DataManagementController;
 use App\Models\Creation;
 use App\Models\Picture;
 use App\Models\Technology;
-use App\Models\User;
 use App\Services\WebsiteExportService;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 use ZipArchive;
 
+#[CoversClass(DataManagementController::class)]
 class DataManagementControllerExportTest extends TestCase
 {
     use ActsAsUser, RefreshDatabase;
@@ -25,6 +30,7 @@ class DataManagementControllerExportTest extends TestCase
         Storage::fake('public');
     }
 
+    #[Test]
     public function test_data_management_index_page_loads_successfully(): void
     {
         $response = $this
@@ -37,17 +43,15 @@ class DataManagementControllerExportTest extends TestCase
         );
     }
 
+    #[Test]
     public function test_export_creates_valid_zip_file(): void
     {
-        // Create test data
-        $technology = Technology::factory()->create(['name' => 'Laravel']);
-        $picture = Picture::factory()->create(['filename' => 'test-image.jpg']);
-        $creation = Creation::factory()->create(['name' => 'Test Project']);
+        Technology::factory()->create(['name' => 'Laravel']);
+        Picture::factory()->create(['filename' => 'test-image.jpg']);
+        Creation::factory()->create(['name' => 'Test Project']);
 
-        // Create test file in storage
         Storage::disk('public')->put('uploads/test-file.txt', 'test content');
 
-        // Test the export service directly instead of through HTTP
         $exportService = new WebsiteExportService;
         $zipPath = $exportService->exportWebsite();
 
@@ -56,21 +60,18 @@ class DataManagementControllerExportTest extends TestCase
         $zip = new ZipArchive;
         $this->assertTrue($zip->open($zipPath) === true);
 
-        // Check for expected files
         $this->assertNotFalse($zip->locateName('export-metadata.json'));
         $this->assertNotFalse($zip->locateName('database/technologies.json'));
         $this->assertNotFalse($zip->locateName('database/pictures.json'));
         $this->assertNotFalse($zip->locateName('database/creations.json'));
         $this->assertNotFalse($zip->locateName('files/uploads/test-file.txt'));
 
-        // Verify metadata content
         $metadata = json_decode($zip->getFromName('export-metadata.json'), true);
         $this->assertIsArray($metadata);
         $this->assertArrayHasKey('export_date', $metadata);
         $this->assertArrayHasKey('laravel_version', $metadata);
         $this->assertArrayHasKey('tables_exported', $metadata);
 
-        // Verify database content
         $technologiesData = json_decode($zip->getFromName('database/technologies.json'), true);
         $this->assertIsArray($technologiesData);
         $this->assertCount(1, $technologiesData);
@@ -78,13 +79,12 @@ class DataManagementControllerExportTest extends TestCase
 
         $zip->close();
 
-        // Clean up
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_export_handles_empty_database(): void
     {
-        // Test the export service directly with empty database
         $exportService = new WebsiteExportService;
         $zipPath = $exportService->exportWebsite();
 
@@ -93,13 +93,13 @@ class DataManagementControllerExportTest extends TestCase
         $zip = new ZipArchive;
         $this->assertTrue($zip->open($zipPath) === true);
 
-        // Should still have metadata and empty database files
         $this->assertNotFalse($zip->locateName('export-metadata.json'));
 
         $zip->close();
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_export_includes_all_expected_tables(): void
     {
         $exportService = new WebsiteExportService;
@@ -123,9 +123,9 @@ class DataManagementControllerExportTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_export_requires_authentication(): void
     {
-        // Logout the user that was logged in during setUp
         auth()->logout();
 
         $response = $this->post('/dashboard/data-management/export');
@@ -133,9 +133,9 @@ class DataManagementControllerExportTest extends TestCase
         $response->assertRedirect('/login');
     }
 
+    #[Test]
     public function test_export_preserves_file_structure(): void
     {
-        // Create nested file structure
         Storage::disk('public')->put('uploads/images/test1.jpg', 'image content 1');
         Storage::disk('public')->put('uploads/images/subfolder/test2.jpg', 'image content 2');
         Storage::disk('public')->put('uploads/documents/test.pdf', 'pdf content');
@@ -148,12 +148,10 @@ class DataManagementControllerExportTest extends TestCase
         $zip = new ZipArchive;
         $this->assertTrue($zip->open($zipPath) === true);
 
-        // Verify file structure is preserved
         $this->assertNotFalse($zip->locateName('files/uploads/images/test1.jpg'));
         $this->assertNotFalse($zip->locateName('files/uploads/images/subfolder/test2.jpg'));
         $this->assertNotFalse($zip->locateName('files/uploads/documents/test.pdf'));
 
-        // Verify file content
         $this->assertEquals('image content 1', $zip->getFromName('files/uploads/images/test1.jpg'));
         $this->assertEquals('image content 2', $zip->getFromName('files/uploads/images/subfolder/test2.jpg'));
         $this->assertEquals('pdf content', $zip->getFromName('files/uploads/documents/test.pdf'));
@@ -162,9 +160,10 @@ class DataManagementControllerExportTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_export_contains_valid_json_data(): void
     {
-        $technology = Technology::factory()->create([
+        Technology::factory()->create([
             'name' => 'Test Technology',
             'type' => 'framework',
         ]);
@@ -192,9 +191,9 @@ class DataManagementControllerExportTest extends TestCase
         unlink($zipPath);
     }
 
+    #[Test]
     public function test_export_handles_service_failure_gracefully(): void
     {
-        // Mock the export service to throw an exception
         $this->mock(WebsiteExportService::class, function ($mock) {
             $mock->shouldReceive('exportWebsite')
                 ->once()
@@ -211,6 +210,7 @@ class DataManagementControllerExportTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_export_cleans_up_old_exports(): void
     {
         $exportService = $this->mock(WebsiteExportService::class);
@@ -221,11 +221,10 @@ class DataManagementControllerExportTest extends TestCase
 
         $exportService->shouldReceive('cleanupOldExports')
             ->once()
-            ->andReturn(2); // Simulate cleaning up 2 old files
+            ->andReturn(2);
 
-        // Mock file_exists and other file operations
         $this->app->bind('files', function () {
-            $files = \Mockery::mock(\Illuminate\Filesystem\Filesystem::class);
+            $files = Mockery::mock(Filesystem::class);
             $files->shouldReceive('exists')->andReturn(true);
             $files->shouldReceive('get')->andReturn('zip content');
             $files->shouldReceive('delete')->andReturn(true);
@@ -233,13 +232,12 @@ class DataManagementControllerExportTest extends TestCase
             return $files;
         });
 
-        $response = $this
-            ->post('/dashboard/data-management/export');
+        $this->post('/dashboard/data-management/export');
 
-        // The cleanup should be called even on successful export
         $exportService->shouldHaveReceived('cleanupOldExports');
     }
 
+    #[Test]
     public function test_data_management_page_shows_correct_table_lists(): void
     {
         $response = $this

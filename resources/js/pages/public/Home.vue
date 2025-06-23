@@ -9,6 +9,7 @@ import TechnologyExperiencesContainer from '@/components/public/Technology/Techn
 import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
+import Cube from '@/components/shapes/cube.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
@@ -107,7 +108,8 @@ const pageImage = '/opengraph-image-1200-630.jpg';
 
             <section class="flex flex-col gap-16" id="laravel-section">
                 <div class="flex">
-                    <div class="flex flex-1 flex-col gap-8">
+                    <div class="relative flex flex-1 flex-col gap-8">
+                        <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[128px] left-[-80px]" />
                         <HeroSectionTitle>{{ t('home.laravel-section.title') }}</HeroSectionTitle>
                         <SectionParagraph>
                             {{ t('home.laravel-section.paragraph') }}
@@ -130,7 +132,8 @@ const pageImage = '/opengraph-image-1200-630.jpg';
             </section>
 
             <section class="flex flex-col items-center gap-16" id="other-skills-section">
-                <div class="inline-flex max-w-[56rem] flex-col items-center gap-8 text-center">
+                <div class="relative inline-flex max-w-[56rem] flex-col items-center gap-8 text-center">
+                    <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[8px] left-[-80px]" />
                     <HeroSectionTitle>{{ t('home.other_skills.title') }}</HeroSectionTitle>
                     <SectionParagraph>
                         {{ t('home.other_skills.description') }}
@@ -141,7 +144,8 @@ const pageImage = '/opengraph-image-1200-630.jpg';
 
             <section class="flex flex-col items-center gap-16" id="career-section">
                 <div class="flex">
-                    <div class="flex flex-1 flex-col gap-8">
+                    <div class="relative flex flex-1 flex-col gap-8">
+                        <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[0px] right-[-64px]" />
                         <HeroSectionTitle>{{ t('home.career.title') }}</HeroSectionTitle>
                         <SectionParagraph>
                             {{ t('home.career.description') }}

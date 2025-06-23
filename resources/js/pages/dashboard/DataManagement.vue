@@ -12,7 +12,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import { AlertTriangle, Download, Info, Trash2, Upload } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 
 interface Props {
     exportTables: string[];
@@ -35,6 +35,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 // State management
 const isExporting = ref(false);
 const exportProgress = ref(0);
+const exportRequestId = ref<string | null>(null);
+const exportStatusInterval = ref<number | null>(null);
+const exportDownloadUrl = ref<string | null>(null);
 const isImporting = ref(false);
 const importProgress = ref(0);
 const importFile = ref<File | null>(null);
@@ -56,54 +59,79 @@ const handleExport = async () => {
     exportProgress.value = 0;
     error.value = null;
     success.value = null;
-
-    // Simulate progress
-    const progressInterval = setInterval(() => {
-        if (exportProgress.value < 90) {
-            exportProgress.value += 10;
-        }
-    }, 500);
+    exportRequestId.value = null;
+    exportDownloadUrl.value = null;
 
     try {
-        const response = await axios.post(
-            '/dashboard/data-management/export',
-            {},
-            {
-                responseType: 'blob',
-            },
-        );
+        const response = await axios.post('/dashboard/data-management/export');
 
-        clearInterval(progressInterval);
-        exportProgress.value = 100;
-
-        // Create download link
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-
-        // Extract filename from response headers or use default
-        const contentDisposition = response.headers['content-disposition'];
-        let filename = 'website-export.zip';
-        if (contentDisposition) {
-            const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-            if (filenameMatch) {
-                filename = filenameMatch[1];
-            }
+        if (response.status === 202) {
+            // Export accepted, start polling for status
+            exportRequestId.value = response.data.request_id;
+            startExportStatusPolling();
+        } else if (response.status === 409) {
+            // Export already in progress
+            error.value = response.data.message;
+            isExporting.value = false;
         }
-
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-
-        success.value = 'Export completed successfully!';
     } catch (err: any) {
-        clearInterval(progressInterval);
-        error.value = err.response?.data?.message || 'Export failed. Please try again.';
-    } finally {
+        error.value = err.response?.data?.message || 'Failed to start export. Please try again.';
         isExporting.value = false;
-        exportProgress.value = 0;
+    }
+};
+
+const startExportStatusPolling = () => {
+    if (!exportRequestId.value) return;
+
+    exportStatusInterval.value = setInterval(async () => {
+        try {
+            const response = await axios.get(`/dashboard/data-management/export/${exportRequestId.value}/status`);
+            const status = response.data;
+
+            switch (status.status) {
+                case 'queued':
+                    exportProgress.value = 10;
+                    break;
+                case 'processing':
+                    exportProgress.value = 50;
+                    break;
+                case 'completed':
+                    exportProgress.value = 100;
+                    exportDownloadUrl.value = status.download_url;
+                    success.value = 'Export completed successfully! Click the download button to get your file.';
+                    stopExportStatusPolling();
+                    isExporting.value = false;
+                    break;
+                case 'failed':
+                    error.value = status.error || 'Export failed. Please try again.';
+                    stopExportStatusPolling();
+                    isExporting.value = false;
+                    break;
+                case 'not_found':
+                    error.value = 'Export request not found or expired.';
+                    stopExportStatusPolling();
+                    isExporting.value = false;
+                    break;
+            }
+        } catch (err: any) {
+            error.value = 'Failed to check export status. Please refresh the page.';
+            stopExportStatusPolling();
+            isExporting.value = false;
+            console.error(err);
+        }
+    }, 2000); // Poll every 2 seconds
+};
+
+const stopExportStatusPolling = () => {
+    if (exportStatusInterval.value) {
+        clearInterval(exportStatusInterval.value);
+        exportStatusInterval.value = null;
+    }
+};
+
+const downloadExport = () => {
+    if (exportDownloadUrl.value) {
+        window.location.href = exportDownloadUrl.value;
     }
 };
 
@@ -222,6 +250,11 @@ const formatFileSize = (bytes: number) => {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i];
 };
+
+// Cleanup on component unmount
+onUnmounted(() => {
+    stopExportStatusPolling();
+});
 </script>
 
 <template>
@@ -277,13 +310,29 @@ const formatFileSize = (bytes: number) => {
                         <div v-if="isExporting" class="space-y-2">
                             <Label>Export progress</Label>
                             <Progress :value="exportProgress" class="w-full" />
-                            <p class="text-muted-foreground text-sm">Exporting data... {{ exportProgress }}%</p>
+                            <p class="text-muted-foreground text-sm">
+                                {{
+                                    exportProgress <= 10
+                                        ? 'Queued for processing...'
+                                        : exportProgress <= 50
+                                          ? 'Processing export...'
+                                          : 'Finalizing export...'
+                                }}
+                                {{ exportProgress }}%
+                            </p>
                         </div>
 
-                        <Button @click="handleExport" :disabled="isExporting" class="w-full">
-                            <Download class="mr-2 h-4 w-4" />
-                            {{ isExporting ? 'Exporting...' : 'Export Website Data' }}
-                        </Button>
+                        <div class="space-y-2">
+                            <Button @click="handleExport" :disabled="isExporting" class="w-full">
+                                <Download class="mr-2 h-4 w-4" />
+                                {{ isExporting ? 'Exporting...' : 'Export Website Data' }}
+                            </Button>
+
+                            <Button v-if="exportDownloadUrl" @click="downloadExport" variant="outline" class="w-full">
+                                <Download class="mr-2 h-4 w-4" />
+                                Download Export File
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
 

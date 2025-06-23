@@ -7,9 +7,12 @@ use App\Models\Technology;
 use App\Services\WebsiteExportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use ZipArchive;
 
+#[CoversClass(WebsiteExportService::class)]
 class WebsiteExportServiceTest extends TestCase
 {
     use RefreshDatabase;
@@ -20,9 +23,11 @@ class WebsiteExportServiceTest extends TestCase
     {
         parent::setUp();
         $this->exportService = new WebsiteExportService;
+        Storage::fake('local');
         Storage::fake('public');
     }
 
+    #[Test]
     public function test_get_export_tables_returns_correct_tables(): void
     {
         $tables = $this->exportService->getExportTables();
@@ -33,41 +38,38 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertContains('creations', $tables);
         $this->assertContains('pictures', $tables);
 
-        // Verify order - users should come before pivot tables
         $usersIndex = array_search('users', $tables);
         $creationTechnologyIndex = array_search('creation_technology', $tables);
         $this->assertLessThan($creationTechnologyIndex, $usersIndex);
     }
 
+    #[Test]
     public function test_export_website_creates_zip_file(): void
     {
         $zipPath = $this->exportService->exportWebsite();
 
-        $this->assertFileExists($zipPath);
+        $this->assertTrue(Storage::fileExists($zipPath));
         $this->assertStringEndsWith('.zip', $zipPath);
         $this->assertStringContainsString('website-export-', $zipPath);
 
-        // Clean up
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_export_website_creates_valid_zip_structure(): void
     {
-        // Create test data
         Technology::factory()->create(['name' => 'Test Tech']);
         Storage::disk('public')->put('test-file.txt', 'test content');
 
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $this->assertTrue($zip->open($zipPath) === true);
+        $this->assertTrue($zip->open(Storage::path($zipPath)) === true);
 
-        // Check required files exist
         $this->assertNotFalse($zip->locateName('export-metadata.json'));
         $this->assertNotFalse($zip->locateName('database/technologies.json'));
         $this->assertNotFalse($zip->locateName('files/test-file.txt'));
 
-        // Verify metadata structure
         $metadata = json_decode($zip->getFromName('export-metadata.json'), true);
         $this->assertArrayHasKey('export_date', $metadata);
         $this->assertArrayHasKey('laravel_version', $metadata);
@@ -75,28 +77,26 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertArrayHasKey('tables_exported', $metadata);
         $this->assertArrayHasKey('files_count', $metadata);
 
-        // Verify database export
         $techData = json_decode($zip->getFromName('database/technologies.json'), true);
         $this->assertIsArray($techData);
         $this->assertCount(1, $techData);
         $this->assertEquals('Test Tech', $techData[0]['name']);
 
-        // Verify file export
         $fileContent = $zip->getFromName('files/test-file.txt');
         $this->assertEquals('test content', $fileContent);
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_export_website_handles_empty_database(): void
     {
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $zip->open($zipPath);
+        $zip->open(Storage::path($zipPath));
 
-        // Should still create database files even if empty
         $this->assertNotFalse($zip->locateName('database/technologies.json'));
 
         $techData = json_decode($zip->getFromName('database/technologies.json'), true);
@@ -104,24 +104,25 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertEmpty($techData);
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_export_website_handles_no_files(): void
     {
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $zip->open($zipPath);
+        $zip->open(Storage::path($zipPath));
 
-        // Should still create metadata even with no files
         $metadata = json_decode($zip->getFromName('export-metadata.json'), true);
         $this->assertEquals(0, $metadata['files_count']);
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_export_website_includes_nested_files(): void
     {
         Storage::disk('public')->put('uploads/images/test1.jpg', 'image1');
@@ -131,7 +132,7 @@ class WebsiteExportServiceTest extends TestCase
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $zip->open($zipPath);
+        $zip->open(Storage::path($zipPath));
 
         $this->assertNotFalse($zip->locateName('files/uploads/images/test1.jpg'));
         $this->assertNotFalse($zip->locateName('files/uploads/images/subfolder/test2.jpg'));
@@ -142,9 +143,10 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertEquals('pdf content', $zip->getFromName('files/documents/test.pdf'));
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_export_website_handles_special_characters(): void
     {
         Technology::factory()->create(['name' => 'Spécial Téch & Ümlauts']);
@@ -153,7 +155,7 @@ class WebsiteExportServiceTest extends TestCase
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $zip->open($zipPath);
+        $zip->open(Storage::path($zipPath));
 
         $techData = json_decode($zip->getFromName('database/technologies.json'), true);
         $this->assertEquals('Spécial Téch & Ümlauts', $techData[0]['name']);
@@ -162,21 +164,20 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertEquals('spécial content', $fileContent);
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_export_website_includes_all_table_data(): void
     {
-        // Create test data for multiple tables
-        $tech = Technology::factory()->create(['name' => 'Laravel']);
-        $picture = Picture::factory()->create(['filename' => 'test.jpg']);
+        Technology::factory()->create(['name' => 'Laravel']);
+        Picture::factory()->create(['filename' => 'test.jpg']);
 
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $zip->open($zipPath);
+        $zip->open(Storage::path($zipPath));
 
-        // Verify both tables are exported
         $techData = json_decode($zip->getFromName('database/technologies.json'), true);
         $pictureData = json_decode($zip->getFromName('database/pictures.json'), true);
 
@@ -186,20 +187,20 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertEquals('test.jpg', $pictureData[0]['filename']);
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_cleanup_old_exports_removes_old_files(): void
     {
-        $tempDir = storage_path('app/temp');
+        $tempDir = Storage::path('temp');
         if (! is_dir($tempDir)) {
             mkdir($tempDir, 0755, true);
         }
 
-        // Create old export files
-        $oldFile1 = $tempDir.'/website-export-old1.zip';
-        $oldFile2 = $tempDir.'/website-export-old2.zip';
-        $recentFile = $tempDir.'/website-export-recent.zip';
+        $oldFile1 = Storage::path('/temp/website-export-old1.zip');
+        $oldFile2 = Storage::path('/temp/website-export-old2.zip');
+        $recentFile = Storage::path('/website-export-recent.zip');
 
         touch($oldFile1, time() - (10 * 24 * 60 * 60)); // 10 days old
         touch($oldFile2, time() - (8 * 24 * 60 * 60));  // 8 days old
@@ -212,12 +213,12 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertFileDoesNotExist($oldFile2);
         $this->assertFileExists($recentFile);
 
-        // Clean up
         if (file_exists($recentFile)) {
             unlink($recentFile);
         }
     }
 
+    #[Test]
     public function test_cleanup_old_exports_handles_nonexistent_directory(): void
     {
         $tempDir = storage_path('app/temp');
@@ -237,6 +238,7 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertEquals(0, $deleted);
     }
 
+    #[Test]
     public function test_export_preserves_database_relationships(): void
     {
         // Create related data
@@ -250,7 +252,7 @@ class WebsiteExportServiceTest extends TestCase
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $zip->open($zipPath);
+        $zip->open(Storage::path($zipPath));
 
         // Verify all related data is exported
         $creationData = json_decode($zip->getFromName('database/creations.json'), true);
@@ -262,15 +264,16 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertEquals($tech->id, $pivotData[0]['technology_id']);
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_export_metadata_contains_correct_information(): void
     {
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $zip->open($zipPath);
+        $zip->open(Storage::path($zipPath));
 
         $metadata = json_decode($zip->getFromName('export-metadata.json'), true);
 
@@ -284,9 +287,10 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertNotFalse(\DateTime::createFromFormat('Y-m-d\TH:i:s.u\Z', $metadata['export_date']) ?: \DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $metadata['export_date']));
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 
+    #[Test]
     public function test_export_handles_large_dataset(): void
     {
         // Create multiple records to test performance
@@ -296,7 +300,7 @@ class WebsiteExportServiceTest extends TestCase
         $zipPath = $this->exportService->exportWebsite();
 
         $zip = new ZipArchive;
-        $zip->open($zipPath);
+        $zip->open(Storage::path($zipPath));
 
         $techData = json_decode($zip->getFromName('database/technologies.json'), true);
         $pictureData = json_decode($zip->getFromName('database/pictures.json'), true);
@@ -305,6 +309,6 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertCount(50, $pictureData);
 
         $zip->close();
-        unlink($zipPath);
+        Storage::delete($zipPath);
     }
 }

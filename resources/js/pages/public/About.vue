@@ -138,14 +138,6 @@ const pageImage = '/opengraph-image-1200-630.jpg';
                         et disponible sous les licences Creative Common.
                     </p>
                 </div>
-                <div class="flex flex-col">
-                    <h2 class="text-design-system-title mb-8 text-2xl font-bold">Est-ce que je propose mes services ?</h2>
-                    <p class="text-design-system-paragraph">
-                        Non, je ne propose pas mes services. Aussi bien en la qualité de développeur qu’en la qualité de map maker.
-                        <span class="font-bold">Toutefois</span>, si vous rencontrez des problèmes sur l’une de mes créations et que vous avez besoin
-                        d’aide (hors aide en mapping, désolé), je peux intervenir dans la mesure du possible.
-                    </p>
-                </div>
             </div>
         </div>
     </PublicAppLayout>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRSimplifiedCreation } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import Skeleton from '@/components/ui/skeleton/Skeleton.vue';
 
 const props = defineProps<{
     creation: SSRSimplifiedCreation;

@@ -5,6 +5,7 @@ namespace Tests\Feature\Models\Video;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
 use App\Http\Controllers\Admin\Api\VideoController;
+use App\Jobs\PictureJob;
 use App\Models\Picture;
 use App\Models\Video;
 use App\Services\BunnyStreamService;
@@ -12,7 +13,9 @@ use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Mockery\MockInterface;
@@ -810,6 +813,129 @@ class VideoControllerTest extends TestCase
                     'name',
                     'cover_picture',
                 ],
+            ]);
+    }
+
+    #[Test]
+    public function test_download_thumbnail_success(): void
+    {
+        Queue::fake();
+        Storage::fake('public');
+
+        $video = Video::factory()->create([
+            'status' => VideoStatus::READY,
+            'bunny_video_id' => 'bunny-12345',
+        ]);
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($video) {
+                $mock->shouldReceive('getThumbnailUrl')
+                    ->once()
+                    ->with($video->bunny_video_id)
+                    ->andReturn('https://example.com/thumbnail.jpg');
+            })
+        );
+
+        Http::fake([
+            'https://example.com/thumbnail.jpg' => Http::response('fake-image-content', 200),
+        ]);
+
+        $response = $this->postJson(route('dashboard.api.videos.download-thumbnail', $video->id));
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'message',
+                'picture' => [
+                    'id',
+                    'filename',
+                    'path_original',
+                ],
+                'video' => [
+                    'id',
+                    'cover_picture_id',
+                ],
+            ]);
+
+        // Verify video was updated with cover picture
+        $video->refresh();
+        $this->assertNotNull($video->cover_picture_id);
+
+        // Verify picture was created and linked to video
+        $picture = $video->coverPicture;
+        $this->assertNotNull($picture);
+        $this->assertStringStartsWith("bunny_thumbnail_{$video->bunny_video_id}_", $picture->filename);
+
+        // Verify PictureJob was dispatched
+        Queue::assertPushed(PictureJob::class);
+    }
+
+    #[Test]
+    public function test_download_thumbnail_fails_when_video_not_ready(): void
+    {
+        $video = Video::factory()->create([
+            'status' => VideoStatus::PENDING,
+        ]);
+
+        $response = $this->postJson(route('dashboard.api.videos.download-thumbnail', $video->id));
+
+        $response->assertStatus(400)
+            ->assertJson([
+                'message' => 'Video must be ready before downloading thumbnail.',
+            ]);
+    }
+
+    #[Test]
+    public function test_download_thumbnail_fails_when_bunny_service_fails(): void
+    {
+        $video = Video::factory()->create([
+            'status' => VideoStatus::READY,
+        ]);
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($video) {
+                $mock->shouldReceive('getThumbnailUrl')
+                    ->once()
+                    ->with($video->bunny_video_id)
+                    ->andReturn(null);
+            })
+        );
+
+        $response = $this->postJson(route('dashboard.api.videos.download-thumbnail', $video->id));
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'message' => 'Failed to get thumbnail URL from Bunny Stream.',
+            ]);
+    }
+
+    #[Test]
+    public function test_download_thumbnail_fails_when_http_download_fails(): void
+    {
+        $video = Video::factory()->create([
+            'status' => VideoStatus::READY,
+        ]);
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($video) {
+                $mock->shouldReceive('getThumbnailUrl')
+                    ->once()
+                    ->with($video->bunny_video_id)
+                    ->andReturn('https://example.com/thumbnail.jpg');
+            })
+        );
+
+        Http::fake([
+            'https://example.com/thumbnail.jpg' => Http::response('', 404),
+        ]);
+
+        $response = $this->postJson(route('dashboard.api.videos.download-thumbnail', $video->id));
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'message' => 'Failed to download thumbnail from Bunny Stream.',
             ]);
     }
 }

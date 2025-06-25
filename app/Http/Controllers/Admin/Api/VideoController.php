@@ -7,11 +7,15 @@ use App\Enums\VideoVisibility;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Video\VideoRequest;
 use App\Http\Requests\Video\VideoUploadRequest;
+use App\Jobs\PictureJob;
+use App\Models\Picture;
 use App\Models\Video;
 use App\Services\BunnyStreamService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Visibility;
@@ -197,6 +201,84 @@ class VideoController extends Controller
             'status' => $bunnyData['status'] ?? null,
             'status_text' => $this->getStatusText($bunnyData['status'] ?? null),
         ]);
+    }
+
+    /**
+     * Download the video thumbnail from Bunny Stream and store it as a Picture
+     */
+    public function downloadThumbnail(int $videoId): JsonResponse
+    {
+        $video = Video::findOrFail($videoId);
+
+        // Check if video is ready
+        if ($video->status !== VideoStatus::READY) {
+            return response()->json([
+                'message' => 'Video must be ready before downloading thumbnail.',
+            ], 400);
+        }
+
+        try {
+            // Get thumbnail URL from Bunny Stream
+            $thumbnailUrl = $this->bunnyStreamService->getThumbnailUrl($video->bunny_video_id);
+
+            if (! $thumbnailUrl) {
+                return response()->json([
+                    'message' => 'Failed to get thumbnail URL from Bunny Stream.',
+                ], 500);
+            }
+
+            // Download the thumbnail image
+            $response = Http::get($thumbnailUrl);
+
+            if (! $response->successful()) {
+                return response()->json([
+                    'message' => 'Failed to download thumbnail from Bunny Stream.',
+                ], 500);
+            }
+
+            // Store the image file
+            $folderName = 'uploads/'.Carbon::now()->format('Y/m/d');
+            $fileName = 'bunny_thumbnail_'.$video->bunny_video_id.'_'.uniqid().'.jpg';
+            $filePath = $folderName.'/'.$fileName;
+
+            // Save to local storage
+            Storage::disk('public')->put($filePath, $response->body());
+
+            // Save to CDN if configured
+            if (config('app.cdn_disk')) {
+                Storage::disk(config('app.cdn_disk'))->put($filePath, $response->body());
+            }
+
+            // Create Picture record
+            $picture = Picture::create([
+                'filename' => $fileName,
+                'size' => strlen($response->body()),
+                'path_original' => $filePath,
+            ]);
+
+            // Dispatch optimization job
+            PictureJob::dispatch($picture);
+
+            // Update video to use this as cover picture
+            $video->update(['cover_picture_id' => $picture->id]);
+
+            return response()->json([
+                'message' => 'Thumbnail downloaded and set as cover picture successfully.',
+                'picture' => $picture->load('optimizedPictures'),
+                'video' => $video->load('coverPicture'),
+            ]);
+
+        } catch (Exception $e) {
+            Log::error('Error downloading video thumbnail', [
+                'video_id' => $videoId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'Error while downloading thumbnail: '.$e->getMessage(),
+            ], 500);
+        }
     }
 
     private function getStatusText(?int $status): string

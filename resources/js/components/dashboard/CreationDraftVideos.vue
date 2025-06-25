@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Video } from '@/types';
 import axios from 'axios';
-import { Edit, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
+import { Edit, FileVideo, ImageDown, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -281,6 +281,31 @@ const canSetPublic = (status: string): boolean => {
     return status === 'ready';
 };
 
+const downloadThumbnail = async (video: Video) => {
+    if (!confirm('Télécharger la miniature Bunny Stream comme image de couverture ?')) {
+        return;
+    }
+
+    loading.value = true;
+    error.value = null;
+
+    try {
+        await axios.post(
+            route('dashboard.api.videos.download-thumbnail', {
+                video: video.id,
+            }),
+        );
+
+        await fetchVideos();
+        await fetchAllVideos();
+    } catch (err) {
+        error.value = 'Erreur lors du téléchargement de la miniature';
+        console.error(err);
+    } finally {
+        loading.value = false;
+    }
+};
+
 onMounted(() => {
     if (props.creationDraftId) {
         fetchVideos();
@@ -347,6 +372,16 @@ watch(
                                 </div>
                             </div>
                             <div class="ml-2 flex flex-shrink-0 space-x-1">
+                                <Button
+                                    v-if="video.status === 'ready'"
+                                    variant="ghost"
+                                    size="icon"
+                                    @click.stop="downloadThumbnail(video)"
+                                    title="Télécharger miniature comme couverture"
+                                    :disabled="loading"
+                                >
+                                    <ImageDown class="h-4 w-4" />
+                                </Button>
                                 <Button variant="ghost" size="icon" @click.stop="openEditModal(video)" title="Modifier la vidéo">
                                     <Edit class="h-4 w-4" />
                                 </Button>

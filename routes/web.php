@@ -143,6 +143,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('videos.metadata');
         Route::get('videos/{video}/status', [VideoController::class, 'status'])
             ->name('videos.status');
+        Route::post('videos/{video}/download-thumbnail', [VideoController::class, 'downloadThumbnail'])
+            ->name('videos.download-thumbnail');
 
         Route::post('creation-drafts/{creation_draft}/attach-person', [CreationDraftController::class, 'attachPerson'])
             ->name('creation-drafts.attach-person');

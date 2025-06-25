@@ -27,16 +27,10 @@ class SearchController extends Controller
                 'tags' => Tag::select('id', 'name', 'slug')
                     ->orderBy('name')
                     ->get(),
-                'technologies' => Technology::select('id', 'name', 'type', 'svg_icon')
-                    ->orderBy('name')
+                'technologies' => Technology::orderBy('name')
                     ->get()
-                    ->map(function ($tech) {
-                        return [
-                            'id' => $tech->id,
-                            'name' => $tech->name,
-                            'type' => $tech->type,
-                            'svgIcon' => $tech->svg_icon,
-                        ];
+                    ->map(function (Technology $tech) {
+                        return $this->publicControllersService->formatTechnologyForSSR($tech);
                     }),
             ];
         });

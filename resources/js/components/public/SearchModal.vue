@@ -386,7 +386,12 @@ onUnmounted(() => {
                                                     :key="tech.id"
                                                     class="inline-flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs"
                                                 >
-                                                    <span class="h-3 w-3" v-html="tech.svgIcon"></span>
+                                                    <img
+                                                        :src="tech.iconPicture.webp.thumbnail"
+                                                        :alt="`${tech.name} icon`"
+                                                        class="h-3 w-3 object-contain"
+                                                        loading="lazy"
+                                                    />
                                                     {{ tech.name }}
                                                 </span>
                                                 <span

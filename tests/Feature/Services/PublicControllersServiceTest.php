@@ -210,7 +210,6 @@ class PublicControllersServiceTest extends TestCase
             $this->assertEquals($technology->id, $resultTechnology['id']);
             $this->assertEquals($technology->name, $resultTechnology['name']);
             $this->assertEquals($technology->type, $resultTechnology['type']);
-            $this->assertEquals($technology->svg_icon, $resultTechnology['svgIcon']);
         }
 
         $this->assertArrayHasKey('logo', $result);

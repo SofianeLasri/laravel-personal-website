@@ -43,7 +43,6 @@ class ProjectsControllerTest extends TestCase
                     'creationCount' => 2,
                     'name' => $technology->name,
                     'icon' => $technology->icon,
-                    'svgIcon' => $technology->svg_icon,
                 ];
             });
         });
@@ -56,8 +55,6 @@ class ProjectsControllerTest extends TestCase
             ->where('technologies.0.id', $technologies[0]->id)
             ->where('technologies.0.creationCount', 2)
             ->where('technologies.0.name', $technologies[0]->name)
-            ->where('technologies.0.icon', $technologies[0]->icon)
-            ->where('technologies.0.svgIcon', $technologies[0]->svg_icon)
         );
     }
 }

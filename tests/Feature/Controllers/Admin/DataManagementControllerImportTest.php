@@ -341,12 +341,26 @@ class DataManagementControllerImportTest extends TestCase
         ];
         $zip->addFromString('export-metadata.json', json_encode($metadata));
 
+        $picturesData = [
+            [
+                'id' => 1,
+                'filename' => 'test-icon.jpg',
+                'width' => 128,
+                'height' => 128,
+                'size' => 5000,
+                'path_original' => 'uploads/test-icon.jpg',
+                'created_at' => now()->toISOString(),
+                'updated_at' => now()->toISOString(),
+            ],
+        ];
+        $zip->addFromString('database/pictures.json', json_encode($picturesData));
+
         $technologiesData = [
             [
                 'id' => 1,
                 'name' => 'Test Technology',
                 'type' => 'framework',
-                'svg_icon' => '<svg>test</svg>',
+                'icon_picture_id' => 1,
                 'description_translation_key_id' => 1,
                 'created_at' => now()->toISOString(),
                 'updated_at' => now()->toISOString(),

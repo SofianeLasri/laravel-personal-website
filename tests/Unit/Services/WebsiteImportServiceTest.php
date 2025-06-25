@@ -315,7 +315,7 @@ class WebsiteImportServiceTest extends TestCase
                 'id' => 1,
                 'name' => 'Imported Tech',
                 'type' => 'framework',
-                'svg_icon' => '<svg></svg>',
+                'icon_picture_id' => 1,
                 'description_translation_key_id' => 1,
                 'created_at' => now()->toISOString(),
                 'updated_at' => now()->toISOString(),
@@ -498,8 +498,21 @@ class WebsiteImportServiceTest extends TestCase
                 'id' => 1,
                 'name' => 'Laravel',
                 'type' => 'framework',
-                'svg_icon' => '<svg></svg>',
+                'icon_picture_id' => 1,
                 'description_translation_key_id' => 1,
+                'created_at' => now()->toISOString(),
+                'updated_at' => now()->toISOString(),
+            ],
+        ];
+
+        $picturesData = [
+            [
+                'id' => 1,
+                'filename' => 'laravel-icon.jpg',
+                'width' => 128,
+                'height' => 128,
+                'size' => 5000,
+                'path_original' => 'uploads/laravel-icon.jpg',
                 'created_at' => now()->toISOString(),
                 'updated_at' => now()->toISOString(),
             ],
@@ -510,6 +523,7 @@ class WebsiteImportServiceTest extends TestCase
         $pivotData = [];
 
         $zip->addFromString('database/translation_keys.json', json_encode($translationKeysData));
+        $zip->addFromString('database/pictures.json', json_encode($picturesData));
         $zip->addFromString('database/technologies.json', json_encode($technologiesData));
         $zip->addFromString('database/creations.json', json_encode($creationsData));
         $zip->addFromString('database/creation_technology.json', json_encode($pivotData));

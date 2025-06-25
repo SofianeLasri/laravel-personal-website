@@ -5,6 +5,7 @@ namespace Tests\Feature\Models\Technology;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Models\Creation;
 use App\Models\CreationDraft;
+use App\Models\Picture;
 use App\Models\Technology;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,11 +41,12 @@ class TechnologyControllerTest extends TestCase
     #[Test]
     public function test_store()
     {
+        $picture = Picture::factory()->create();
+
         $data = [
             'name' => 'Test Technology',
             'type' => 'framework',
-            'svg_icon' => '<svg></svg>',
-            'featured' => true,
+            'icon_picture_id' => $picture->id,
             'locale' => 'en',
             'description' => 'This is a test technology.',
         ];
@@ -55,6 +57,7 @@ class TechnologyControllerTest extends TestCase
         $this->assertDatabaseHas('technologies', [
             'name' => 'Test Technology',
             'type' => 'framework',
+            'icon_picture_id' => $picture->id,
         ]);
     }
 
@@ -75,12 +78,12 @@ class TechnologyControllerTest extends TestCase
     public function test_update()
     {
         $technology = Technology::factory()->create();
+        $picture = Picture::factory()->create();
 
         $data = [
             'name' => 'Updated Technology',
             'type' => 'library',
-            'svg_icon' => '<svg></svg>',
-            'featured' => false,
+            'icon_picture_id' => $picture->id,
             'locale' => 'fr',
             'description' => 'This is an updated technology.',
         ];

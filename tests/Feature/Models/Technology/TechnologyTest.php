@@ -24,7 +24,6 @@ class TechnologyTest extends TestCase
 
         $technology = Technology::factory()->create([
             'name' => 'Laravel',
-            'svg_icon' => '<svg>...</svg>',
             'description_translation_key_id' => $descKey->id,
         ]);
 

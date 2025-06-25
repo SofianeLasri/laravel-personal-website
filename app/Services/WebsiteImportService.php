@@ -26,13 +26,13 @@ class WebsiteImportService
         // Core reference tables (no dependencies)
         // 'users',
         'translation_keys',
-        'technologies',
-        'people',
-        'tags',
         'pictures',
         'optimized_pictures',
+        'people',
+        'tags',
         'videos',
         'social_media_links',
+        'technologies', // moved after pictures since it depends on pictures via icon_picture_id
         'technology_experiences',
         'certifications',
         'experiences',

@@ -13,23 +13,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Create a dummy picture for all technologies
-        $dummyPicture = $this->createDummyPicture();
 
         Schema::table('technologies', function (Blueprint $table) {
             $table->unsignedBigInteger('icon_picture_id')->nullable();
             $table->foreign('icon_picture_id')->references('id')->on('pictures')->onDelete('cascade');
         });
 
-        // Update all existing technologies to use the dummy picture
-        DB::table('technologies')->update(['icon_picture_id' => $dummyPicture->id]);
+        if (DB::table('technologies')->count() > 0) {
+            $dummyPicture = $this->createDummyPicture();
+            DB::table('technologies')->update(['icon_picture_id' => $dummyPicture->id]);
+        }
 
-        // Make the field required
         Schema::table('technologies', function (Blueprint $table) {
             $table->unsignedBigInteger('icon_picture_id')->nullable(false)->change();
         });
 
-        // Remove the old svg_icon field
         Schema::table('technologies', function (Blueprint $table) {
             $table->dropColumn('svg_icon');
         });

@@ -143,7 +143,7 @@ if (props.creation.screenshots.length > 0) {
                                 :key="tech.name"
                                 :name="tech.name"
                                 :description="tech.description"
-                                :svgIcon="tech.svgIcon"
+                                :iconPicture="tech.iconPicture"
                                 class="bg-gray-100"
                             />
                         </div>

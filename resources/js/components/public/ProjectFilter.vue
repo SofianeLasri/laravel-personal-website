@@ -3,7 +3,7 @@ import ActiveButton from '@/components/public/Ui/Button/ActiveButton.vue';
 import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRTechnology } from '@/types';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
     name: string;
@@ -18,10 +18,35 @@ const emit = defineEmits<{
 }>();
 
 const selectedFilters = ref<Set<number>>(new Set(props.initialSelectedFilters || []));
-const isCollapsed = ref(false);
+
+// Check if screen is mobile size (< lg breakpoint = 1024px)
+const isMobile = ref(window.innerWidth < 1024);
+const isCollapsed = ref(isMobile.value);
 
 const sortedTechnologies = computed(() => {
     return [...props.technologies].sort((a, b) => b.creationCount - a.creationCount);
+});
+
+const handleResize = () => {
+    const wasMobile = isMobile.value;
+    isMobile.value = window.innerWidth < 1024;
+
+    // If switching from mobile to desktop, expand the filter
+    if (wasMobile && !isMobile.value) {
+        isCollapsed.value = false;
+    }
+    // If switching from desktop to mobile, collapse the filter
+    else if (!wasMobile && isMobile.value) {
+        isCollapsed.value = true;
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('resize', handleResize);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
 });
 
 watch(

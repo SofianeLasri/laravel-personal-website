@@ -14,7 +14,7 @@ defineProps<{
             <img :src="iconPicture.webp.small" :alt="`${name} icon`" class="h-full w-full object-contain" loading="lazy" />
         </div>
         <div class="flex w-full flex-col justify-center gap-1">
-            <div class="text-design-system-title text-sm lg:text-base">{{ name }}</div>
+            <div class="text-design-system-title text-sm font-bold lg:text-base">{{ name }}</div>
             <div class="text-design-system-paragraph w-full justify-center text-xs lg:text-sm">
                 {{ description }}
             </div>

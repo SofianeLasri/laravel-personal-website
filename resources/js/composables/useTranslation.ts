@@ -4,7 +4,7 @@ import { computed } from 'vue';
 export function useTranslation() {
     const page = usePage();
 
-    function t(key: string): string {
+    function t(key: string, replacements?: Record<string, string | number>): string {
         const keys = key.split('.');
         let result: any = page.props.translations || {};
 
@@ -16,7 +16,18 @@ export function useTranslation() {
             }
         }
 
-        return result as string;
+        let translatedString = result as string;
+
+        // Handle variable replacements
+        if (replacements) {
+            for (const [placeholder, value] of Object.entries(replacements)) {
+                // Replace Laravel-style placeholders (:variable) with actual values
+                const pattern = new RegExp(`:${placeholder}\\b`, 'g');
+                translatedString = translatedString.replace(pattern, String(value));
+            }
+        }
+
+        return translatedString;
     }
 
     return {

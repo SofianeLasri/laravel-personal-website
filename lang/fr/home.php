@@ -28,6 +28,6 @@ return [
     ],
     'career' => [
         'title' => 'Mon parcours professionnel & scolaire.',
-        'description' => 'Bien souvent, c’est au travers de mes projets personnels que j’apprends le plus. Mais mon parcours scolaire et professionnel m’a permis d’obtenir de solides bases dans plusieurs domaines.',
+        'description' => 'Bien souvent, c’est au travers de mes projets personnels que j’apprends le plus. Mais mon parcours scolaire et professionnel m’ont permis d’obtenir de solides bases dans plusieurs domaines.',
     ],
 ];

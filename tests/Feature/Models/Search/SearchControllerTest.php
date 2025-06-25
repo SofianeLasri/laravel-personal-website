@@ -17,27 +17,21 @@ class SearchControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Mock the PublicControllersService to avoid complex transformation logic
-        $this->mock(PublicControllersService::class, function ($mock) {
-            $mock->shouldReceive('formatCreationForSSRShort')
-                ->andReturn([
-                    'id' => 1,
-                    'name' => 'Test Creation',
-                    'slug' => 'test-creation',
-                    'shortDescription' => 'Test description',
-                    'type' => 'website',
-                    'technologies' => [],
-                ]);
-        });
-    }
-
     #[Test]
     public function test_filters_endpoint_returns_tags_and_technologies()
     {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatTechnologyForSSR')
+                ->andReturn([
+                    'id' => 1,
+                    'creationCount' => 2,
+                    'name' => 'Test framework',
+                    'description' => 'Test description',
+                    'type' => 'framework',
+                    'iconPicture' => 1,
+                ]);
+        });
+
         Tag::factory()->count(3)->create();
         Technology::factory()->count(2)->create();
 
@@ -49,7 +43,7 @@ class SearchControllerTest extends TestCase
                 '*' => ['id', 'name', 'slug'],
             ],
             'technologies' => [
-                '*' => ['id', 'name', 'type', 'svgIcon'],
+                '*' => ['id', 'name', 'type', 'iconPicture'],
             ],
         ]);
 
@@ -61,6 +55,18 @@ class SearchControllerTest extends TestCase
     #[Test]
     public function test_search_without_query_returns_all_creations()
     {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatCreationForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'name' => 'Test Creation',
+                    'slug' => 'test-creation',
+                    'shortDescription' => 'Test description',
+                    'type' => 'website',
+                    'technologies' => [],
+                ]);
+        });
+
         Creation::factory()->count(5)->create();
 
         $response = $this->get(route('public.search'));
@@ -78,6 +84,18 @@ class SearchControllerTest extends TestCase
     #[Test]
     public function test_search_with_query_returns_matching_creations()
     {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatCreationForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'name' => 'Test Creation',
+                    'slug' => 'test-creation',
+                    'shortDescription' => 'Test description',
+                    'type' => 'website',
+                    'technologies' => [],
+                ]);
+        });
+
         Creation::factory()->create(['name' => 'Laravel Project']);
         Creation::factory()->create(['name' => 'Vue.js App']);
 
@@ -96,6 +114,18 @@ class SearchControllerTest extends TestCase
     #[Test]
     public function test_search_with_tag_filter()
     {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatCreationForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'name' => 'Test Creation',
+                    'slug' => 'test-creation',
+                    'shortDescription' => 'Test description',
+                    'type' => 'website',
+                    'technologies' => [],
+                ]);
+        });
+
         $tag = Tag::factory()->create(['name' => 'Web Development']);
         $creation = Creation::factory()->create(['name' => 'Test Project']);
         $creation->tags()->attach($tag);
@@ -112,6 +142,18 @@ class SearchControllerTest extends TestCase
     #[Test]
     public function test_search_with_technology_filter()
     {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatCreationForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'name' => 'Test Creation',
+                    'slug' => 'test-creation',
+                    'shortDescription' => 'Test description',
+                    'type' => 'website',
+                    'technologies' => [],
+                ]);
+        });
+
         $technology = Technology::factory()->create(['name' => 'Laravel']);
         $creation = Creation::factory()->create(['name' => 'Laravel App']);
         $creation->technologies()->attach($technology);
@@ -128,6 +170,18 @@ class SearchControllerTest extends TestCase
     #[Test]
     public function test_search_combines_query_and_filters()
     {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatCreationForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'name' => 'Test Creation',
+                    'slug' => 'test-creation',
+                    'shortDescription' => 'Test description',
+                    'type' => 'website',
+                    'technologies' => [],
+                ]);
+        });
+
         $tag = Tag::factory()->create(['name' => 'Frontend']);
         $technology = Technology::factory()->create(['name' => 'Vue.js']);
 
@@ -149,6 +203,18 @@ class SearchControllerTest extends TestCase
     #[Test]
     public function test_search_respects_limit()
     {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatCreationForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'name' => 'Test Creation',
+                    'slug' => 'test-creation',
+                    'shortDescription' => 'Test description',
+                    'type' => 'website',
+                    'technologies' => [],
+                ]);
+        });
+
         // Create more than 20 creations to test limit
         Creation::factory()->count(25)->create([
             'name' => 'Test Project',
@@ -166,7 +232,19 @@ class SearchControllerTest extends TestCase
     #[Test]
     public function test_search_caches_results()
     {
-        $creation = Creation::factory()->create(['name' => 'Cached Project']);
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatCreationForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'name' => 'Test Creation',
+                    'slug' => 'test-creation',
+                    'shortDescription' => 'Test description',
+                    'type' => 'website',
+                    'technologies' => [],
+                ]);
+        });
+
+        Creation::factory()->create(['name' => 'Cached Project']);
 
         // First request
         $response1 = $this->get(route('public.search', ['q' => 'Cached']));

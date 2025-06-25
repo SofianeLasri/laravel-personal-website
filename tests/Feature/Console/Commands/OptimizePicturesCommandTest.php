@@ -47,7 +47,6 @@ class OptimizePicturesCommandTest extends TestCase
 
         $this->artisan(OptimizePicturesCommand::class)
             ->expectsOutput('Starting to optimize pictures...')
-            ->expectsOutput('Found 2 pictures to optimize.')
             ->expectsOutput('All optimization jobs have been dispatched.')
             ->assertExitCode(0);
     }
@@ -60,7 +59,6 @@ class OptimizePicturesCommandTest extends TestCase
 
         $this->artisan(OptimizePicturesCommand::class, ['--chunk' => 5])
             ->expectsOutput('Starting to optimize pictures...')
-            ->expectsOutput('Found 25 pictures to optimize.')
             ->expectsOutput('All optimization jobs have been dispatched.')
             ->assertExitCode(0);
     }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Heading from '@/components/dashboard/Heading.vue';
+import PictureInput from '@/components/dashboard/PictureInput.vue';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -41,13 +42,13 @@ const isLoading = ref(false);
 
 const newTechnologyName = ref('');
 const newTechnologyType = ref('framework');
-const newTechnologySvg = ref('');
+const newTechnologyIconPictureId = ref<number | undefined>(undefined);
 const newTechnologyDescription = ref('');
 
 const editTechnologyId = ref<number | null>(null);
 const editTechnologyName = ref('');
 const editTechnologyType = ref('');
-const editTechnologySvg = ref('');
+const editTechnologyIconPictureId = ref<number | undefined>(undefined);
 const editTechnologyDescription = ref('');
 const technologyToDelete = ref<TechnologyWithCreationsCount | null>(null);
 
@@ -96,7 +97,7 @@ const getTechnologyTypeLabel = (type: string): string => {
 };
 
 const createTechnology = async () => {
-    if (!newTechnologyName.value.trim() || !newTechnologySvg.value.trim() || !newTechnologyDescription.value.trim()) return;
+    if (!newTechnologyName.value.trim() || !newTechnologyIconPictureId.value || !newTechnologyDescription.value.trim()) return;
 
     isLoading.value = true;
 
@@ -104,7 +105,7 @@ const createTechnology = async () => {
         await axios.post(route('dashboard.api.technologies.store'), {
             name: newTechnologyName.value.trim(),
             type: newTechnologyType.value,
-            svg_icon: newTechnologySvg.value.trim(),
+            icon_picture_id: newTechnologyIconPictureId.value,
             locale: locale.value,
             description: newTechnologyDescription.value.trim(),
         });
@@ -133,23 +134,27 @@ const createTechnology = async () => {
 };
 
 const updateTechnology = async () => {
-    if (!editTechnologyId.value || !editTechnologyName.value.trim() || !editTechnologySvg.value.trim() || !editTechnologyDescription.value.trim())
-        return;
+    if (!editTechnologyId.value || !editTechnologyName.value.trim() || !editTechnologyDescription.value.trim()) return;
 
     isLoading.value = true;
 
     try {
+        const updateData: any = {
+            name: editTechnologyName.value.trim(),
+            type: editTechnologyType.value,
+            locale: locale.value,
+            description: editTechnologyDescription.value.trim(),
+        };
+
+        if (editTechnologyIconPictureId.value) {
+            updateData.icon_picture_id = editTechnologyIconPictureId.value;
+        }
+
         await axios.put(
             route('dashboard.api.technologies.update', {
                 technology: editTechnologyId.value,
             }),
-            {
-                name: editTechnologyName.value.trim(),
-                type: editTechnologyType.value,
-                svg_icon: editTechnologySvg.value.trim(),
-                locale: locale.value,
-                description: editTechnologyDescription.value.trim(),
-            },
+            updateData,
         );
 
         resetEditTechnologyForm();
@@ -207,7 +212,7 @@ const openEditTechnologyForm = (technology: TechnologyWithCreationsCount) => {
     editTechnologyId.value = technology.id;
     editTechnologyName.value = technology.name;
     editTechnologyType.value = technology.type;
-    editTechnologySvg.value = technology.svg_icon;
+    editTechnologyIconPictureId.value = technology.icon_picture?.id || undefined;
     editTechnologyDescription.value = getTechnologyDescription(technology);
     isEditTechnologyDialogOpen.value = true;
 };
@@ -215,7 +220,7 @@ const openEditTechnologyForm = (technology: TechnologyWithCreationsCount) => {
 const resetTechnologyForm = () => {
     newTechnologyName.value = '';
     newTechnologyType.value = 'framework';
-    newTechnologySvg.value = '';
+    newTechnologyIconPictureId.value = undefined;
     newTechnologyDescription.value = '';
 };
 
@@ -223,7 +228,7 @@ const resetEditTechnologyForm = () => {
     editTechnologyId.value = null;
     editTechnologyName.value = '';
     editTechnologyType.value = '';
-    editTechnologySvg.value = '';
+    editTechnologyIconPictureId.value = undefined;
     editTechnologyDescription.value = '';
 };
 
@@ -415,7 +420,14 @@ const breadcrumbs: BreadcrumbItem[] = [
                     <div class="p-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                <div class="mr-3 h-10 w-10" v-html="technology.svg_icon"></div>
+                                <div class="mr-3 flex h-10 w-10 items-center justify-center">
+                                    <img
+                                        v-if="technology.icon_picture"
+                                        :src="`/storage/${technology.icon_picture.path_original}`"
+                                        :alt="technology.name"
+                                        class="h-full w-full object-contain"
+                                    />
+                                </div>
                                 <div>
                                     <h3 class="text-lg font-semibold">{{ technology.name }}</h3>
                                     <Badge variant="outline">{{ getTechnologyTypeLabel(technology.type) }}</Badge>
@@ -513,11 +525,8 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-sm font-medium">Icône SVG</label>
-                        <Textarea v-model="newTechnologySvg" placeholder="<svg>...</svg>" rows="3" class="max-h-32 break-all" />
-                        <div v-if="newTechnologySvg" class="mt-2 flex justify-center rounded-md border p-2">
-                            <div class="h-10 w-10" v-html="newTechnologySvg"></div>
-                        </div>
+                        <label class="text-sm font-medium">Icône</label>
+                        <PictureInput v-model="newTechnologyIconPictureId" />
                     </div>
 
                     <div class="space-y-2">
@@ -528,7 +537,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                 <DialogFooter>
                     <Button variant="outline" @click="isAddTechnologyDialogOpen = false" :disabled="isLoading"> Annuler </Button>
-                    <Button :disabled="!newTechnologyName || !newTechnologySvg || !newTechnologyDescription || isLoading" @click="createTechnology">
+                    <Button
+                        :disabled="!newTechnologyName || !newTechnologyIconPictureId || !newTechnologyDescription || isLoading"
+                        @click="createTechnology"
+                    >
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Créer
                     </Button>
@@ -565,11 +577,8 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-sm font-medium">Icône SVG</label>
-                        <Textarea v-model="editTechnologySvg" placeholder="<svg>...</svg>" rows="3" class="max-h-32 break-all" />
-                        <div v-if="editTechnologySvg" class="mt-2 flex justify-center rounded-md border p-2">
-                            <div class="h-10 w-10" v-html="editTechnologySvg"></div>
-                        </div>
+                        <label class="text-sm font-medium">Icône</label>
+                        <PictureInput v-model="editTechnologyIconPictureId" />
                     </div>
 
                     <div class="space-y-2">
@@ -580,10 +589,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
                 <DialogFooter>
                     <Button variant="outline" @click="isEditTechnologyDialogOpen = false" :disabled="isLoading"> Annuler </Button>
-                    <Button
-                        :disabled="!editTechnologyName || !editTechnologySvg || !editTechnologyDescription || isLoading"
-                        @click="updateTechnology"
-                    >
+                    <Button :disabled="!editTechnologyName || !editTechnologyDescription || isLoading" @click="updateTechnology">
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Enregistrer
                     </Button>

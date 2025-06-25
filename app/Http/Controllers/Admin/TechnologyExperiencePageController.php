@@ -12,7 +12,7 @@ class TechnologyExperiencePageController extends Controller
 {
     public function __invoke(): Response
     {
-        $technologies = Technology::with(['descriptionTranslationKey.translations'])
+        $technologies = Technology::with(['descriptionTranslationKey.translations', 'iconPicture'])
             ->withCount('creations')
             ->get();
 

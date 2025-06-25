@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $name
  * @property TechnologyType $type
- * @property string $svg_icon
+ * @property int $icon_picture_id
  * @property int $description_translation_key_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection|Creation[] $creations
  * @property-read TranslationKey $descriptionTranslationKey
  * @property-read Collection|CreationDraft[] $creationDrafts
+ * @property-read Picture $iconPicture
  */
 class Technology extends Model
 {
@@ -35,13 +36,12 @@ class Technology extends Model
     protected $fillable = [
         'name',
         'type',
-        'svg_icon',
+        'icon_picture_id',
         'description_translation_key_id',
     ];
 
     protected $casts = [
         'name' => 'string',
-        'svg_icon' => 'string',
         'type' => TechnologyType::class,
     ];
 
@@ -67,5 +67,13 @@ class Technology extends Model
     public function creationDrafts(): BelongsToMany
     {
         return $this->belongsToMany(CreationDraft::class, 'creation_draft_technology', 'technology_id', 'creation_draft_id');
+    }
+
+    /**
+     * @return BelongsTo<Picture, $this>
+     */
+    public function iconPicture(): BelongsTo
+    {
+        return $this->belongsTo(Picture::class, 'icon_picture_id');
     }
 }

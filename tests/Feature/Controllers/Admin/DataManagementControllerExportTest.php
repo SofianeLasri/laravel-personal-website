@@ -230,8 +230,8 @@ class DataManagementControllerExportTest extends TestCase
                 ->where(1, 'translation_keys')
                 ->etc()
             )*/
-            ->has('importTables', fn ($tables) => $tables->where(0, 'users')
-                ->where(1, 'translation_keys')
+            ->has('importTables', fn ($tables) => $tables->where(0, 'translation_keys')
+                ->where(1, 'pictures')
                 ->etc()
             )
         );

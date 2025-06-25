@@ -54,7 +54,6 @@ const toggleFilter = (techId: number) => {
             <svg
                 class="h-5 w-5 transition-transform duration-300"
                 :class="isCollapsed ? '' : 'rotate-180'"
-                fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 aria-hidden="true"
@@ -72,7 +71,12 @@ const toggleFilter = (techId: number) => {
                     <ActiveButton v-if="selectedFilters.has(tech.id)" class="w-full rounded-lg !px-3 py-2" @click="toggleFilter(tech.id)">
                         <div class="flex grow items-center gap-2">
                             <div class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2">
-                                <div v-html="tech.svgIcon" class="size-full"></div>
+                                <img
+                                    :src="tech.iconPicture.webp.thumbnail"
+                                    :alt="`${tech.name} icon`"
+                                    class="size-full object-contain"
+                                    loading="lazy"
+                                />
                             </div>
                             <div>{{ tech.name }}</div>
                         </div>
@@ -82,7 +86,12 @@ const toggleFilter = (techId: number) => {
                     <WhiteButton v-else class="w-full rounded-lg border-none !px-3 py-2" @click="toggleFilter(tech.id)">
                         <div class="flex grow items-center gap-2">
                             <div class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2">
-                                <div v-html="tech.svgIcon" class="size-full"></div>
+                                <img
+                                    :src="tech.iconPicture.webp.thumbnail"
+                                    :alt="`${tech.name} icon`"
+                                    class="size-full object-contain"
+                                    loading="lazy"
+                                />
                             </div>
                             <div>{{ tech.name }}</div>
                         </div>

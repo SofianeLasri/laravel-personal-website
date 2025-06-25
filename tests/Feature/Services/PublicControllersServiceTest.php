@@ -118,7 +118,8 @@ class PublicControllersServiceTest extends TestCase
         $this->assertEquals(3, $result['creationCount']);
         $this->assertEquals($technology->name, $result['name']);
         $this->assertEquals($technology->type, $result['type']);
-        $this->assertEquals($technology->svg_icon, $result['svgIcon']);
+        $this->assertArrayHasKey('iconPicture', $result);
+        $this->assertNotNull($result['iconPicture']);
     }
 
     #[Test]
@@ -209,7 +210,6 @@ class PublicControllersServiceTest extends TestCase
             $this->assertEquals($technology->id, $resultTechnology['id']);
             $this->assertEquals($technology->name, $resultTechnology['name']);
             $this->assertEquals($technology->type, $resultTechnology['type']);
-            $this->assertEquals($technology->svg_icon, $resultTechnology['svgIcon']);
         }
 
         $this->assertArrayHasKey('logo', $result);

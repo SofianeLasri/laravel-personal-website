@@ -61,7 +61,14 @@ if (startYear && endYear) {
             <div class="hidden flex-col gap-2.5 py-2 md:flex">
                 <div class="flex items-center gap-2">
                     <div v-for="technology in creation.technologies" :key="technology.name">
-                        <div v-html="technology.svgIcon" class="size-4"></div>
+                        <div class="flex size-4 items-center justify-center overflow-hidden">
+                            <img
+                                :src="technology.iconPicture.webp.thumbnail"
+                                :alt="`${technology.name} icon`"
+                                class="h-full w-full object-contain"
+                                loading="lazy"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

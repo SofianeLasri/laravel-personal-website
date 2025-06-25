@@ -2,12 +2,19 @@
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRSimplifiedCreation } from '@/types';
 import { Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue';
 
 const props = defineProps<{
     creation: SSRSimplifiedCreation;
 }>();
 
 const { t } = useTranslation();
+const isImageLoaded = ref(false);
+
+const handleImageLoad = () => {
+    isImageLoaded.value = true;
+};
 
 const startYear = new Date(props.creation.startedAt).getFullYear();
 const endYear = props.creation.endedAt ? new Date(props.creation.endedAt).getFullYear() : null;
@@ -24,12 +31,19 @@ if (startYear && endYear) {
 <template>
     <div class="flex w-full flex-shrink-0 flex-col gap-4 select-none md:w-[40rem]">
         <Link
-            class="flex aspect-video flex-col gap-2.5 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
+            class="relative flex aspect-video flex-col gap-2.5 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
             :href="route('public.projects.show', { slug: creation.slug })"
         >
+            <Skeleton v-if="!isImageLoaded" class="absolute inset-0 z-10" />
             <picture class="h-full w-full">
                 <source :srcset="creation.coverImage.webp.medium" type="image/webp" />
-                <img :src="creation.coverImage.avif.medium" alt="Project cover" class="h-full w-full object-cover" loading="lazy" />
+                <img
+                    :src="creation.coverImage.avif.medium"
+                    alt="Project cover"
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                    @load="handleImageLoad"
+                />
             </picture>
         </Link>
         <div class="flex gap-4 rounded-2xl">

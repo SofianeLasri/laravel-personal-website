@@ -105,7 +105,7 @@ class PublicControllersService
      *      endedAtFormatted: string|null,
      *      type: CreationType,
      *      shortDescription: string|null,
-     *      technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
+     *      technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>
      *  }>
      */
     public function getLaravelCreations(): Collection
@@ -119,7 +119,15 @@ class PublicControllersService
         $developmentCreations = Creation::whereIn('type', self::DEVELOPMENT_TYPES)
             ->whereHas('technologies', function ($query) use ($laravel) {
                 $query->where('technologies.id', $laravel->id);
-            })->orderByRaw('(ended_at IS NULL) DESC, ended_at DESC')->get()->withRelationshipAutoloading();
+            })
+            ->with([
+                'logo',
+                'coverImage',
+                'shortDescriptionTranslationKey.translations',
+                'technologies.iconPicture',
+                'technologies.descriptionTranslationKey.translations',
+            ])
+            ->orderByRaw('(ended_at IS NULL) DESC, ended_at DESC')->get();
 
         return $developmentCreations->map(function (Creation $creation) {
             return $this->formatCreationForSSRShort($creation);
@@ -142,12 +150,18 @@ class PublicControllersService
      *     endedAtFormatted: string|null,
      *     type: CreationType,
      *     shortDescription: string|null,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>
      * }>
      */
     public function getCreations(): Collection
     {
-        $creations = Creation::orderByRaw('(ended_at IS NULL) DESC, ended_at DESC')->get()->withRelationshipAutoloading();
+        $creations = Creation::with([
+            'logo',
+            'coverImage',
+            'shortDescriptionTranslationKey.translations',
+            'technologies.iconPicture',
+            'technologies.descriptionTranslationKey.translations',
+        ])->orderByRaw('(ended_at IS NULL) DESC, ended_at DESC')->get();
 
         return $creations->map(function (Creation $creation) {
             return $this->formatCreationForSSRShort($creation);
@@ -171,7 +185,7 @@ class PublicControllersService
      *     endedAtFormatted: string|null,
      *     type: CreationType,
      *     shortDescription: string|null,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>
      * }
      */
     public function formatCreationForSSRShort(Creation $creation): array
@@ -217,7 +231,7 @@ class PublicControllersService
      *     sourceCodeUrl: string|null,
      *     features: array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
      *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string}>,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, svgIcon: string}>,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
      *     people: array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
      *     videos: array<int, array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>}
      */
@@ -388,7 +402,7 @@ class PublicControllersService
      * Format the Technology model for Server-Side Rendering (SSR).
      * Returns a SSRTechnology TypeScript type compatible array.
      *
-     * @return array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}
+     * @return array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
@@ -400,7 +414,7 @@ class PublicControllersService
             'name' => $technology->name,
             'description' => $description,
             'type' => $technology->type,
-            'svgIcon' => $technology->svg_icon,
+            'iconPicture' => $this->formatPictureForSSR($technology->iconPicture),
         ];
     }
 
@@ -416,11 +430,15 @@ class PublicControllersService
      *     creationCount: int,
      *     type: TechnologyType,
      *     typeLabel: string,
-     *     svgIcon: string}>
+     *     iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>
      */
     public function getTechnologyExperiences(): Collection
     {
-        $experiences = TechnologyExperience::all()->withRelationshipAutoloading();
+        $experiences = TechnologyExperience::with([
+            'technology.iconPicture',
+            'technology.descriptionTranslationKey.translations',
+            'descriptionTranslationKey.translations',
+        ])->get();
 
         return $experiences->map(function (TechnologyExperience $experience) {
             $technologyId = $experience->technology->id;
@@ -434,7 +452,7 @@ class PublicControllersService
                 'creationCount' => $this->creationCountByTechnology[$technologyId] ?? 0,
                 'type' => $experience->technology->type,
                 'typeLabel' => $experience->technology->type->label(),
-                'svgIcon' => $experience->technology->svg_icon,
+                'iconPicture' => $this->formatPictureForSSR($experience->technology->iconPicture),
             ];
         });
     }
@@ -452,7 +470,7 @@ class PublicControllersService
      *     websiteUrl: string|null,
      *     shortDescription: string,
      *     fullDescription: string,
-     *     technologies: Collection<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>,
+     *     technologies: Collection<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
      *     type: ExperienceType,
      *     startedAt: Carbon,
      *     endedAt: Carbon|null,
@@ -461,7 +479,14 @@ class PublicControllersService
      */
     public function getExperiences(): Collection
     {
-        $experiences = Experience::all()->withRelationshipAutoloading();
+        $experiences = Experience::with([
+            'titleTranslationKey.translations',
+            'shortDescriptionTranslationKey.translations',
+            'fullDescriptionTranslationKey.translations',
+            'logo',
+            'technologies.iconPicture',
+            'technologies.descriptionTranslationKey.translations',
+        ])->get();
 
         return $experiences->map(function (Experience $experience) {
             $title = $this->getTranslationWithFallback($experience->titleTranslationKey->translations);
@@ -571,7 +596,7 @@ class PublicControllersService
      *     websiteUrl: string|null,
      *     shortDescription: string,
      *     fullDescription: string,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
      *     type: ExperienceType,
      *     startedAt: string,
      *     endedAt: string|null,
@@ -587,6 +612,7 @@ class PublicControllersService
                 'shortDescriptionTranslationKey.translations',
                 'fullDescriptionTranslationKey.translations',
                 'logo',
+                'technologies.iconPicture',
                 'technologies.descriptionTranslationKey.translations',
             ])
             ->orderBy('started_at', 'desc')
@@ -663,7 +689,7 @@ class PublicControllersService
      *     websiteUrl: string|null,
      *     shortDescription: string,
      *     fullDescription: string,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, svgIcon: string}>,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
      *     type: ExperienceType,
      *     startedAt: string,
      *     endedAt: string|null,

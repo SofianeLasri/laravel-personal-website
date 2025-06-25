@@ -226,7 +226,7 @@ class CreationDraftController extends Controller
 
     public function getTechnologies(CreationDraft $creationDraft): JsonResponse
     {
-        return response()->json($creationDraft->technologies()->with(['descriptionTranslationKey.translations'])->get());
+        return response()->json($creationDraft->technologies()->with(['descriptionTranslationKey.translations', 'iconPicture'])->get());
     }
 
     /**

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
+import PictureInput from '@/components/dashboard/PictureInput.vue';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -46,12 +47,12 @@ const isEditTechnologyDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 const newTechnologyName = ref('');
 const newTechnologyType = ref('framework');
-const newTechnologySvg = ref('');
+const newTechnologyIconPictureId = ref<number | undefined>(undefined);
 const newTechnologyDescription = ref('');
 const editTechnologyId = ref<number | null>(null);
 const editTechnologyName = ref('');
 const editTechnologyType = ref('');
-const editTechnologySvg = ref('');
+const editTechnologyIconPictureId = ref<number | undefined>(undefined);
 const editTechnologyDescription = ref('');
 const technologyToDelete = ref<Technology | null>(null);
 const technologyHasAssociations = ref(false);
@@ -163,7 +164,7 @@ const dissociateTechnology = async (technologyId: number) => {
 };
 
 const createTechnology = async () => {
-    if (!newTechnologyName.value.trim() || !newTechnologySvg.value.trim() || !newTechnologyDescription.value.trim()) return;
+    if (!newTechnologyName.value.trim() || !newTechnologyIconPictureId.value || !newTechnologyDescription.value.trim()) return;
 
     loading.value = true;
     error.value = null;
@@ -172,7 +173,7 @@ const createTechnology = async () => {
         const response = await axios.post(route('dashboard.api.technologies.store'), {
             name: newTechnologyName.value.trim(),
             type: newTechnologyType.value,
-            svg_icon: newTechnologySvg.value.trim(),
+            icon_picture_id: newTechnologyIconPictureId.value,
             locale: props.locale,
             description: newTechnologyDescription.value.trim(),
         });
@@ -206,24 +207,28 @@ const createTechnology = async () => {
 };
 
 const updateTechnology = async () => {
-    if (!editTechnologyId.value || !editTechnologyName.value.trim() || !editTechnologySvg.value.trim() || !editTechnologyDescription.value.trim())
-        return;
+    if (!editTechnologyId.value || !editTechnologyName.value.trim() || !editTechnologyDescription.value.trim()) return;
 
     loading.value = true;
     error.value = null;
 
     try {
+        const updateData: any = {
+            name: editTechnologyName.value.trim(),
+            type: editTechnologyType.value,
+            locale: props.locale,
+            description: editTechnologyDescription.value.trim(),
+        };
+
+        if (editTechnologyIconPictureId.value) {
+            updateData.icon_picture_id = editTechnologyIconPictureId.value;
+        }
+
         const response = await axios.put(
             route('dashboard.api.technologies.update', {
                 technology: editTechnologyId.value,
             }),
-            {
-                name: editTechnologyName.value.trim(),
-                type: editTechnologyType.value,
-                svg_icon: editTechnologySvg.value.trim(),
-                locale: props.locale,
-                description: editTechnologyDescription.value.trim(),
-            },
+            updateData,
         );
 
         const index = allTechnologies.value.findIndex((t) => t.id === editTechnologyId.value);
@@ -326,7 +331,7 @@ const openEditForm = (technology: Technology) => {
     editTechnologyId.value = technology.id;
     editTechnologyName.value = technology.name;
     editTechnologyType.value = technology.type;
-    editTechnologySvg.value = technology.svg_icon;
+    editTechnologyIconPictureId.value = technology.icon_picture?.id || undefined;
     editTechnologyDescription.value = getTechnologyDescription(technology);
     isEditTechnologyDialogOpen.value = true;
 };
@@ -342,7 +347,7 @@ const confirmDeleteTechnology = async (technology: Technology) => {
 const resetTechnologyForm = () => {
     newTechnologyName.value = '';
     newTechnologyType.value = 'framework';
-    newTechnologySvg.value = '';
+    newTechnologyIconPictureId.value = undefined;
     newTechnologyDescription.value = '';
 };
 
@@ -350,7 +355,7 @@ const resetEditForm = () => {
     editTechnologyId.value = null;
     editTechnologyName.value = '';
     editTechnologyType.value = '';
-    editTechnologySvg.value = '';
+    editTechnologyIconPictureId.value = undefined;
     editTechnologyDescription.value = '';
 };
 
@@ -407,7 +412,14 @@ watch(
                         :key="technology.id"
                         class="border-border flex items-center rounded-md border p-3"
                     >
-                        <div class="mr-3 h-8 w-8 flex-shrink-0" v-html="technology.svg_icon"></div>
+                        <div class="mr-3 flex h-8 w-8 flex-shrink-0 items-center justify-center">
+                            <img
+                                v-if="technology.icon_picture"
+                                :src="`/storage/${technology.icon_picture.path_original}`"
+                                :alt="technology.name"
+                                class="h-full w-full object-contain"
+                            />
+                        </div>
 
                         <div class="min-w-0 flex-1">
                             <p class="truncate text-sm font-medium">{{ technology.name }}</p>
@@ -453,7 +465,14 @@ watch(
                                     :key="technology.id"
                                     class="hover:bg-muted flex items-center rounded-md p-3"
                                 >
-                                    <div class="mr-3 h-8 w-8 flex-shrink-0" v-html="technology.svg_icon"></div>
+                                    <div class="mr-3 flex h-8 w-8 flex-shrink-0 items-center justify-center">
+                                        <img
+                                            v-if="technology.icon_picture"
+                                            :src="`/storage/${technology.icon_picture.path_original}`"
+                                            :alt="technology.name"
+                                            class="h-full w-full object-contain"
+                                        />
+                                    </div>
 
                                     <div class="min-w-0 flex-1">
                                         <p class="truncate text-sm font-medium">{{ technology.name }}</p>
@@ -520,11 +539,8 @@ watch(
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-sm font-medium">Icône SVG</label>
-                            <Textarea v-model="newTechnologySvg" placeholder="<svg>...</svg>" rows="3" />
-                            <div v-if="newTechnologySvg" class="mt-2 flex justify-center rounded-md border p-2">
-                                <div class="h-10 w-10" v-html="newTechnologySvg"></div>
-                            </div>
+                            <label class="text-sm font-medium">Icône</label>
+                            <PictureInput v-model="newTechnologyIconPictureId" />
                         </div>
 
                         <div class="space-y-2">
@@ -535,7 +551,10 @@ watch(
 
                     <DialogFooter>
                         <Button variant="outline" @click="isAddTechnologyDialogOpen = false" :disabled="loading">Annuler</Button>
-                        <Button :disabled="!newTechnologyName || !newTechnologySvg || !newTechnologyDescription || loading" @click="createTechnology">
+                        <Button
+                            :disabled="!newTechnologyName || !newTechnologyIconPictureId || !newTechnologyDescription || loading"
+                            @click="createTechnology"
+                        >
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Créer
                         </Button>
@@ -570,11 +589,8 @@ watch(
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-sm font-medium">Icône SVG</label>
-                            <Textarea v-model="editTechnologySvg" placeholder="<svg>...</svg>" rows="3" />
-                            <div v-if="editTechnologySvg" class="mt-2 flex justify-center rounded-md border p-2">
-                                <div class="h-10 w-10" v-html="editTechnologySvg"></div>
-                            </div>
+                            <label class="text-sm font-medium">Icône</label>
+                            <PictureInput v-model="editTechnologyIconPictureId" />
                         </div>
 
                         <div class="space-y-2">
@@ -585,10 +601,7 @@ watch(
 
                     <DialogFooter>
                         <Button variant="outline" @click="isEditTechnologyDialogOpen = false" :disabled="loading">Annuler</Button>
-                        <Button
-                            :disabled="!editTechnologyName || !editTechnologySvg || !editTechnologyDescription || loading"
-                            @click="updateTechnology"
-                        >
+                        <Button :disabled="!editTechnologyName || !editTechnologyDescription || loading" @click="updateTechnology">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Enregistrer
                         </Button>

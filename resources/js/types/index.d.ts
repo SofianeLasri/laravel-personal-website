@@ -124,7 +124,8 @@ interface Technology {
     id: number;
     name: string;
     type: TechnologyType;
-    svg_icon: string;
+    icon_picture_id: number;
+    icon_picture?: Picture;
     description_translation_key_id: number;
     created_at: string;
     updated_at: string;
@@ -234,7 +235,7 @@ interface SSRTechnology {
     description: string;
     creationCount: number;
     type: TechnologyType;
-    svgIcon: string;
+    iconPicture: SSRPicture;
 }
 
 interface SSRTechnologyExperience extends SSRTechnology {

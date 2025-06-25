@@ -54,7 +54,14 @@ const projectsUrl = computed(() => {
             <div class="flex flex-col items-start justify-start gap-4">
                 <div class="flex items-center justify-start gap-4">
                     <div class="outline-border flex size-12 items-center justify-center gap-2.5 rounded-lg outline-1">
-                        <div class="flex size-7 items-center justify-center" v-html="experience.svgIcon"></div>
+                        <div class="flex size-7 items-center justify-center">
+                            <img
+                                v-if="experience.iconPicture"
+                                :src="experience.iconPicture.webp.small"
+                                :alt="experience.name"
+                                class="h-full w-full object-contain"
+                            />
+                        </div>
                     </div>
                     <div class="size- flex flex-col items-start justify-start">
                         <div class="text-design-system-title justify-center text-xl font-bold">

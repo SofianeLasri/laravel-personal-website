@@ -306,7 +306,12 @@ onUnmounted(() => {
                                                         : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
                                                 "
                                             >
-                                                <span class="h-4 w-4" v-html="tech.svgIcon"></span>
+                                                <img
+                                                    :src="tech.iconPicture.webp.thumbnail"
+                                                    :alt="`${tech.name} icon`"
+                                                    class="h-4 w-4 object-contain"
+                                                    loading="lazy"
+                                                />
                                                 {{ tech.name }}
                                             </button>
                                         </div>

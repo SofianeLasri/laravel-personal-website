@@ -17,7 +17,7 @@ class TechnologyController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json(Technology::with(['descriptionTranslationKey.translations'])->get());
+        return response()->json(Technology::with(['descriptionTranslationKey.translations', 'iconPicture'])->get());
     }
 
     /**
@@ -28,7 +28,7 @@ class TechnologyController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:technologies,name'],
             'type' => ['required', 'string', 'in:'.implode(',', TechnologyType::values())],
-            'svg_icon' => ['required', 'string'],
+            'icon_picture_id' => ['required', 'integer', 'exists:pictures,id'],
             'locale' => ['required', 'string', 'in:en,fr'],
             'description' => ['required', 'string'],
         ]);
@@ -38,11 +38,11 @@ class TechnologyController extends Controller
         $technology = Technology::create([
             'name' => $request->name,
             'type' => $request->type,
-            'svg_icon' => $request->svg_icon,
+            'icon_picture_id' => $request->icon_picture_id,
             'description_translation_key_id' => $descriptionTranslation->translation_key_id,
         ]);
 
-        return response()->json($technology->load('descriptionTranslationKey.translations'), Response::HTTP_CREATED);
+        return response()->json($technology->load(['descriptionTranslationKey.translations', 'iconPicture']), Response::HTTP_CREATED);
     }
 
     /**
@@ -50,7 +50,7 @@ class TechnologyController extends Controller
      */
     public function show(Technology $technology): JsonResponse
     {
-        return response()->json($technology->load(['descriptionTranslationKey.translations']));
+        return response()->json($technology->load(['descriptionTranslationKey.translations', 'iconPicture']));
     }
 
     /**
@@ -61,7 +61,7 @@ class TechnologyController extends Controller
         $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
             'type' => ['sometimes', 'string', 'in:'.implode(',', TechnologyType::values())],
-            'svg_icon' => ['sometimes', 'string'],
+            'icon_picture_id' => ['sometimes', 'integer', 'exists:pictures,id'],
             'locale' => ['required_with:description', 'string', 'in:en,fr'],
             'description' => ['sometimes', 'string'],
         ]);
@@ -76,9 +76,11 @@ class TechnologyController extends Controller
             Translation::createOrUpdate($technology->descriptionTranslationKey, $request->input('locale'), $request->description);
         }
 
-        $technology->update($request->only(['name', 'type', 'svg_icon']));
+        $updateData = $request->only(['name', 'type', 'icon_picture_id']);
 
-        return response()->json($technology->fresh(['descriptionTranslationKey.translations']));
+        $technology->update($updateData);
+
+        return response()->json($technology->fresh(['descriptionTranslationKey.translations', 'iconPicture']));
     }
 
     /**

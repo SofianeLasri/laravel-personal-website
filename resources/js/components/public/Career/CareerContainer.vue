@@ -11,7 +11,7 @@ import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
 import WhiteLinkButtonSm from '@/components/public/Ui/Button/WhiteLinkButtonSm.vue';
 import Cube from '@/components/shapes/cube.vue';
 import { useTranslation } from '@/composables/useTranslation';
-import { SSRExperience } from '@/types';
+import { SSRExperience, SSRTechnology } from '@/types';
 import { computed, onMounted, ref, watch } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
 
@@ -98,7 +98,7 @@ const selectExperience = (experienceId: number) => {
     selectedExperienceId.value = experienceId;
 };
 
-const getTechnologies = (technologies: any) => {
+const getTechnologies = (technologies: SSRTechnology[]) => {
     if (!technologies) return [];
     if (Array.isArray(technologies)) return technologies;
     return [technologies];
@@ -177,7 +177,7 @@ const getTechnologies = (technologies: any) => {
                             <div
                                 class="outline-border flex size-16 items-center justify-center gap-2.5 rounded-xl bg-white p-3 outline-1 lg:size-24 lg:p-4"
                             >
-                                <picture class="h-full w-full">
+                                <picture class="h-full w-full" v-if="selectedExperience.logo">
                                     <source :srcset="selectedExperience.logo.webp.thumbnail" type="image/webp" />
                                     <img
                                         :src="selectedExperience.logo.avif.thumbnail"
@@ -227,7 +227,7 @@ const getTechnologies = (technologies: any) => {
                                     :key="tech.name"
                                     :name="tech.name"
                                     :description="tech.description"
-                                    :svgIcon="tech.svgIcon"
+                                    :iconPicture="tech.iconPicture"
                                 />
                             </div>
                         </div>

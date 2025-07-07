@@ -30,11 +30,10 @@ use App\Http\Controllers\Public\ProjectsController;
 use App\Http\Controllers\Public\SearchController;
 use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::name('public.')->group(function () {
     Route::get('/cv-pdf', function () {
-        return Inertia::location('https://cloud.sl-projects.com/index.php/s/zCdQQKSEoGSSE8X');
+        return redirect('https://cloud.sl-projects.com/index.php/s/zCdQQKSEoGSSE8X');
     })->name('cv');
 
     Route::get('/', HomeController::class)->name('home');

@@ -11,13 +11,13 @@
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" media="(prefers-color-scheme: light)">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)">
         
-        <!-- Basic Open Graph for site -->
+        <!-- Generic Open Graph tags -->
         <meta property="og:locale" content="{{ app()->getLocale() }}" />
-        <meta property="og:locale:alternate" content="fr_FR" />
-        <meta property="og:locale:alternate" content="en_GB" />
-        <meta property="og:site_name" content="{{ config('app.name', 'Laravel') }}" />
+        <meta property="og:locale:alternate" content="fr" />
+        <meta property="og:locale:alternate" content="en" />
+        <meta property="og:site_name" content="{{ config('app.name', 'SofianeLasri') }}" />
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'SofianeLasri') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=inter:400,500,700" rel="stylesheet" />

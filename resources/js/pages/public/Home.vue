@@ -19,7 +19,7 @@ import { Head, usePage } from '@inertiajs/vue3';
 const page = usePage();
 const { t } = useTranslation();
 
-defineProps<{
+const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
     yearsOfExperience: number;
     developmentCreationsCount: number;
@@ -30,8 +30,12 @@ defineProps<{
 }>();
 
 const pageTitle = 'Sofiane Lasri - Développeur Full Stack';
-const pageDescription = `Portfolio de Sofiane Lasri, développeur Full Stack.`;
-const pageKeywords = 'Sofiane Lasri, développeur web, Laravel, Vue.js, PHP, JavaScript, Full Stack, portfolio, développement web';
+const pageDescription =
+    'Portfolio de Sofiane Lasri, développeur Full-Stack spécialisé sur le framework Laravel, avec plus de ' +
+    props.yearsOfExperience +
+    " ans d'expérience dans le développement web.";
+const pageKeywords =
+    'Sofiane Lasri, Sofiane Lasri-Trienpont, développeur web, Laravel, Vue.js, PHP, JavaScript, Full-Stack, portfolio, développement web';
 const pageUrl = page.props.ziggy.location;
 const pageImage = '/opengraph-image-1200-630.jpg';
 </script>

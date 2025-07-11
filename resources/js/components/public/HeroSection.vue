@@ -122,7 +122,11 @@ onMounted(() => {
             <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[300px] left-[-80px]" />
         </div>
         <div class="bg-primary z-1 hidden size-[35rem] flex-shrink-0 items-end justify-end overflow-hidden rounded-2xl xl:flex">
-            <img class="h-full" src="/resources/images/public/big-head-geneva-may-2025.avif" alt="Photo de Sofiane Lasri" />
+            <picture>
+                <source type="image/avif" srcset="/resources/images/public/big-head-geneva-may-2025.avif" />
+                <source type="image/jpeg" srcset="/resources/images/public/big-head-geneva-may-2025.jpg" />
+                <img class="h-full" src="/resources/images/public/big-head-geneva-may-2025.jpg" alt="Photo de Sofiane Lasri" />
+            </picture>
         </div>
     </div>
 </template>

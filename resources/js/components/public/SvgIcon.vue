@@ -7,27 +7,20 @@ const props = defineProps<{
 }>();
 
 const svgContent = computed(() => {
-    // Parse SVG and add necessary attributes for Safari compatibility
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(props.svg, 'image/svg+xml');
-    const svgElement = doc.querySelector('svg');
+    // For SSR compatibility, we'll use regex instead of DOMParser
+    let svgString = props.svg;
 
-    if (svgElement) {
-        // Ensure SVG has proper namespace
-        if (!svgElement.getAttribute('xmlns')) {
-            svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        }
-
-        // Add width and height if not present
-        if (!svgElement.getAttribute('width') && !svgElement.getAttribute('height')) {
-            svgElement.setAttribute('width', '100%');
-            svgElement.setAttribute('height', '100%');
-        }
-
-        return svgElement.outerHTML;
+    // Ensure SVG has proper namespace
+    if (!svgString.includes('xmlns=')) {
+        svgString = svgString.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     }
 
-    return props.svg;
+    // Add width and height if not present
+    if (!svgString.includes('width=') && !svgString.includes('height=')) {
+        svgString = svgString.replace('<svg', '<svg width="100%" height="100%"');
+    }
+
+    return svgString;
 });
 </script>
 

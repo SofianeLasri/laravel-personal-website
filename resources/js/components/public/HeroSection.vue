@@ -2,6 +2,7 @@
 import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
 import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
 import LightLinkButton from '@/components/public/Ui/Button/LightLinkButton.vue';
+import SvgIcon from '@/components/public/SvgIcon.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
 import { useTranslation } from '@/composables/useTranslation';
@@ -77,7 +78,7 @@ onMounted(() => {
                         {{ t('home.hero.download_cv') }}
                     </BlackLinkButton>
                     <LightLinkButton v-for="link in socialMediaLinks" :key="link.name" :href="link.url" :title="link.name" target="_blank">
-                        <div class="absolute flex h-4 fill-black" v-html="link.icon_svg"></div>
+                        <SvgIcon :svg="link.icon_svg" class="absolute flex h-4 fill-black" />
                     </LightLinkButton>
                 </div>
                 <div class="flex flex-wrap items-center gap-4 self-stretch">

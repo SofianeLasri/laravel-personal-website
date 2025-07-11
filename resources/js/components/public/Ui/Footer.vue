@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Logo from '@/components/public/Logo.vue';
+import SvgIcon from '@/components/public/SvgIcon.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SocialMediaLink } from '@/types';
 import { Link } from '@inertiajs/vue3';
@@ -58,7 +59,7 @@ const { t } = useTranslation();
                                 <li class="mb-2 list-none" v-for="link in socialMediaLinks" :key="link.id">
                                     <a :href="link.url" :title="link.name" target="_blank">
                                         <div class="flex items-center justify-start gap-2">
-                                            <div class="flex h-4 fill-black" v-html="link.icon_svg"></div>
+                                            <SvgIcon :svg="link.icon_svg" class="flex h-4 fill-black" />
                                             <span>{{ link.name }}</span>
                                         </div>
                                     </a>

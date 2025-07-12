@@ -61,7 +61,7 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
     }
 
     #[Test]
-    public function it_sets_english_locale_when_accept_language_is_english()
+    public function it_sets_french_locale_by_default_when_accept_language_is_english()
     {
         $request = Request::create('/', 'GET');
         $request->headers->set('Accept-Language', 'en-US,en;q=0.9');
@@ -72,11 +72,12 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
             return response('test');
         });
 
-        $this->assertEquals('en', App::getLocale());
+        // Now defaults to French even with English Accept-Language
+        $this->assertEquals('fr', App::getLocale());
     }
 
     #[Test]
-    public function it_sets_english_locale_when_accept_language_is_not_french()
+    public function it_sets_french_locale_by_default_when_accept_language_is_not_french()
     {
         $request = Request::create('/', 'GET');
         $request->headers->set('Accept-Language', 'es-ES,es;q=0.9,en;q=0.8');
@@ -87,11 +88,12 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
             return response('test');
         });
 
-        $this->assertEquals('en', App::getLocale());
+        // Now defaults to French for any non-French language
+        $this->assertEquals('fr', App::getLocale());
     }
 
     #[Test]
-    public function it_sets_english_locale_when_no_accept_language_header()
+    public function it_sets_french_locale_by_default_when_no_accept_language_header()
     {
         $request = Request::create('/', 'GET');
         // No Accept-Language header
@@ -102,11 +104,12 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
             return response('test');
         });
 
-        $this->assertEquals('en', App::getLocale());
+        // Now defaults to French when no header
+        $this->assertEquals('fr', App::getLocale());
     }
 
     #[Test]
-    public function it_sets_english_locale_when_accept_language_header_is_empty()
+    public function it_sets_french_locale_by_default_when_accept_language_header_is_empty()
     {
         $request = Request::create('/', 'GET');
         $request->headers->set('Accept-Language', '');
@@ -117,7 +120,8 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
             return response('test');
         });
 
-        $this->assertEquals('en', App::getLocale());
+        // Now defaults to French when header is empty
+        $this->assertEquals('fr', App::getLocale());
     }
 
     #[Test]
@@ -136,7 +140,7 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
     }
 
     #[Test]
-    public function it_respects_quality_values_when_english_has_higher_priority()
+    public function it_sets_french_locale_by_default_when_english_has_higher_priority()
     {
         $request = Request::create('/', 'GET');
         $request->headers->set('Accept-Language', 'fr;q=0.7,en;q=0.9,de;q=0.8');
@@ -147,7 +151,8 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
             return response('test');
         });
 
-        $this->assertEquals('en', App::getLocale());
+        // Now defaults to French regardless of Accept-Language priority
+        $this->assertEquals('fr', App::getLocale());
     }
 
     #[Test]
@@ -177,8 +182,8 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
             return response('test');
         });
 
-        // Should default to English for any unrecognized format
-        $this->assertEquals('en', App::getLocale());
+        // Should default to French for any unrecognized format
+        $this->assertEquals('fr', App::getLocale());
     }
 
     #[Test]
@@ -195,6 +200,75 @@ class SetLocaleFromAcceptLanguageTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('success', $response->getContent());
+        $this->assertEquals('fr', App::getLocale());
+    }
+
+    #[Test]
+    public function it_sets_english_locale_when_language_preference_cookie_is_en()
+    {
+        $request = Request::create('/', 'GET');
+        $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9');
+        $request->cookies->set('language_preference', 'en');
+
+        $middleware = new SetLocaleFromAcceptLanguage;
+
+        $middleware->handle($request, function ($req) {
+            return response('test');
+        });
+
+        // Cookie preference should override Accept-Language
+        $this->assertEquals('en', App::getLocale());
+    }
+
+    #[Test]
+    public function it_sets_french_locale_when_language_preference_cookie_is_fr()
+    {
+        $request = Request::create('/', 'GET');
+        $request->headers->set('Accept-Language', 'en-US,en;q=0.9');
+        $request->cookies->set('language_preference', 'fr');
+
+        $middleware = new SetLocaleFromAcceptLanguage;
+
+        $middleware->handle($request, function ($req) {
+            return response('test');
+        });
+
+        // Cookie preference should override Accept-Language
+        $this->assertEquals('fr', App::getLocale());
+    }
+
+    #[Test]
+    public function it_ignores_invalid_language_preference_cookie()
+    {
+        $request = Request::create('/', 'GET');
+        $request->headers->set('Accept-Language', 'en-US,en;q=0.9');
+        $request->cookies->set('language_preference', 'invalid');
+
+        $middleware = new SetLocaleFromAcceptLanguage;
+
+        $middleware->handle($request, function ($req) {
+            return response('test');
+        });
+
+        // Should default to French when cookie is invalid
+        $this->assertEquals('fr', App::getLocale());
+    }
+
+    #[Test]
+    public function it_stores_browser_language_in_request_attributes()
+    {
+        $request = Request::create('/', 'GET');
+        $request->headers->set('Accept-Language', 'en-US,en;q=0.9,de;q=0.8');
+
+        $middleware = new SetLocaleFromAcceptLanguage;
+
+        $middleware->handle($request, function ($req) {
+            // Check that browser language is stored in request attributes
+            $this->assertEquals('en', $req->attributes->get('browser_language'));
+
+            return response('test');
+        });
+
         $this->assertEquals('fr', App::getLocale());
     }
 }

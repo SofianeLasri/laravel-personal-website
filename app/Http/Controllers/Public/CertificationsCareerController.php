@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\Controller;
 use App\Models\SocialMediaLink;
 use App\Services\PublicControllersService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
-class CertificationsCareerController extends Controller
+class CertificationsCareerController extends PublicController
 {
-    public function __invoke(PublicControllersService $publicControllersService)
+    public function __invoke(Request $request, PublicControllersService $publicControllersService): Response
     {
         $careerData = $publicControllersService->getCertificationsCareerData();
 
         return Inertia::render('public/CertificationsCareer', [
             'socialMediaLinks' => SocialMediaLink::all(),
             'locale' => app()->getLocale(),
+            'browserLanguage' => $this->getBrowserLanguage($request),
             'translations' => [
                 'navigation' => __('navigation'),
                 'footer' => __('footer'),

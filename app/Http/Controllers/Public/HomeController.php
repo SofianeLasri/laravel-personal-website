@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Public;
 
 use App\Enums\TechnologyType;
-use App\Http\Controllers\Controller;
 use App\Models\SocialMediaLink;
 use App\Models\TechnologyExperience;
 use App\Services\PublicControllersService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class HomeController extends Controller
+class HomeController extends PublicController
 {
     public function __construct(protected PublicControllersService $service) {}
 
-    public function __invoke(): Response
+    public function __invoke(Request $request): Response
     {
         $developmentStats = $this->service->getDevelopmentStats();
         // Laravel + tech with experience texts
@@ -22,6 +22,7 @@ class HomeController extends Controller
 
         return Inertia::render('public/Home', [
             'locale' => app()->getLocale(),
+            'browserLanguage' => $this->getBrowserLanguage($request),
             'translations' => [
                 'home' => __('home'),
                 'navigation' => __('navigation'),

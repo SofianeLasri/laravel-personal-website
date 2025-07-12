@@ -16,21 +16,22 @@ class SetLocaleFromAcceptLanguage
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $acceptLanguage = $request->header('Accept-Language');
+        // First check if there's a language preference cookie
+        $languagePreference = $request->cookie('language_preference');
 
-        if ($acceptLanguage) {
-            // Parse the Accept-Language header to get the preferred language
-            $preferredLanguage = $this->parseAcceptLanguage($acceptLanguage);
-
-            // Check if the preferred language is French
-            if ($this->isFrench($preferredLanguage)) {
-                App::setLocale('fr');
-            } else {
-                App::setLocale('en');
-            }
+        if ($languagePreference && in_array($languagePreference, ['fr', 'en'])) {
+            // Use the language preference from cookie
+            App::setLocale($languagePreference);
         } else {
-            // Default to English if no Accept-Language header is present
-            App::setLocale('en');
+            // Default to French
+            App::setLocale('fr');
+
+            // Store the browser's preferred language in the request for potential use by the frontend
+            $acceptLanguage = $request->header('Accept-Language');
+            if ($acceptLanguage) {
+                $browserLanguage = $this->parseAcceptLanguage($acceptLanguage);
+                $request->attributes->set('browser_language', $browserLanguage);
+            }
         }
 
         return $next($request);

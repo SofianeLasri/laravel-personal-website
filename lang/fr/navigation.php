@@ -18,4 +18,13 @@ return [
     'search_placeholder' => 'Rechercher',
     'open_search' => 'Ouvrir la recherche',
     'close' => 'Fermer',
+
+    // Language
+    'language' => 'Langue',
+    'change_language' => 'Changer de langue',
+    'select_language' => 'Sélectionner une langue',
+    'french' => 'Français',
+    'english' => 'Anglais',
+    'translate_to_english' => 'Traduire en anglais',
+    'current_language_french' => 'Langue actuelle : Français',
 ];

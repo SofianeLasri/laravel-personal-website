@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\Controller;
 use App\Models\SocialMediaLink;
 use App\Models\Technology;
 use App\Services\PublicControllersService;
+use Illuminate\Http\Request;
 use Inertia\Response;
 
-class ProjectsController extends Controller
+class ProjectsController extends PublicController
 {
     public function __construct(protected PublicControllersService $service) {}
 
-    public function __invoke(): Response
+    public function __invoke(Request $request): Response
     {
         $locale = app()->getLocale();
 
@@ -22,6 +22,7 @@ class ProjectsController extends Controller
 
         return inertia('public/Projects', [
             'locale' => $locale,
+            'browserLanguage' => $this->getBrowserLanguage($request),
             'translations' => [
                 'projects' => __('projects'),
                 'navigation' => __('navigation'),

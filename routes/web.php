@@ -51,6 +51,9 @@ Route::name('public.')->group(function () {
 
     // Sitemap
     Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+
+    // Language preference
+    Route::post('/set-language', [\App\Http\Controllers\Public\LanguageController::class, 'setLanguage'])->name('set-language');
 });
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {

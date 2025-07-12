@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\Controller;
 use App\Models\SocialMediaLink;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class AboutController extends Controller
+class AboutController extends PublicController
 {
-    public function __invoke(): Response
+    public function __invoke(Request $request): Response
     {
         return Inertia::render('public/About', [
             'locale' => app()->getLocale(),
+            'browserLanguage' => $this->getBrowserLanguage($request),
             'translations' => [
                 'about' => __('about'),
                 'navigation' => __('navigation'),

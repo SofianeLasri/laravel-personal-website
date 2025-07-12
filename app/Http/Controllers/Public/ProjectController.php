@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\Controller;
 use App\Models\Creation;
 use App\Models\SocialMediaLink;
 use App\Services\PublicControllersService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ProjectController extends Controller
+class ProjectController extends PublicController
 {
     public function __construct(protected PublicControllersService $service) {}
 
-    public function __invoke(string $slug): Response
+    public function __invoke(Request $request, string $slug): Response
     {
         $creation = Creation::where('slug', $slug)->firstOrFail()
             ->withRelationshipAutoloading();
@@ -22,6 +22,7 @@ class ProjectController extends Controller
 
         return Inertia::render('public/Project', [
             'locale' => app()->getLocale(),
+            'browserLanguage' => $this->getBrowserLanguage($request),
             'translations' => [
                 'project' => __('project'),
                 'projects' => __('projects'),

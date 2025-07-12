@@ -18,4 +18,13 @@ return [
     'search_placeholder' => 'Search',
     'open_search' => 'Open search',
     'close' => 'Close',
+
+    // Language
+    'language' => 'Language',
+    'change_language' => 'Change language',
+    'select_language' => 'Select a language',
+    'french' => 'French',
+    'english' => 'English',
+    'translate_to_english' => 'Translate to English',
+    'current_language_french' => 'Current language: French',
 ];

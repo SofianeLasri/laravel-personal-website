@@ -177,7 +177,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                             <div
                                 class="outline-border flex size-16 items-center justify-center gap-2.5 rounded-xl bg-white p-3 outline-1 lg:size-24 lg:p-4"
                             >
-                                <picture class="h-full w-full" v-if="selectedExperience.logo">
+                                <picture class="flex h-full w-full items-center justify-center" v-if="selectedExperience.logo">
                                     <source :srcset="selectedExperience.logo.webp.thumbnail" type="image/webp" />
                                     <img
                                         :src="selectedExperience.logo.avif.thumbnail"

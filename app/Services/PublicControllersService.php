@@ -79,11 +79,16 @@ class PublicControllersService
 
         $baseQuery = Creation::whereIn('type', self::DEVELOPMENT_TYPES)->get();
         $creationCount = $baseQuery->count();
-        $oldestDate = $baseQuery->min('started_at');
 
         $stats['count'] = $creationCount;
-        if ($oldestDate) {
-            $stats['yearsOfExperience'] = round(now()->diffInYears(Carbon::parse($oldestDate), true));
+
+        // Calculate years of experience based on the earliest professional experience
+        $earliestWorkExperience = Experience::where('type', ExperienceType::EMPLOI)
+            ->orderBy('started_at', 'asc')
+            ->first();
+
+        if ($earliestWorkExperience) {
+            $stats['yearsOfExperience'] = round(now()->diffInYears($earliestWorkExperience->started_at, true));
         }
 
         return $stats;

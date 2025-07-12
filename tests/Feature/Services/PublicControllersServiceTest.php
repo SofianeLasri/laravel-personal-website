@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use App\Enums\ExperienceType;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
 use App\Models\Creation;
@@ -37,6 +38,11 @@ class PublicControllersServiceTest extends TestCase
         Creation::factory()->create([
             'started_at' => now()->subYears(2),
             'type' => 'tool',
+        ]);
+
+        Experience::factory()->create([
+            'started_at' => now()->subYears(2),
+            'type' => ExperienceType::EMPLOI,
         ]);
 
         $service = new PublicControllersService;

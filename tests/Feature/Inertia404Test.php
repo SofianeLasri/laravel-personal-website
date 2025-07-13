@@ -30,7 +30,7 @@ class Inertia404Test extends TestCase
         $response->assertInertia(function ($page) {
             $page->component('public/Error404')
                 ->where('translations.errors.404.page_name', 'Page introuvable')
-                ->where('translations.errors.404.home_page_link', 'Retour à l\'accueil');
+                ->where('translations.errors.404.home_page_link', 'Page d\'accueil');
         });
     }
 

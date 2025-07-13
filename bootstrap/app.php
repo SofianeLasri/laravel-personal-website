@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ErrorController;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleDashboardInertiaRequests;
 use App\Http\Middleware\HandlePublicInertiaRequests;
@@ -9,9 +10,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Inertia\Inertia;
 use Sentry\Laravel\Integration;
 use SlProjects\LaravelRequestLogger\app\Http\Middleware\SaveRequestMiddleware;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -46,4 +49,19 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         Integration::handles($exceptions);
+
+        $exceptions->render(function (NotFoundHttpException $e, $request) {
+            if (! $request->expectsJson() && ! $request->is('dashboard*')) {
+                Inertia::setRootView('public-app');
+
+                $controller = new ErrorController;
+                $inertiaResponse = $controller->show404($request);
+                $response = $inertiaResponse->toResponse($request);
+                $response->setStatusCode(404);
+
+                return $response;
+            }
+
+            return null;
+        });
     })->create();

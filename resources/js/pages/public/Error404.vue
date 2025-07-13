@@ -3,10 +3,9 @@ import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink } from '@/types';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import WhiteLinkButton from '@/components/public/Ui/Button/WhiteLinkButton.vue';
 
-const page = usePage();
 const { t } = useTranslation();
 
 defineProps<{
@@ -14,7 +13,6 @@ defineProps<{
 }>();
 
 const pageTitle = t('errors.404.page_name');
-const pageUrl = page.props.ziggy.location;
 </script>
 
 <template>
@@ -22,21 +20,6 @@ const pageUrl = page.props.ziggy.location;
         <!-- SEO Meta Tags -->
         <meta name="description" :content="t('errors.404.page_description')" />
         <meta name="robots" content="noindex, follow" />
-
-        <!-- Open Graph -->
-        <meta property="og:title" :content="pageTitle" />
-        <meta property="og:description" :content="t('errors.404.page_description')" />
-        <meta property="og:url" :content="pageUrl" />
-        <meta property="og:type" content="website" />
-
-        <!-- Twitter Card -->
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" :content="pageTitle" />
-        <meta name="twitter:description" :content="t('errors.404.page_description')" />
-        <meta name="twitter:url" :content="pageUrl" />
-
-        <!-- Canonical URL -->
-        <link rel="canonical" :href="pageUrl" />
     </Head>
 
     <PublicAppLayout :social-media-links="socialMediaLinks">
@@ -65,7 +48,7 @@ const pageUrl = page.props.ziggy.location;
                     </p>
 
                     <div class="flex flex-col gap-4 sm:flex-row">
-                        <BlackLinkButton :href="route('public.home')">
+                        <BlackLinkButton href="/">
                             {{ t('errors.404.home_page_link') }}
                         </BlackLinkButton>
 

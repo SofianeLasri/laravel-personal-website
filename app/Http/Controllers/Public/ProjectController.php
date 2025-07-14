@@ -15,6 +15,11 @@ class ProjectController extends PublicController
 
     public function __invoke(Request $request, string $slug): Response
     {
+        $legacyMappings = config('legacy-projects.mappings', []);
+        if (isset($legacyMappings[$slug])) {
+            $slug = $legacyMappings[$slug];
+        }
+
         $creation = Creation::where('slug', $slug)->firstOrFail()
             ->withRelationshipAutoloading();
 

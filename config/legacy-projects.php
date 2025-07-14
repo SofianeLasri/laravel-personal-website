@@ -16,5 +16,7 @@ return [
 
     'mappings' => [
         'bjloquent' => 'better-jloquent',
+        'vbcms-1-0' => 'vbcms',
+        'rosewood' => 'rp-rosewood',
     ],
 ];

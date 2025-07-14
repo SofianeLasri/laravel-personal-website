@@ -454,7 +454,7 @@ watch(
                     <div class="space-y-2">
                         <Label>Fichier vidéo</Label>
                         <Input type="file" accept="video/*" @change="handleFileSelect" :disabled="loading" />
-                        <p class="text-muted-foreground text-xs">Formats supportés: MP4, AVI, MOV, WMV, FLV, WebM, MKV (max 500MB)</p>
+                        <p class="text-muted-foreground text-xs">Formats supportés: MP4, AVI, MOV, WMV, FLV, WebM, MKV (max 2000MB)</p>
                         <div v-if="newVideoFile" class="text-sm">
                             <p><strong>Fichier:</strong> {{ newVideoFile.name }}</p>
                             <p><strong>Taille:</strong> {{ formatFileSize(newVideoFile.size) }}</p>

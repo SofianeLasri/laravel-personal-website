@@ -17,7 +17,7 @@ services:
       - redis
     networks:
       - app-network
-    mem_limit: 2g
+    mem_limit: 4g
 
   redis:
     image: redis:alpine

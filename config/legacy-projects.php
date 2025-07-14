@@ -18,5 +18,6 @@ return [
         'bjloquent' => 'better-jloquent',
         'vbcms-1-0' => 'vbcms',
         'rosewood' => 'rp-rosewood',
+        'ocean-dr' => 'gca-creator-battle-2020-ocean-dr',
     ],
 ];

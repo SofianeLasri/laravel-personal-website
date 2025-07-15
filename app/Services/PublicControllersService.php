@@ -161,10 +161,10 @@ class PublicControllersService
     public function getCreations(): Collection
     {
         $creations = Creation::with([
-            'logo',
-            'coverImage',
+            'logo.optimizedPictures',
+            'coverImage.optimizedPictures',
             'shortDescriptionTranslationKey.translations',
-            'technologies.iconPicture',
+            'technologies.iconPicture.optimizedPictures',
             'technologies.descriptionTranslationKey.translations',
         ])->orderByRaw('(ended_at IS NULL) DESC, ended_at DESC')->get();
 

@@ -16,7 +16,7 @@ class ProjectsController extends PublicController
     {
         $locale = app()->getLocale();
 
-        $technologies = Technology::all();
+        $technologies = Technology::with(['iconPicture.optimizedPictures', 'descriptionTranslationKey.translations'])->get();
 
         $creations = $this->service->getCreations();
 

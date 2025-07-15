@@ -69,10 +69,12 @@ return [
         ],
 
         'bunnystorage' => [
-            'driver' => 'bunnystorage',
-            'storage_zone' => env('BUNNYSTORAGE_STORAGE_ZONE'),
-            'api_key' => env('BUNNYSTORAGE_API_KEY'),
-            'region' => env('BUNNYSTORAGE_REGION', \PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNRegion::DEFAULT),
+            'driver' => 'ftp',
+            'host' => 'storage.bunnycdn.com',
+            'username' => env('BUNNYSTORAGE_STORAGE_ZONE'),
+            'password' => env('BUNNYSTORAGE_API_KEY'),
+            'port' => 21,
+            'passive' => true,
         ],
     ],
 

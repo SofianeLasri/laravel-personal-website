@@ -71,7 +71,7 @@ const pendingLocale = ref<string | null>(null);
 const getOriginalCreationId = (): number | null => {
     // To avoid errors on ssr
     let url = new URL(page.props.ziggy.location);
-    if (window.location.href) {
+    if (typeof window !== 'undefined' && window.location.href) {
         url = new URL(window.location.href);
     }
 
@@ -230,7 +230,9 @@ const onSubmit = handleSubmit(async (formValues) => {
                 url.searchParams.delete('creation-id');
             }
             url.searchParams.set('draft-id', response.data.id.toString());
-            window.history.replaceState({}, '', url.toString());
+            if (typeof window !== 'undefined') {
+                window.history.replaceState({}, '', url.toString());
+            }
 
             currentCreationDraft.value = response.data;
         }
@@ -294,7 +296,9 @@ onMounted(() => {
     if (creationId && currentCreationDraft.value) {
         url.searchParams.delete('creation-id');
         url.searchParams.set('draft-id', currentCreationDraft.value.id.toString());
-        window.history.replaceState({}, '', url.toString());
+        if (typeof window !== 'undefined') {
+            window.history.replaceState({}, '', url.toString());
+        }
     }
 });
 </script>

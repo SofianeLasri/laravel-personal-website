@@ -130,7 +130,7 @@ const stopExportStatusPolling = () => {
 };
 
 const downloadExport = () => {
-    if (exportDownloadUrl.value) {
+    if (exportDownloadUrl.value && typeof window !== 'undefined') {
         window.location.href = exportDownloadUrl.value;
     }
 };

@@ -20,7 +20,7 @@ const emit = defineEmits<{
 const selectedFilters = ref<Set<number>>(new Set(props.initialSelectedFilters || []));
 
 // Check if screen is mobile size (< lg breakpoint = 1024px)
-const isMobile = ref(window.innerWidth < 1024);
+const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
 const isCollapsed = ref(isMobile.value);
 
 const sortedTechnologies = computed(() => {
@@ -28,6 +28,8 @@ const sortedTechnologies = computed(() => {
 });
 
 const handleResize = () => {
+    if (typeof window === 'undefined') return;
+
     const wasMobile = isMobile.value;
     isMobile.value = window.innerWidth < 1024;
 
@@ -42,11 +44,15 @@ const handleResize = () => {
 };
 
 onMounted(() => {
-    window.addEventListener('resize', handleResize);
+    if (typeof window !== 'undefined') {
+        window.addEventListener('resize', handleResize);
+    }
 });
 
 onUnmounted(() => {
-    window.removeEventListener('resize', handleResize);
+    if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+    }
 });
 
 watch(

@@ -38,6 +38,8 @@ const gameEngines = props.technologies.filter((tech) => tech.type === 'game_engi
 const languages = props.technologies.filter((tech) => tech.type === 'language');
 
 const parseUrlParams = () => {
+    if (typeof window === 'undefined') return;
+
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab') as ProjectTab | null;
 
@@ -80,6 +82,8 @@ const parseUrlParams = () => {
 };
 
 const updateUrlParams = () => {
+    if (typeof window === 'undefined') return;
+
     const params = new URLSearchParams();
 
     params.set('tab', activeTab.value);
@@ -100,8 +104,10 @@ const updateUrlParams = () => {
         params.set('languages', selectedLanguages.value.join(','));
     }
 
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.pushState({ path: newUrl }, '', newUrl);
+    if (typeof window !== 'undefined') {
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.pushState({ path: newUrl }, '', newUrl);
+    }
 };
 
 const activeTab = ref<ProjectTab>('development');
@@ -130,11 +136,15 @@ onMounted(() => {
         }, 0);
     }, 0);
 
-    window.addEventListener('popstate', handlePopState);
+    if (typeof window !== 'undefined') {
+        window.addEventListener('popstate', handlePopState);
+    }
 });
 
 onBeforeUnmount(() => {
-    window.removeEventListener('popstate', handlePopState);
+    if (typeof window !== 'undefined') {
+        window.removeEventListener('popstate', handlePopState);
+    }
 });
 
 const navItems = [

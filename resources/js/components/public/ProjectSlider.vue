@@ -88,17 +88,21 @@ const updateDimensions = (): void => {
 };
 
 const checkIfMobile = (): void => {
-    isMobile.value = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (typeof window !== 'undefined') {
+        isMobile.value = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
 };
 
 onMounted(() => {
     updateDimensions();
     checkIfMobile();
 
-    window.addEventListener('resize', () => {
-        updateDimensions();
-        checkIfMobile();
-    });
+    if (typeof window !== 'undefined') {
+        window.addEventListener('resize', () => {
+            updateDimensions();
+            checkIfMobile();
+        });
+    }
 });
 
 watch(

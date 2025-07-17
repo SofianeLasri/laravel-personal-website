@@ -72,7 +72,9 @@ const deleteCertification = async () => {
     try {
         await axios.delete(route('dashboard.api.certifications.destroy', { certification: certificationToDelete.value.id }));
         toast.success('Certification supprimée avec succès');
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     } catch (error) {
         console.error('Erreur lors de la suppression :', error);
         toast.error('Erreur lors de la suppression de la certification');

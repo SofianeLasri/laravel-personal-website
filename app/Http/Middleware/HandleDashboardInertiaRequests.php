@@ -25,6 +25,9 @@ class HandleDashboardInertiaRequests extends Middleware
             return $next($request);
         }
 
+        // Disable SSR for dashboard routes
+        config(['inertia.ssr.enabled' => false]);
+
         return parent::handle($request, $next);
     }
 

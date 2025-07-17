@@ -19,7 +19,9 @@ const shouldShowPopup = computed(() => {
 const setLanguage = async (language: string) => {
     try {
         await axios.post(route('public.set-language'), { language });
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     } catch (error) {
         console.error('Failed to set language:', error);
     }
@@ -28,7 +30,9 @@ const setLanguage = async (language: string) => {
 const dismissPopup = () => {
     isDismissed.value = true;
     isVisible.value = false;
-    localStorage.setItem('language_popup_dismissed', 'true');
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('language_popup_dismissed', 'true');
+    }
 };
 
 const acceptTranslation = () => {
@@ -36,16 +40,18 @@ const acceptTranslation = () => {
 };
 
 onMounted(() => {
-    const dismissed = localStorage.getItem('language_popup_dismissed');
-    if (dismissed === 'true') {
-        isDismissed.value = true;
-        return;
-    }
+    if (typeof window !== 'undefined') {
+        const dismissed = localStorage.getItem('language_popup_dismissed');
+        if (dismissed === 'true') {
+            isDismissed.value = true;
+            return;
+        }
 
-    if (shouldShowPopup.value) {
-        setTimeout(() => {
-            isVisible.value = true;
-        }, 2000);
+        if (shouldShowPopup.value) {
+            setTimeout(() => {
+                isVisible.value = true;
+            }, 2000);
+        }
     }
 });
 </script>

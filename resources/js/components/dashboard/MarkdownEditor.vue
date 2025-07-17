@@ -111,6 +111,8 @@ const toggleHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
 };
 
 const setLink = () => {
+    if (typeof window === 'undefined') return;
+
     const url = window.prompt('URL');
 
     if (url === null) {

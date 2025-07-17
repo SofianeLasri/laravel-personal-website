@@ -213,6 +213,8 @@ const downloadOriginal = (picture: Picture) => {
 const handlePageChange = (page: number) => {
     if (page < 1 || page > props.pictures.last_page) return;
 
+    if (typeof window === 'undefined') return;
+
     const params = new URLSearchParams(window.location.search);
     params.set('page', page.toString());
 

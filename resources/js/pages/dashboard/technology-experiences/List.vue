@@ -114,7 +114,9 @@ const createTechnology = async () => {
         isAddTechnologyDialogOpen.value = false;
         toast.success('Technologie créée avec succès');
 
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     } catch (err) {
         console.error('Erreur lors de la création de la technologie:', err);
 
@@ -161,7 +163,9 @@ const updateTechnology = async () => {
         isEditTechnologyDialogOpen.value = false;
         toast.success('Technologie mise à jour avec succès');
 
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     } catch (err) {
         console.error('Erreur lors de la mise à jour de la technologie:', err);
 
@@ -199,7 +203,9 @@ const deleteTechnology = async () => {
 
         isDeleteTechnologyDialogOpen.value = false;
         toast.success('Technologie supprimée avec succès');
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     } catch (err) {
         console.error('Erreur lors de la suppression de la technologie:', err);
         toast.error('Impossible de supprimer cette technologie');
@@ -249,7 +255,9 @@ const createExperience = async () => {
         isAddExperienceDialogOpen.value = false;
         toast.success('Expérience créée avec succès');
 
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     } catch (err) {
         console.error("Erreur lors de la création de l'expérience:", err);
 
@@ -289,7 +297,9 @@ const updateExperience = async () => {
         isEditExperienceDialogOpen.value = false;
         toast.success('Expérience mise à jour avec succès');
 
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     } catch (err) {
         console.error("Erreur lors de la mise à jour de l'expérience:", err);
 
@@ -327,7 +337,9 @@ const deleteExperience = async () => {
 
         isDeleteExperienceDialogOpen.value = false;
         toast.success('Expérience supprimée avec succès');
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     } catch (err) {
         console.error("Erreur lors de la suppression de l'expérience:", err);
         toast.error('Impossible de supprimer cette expérience');

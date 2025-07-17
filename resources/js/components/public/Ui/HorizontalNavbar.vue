@@ -42,10 +42,12 @@ const navigateToItem = (itemId: string) => {
             const offsetTop = section.offsetTop;
             const scrollToY = isNavSticky.value ? offsetTop - navHeight.value : offsetTop;
 
-            window.scrollTo({
-                top: scrollToY,
-                behavior: 'smooth',
-            });
+            if (typeof window !== 'undefined') {
+                window.scrollTo({
+                    top: scrollToY,
+                    behavior: 'smooth',
+                });
+            }
         }
     }
 
@@ -88,7 +90,7 @@ const scrollToActiveButton = () => {
 };
 
 const handleScroll = () => {
-    if (props.mode === 'auto') {
+    if (props.mode === 'auto' && typeof window !== 'undefined') {
         const scrollPosition = window.scrollY + 200;
         for (const item of props.items) {
             const element = document.getElementById(item.id);
@@ -138,42 +140,46 @@ watch(
 );
 
 onMounted(() => {
-    if (props.mode === 'auto' || props.sticky) {
-        window.addEventListener('scroll', handleScroll);
-    }
-
-    if (navBarRef.value) {
-        navHeight.value = navBarRef.value.offsetHeight;
-    }
-
-    if (props.showArrows && navScrollContainer.value) {
-        navScrollContainer.value.addEventListener('scroll', checkNavArrows);
-        checkNavArrows();
-    }
-
-    if (props.mode === 'auto' || props.sticky) {
-        handleScroll();
-    }
-
-    window.addEventListener('resize', () => {
-        if (props.showArrows) {
-            checkNavArrows();
-            scrollToActiveButton();
+    if (typeof window !== 'undefined') {
+        if (props.mode === 'auto' || props.sticky) {
+            window.addEventListener('scroll', handleScroll);
         }
+
         if (navBarRef.value) {
             navHeight.value = navBarRef.value.offsetHeight;
         }
-    });
+
+        if (props.showArrows && navScrollContainer.value) {
+            navScrollContainer.value.addEventListener('scroll', checkNavArrows);
+            checkNavArrows();
+        }
+
+        if (props.mode === 'auto' || props.sticky) {
+            handleScroll();
+        }
+
+        window.addEventListener('resize', () => {
+            if (props.showArrows) {
+                checkNavArrows();
+                scrollToActiveButton();
+            }
+            if (navBarRef.value) {
+                navHeight.value = navBarRef.value.offsetHeight;
+            }
+        });
+    }
 });
 
 onBeforeUnmount(() => {
-    if (props.mode === 'auto' || props.sticky) {
-        window.removeEventListener('scroll', handleScroll);
+    if (typeof window !== 'undefined') {
+        if (props.mode === 'auto' || props.sticky) {
+            window.removeEventListener('scroll', handleScroll);
+        }
+        if (props.showArrows && navScrollContainer.value) {
+            navScrollContainer.value.removeEventListener('scroll', checkNavArrows);
+        }
+        window.removeEventListener('resize', () => {});
     }
-    if (props.showArrows && navScrollContainer.value) {
-        navScrollContainer.value.removeEventListener('scroll', checkNavArrows);
-    }
-    window.removeEventListener('resize', () => {});
 });
 </script>
 

@@ -22,6 +22,7 @@ import axios from 'axios';
 import { Edit, ExternalLink, Link as LinkIcon, Loader2, Plus, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { toast } from 'vue-sonner';
+import { useRoute } from '@/composables/useRoute';
 
 // Types
 interface SocialMediaLink {
@@ -35,6 +36,7 @@ interface SocialMediaLink {
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
 }>();
+const route = useRoute();
 
 // État local
 const links = ref<SocialMediaLink[]>(props.socialMediaLinks);

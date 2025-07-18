@@ -4,10 +4,12 @@ import BlackLinkButtonSm from '@/components/public/Ui/Button/BlackLinkButtonSm.v
 import { SSRTechnologyExperience } from '@/types';
 import { computed } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
+import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     experience: SSRTechnologyExperience;
 }>();
+const route = useRoute();
 
 let projectsNumberText: string;
 if (props.experience.creationCount > 1) {

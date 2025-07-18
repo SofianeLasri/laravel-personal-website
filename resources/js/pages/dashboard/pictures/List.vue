@@ -34,6 +34,7 @@ import axios from 'axios';
 import { ArrowUpDown, Download, Eye, Image as ImageIcon, Loader2, MoreHorizontal, Search, Trash2 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
+import { useRoute } from '@/composables/useRoute';
 
 // Types
 interface OptimizedPicture {
@@ -81,6 +82,7 @@ const props = defineProps<{
     pictures: PaginationData;
     filters: Filters;
 }>();
+const route = useRoute();
 
 // État local
 const isLoading = ref(false);

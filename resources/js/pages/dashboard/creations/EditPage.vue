@@ -36,6 +36,12 @@ import { useForm } from 'vee-validate';
 import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import * as z from 'zod';
+import { useRoute } from '@/composables/useRoute';
+
+const props = defineProps<{
+    creationDraft?: CreationDraftWithTranslations;
+}>();
+const route = useRoute();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,10 +53,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('dashboard.creations.edit', undefined, false),
     },
 ];
-
-const props = defineProps<{
-    creationDraft?: CreationDraftWithTranslations;
-}>();
 
 const creationTypes = Object.keys(creationTypeLabels) as CreationType[];
 const isSubmitting = ref(false);

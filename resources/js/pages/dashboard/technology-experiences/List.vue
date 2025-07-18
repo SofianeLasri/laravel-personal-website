@@ -24,11 +24,13 @@ import axios from 'axios';
 import { Code, Edit, Loader2, Plus, Search, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
+import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     technologies: TechnologyWithCreationsCount[];
     technologyExperiences: TechnologyExperience[];
 }>();
+const route = useRoute();
 
 const searchQuery = ref('');
 const locale = ref<'fr' | 'en'>('fr');

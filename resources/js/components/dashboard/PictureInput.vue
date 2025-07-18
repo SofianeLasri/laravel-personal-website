@@ -5,10 +5,12 @@ import { useVModel } from '@vueuse/core';
 import axios from 'axios';
 import { Image } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     modelValue?: number;
 }>();
+const route = useRoute();
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: number | null): void;

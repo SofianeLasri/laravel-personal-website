@@ -10,11 +10,13 @@ import { Feature } from '@/types';
 import axios from 'axios';
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
+import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     creationDraftId: number | null;
     locale: string;
 }>();
+const route = useRoute();
 
 const features = ref<Feature[]>([]);
 const loading = ref(false);

@@ -33,6 +33,14 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Edit, Link as LinkIcon, MoreHorizontal, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import { useRoute } from '@/composables/useRoute';
+
+interface Props {
+    creations: CreationWithTranslationsAndDrafts[];
+}
+
+const props = defineProps<Props>();
+const route = useRoute();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,12 +52,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('dashboard.creations.index', undefined, false),
     },
 ];
-
-interface Props {
-    creations: CreationWithTranslationsAndDrafts[];
-}
-
-const props = defineProps<Props>();
 
 const showDraftAlert = ref(false);
 const selectedCreation = ref<CreationWithTranslationsAndDrafts | null>(null);

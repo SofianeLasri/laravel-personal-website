@@ -9,8 +9,10 @@ import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRoute } from '@/composables/useRoute';
 
 const page = usePage();
+const route = useRoute();
 const { t } = useTranslation();
 const currentUrl = computed(() => new URL(page.props.ziggy.location));
 const currentPath = computed(() => currentUrl.value.href);

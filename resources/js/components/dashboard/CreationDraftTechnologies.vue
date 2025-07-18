@@ -22,11 +22,13 @@ import axios from 'axios';
 import { Code, Loader2, Minus, Pencil, Plus, Search, Trash2 } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
+import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     creationDraftId: number | null;
     locale: string;
 }>();
+const route = useRoute();
 
 const loading = ref(false);
 const error = ref<string | null>(null);

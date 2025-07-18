@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { useRoute } from '@/composables/useRoute';
 
 defineProps<{
     status?: string;
 }>();
+const route = useRoute();
 
 const form = useForm({});
 

@@ -10,7 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { type BreadcrumbItem } from '@/types';
+import { useRoute } from '@/composables/useRoute';
 
+const route = useRoute();
 const breadcrumbItems: BreadcrumbItem[] = [
     {
         title: 'Password settings',

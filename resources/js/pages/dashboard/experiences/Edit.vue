@@ -31,6 +31,7 @@ import { useForm } from 'vee-validate';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
 import * as z from 'zod';
+import { useRoute } from '@/composables/useRoute';
 
 // Types
 interface Experience {
@@ -84,6 +85,7 @@ const props = defineProps<{
     experience?: Experience;
     technologies: Technology[];
 }>();
+const route = useRoute();
 
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [

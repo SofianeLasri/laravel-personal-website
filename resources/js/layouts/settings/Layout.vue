@@ -4,6 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
+import { useRoute } from '@/composables/useRoute';
+
+const page = usePage();
+const route = useRoute();
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -19,8 +23,6 @@ const sidebarNavItems: NavItem[] = [
         href: route('dashboard.appearance', undefined, false),
     },
 ];
-
-const page = usePage();
 
 const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.location).pathname : '';
 </script>

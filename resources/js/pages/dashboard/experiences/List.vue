@@ -21,6 +21,7 @@ import { fr } from 'date-fns/locale';
 import { Briefcase, Edit, ExternalLink, GraduationCap, Plus, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
+import { useRoute } from '@/composables/useRoute';
 
 // Types pour notre page
 interface Experience {
@@ -79,6 +80,7 @@ interface Props {
 
 // Configuration de la page
 const props = defineProps<Props>();
+const route = useRoute();
 const locale = ref<'fr' | 'en'>('fr');
 const deleteConfirmationOpen = ref(false);
 const experienceToDelete = ref<Experience | null>(null);

@@ -6,7 +6,9 @@ import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { useRoute } from '@/composables/useRoute';
 
+const route = useRoute();
 const form = useForm({
     password: '',
 });

@@ -8,10 +8,12 @@ import axios from 'axios';
 import debounce from 'lodash.debounce';
 import { X } from 'lucide-vue-next';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     isOpen: boolean;
 }>();
+const route = useRoute();
 
 const { t } = useTranslation();
 

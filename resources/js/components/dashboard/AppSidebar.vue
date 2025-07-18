@@ -20,6 +20,9 @@ import {
     Logs,
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
+import { useRoute } from '@/composables/useRoute';
+
+const route = useRoute();
 
 const mainNavItems: NavItem[] = [
     {

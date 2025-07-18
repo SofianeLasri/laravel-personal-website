@@ -20,10 +20,12 @@ import axios from 'axios';
 import { Link, Loader2, Pencil, Plus, Search, Trash2, User, UserMinus, UserPlus } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
+import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     creationDraftId: number | null;
 }>();
+const route = useRoute();
 
 const loading = ref(false);
 const error = ref<string | null>(null);

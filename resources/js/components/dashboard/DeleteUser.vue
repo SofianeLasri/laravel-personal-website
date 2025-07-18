@@ -13,8 +13,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { useRoute } from '@/composables/useRoute';
 
 const form = useForm({});
+const route = useRoute();
 
 const deleteUser = (e: Event) => {
     e.preventDefault();

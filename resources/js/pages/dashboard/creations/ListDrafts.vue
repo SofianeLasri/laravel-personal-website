@@ -31,6 +31,14 @@ import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Clock, Edit, Eye, MoreHorizontal, Send, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
+import { useRoute } from '@/composables/useRoute';
+
+interface Props {
+    creationDrafts: CreationDraftWithTranslations[];
+}
+
+const props = defineProps<Props>();
+const route = useRoute();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -42,12 +50,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('dashboard.creations.drafts.index', undefined, false),
     },
 ];
-
-interface Props {
-    creationDrafts: CreationDraftWithTranslations[];
-}
-
-const props = defineProps<Props>();
 
 const itemsPerPage = 25;
 const currentPage = ref(1);

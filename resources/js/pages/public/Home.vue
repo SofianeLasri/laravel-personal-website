@@ -15,8 +15,10 @@ import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRExperience, SSRSimplifiedCreation, SSRTechnologyExperience } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
+import { useRoute } from '@/composables/useRoute';
 
 const page = usePage();
+const route = useRoute();
 const { t } = useTranslation();
 
 const props = defineProps<{

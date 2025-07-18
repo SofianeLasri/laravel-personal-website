@@ -6,12 +6,14 @@ import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { useRoute } from '@/composables/useRoute';
 
 interface Props {
     token: string;
     email: string;
 }
 
+const route = useRoute();
 const props = defineProps<Props>();
 
 const form = useForm({

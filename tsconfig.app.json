@@ -44,15 +44,11 @@
       "@/*": [
         "./resources/js/*"
       ],
-      "ziggy-js": [
-        "./vendor/tightenco/ziggy"
-      ]
     },
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
     "types": [
       "vite/client",
-      "vue/tsx",
       "./resources/js/types"
     ]
     /* Specify type package names to be included without being referenced in a source file. */,

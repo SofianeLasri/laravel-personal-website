@@ -59,11 +59,18 @@ class HomeController extends Controller
             ->leftJoin('urls as origin_url', 'logged_requests.origin_url_id', '=', 'origin_url.id')
             ->join('user_agent_metadata', 'logged_requests.user_agent_id', '=', 'user_agent_metadata.user_agent_id')
             ->join('ip_address_metadata', 'logged_requests.ip_address_id', '=', 'ip_address_metadata.ip_address_id')
+            ->join('ip_addresses', 'logged_requests.ip_address_id', '=', 'ip_addresses.id')
             ->whereLike('urls.url', config('app.url').'%')
             ->whereNotIn('urls.url', $individualExcludedRoutes)
             ->where('user_agent_metadata.is_bot', false)
             ->where('status_code', 200)
             ->whereNull('logged_requests.user_id')
+            ->whereNotIn('ip_addresses.id', function ($query) {
+                $query->select('ip_addresses.id')
+                    ->from('ip_addresses')
+                    ->join('logged_requests', 'logged_requests.ip_address_id', '=', 'ip_addresses.id')
+                    ->whereNotNull('logged_requests.user_id');
+            })
             ->get();
 
         $now = now();

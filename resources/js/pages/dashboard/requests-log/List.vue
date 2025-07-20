@@ -6,13 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Bot, ChevronLeft, ChevronRight, Globe, Search, User } from 'lucide-vue-next';
+import { Bot, ChevronLeft, ChevronRight, Globe, RotateCcw, Search, User } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 interface RequestLog {
@@ -51,6 +53,14 @@ interface Props {
     filters: {
         search: string | null;
         per_page: number;
+        is_bot: string;
+        include_user_agents: string[];
+        exclude_user_agents: string[];
+        include_ips: string[];
+        exclude_ips: string[];
+        date_from: string | null;
+        date_to: string | null;
+        exclude_connected_users_ips: boolean;
     };
 }
 
@@ -58,6 +68,14 @@ const props = defineProps<Props>();
 
 const searchQuery = ref(props.filters.search || '');
 const perPage = ref(props.filters.per_page.toString());
+const isBotFilter = ref(props.filters.is_bot || 'all');
+const includeUserAgents = ref(props.filters.include_user_agents?.join('\n') || '');
+const excludeUserAgents = ref(props.filters.exclude_user_agents?.join('\n') || '');
+const includeIps = ref(props.filters.include_ips?.join('\n') || '');
+const excludeIps = ref(props.filters.exclude_ips?.join('\n') || '');
+const dateFrom = ref(props.filters.date_from || '');
+const dateTo = ref(props.filters.date_to || '');
+const excludeConnectedUsersIps = ref(props.filters.exclude_connected_users_ips || false);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -107,11 +125,24 @@ const truncateUserAgent = (userAgent: string | null, maxLength: number = 60) => 
 };
 
 const search = () => {
+    const includeUAArray = includeUserAgents.value.split('\n').filter((ua) => ua.trim());
+    const excludeUAArray = excludeUserAgents.value.split('\n').filter((ua) => ua.trim());
+    const includeIpArray = includeIps.value.split('\n').filter((ip) => ip.trim());
+    const excludeIpArray = excludeIps.value.split('\n').filter((ip) => ip.trim());
+
     router.get(
         route('dashboard.request-logs.index'),
         {
             search: searchQuery.value || undefined,
             per_page: perPage.value,
+            is_bot: isBotFilter.value !== 'all' ? isBotFilter.value : undefined,
+            include_user_agents: includeUAArray.length > 0 ? includeUAArray : undefined,
+            exclude_user_agents: excludeUAArray.length > 0 ? excludeUAArray : undefined,
+            include_ips: includeIpArray.length > 0 ? includeIpArray : undefined,
+            exclude_ips: excludeIpArray.length > 0 ? excludeIpArray : undefined,
+            date_from: dateFrom.value || undefined,
+            date_to: dateTo.value || undefined,
+            exclude_connected_users_ips: excludeConnectedUsersIps.value ? true : undefined,
         },
         {
             preserveState: true,
@@ -120,13 +151,40 @@ const search = () => {
     );
 };
 
+const resetFilters = () => {
+    searchQuery.value = '';
+    perPage.value = '15';
+    isBotFilter.value = 'all';
+    includeUserAgents.value = '';
+    excludeUserAgents.value = '';
+    includeIps.value = '';
+    excludeIps.value = '';
+    dateFrom.value = '';
+    dateTo.value = '';
+    excludeConnectedUsersIps.value = false;
+    search();
+};
+
 const changePage = (page: number) => {
+    const includeUAArray = includeUserAgents.value.split('\n').filter((ua) => ua.trim());
+    const excludeUAArray = excludeUserAgents.value.split('\n').filter((ua) => ua.trim());
+    const includeIpArray = includeIps.value.split('\n').filter((ip) => ip.trim());
+    const excludeIpArray = excludeIps.value.split('\n').filter((ip) => ip.trim());
+
     router.get(
         route('dashboard.request-logs.index'),
         {
             page: page,
             search: searchQuery.value || undefined,
             per_page: perPage.value,
+            is_bot: isBotFilter.value !== 'all' ? isBotFilter.value : undefined,
+            include_user_agents: includeUAArray.length > 0 ? includeUAArray : undefined,
+            exclude_user_agents: excludeUAArray.length > 0 ? excludeUAArray : undefined,
+            include_ips: includeIpArray.length > 0 ? includeIpArray : undefined,
+            exclude_ips: excludeIpArray.length > 0 ? excludeIpArray : undefined,
+            date_from: dateFrom.value || undefined,
+            date_to: dateTo.value || undefined,
+            exclude_connected_users_ips: excludeConnectedUsersIps.value ? true : undefined,
         },
         {
             preserveState: true,
@@ -160,39 +218,131 @@ const paginationInfo = computed(() => {
                     <CardTitle>Filtres</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-                        <div class="md:col-span-2">
-                            <Label for="search">Rechercher</Label>
-                            <div class="relative">
-                                <Search class="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-                                <Input
-                                    id="search"
-                                    v-model="searchQuery"
-                                    placeholder="IP, URL, User-Agent, Méthode, Status..."
-                                    class="pl-10"
-                                    @keyup.enter="search"
+                    <div class="space-y-6">
+                        <!-- Main filters row -->
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                            <div class="md:col-span-2">
+                                <Label for="search">Rechercher</Label>
+                                <div class="relative">
+                                    <Search class="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                                    <Input
+                                        id="search"
+                                        v-model="searchQuery"
+                                        placeholder="IP, URL, User-Agent, Méthode, Status..."
+                                        class="pl-10"
+                                        @keyup.enter="search"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label for="per_page">Éléments par page</Label>
+                                <Select v-model="perPage">
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="10">10</SelectItem>
+                                        <SelectItem value="15">15</SelectItem>
+                                        <SelectItem value="25">25</SelectItem>
+                                        <SelectItem value="50">50</SelectItem>
+                                        <SelectItem value="100">100</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div>
+                                <Label for="is_bot">Type de visiteur</Label>
+                                <Select v-model="isBotFilter">
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Tous</SelectItem>
+                                        <SelectItem value="false">Humains seulement</SelectItem>
+                                        <SelectItem value="true">Bots seulement</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        <!-- Date filters -->
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                            <div>
+                                <Label for="date_from">Date de début</Label>
+                                <Input id="date_from" v-model="dateFrom" type="date" placeholder="Date de début" />
+                            </div>
+
+                            <div>
+                                <Label for="date_to">Date de fin</Label>
+                                <Input id="date_to" v-model="dateTo" type="date" placeholder="Date de fin" />
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <Label>Options de filtrage</Label>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <Switch id="exclude_connected_users" v-model:checked="excludeConnectedUsersIps" />
+                                    <Label for="exclude_connected_users" class="cursor-pointer font-normal">
+                                        Exclure les IP des utilisateurs connectés
+                                    </Label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User agents and IPs filters -->
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                            <div>
+                                <Label for="include_user_agents">User-Agents à inclure</Label>
+                                <Textarea
+                                    id="include_user_agents"
+                                    v-model="includeUserAgents"
+                                    placeholder="Un par ligne (recherche partielle)"
+                                    rows="3"
+                                    class="text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <Label for="exclude_user_agents">User-Agents à exclure</Label>
+                                <Textarea
+                                    id="exclude_user_agents"
+                                    v-model="excludeUserAgents"
+                                    placeholder="Un par ligne (recherche partielle)"
+                                    rows="3"
+                                    class="text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <Label for="include_ips">IPs à inclure</Label>
+                                <Textarea
+                                    id="include_ips"
+                                    v-model="includeIps"
+                                    placeholder="Une par ligne (correspondance exacte)"
+                                    rows="3"
+                                    class="text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <Label for="exclude_ips">IPs à exclure</Label>
+                                <Textarea
+                                    id="exclude_ips"
+                                    v-model="excludeIps"
+                                    placeholder="Une par ligne (correspondance exacte)"
+                                    rows="3"
+                                    class="text-sm"
                                 />
                             </div>
                         </div>
 
-                        <div>
-                            <Label for="per_page">Éléments par page</Label>
-                            <Select v-model="perPage">
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10">10</SelectItem>
-                                    <SelectItem value="15">15</SelectItem>
-                                    <SelectItem value="25">25</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
-                                    <SelectItem value="100">100</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div class="flex items-end">
-                            <Button @click="search" class="w-full">
+                        <!-- Action buttons -->
+                        <div class="flex items-center justify-end space-x-2">
+                            <Button variant="outline" @click="resetFilters">
+                                <RotateCcw class="mr-2 h-4 w-4" />
+                                Réinitialiser
+                            </Button>
+                            <Button @click="search">
                                 <Search class="mr-2 h-4 w-4" />
                                 Rechercher
                             </Button>

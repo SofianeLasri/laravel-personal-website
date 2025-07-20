@@ -12,8 +12,33 @@ class RequestLogController extends Controller
 {
     public function index(Request $request): Response
     {
+        $request->validate([
+            'per_page' => 'nullable|integer|min:1|max:100',
+            'search' => 'nullable|string',
+            'is_bot' => 'nullable|in:true,false,all',
+            'include_user_agents' => 'nullable|array',
+            'include_user_agents.*' => 'string',
+            'exclude_user_agents' => 'nullable|array',
+            'exclude_user_agents.*' => 'string',
+            'include_ips' => 'nullable|array',
+            'include_ips.*' => 'string|ip',
+            'exclude_ips' => 'nullable|array',
+            'exclude_ips.*' => 'string|ip',
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date|after_or_equal:date_from',
+            'exclude_connected_users_ips' => 'nullable|boolean',
+        ]);
+
         $perPage = $request->get('per_page', 15);
         $search = $request->get('search');
+        $isBot = $request->get('is_bot', 'all');
+        $includeUserAgents = $request->get('include_user_agents', []);
+        $excludeUserAgents = $request->get('exclude_user_agents', []);
+        $includeIps = $request->get('include_ips', []);
+        $excludeIps = $request->get('exclude_ips', []);
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        $excludeConnectedUsersIps = $request->boolean('exclude_connected_users_ips', false);
 
         $query = LoggedRequest::with([
             'ipAddress',
@@ -56,6 +81,55 @@ class RequestLogController extends Controller
             });
         }
 
+        // Bot status filter
+        if ($isBot !== 'all') {
+            $query->where('user_agent_metadata.is_bot', $isBot === 'true');
+        }
+
+        // Include specific user agents
+        if (! empty($includeUserAgents)) {
+            $query->where(function ($q) use ($includeUserAgents) {
+                foreach ($includeUserAgents as $userAgent) {
+                    $q->orWhere('user_agents.user_agent', 'like', "%{$userAgent}%");
+                }
+            });
+        }
+
+        // Exclude specific user agents
+        if (! empty($excludeUserAgents)) {
+            foreach ($excludeUserAgents as $userAgent) {
+                $query->where('user_agents.user_agent', 'not like', "%{$userAgent}%");
+            }
+        }
+
+        // Include specific IP addresses
+        if (! empty($includeIps)) {
+            $query->whereIn('ip_addresses.ip', $includeIps);
+        }
+
+        // Exclude specific IP addresses
+        if (! empty($excludeIps)) {
+            $query->whereNotIn('ip_addresses.ip', $excludeIps);
+        }
+
+        // Date range filter
+        if ($dateFrom) {
+            $query->where('logged_requests.created_at', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->where('logged_requests.created_at', '<=', $dateTo.' 23:59:59');
+        }
+
+        // Exclude connected users' IP addresses
+        if ($excludeConnectedUsersIps) {
+            $query->whereNotIn('logged_requests.ip_address_id', function ($subquery) {
+                $subquery->select('lr.ip_address_id')
+                    ->from('logged_requests as lr')
+                    ->whereNotNull('lr.user_id')
+                    ->distinct();
+            });
+        }
+
         $requests = $query->paginate($perPage);
 
         return Inertia::render('dashboard/requests-log/List', [
@@ -63,6 +137,14 @@ class RequestLogController extends Controller
             'filters' => [
                 'search' => $search,
                 'per_page' => $perPage,
+                'is_bot' => $isBot,
+                'include_user_agents' => $includeUserAgents,
+                'exclude_user_agents' => $excludeUserAgents,
+                'include_ips' => $includeIps,
+                'exclude_ips' => $excludeIps,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'exclude_connected_users_ips' => $excludeConnectedUsersIps,
             ],
         ]);
     }

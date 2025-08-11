@@ -13,6 +13,10 @@ abstract class PublicController extends Controller
      */
     protected function getBrowserLanguage(Request $request): ?string
     {
+        if (! $request->attributes->has('browser_language')) {
+            return config('app.locale');
+        }
+
         return $request->attributes->get('browser_language');
     }
 }

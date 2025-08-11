@@ -7,6 +7,7 @@ use App\Models\SocialMediaLink;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Tighten\Ziggy\Ziggy;
 
 class ErrorController extends PublicController
 {
@@ -26,6 +27,14 @@ class ErrorController extends PublicController
                 'footer' => __('footer'),
             ],
             'socialMediaLinks' => $socialMediaLinks,
+
+            // We add this because the 404 page doesn't seem to use the Inertia middleware.
+            // So its created SSR errors with the Ziggy location and routes.
+            'name' => config('app.name'),
+            'ziggy' => [
+                ...(new Ziggy)->toArray(),
+                'location' => $request->url(),
+            ],
         ]);
     }
 }

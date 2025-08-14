@@ -27,6 +27,7 @@ class ExperienceTest extends TestCase
 
         $experience = Experience::create([
             'title_translation_key_id' => $titleKey->id,
+            'slug' => 'test',
             'organization_name' => 'Université Paris Saclay',
             'type' => ExperienceType::FORMATION,
             'location' => 'Saclay, France',
@@ -41,6 +42,7 @@ class ExperienceTest extends TestCase
         $this->assertDatabaseHas('experiences', [
             'id' => $experience->id,
             'organization_name' => 'Université Paris Saclay',
+            'slug' => 'test',
             'type' => 'formation',
             'location' => 'Saclay, France',
         ]);

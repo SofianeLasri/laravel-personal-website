@@ -75,8 +75,8 @@ const formatPeriod = () => {
             <div class="flex flex-col gap-8 pt-8">
                 <div class="flex flex-col gap-6">
                     <!-- Organization Logo and Info -->
-                    <div class="flex items-start gap-6">
-                        <div v-if="experience.logo" class="flex-shrink-0">
+                    <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
+                        <div v-if="experience.logo" class="mx-auto flex-shrink-0 sm:mx-0">
                             <div
                                 class="flex size-24 items-center justify-center rounded-lg border bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
                             >
@@ -90,10 +90,10 @@ const formatPeriod = () => {
                         </div>
                         <div class="flex flex-grow flex-col gap-4">
                             <div>
-                                <h1 class="text-design-system-title text-3xl font-bold lg:text-4xl">
+                                <h1 class="text-design-system-title text-center text-3xl font-bold sm:text-left lg:text-4xl">
                                     {{ experience.title }}
                                 </h1>
-                                <div class="mt-2 flex items-center gap-2">
+                                <div class="mt-2 flex items-center justify-center gap-2 sm:justify-start">
                                     <Building class="text-design-system-paragraph size-5" />
                                     <span class="text-design-system-paragraph text-lg font-medium">
                                         {{ experience.organizationName }}
@@ -111,7 +111,7 @@ const formatPeriod = () => {
                             </div>
 
                             <!-- Meta Information -->
-                            <div class="text-design-system-paragraph flex flex-wrap gap-4">
+                            <div class="text-design-system-paragraph flex flex-wrap justify-center gap-4 sm:justify-start">
                                 <div class="flex items-center gap-2">
                                     <CalendarDays class="size-4" />
                                     <span class="text-sm">{{ formatPeriod() }}</span>

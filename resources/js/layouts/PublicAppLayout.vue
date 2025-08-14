@@ -14,10 +14,32 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <div class="relative flex min-h-screen flex-col items-center bg-[url(/resources/images/public/dots.svg)]">
+    <div class="dots-background relative flex min-h-screen flex-col items-center">
         <Navbar />
         <slot />
         <LanguagePopup />
     </div>
     <Footer :socialMediaLinks="socialMediaLinks" />
 </template>
+
+<style>
+.dots-background {
+    background-image: url('/images/dots-light.svg');
+    background-repeat: repeat;
+    position: relative;
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not(.light) .dots-background {
+        background-image: url('/images/dots-dark.svg');
+    }
+}
+
+html.dark .dots-background {
+    background-image: url('/images/dots-dark.svg');
+}
+
+html.light .dots-background {
+    background-image: url('/images/dots-light.svg');
+}
+</style>

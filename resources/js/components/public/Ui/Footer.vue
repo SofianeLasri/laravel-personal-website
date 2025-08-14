@@ -13,9 +13,9 @@ const { t } = useTranslation();
 </script>
 
 <template>
-    <div class="relative flex flex-col overflow-hidden bg-black">
+    <div class="relative flex flex-col overflow-hidden bg-black dark:bg-gray-900">
         <div
-            class="border-border flex w-full flex-col items-center justify-start gap-2.5 rounded-br-2xl rounded-bl-2xl border-t bg-gray-100 py-8 md:py-16"
+            class="border-border flex w-full flex-col items-center justify-start gap-2.5 rounded-br-2xl rounded-bl-2xl border-t bg-gray-100 py-8 md:py-16 dark:border-gray-800 dark:bg-gray-100"
         >
             <div class="container space-y-8 px-4 md:space-y-0">
                 <!-- Section principale du footer -->
@@ -24,8 +24,8 @@ const { t } = useTranslation();
                     <div class="flex flex-col gap-4">
                         <Logo class="h-8" />
                         <div class="flex flex-col justify-start">
-                            <div class="text-xl font-bold text-black">{{ t('footer.name') }}</div>
-                            <div class="text-design-system-paragraph text-base font-normal">{{ t('footer.title') }}</div>
+                            <div class="text-xl font-bold text-black dark:text-gray-100">{{ t('footer.name') }}</div>
+                            <div class="text-design-system-paragraph text-base font-normal dark:text-gray-400">{{ t('footer.title') }}</div>
                         </div>
                     </div>
 
@@ -33,7 +33,7 @@ const { t } = useTranslation();
                     <div class="flex flex-col justify-start gap-8 sm:flex-row md:justify-end md:gap-16">
                         <!-- Colonne Portfolio -->
                         <div class="flex flex-col justify-start gap-4">
-                            <div class="text-xl font-bold text-black">{{ t('footer.portfolio') }}</div>
+                            <div class="text-xl font-bold text-black dark:text-gray-100">{{ t('footer.portfolio') }}</div>
                             <ul class="text-design-system-paragraph text-base font-normal">
                                 <li class="mb-2 list-none">
                                     <Link :href="route('public.home')" :title="t('footer.home')">{{ t('footer.home') }}</Link>
@@ -54,12 +54,12 @@ const { t } = useTranslation();
 
                         <!-- Colonne Me retrouver -->
                         <div class="flex flex-col justify-start gap-4">
-                            <div class="text-xl font-bold text-black">{{ t('footer.find_me') }}</div>
+                            <div class="text-xl font-bold text-black dark:text-gray-100">{{ t('footer.find_me') }}</div>
                             <ul class="text-design-system-paragraph text-base font-normal">
                                 <li class="mb-2 list-none" v-for="link in socialMediaLinks" :key="link.id">
                                     <a :href="link.url" :title="link.name" target="_blank">
                                         <div class="flex items-center justify-start gap-2">
-                                            <SvgIcon :svg="link.icon_svg" class="flex h-4 fill-black" />
+                                            <SvgIcon :svg="link.icon_svg" class="flex h-4 fill-black dark:fill-gray-100" />
                                             <span>{{ link.name }}</span>
                                         </div>
                                     </a>
@@ -74,7 +74,7 @@ const { t } = useTranslation();
         <!-- Copyright -->
         <div class="flex w-full flex-col items-center justify-start gap-2.5">
             <div class="container flex h-12 items-center justify-center px-4 text-center md:justify-start md:px-0 md:text-left">
-                <div class="text-sm text-white md:text-base">{{ t('footer.copyright') }}</div>
+                <div class="text-sm text-white md:text-base dark:text-gray-400">{{ t('footer.copyright') }}</div>
             </div>
         </div>
     </div>

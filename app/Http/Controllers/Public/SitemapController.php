@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Creation;
+use App\Models\Experience;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
@@ -22,6 +23,13 @@ class SitemapController extends Controller
             ->setLastModificationDate(now())
             ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
             ->setPriority(0.9));
+
+        Experience::all()->each(function (Experience $experience) use ($sitemap) {
+            $sitemap->add(Url::create(route('public.experience.show', $experience->slug))
+                ->setLastModificationDate($experience->updated_at)
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+                ->setPriority(0.8));
+        });
 
         $sitemap->add(Url::create(route('public.certifications-career'))
             ->setLastModificationDate(now())

@@ -83,17 +83,21 @@ const toggleFilter = (techId: number) => {
 </script>
 
 <template>
-    <div class="flex max-h-96 w-full flex-col items-start overflow-hidden rounded-2xl border bg-gray-100">
-        <div class="flex w-full cursor-pointer items-center justify-between gap-2.5 px-4 py-3" @click="toggleCollapse" :aria-expanded="!isCollapsed">
+    <div class="flex max-h-96 w-full flex-col items-start overflow-hidden rounded-2xl border bg-gray-100 dark:border-gray-800 dark:bg-gray-900">
+        <div
+            class="flex w-full cursor-pointer items-center justify-between gap-2.5 px-4 py-3 transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
+            @click="toggleCollapse"
+            :aria-expanded="!isCollapsed"
+        >
             <div class="text-design-system-title justify-center">{{ name }}</div>
             <svg
-                class="h-5 w-5 transition-transform duration-300"
+                class="h-5 w-5 transition-transform duration-300 dark:text-gray-200"
                 :class="isCollapsed ? '' : 'rotate-180'"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 aria-hidden="true"
             >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" fill="none" />
             </svg>
         </div>
 
@@ -101,11 +105,13 @@ const toggleFilter = (techId: number) => {
             class="outline-border flex flex-col self-stretch overflow-hidden rounded-2xl rounded-b-none outline-1 transition-all duration-300 ease-in-out"
             :class="isCollapsed ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100'"
         >
-            <div class="custom-scrollbar flex flex-col items-start gap-2 overflow-y-auto bg-white p-2">
+            <div class="custom-scrollbar flex flex-col items-start gap-2 overflow-y-auto bg-white p-2 dark:bg-gray-950">
                 <template v-for="tech in sortedTechnologies" :key="tech.id">
                     <ActiveButton v-if="selectedFilters.has(tech.id)" class="w-full rounded-lg !px-3 py-2" @click="toggleFilter(tech.id)">
                         <div class="flex grow items-center gap-2">
-                            <div class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2">
+                            <div
+                                class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2 dark:border-gray-700 dark:bg-gray-900"
+                            >
                                 <img
                                     :src="tech.iconPicture.webp.thumbnail"
                                     :alt="`${tech.name} icon`"
@@ -120,7 +126,9 @@ const toggleFilter = (techId: number) => {
 
                     <WhiteButton v-else class="w-full rounded-lg border-none !px-3 py-2" @click="toggleFilter(tech.id)">
                         <div class="flex grow items-center gap-2">
-                            <div class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2">
+                            <div
+                                class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2 dark:border-gray-700 dark:bg-gray-900"
+                            >
                                 <img
                                     :src="tech.iconPicture.webp.thumbnail"
                                     :alt="`${tech.name} icon`"
@@ -134,7 +142,7 @@ const toggleFilter = (techId: number) => {
                     </WhiteButton>
                 </template>
 
-                <div v-if="sortedTechnologies.length === 0" class="w-full px-3 py-2 text-center text-gray-500">
+                <div v-if="sortedTechnologies.length === 0" class="w-full px-3 py-2 text-center text-gray-500 dark:text-gray-400">
                     {{ t('projects.no_technology_available') }}
                 </div>
             </div>
@@ -146,7 +154,7 @@ const toggleFilter = (techId: number) => {
 .custom-scrollbar {
     /* Firefox */
     scrollbar-width: thin;
-    scrollbar-color: var(--color-gray-200) transparent;
+    scrollbar-color: var(--gray-200) transparent;
 
     /* Webkit */
     &::-webkit-scrollbar {
@@ -159,13 +167,26 @@ const toggleFilter = (techId: number) => {
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: var(--color-gray-200);
+        background-color: var(--gray-200);
         border-radius: 10px;
         border: 2px solid transparent;
     }
 
     &::-webkit-scrollbar-thumb:hover {
-        background-color: var(--color-gray-400);
+        background-color: var(--gray-400);
     }
+}
+
+/* Dark mode scrollbar styles */
+:global(.dark) .custom-scrollbar {
+    scrollbar-color: var(--gray-700) transparent;
+}
+
+:global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--gray-700);
+}
+
+:global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--gray-600);
 }
 </style>

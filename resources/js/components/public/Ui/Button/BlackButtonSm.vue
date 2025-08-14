@@ -25,10 +25,10 @@ defineOptions({
         :type="type"
         :disabled="disabled || loading"
         :aria-busy="loading"
-        class="flex h-8 flex-shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-black px-4 text-white hover:bg-gray-950"
+        class="flex h-8 flex-shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-black px-4 text-white hover:bg-gray-950 dark:bg-gray-100 dark:text-gray-990 dark:hover:bg-gray-200"
         v-bind="$attrs"
     >
-        <span v-if="loading" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+        <span v-if="loading" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent dark:border-gray-990 dark:border-t-transparent"></span>
 
         <slot></slot>
     </button>

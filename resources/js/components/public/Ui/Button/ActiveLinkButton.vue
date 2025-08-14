@@ -34,9 +34,9 @@ defineOptions({
         :target="disabled || loading ? undefined : target"
         :aria-busy="loading"
         :aria-disabled="disabled || loading"
-        class="bg-atomic-tangerine-200 flex h-12 flex-shrink-0 items-center justify-center gap-3 rounded-full px-6 text-black no-underline focus:border-none"
+        class="bg-atomic-tangerine-200 flex h-12 flex-shrink-0 items-center justify-center gap-3 rounded-full px-6 text-black no-underline focus:border-none dark:bg-atomic-tangerine-700 dark:text-gray-100"
         :class="{
-            'hover:bg-atomic-tangerine-400 cursor-pointer': !disabled && !loading,
+            'hover:bg-atomic-tangerine-400 cursor-pointer dark:hover:bg-atomic-tangerine-600': !disabled && !loading,
             'cursor-not-allowed opacity-70': disabled || loading,
         }"
         role="button"
@@ -44,7 +44,7 @@ defineOptions({
         v-bind="$attrs"
         @click="disabled || loading ? $event.preventDefault() : null"
     >
-        <span v-if="loading" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent"></span>
+        <span v-if="loading" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent dark:border-gray-100 dark:border-t-transparent"></span>
 
         <slot></slot>
     </a>

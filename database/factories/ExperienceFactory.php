@@ -8,6 +8,7 @@ use App\Models\Picture;
 use App\Models\Technology;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class ExperienceFactory extends Factory
 {
@@ -16,12 +17,14 @@ class ExperienceFactory extends Factory
     public function definition(): array
     {
         $isFormation = $this->faker->boolean();
+        $organizationName = $isFormation
+            ? $this->faker->randomElement(['Université Paris Saclay', 'Efrei Paris'])
+            : $this->faker->company();
 
         return [
             'title_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
-            'organization_name' => $isFormation
-                ? $this->faker->randomElement(['Université Paris Saclay', 'Efrei Paris'])
-                : $this->faker->company(),
+            'organization_name' => $organizationName,
+            'slug' => Str::slug($organizationName.'-'.$this->faker->unique()->randomNumber()),
             'logo_id' => Picture::factory(),
             'type' => $isFormation ? ExperienceType::FORMATION : ExperienceType::EMPLOI,
             'location' => $this->faker->city().', '.$this->faker->country(),

@@ -247,6 +247,7 @@ interface SSRExperience {
     id: number;
     title: string;
     organizationName: string;
+    slug: string;
     logo: SSRPicture | null;
     location: string;
     websiteUrl: string | null;

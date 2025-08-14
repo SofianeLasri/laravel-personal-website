@@ -12,6 +12,7 @@ import WhiteLinkButtonSm from '@/components/public/Ui/Button/WhiteLinkButtonSm.v
 import Cube from '@/components/shapes/cube.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRExperience, SSRTechnology } from '@/types';
+import { Link } from '@inertiajs/vue3';
 import { computed, onMounted, ref, watch } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
 
@@ -192,10 +193,20 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                     <div class="text-design-system-title text-xl font-bold lg:text-2xl">{{ selectedExperience.title }}</div>
                                     <div class="text-design-system-title text-sm lg:text-base">{{ selectedExperience.organizationName }}</div>
                                 </div>
-                                <WhiteLinkButtonSm v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
-                                    <span>{{ t('career.visit_website') }}</span>
-                                    <ArrowUpRightRegular class="h-4 fill-black" />
-                                </WhiteLinkButtonSm>
+                                <div class="flex flex-wrap items-start gap-2">
+                                    <Link
+                                        v-if="selectedExperience.slug"
+                                        :href="`/certifications-career/${selectedExperience.slug}`"
+                                        class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-black transition-colors hover:bg-gray-200"
+                                    >
+                                        <span>{{ t('career.view_details') }}</span>
+                                        <ArrowUpRightRegular class="h-3 fill-black" />
+                                    </Link>
+                                    <WhiteLinkButtonSm v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
+                                        <span>{{ t('career.visit_website') }}</span>
+                                        <ArrowUpRightRegular class="h-4 fill-black" />
+                                    </WhiteLinkButtonSm>
+                                </div>
                             </div>
                         </div>
                         <div class="z-10 mt-4 inline-flex flex-col items-start justify-end gap-2 lg:mt-0 lg:items-end xl:shrink-0">

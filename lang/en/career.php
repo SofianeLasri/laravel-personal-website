@@ -8,6 +8,7 @@ return [
     'technologies_used' => 'Technologies used',
     'select_experience' => 'Please select an experience to see details',
     'visit_website' => 'Visit the website',
+    'view_details' => 'View details',
     'certifications' => 'Certifications',
     'level' => 'Level',
     'score' => 'Score',

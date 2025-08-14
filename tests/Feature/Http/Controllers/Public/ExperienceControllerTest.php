@@ -10,8 +10,6 @@ use App\Models\Technology;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class ExperienceControllerTest extends TestCase
@@ -24,18 +22,10 @@ class ExperienceControllerTest extends TestCase
     {
         parent::setUp();
 
-        // Add slug column if it doesn't exist (for test database)
-        if (! Schema::hasColumn('experiences', 'slug')) {
-            DB::statement('ALTER TABLE experiences ADD COLUMN slug VARCHAR(255)');
-        }
-
-        // Create social media links
         SocialMediaLink::factory()->count(3)->create();
 
-        // Create a picture for logo
         $logo = Picture::factory()->create();
 
-        // Create translation keys with translations
         $titleKey = TranslationKey::factory()->create();
         Translation::factory()->create([
             'translation_key_id' => $titleKey->id,
@@ -72,7 +62,6 @@ class ExperienceControllerTest extends TestCase
             'text' => 'Description complète de l\'expérience en français',
         ]);
 
-        // Create experience
         $this->experience = Experience::factory()->create([
             'title_translation_key_id' => $titleKey->id,
             'organization_name' => 'Test Company',
@@ -86,11 +75,9 @@ class ExperienceControllerTest extends TestCase
             'ended_at' => now()->subYear(),
         ]);
 
-        // Manually set slug since it's not in the factory
         $this->experience->slug = 'test-company-senior-developer';
         $this->experience->save();
 
-        // Attach technologies
         $technologies = Technology::factory()->count(3)->create();
         $this->experience->technologies()->attach($technologies);
     }

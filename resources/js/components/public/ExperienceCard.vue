@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRExperience } from '@/types';
+import { Link } from '@inertiajs/vue3';
 
 const { t } = useTranslation();
 
@@ -17,13 +18,7 @@ const formatPeriod = (startDate: string, endDate: string | null) => {
 </script>
 
 <template>
-    <a
-        :href="experience.websiteUrl ? experience.websiteUrl : '#'"
-        :class="{ 'pointer-events-none': !experience.websiteUrl }"
-        class="flex gap-4 rounded-2xl transition-transform hover:scale-105"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
+    <Link :href="`/certifications-career/${experience.slug}`" class="flex gap-4 rounded-2xl transition-transform hover:scale-105">
         <div
             class="flex size-20 flex-shrink-0 items-center justify-center gap-2.5 rounded-lg border bg-white p-3 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] md:p-4"
         >
@@ -47,5 +42,5 @@ const formatPeriod = (startDate: string, endDate: string | null) => {
                 {{ formatPeriod(experience.startedAtFormatted, experience.endedAtFormatted) }}
             </div>
         </div>
-    </a>
+    </Link>
 </template>

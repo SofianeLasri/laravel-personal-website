@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $title_translation_key_id
  * @property string $organization_name
+ * @property string $slug
  * @property int $logo_id
  * @property ExperienceType $type
  * @property string $location
@@ -45,6 +46,7 @@ class Experience extends Model
     protected $fillable = [
         'title_translation_key_id',
         'organization_name',
+        'slug',
         'logo_id',
         'type',
         'location',
@@ -61,6 +63,7 @@ class Experience extends Model
         'ended_at' => 'date',
         'website_url' => 'string',
         'organization_name' => 'string',
+        'slug' => 'string',
         'location' => 'string',
     ];
 

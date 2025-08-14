@@ -7,6 +7,7 @@ use App\Http\Requests\ExperienceRequest;
 use App\Models\Experience;
 use App\Models\Translation;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 class ExperienceController extends Controller
 {
@@ -25,9 +26,21 @@ class ExperienceController extends Controller
         $shortDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->short_description);
         $fullDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->full_description);
 
+        // Generate slug from organization name and title
+        $baseSlug = Str::slug($request->organization_name.' '.$request->title);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        // Check for uniqueness and add numeric suffix if needed
+        while (Experience::where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
+
         $experience = Experience::create([
             'title_translation_key_id' => $titleTranslation->translation_key_id,
             'organization_name' => $request->organization_name,
+            'slug' => $slug,
             'logo_id' => $request->logo_id,
             'type' => $request->type,
             'location' => $request->location,
@@ -68,7 +81,8 @@ class ExperienceController extends Controller
         $shortDescriptionTranslation = Translation::createOrUpdate($experience->shortDescriptionTranslationKey, $request->input('locale'), $request->short_description);
         $fullDescriptionTranslation = Translation::createOrUpdate($experience->fullDescriptionTranslationKey, $request->input('locale'), $request->full_description);
 
-        $experience->update([
+        // Generate new slug if organization name or title changed
+        $updateData = [
             'title_translation_key_id' => $titleTranslation->translation_key_id,
             'organization_name' => $request->organization_name,
             'logo_id' => $request->logo_id,
@@ -79,7 +93,24 @@ class ExperienceController extends Controller
             'full_description_translation_key_id' => $fullDescriptionTranslation->translation_key_id,
             'started_at' => $request->started_at,
             'ended_at' => $request->ended_at,
-        ]);
+        ];
+
+        // Only regenerate slug if organization name changed or slug doesn't exist
+        if ($experience->organization_name !== $request->organization_name || ! $experience->slug) {
+            $baseSlug = Str::slug($request->organization_name.' '.$request->title);
+            $slug = $baseSlug;
+            $counter = 1;
+
+            // Check for uniqueness (excluding current experience)
+            while (Experience::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+                $slug = $baseSlug.'-'.$counter;
+                $counter++;
+            }
+
+            $updateData['slug'] = $slug;
+        }
+
+        $experience->update($updateData);
 
         if ($request->technologies) {
             $experience->technologies()->sync($request->technologies);

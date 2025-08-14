@@ -8,6 +8,7 @@ return [
     'technologies_used' => 'Technologies utilisées',
     'select_experience' => 'Veuillez sélectionner une expérience pour voir les détails',
     'visit_website' => 'Voir le site internet',
+    'view_details' => 'Voir les détails',
     'certifications' => 'Certifications',
     'level' => 'Niveau',
     'score' => 'Score',

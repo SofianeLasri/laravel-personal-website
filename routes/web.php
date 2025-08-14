@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Admin\TranslationPageController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CertificationsCareerController;
+use App\Http\Controllers\Public\ExperienceController as PublicExperienceController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ProjectsController;
@@ -44,6 +45,9 @@ Route::name('public.')->group(function () {
         ->name('projects.show');
     Route::get('/certifications-career', CertificationsCareerController::class)
         ->name('certifications-career');
+    Route::get('/certifications-career/{slug}', PublicExperienceController::class)
+        ->where('slug', '[A-Za-z0-9\-]+')
+        ->name('experience.show');
 
     // Search routes
     Route::get('/search', [SearchController::class, 'search'])->name('search');

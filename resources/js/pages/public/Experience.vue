@@ -77,12 +77,16 @@ const formatPeriod = () => {
                     <!-- Organization Logo and Info -->
                     <div class="flex items-start gap-6">
                         <div v-if="experience.logo" class="flex-shrink-0">
-                            <img
-                                :src="experience.logo.webp.small"
-                                :alt="`Logo ${experience.organizationName}`"
-                                class="h-20 w-20 rounded-lg object-contain"
-                                loading="lazy"
-                            />
+                            <div
+                                class="flex size-24 items-center justify-center rounded-lg border bg-white p-4 shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]"
+                            >
+                                <img
+                                    :src="experience.logo.webp.small"
+                                    :alt="`Logo ${experience.organizationName}`"
+                                    class="h-full w-full object-contain"
+                                    loading="lazy"
+                                />
+                            </div>
                         </div>
                         <div class="flex flex-grow flex-col gap-4">
                             <div>
@@ -132,7 +136,7 @@ const formatPeriod = () => {
                 <!-- Description Section -->
                 <section class="flex flex-col gap-8">
                     <ContentSectionTitle>{{ t('experience.description') }}</ContentSectionTitle>
-                    <vue-markdown class="prose prose-lg text-design-system-paragraph max-w-none" :source="experience.fullDescription" />
+                    <vue-markdown class="markdown-view" :source="experience.fullDescription" />
                 </section>
 
                 <!-- Technologies Section -->

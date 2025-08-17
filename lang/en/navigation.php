@@ -12,6 +12,7 @@ return [
     'menu' => 'Menu',
     'main_menu' => 'Main menu',
     'close_menu' => 'Close menu',
+    'theme' => 'Theme',
 
     // Search
     'search' => 'Search',

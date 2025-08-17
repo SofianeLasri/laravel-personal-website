@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import TechnologyExperienceCard from '@/components/public/Technology/TechnologyExperienceCard.vue';
-import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
-import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import { SSRTechnologyExperience } from '@/types';
 import { computed, ref } from 'vue';
 
@@ -38,14 +37,15 @@ const isButtonActive = (type: string): boolean => {
 <template>
     <div class="flex flex-col gap-16 self-stretch 2xl:flex-row">
         <div class="flex shrink-0 flex-col justify-center gap-4 lg:flex-row 2xl:w-72 2xl:flex-col 2xl:justify-start">
-            <BlackButton v-if="isButtonActive('frameworks-libraries')" @click="setTechType('framework')"> Framework & Librairies </BlackButton>
-            <WhiteButton v-else @click="setTechType('framework')"> Framework & Librairies </WhiteButton>
+            <BaseButton :variant="isButtonActive('frameworks-libraries') ? 'black' : 'white'" @click="setTechType('framework')">
+                Framework & Librairies
+            </BaseButton>
 
-            <BlackButton v-if="isButtonActive('language')" @click="setTechType('language')"> Langages de programmation </BlackButton>
-            <WhiteButton v-else @click="setTechType('language')"> Langages de programmation </WhiteButton>
+            <BaseButton :variant="isButtonActive('language') ? 'black' : 'white'" @click="setTechType('language')">
+                Langages de programmation
+            </BaseButton>
 
-            <BlackButton v-if="isButtonActive('other')" @click="setTechType('other')"> Annexes </BlackButton>
-            <WhiteButton v-else @click="setTechType('other')"> Annexes </WhiteButton>
+            <BaseButton :variant="isButtonActive('other') ? 'black' : 'white'" @click="setTechType('other')"> Annexes </BaseButton>
         </div>
         <div class="grid grow grid-cols-1 gap-8 xl:grid-cols-2">
             <TechnologyExperienceCard v-for="experience in filteredTechnologies" :key="experience.id" :experience="experience" />

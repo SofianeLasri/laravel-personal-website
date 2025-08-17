@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import LightShape from '@/components/public/LightShape.vue';
-import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
-import WhiteLinkButton from '@/components/public/Ui/Button/WhiteLinkButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRFullCreation } from '@/types';
 import { computed } from 'vue';
@@ -71,8 +70,12 @@ const formattedPeriod = computed(() => {
                 </div>
             </div>
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <BlackLinkButton v-if="creation.externalUrl" :href="creation.externalUrl"> {{ t('project.visit_website') }} </BlackLinkButton>
-                <WhiteLinkButton v-if="creation.sourceCodeUrl" :href="creation.sourceCodeUrl"> {{ t('project.source_code') }} </WhiteLinkButton>
+                <BaseButton variant="black" as="link" v-if="creation.externalUrl" :href="creation.externalUrl">
+                    {{ t('project.visit_website') }}
+                </BaseButton>
+                <BaseButton variant="white" as="link" v-if="creation.sourceCodeUrl" :href="creation.sourceCodeUrl">
+                    {{ t('project.source_code') }}
+                </BaseButton>
             </div>
         </div>
         <div class="relative hidden lg:block">

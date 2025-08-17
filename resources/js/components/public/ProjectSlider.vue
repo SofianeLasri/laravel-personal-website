@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ArrowLeftRegular from '@/components/font-awesome/ArrowLeftRegular.vue';
 import ArrowRightRegular from '@/components/font-awesome/ArrowRightRegular.vue';
-import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import type { SSRSimplifiedCreation } from '@/types';
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -121,9 +121,9 @@ watch(
             class="dark:from-gray-990 dark:to-gray-990/0 absolute top-0 bottom-0 left-0 z-10 flex h-full w-16 items-center justify-center bg-gradient-to-r from-gray-100 to-gray-100/0"
             aria-label="Défiler vers la gauche"
         >
-            <BlackButton v-if="canScrollLeft" @click="scroll('left')" class="w-12">
+            <BaseButton variant="black" v-if="canScrollLeft" @click="scroll('left')" class="w-12">
                 <ArrowLeftRegular class="absolute h-4 fill-white dark:fill-gray-900" />
-            </BlackButton>
+            </BaseButton>
         </button>
 
         <div
@@ -140,9 +140,9 @@ watch(
             v-if="canScrollRight"
             class="dark:from-gray-990/0 dark:to-gray-990 absolute top-0 right-0 bottom-0 z-10 flex h-full w-16 items-center justify-center bg-gradient-to-r from-gray-100/0 to-gray-100"
         >
-            <BlackButton v-if="canScrollRight" class="w-12" @click="scroll('right')">
+            <BaseButton variant="black" v-if="canScrollRight" class="w-12" @click="scroll('right')">
                 <ArrowRightRegular class="absolute h-4 fill-white dark:fill-gray-900" />
-            </BlackButton>
+            </BaseButton>
         </div>
     </div>
 </template>

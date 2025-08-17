@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
-import BlackLinkButtonSm from '@/components/public/Ui/Button/BlackLinkButtonSm.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import { SSRTechnologyExperience } from '@/types';
 import { computed } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
@@ -82,10 +82,10 @@ const projectsUrl = computed(() => {
                     <vue-markdown class="markdown-view" :source="experience.description" />
                 </div>
             </div>
-            <BlackLinkButtonSm :href="projectsUrl">
+            <BaseButton variant="black" size="sm" as="link" :href="projectsUrl">
                 <span>Voir les projets</span>
                 <ArrowUpRightRegular class="dark:fill-gray-990 h-4 fill-white" />
-            </BlackLinkButtonSm>
+            </BaseButton>
         </div>
     </div>
 </template>

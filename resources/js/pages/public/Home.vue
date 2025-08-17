@@ -6,7 +6,7 @@ import LightShape from '@/components/public/LightShape.vue';
 import ProjectCard from '@/components/public/ProjectCard.vue';
 import ProjectSlider from '@/components/public/ProjectSlider.vue';
 import TechnologyExperiencesContainer from '@/components/public/Technology/TechnologyExperiencesContainer.vue';
-import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import Cube from '@/components/shapes/cube.vue';
@@ -129,10 +129,10 @@ const pageImage = '/opengraph-image-1200-630.jpg';
                         <ProjectCard v-for="creation in laravelCreations" :key="creation.id" :creation="creation" />
                     </ProjectSlider>
                     <div class="w-fit">
-                        <BlackLinkButton :href="route('public.projects')">
+                        <BaseButton variant="black" as="link" :href="route('public.projects')">
                             <span>{{ t('home.laravel-section.view_other_projects') }}</span>
                             <ArrowUpRightRegular class="dark:fill-gray-990 h-4 fill-white" />
-                        </BlackLinkButton>
+                        </BaseButton>
                     </div>
                 </div>
             </section>

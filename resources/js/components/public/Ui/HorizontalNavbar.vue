@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ArrowLeftRegular from '@/components/font-awesome/ArrowLeftRegular.vue';
 import ArrowRightRegular from '@/components/font-awesome/ArrowRightRegular.vue';
-import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 interface NavItem {
@@ -193,13 +193,14 @@ onBeforeUnmount(() => {
         }"
     >
         <div class="relative container mx-auto px-4">
-            <BlackButton
+            <BaseButton
+                variant="black"
                 v-if="showArrows && showLeftArrow"
                 @click="scrollNavLeft"
                 class="absolute top-1/2 left-0 z-10 w-12 -translate-y-1/2 transition-all"
             >
                 <ArrowLeftRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
-            </BlackButton>
+            </BaseButton>
 
             <div ref="navScrollContainer" class="no-scrollbar flex space-x-8 overflow-x-auto">
                 <button
@@ -218,13 +219,14 @@ onBeforeUnmount(() => {
                 </button>
             </div>
 
-            <BlackButton
+            <BaseButton
+                variant="black"
                 v-if="showArrows && showRightArrow"
                 @click="scrollNavRight"
                 class="absolute top-1/2 right-0 z-10 w-12 -translate-y-1/2 transition-all"
             >
                 <ArrowRightRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
-            </BlackButton>
+            </BaseButton>
         </div>
     </div>
     <div v-if="isNavSticky && sticky" :style="{ height: `${navHeight}px` }"></div>

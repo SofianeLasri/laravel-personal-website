@@ -5,7 +5,7 @@ import NavBrand from '@/components/public/Navbar/NavBrand.vue';
 import NavMenuItem from '@/components/public/Navbar/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/Navbar/NavSearchBar.vue';
 import SearchModal from '@/components/public/SearchModal.vue';
-import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import ThemeToggle from '@/components/public/ThemeToggle.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { usePage } from '@inertiajs/vue3';
@@ -124,10 +124,10 @@ onUnmounted(() => {
         <NavBrand />
         <div class="flex flex-nowrap items-center justify-center gap-4">
             <NavSearchBar class="hidden md:flex" @click="openSearchModal" :placeholder="t('navigation.search_placeholder')" />
-            <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
+            <BaseButton variant="black" @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
                 <span class="xs:block hidden">{{ t('navigation.menu') }}</span>
                 <BarStaggeredRegular class="xs:relative dark:fill-gray-990 absolute size-4 fill-white" />
-            </BlackButton>
+            </BaseButton>
         </div>
     </div>
 
@@ -144,11 +144,12 @@ onUnmounted(() => {
             <div class="bg-background motion-preset-slide-left flex w-full max-w-lg flex-shrink-0 flex-col items-start border-l py-16 pr-8">
                 <div class="flex w-full flex-col gap-12">
                     <div class="flex items-center justify-end gap-4">
-                        <BlackButton class="md:hidden" @click="openSearchModal" :aria-label="t('navigation.open_search')">
+                        <BaseButton variant="black" class="md:hidden" @click="openSearchModal" :aria-label="t('navigation.open_search')">
                             <span>{{ t('navigation.search') }}</span>
                             <MagnifyingGlassRegular class="size-4 fill-white dark:fill-gray-100" />
-                        </BlackButton>
-                        <BlackButton
+                        </BaseButton>
+                        <BaseButton
+                            variant="black"
                             @click="closeMenu"
                             :aria-expanded="isMenuOpen"
                             aria-controls="fullscreen-menu"
@@ -156,7 +157,7 @@ onUnmounted(() => {
                         >
                             <span>{{ t('navigation.close') }}</span>
                             <BarStaggeredRegular class="size-4 fill-white dark:fill-gray-100" />
-                        </BlackButton>
+                        </BaseButton>
                     </div>
 
                     <div class="flex flex-col gap-8">

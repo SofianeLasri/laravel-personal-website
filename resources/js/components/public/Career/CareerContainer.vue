@@ -6,9 +6,7 @@ import LocationDotSolid from '@/components/font-awesome/LocationDotSolid.vue';
 import CareerActiveButton from '@/components/public/Career/CareerActiveButton.vue';
 import CareerInactiveButton from '@/components/public/Career/CareerInactiveButton.vue';
 import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
-import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
-import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
-import WhiteLinkButtonSm from '@/components/public/Ui/Button/WhiteLinkButtonSm.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import Cube from '@/components/shapes/cube.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRExperience, SSRTechnology } from '@/types';
@@ -111,23 +109,15 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
         <div
             class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex flex-col gap-2 rounded-2xl p-2 sm:flex-row"
         >
-            <BlackButton v-if="selectedType === 'formation'" class="rounded-lg">
-                <GraduationCapSolid class="h-4 fill-white dark:fill-gray-900" />
+            <BaseButton :variant="selectedType === 'formation' ? 'black' : 'white'" class="rounded-lg" @click="selectedType !== 'formation' ? changeType('formation') : null">
+                <GraduationCapSolid :class="selectedType === 'formation' ? 'h-4 fill-white dark:fill-gray-900' : 'h-4 fill-black dark:fill-gray-100'" />
                 <span>{{ t('career.education') }}</span>
-            </BlackButton>
-            <WhiteButton v-else class="rounded-lg" @click="changeType('formation')">
-                <GraduationCapSolid class="h-4 fill-black dark:fill-gray-100" />
-                <span>{{ t('career.education') }}</span>
-            </WhiteButton>
+            </BaseButton>
 
-            <BlackButton v-if="selectedType === 'emploi'" class="rounded-lg">
-                <BriefcaseSolid class="h-4 fill-white dark:fill-gray-900" />
+            <BaseButton :variant="selectedType === 'emploi' ? 'black' : 'white'" class="rounded-lg" @click="selectedType !== 'emploi' ? changeType('emploi') : null">
+                <BriefcaseSolid :class="selectedType === 'emploi' ? 'h-4 fill-white dark:fill-gray-900' : 'h-4 fill-black dark:fill-gray-100'" />
                 <span>{{ t('career.professional') }}</span>
-            </BlackButton>
-            <WhiteButton v-else class="rounded-lg" @click="changeType('emploi')">
-                <BriefcaseSolid class="h-4 fill-black dark:fill-gray-100" />
-                <span>{{ t('career.professional') }}</span>
-            </WhiteButton>
+            </BaseButton>
         </div>
 
         <div class="flex flex-col items-start justify-start gap-8 self-stretch lg:flex-row">
@@ -204,10 +194,10 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                         <span>{{ t('career.view_details') }}</span>
                                         <ArrowUpRightRegular class="h-3 fill-black dark:fill-gray-100" />
                                     </Link>
-                                    <WhiteLinkButtonSm v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
+                                    <BaseButton variant="white" size="sm" as="link" v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
                                         <span>{{ t('career.visit_website') }}</span>
                                         <ArrowUpRightRegular class="h-4 fill-black dark:fill-gray-100" />
-                                    </WhiteLinkButtonSm>
+                                    </BaseButton>
                                 </div>
                             </div>
                         </div>

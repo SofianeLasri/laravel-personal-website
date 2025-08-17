@@ -36,6 +36,12 @@ class ProjectsControllerTest extends TestCase
     {
         $technologies = Technology::factory()->count(3)->create();
 
+        // Create creations and attach technologies to them so they appear in the filter
+        $creations = \App\Models\Creation::factory()->count(2)->create();
+        foreach ($creations as $creation) {
+            $creation->technologies()->attach($technologies->pluck('id'));
+        }
+
         $this->partialMock(PublicControllersService::class, function (MockInterface $mock) {
             $mock->shouldReceive('formatTechnologyForSSR')->andReturnUsing(function ($technology) {
                 return [
@@ -45,6 +51,7 @@ class ProjectsControllerTest extends TestCase
                     'icon' => $technology->icon,
                 ];
             });
+            $mock->shouldReceive('getCreations')->andReturn(collect());
         });
 
         $response = $this->get(route('public.projects'));

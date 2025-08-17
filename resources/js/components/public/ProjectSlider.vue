@@ -118,11 +118,11 @@ watch(
     <div class="relative overflow-hidden py-3" ref="sliderContainer">
         <button
             v-if="canScrollLeft"
-            class="absolute top-0 bottom-0 left-0 z-10 flex h-full w-16 items-center justify-center bg-gradient-to-r from-gray-100 to-gray-100/0"
+            class="dark:from-gray-990 dark:to-gray-990/0 absolute top-0 bottom-0 left-0 z-10 flex h-full w-16 items-center justify-center bg-gradient-to-r from-gray-100 to-gray-100/0"
             aria-label="Défiler vers la gauche"
         >
             <BlackButton v-if="canScrollLeft" @click="scroll('left')" class="w-12">
-                <ArrowLeftRegular class="absolute h-4 fill-white" />
+                <ArrowLeftRegular class="absolute h-4 fill-white dark:fill-gray-900" />
             </BlackButton>
         </button>
 
@@ -138,10 +138,10 @@ watch(
 
         <div
             v-if="canScrollRight"
-            class="absolute top-0 right-0 bottom-0 z-10 flex h-full w-16 items-center justify-center bg-gradient-to-r from-gray-100/0 to-gray-100"
+            class="dark:from-gray-990/0 dark:to-gray-990 absolute top-0 right-0 bottom-0 z-10 flex h-full w-16 items-center justify-center bg-gradient-to-r from-gray-100/0 to-gray-100"
         >
             <BlackButton v-if="canScrollRight" class="w-12" @click="scroll('right')">
-                <ArrowRightRegular class="absolute h-4 fill-white" />
+                <ArrowRightRegular class="absolute h-4 fill-white dark:fill-gray-900" />
             </BlackButton>
         </div>
     </div>

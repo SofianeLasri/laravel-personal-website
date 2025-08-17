@@ -6,6 +6,7 @@ import NavMenuItem from '@/components/public/Navbar/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/Navbar/NavSearchBar.vue';
 import SearchModal from '@/components/public/SearchModal.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import ThemeToggle from '@/components/public/ThemeToggle.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -125,7 +126,7 @@ onUnmounted(() => {
             <NavSearchBar class="hidden md:flex" @click="openSearchModal" :placeholder="t('navigation.search_placeholder')" />
             <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
                 <span class="xs:block hidden">{{ t('navigation.menu') }}</span>
-                <BarStaggeredRegular class="xs:relative absolute size-4 fill-white" />
+                <BarStaggeredRegular class="xs:relative dark:fill-gray-990 absolute size-4 fill-white" />
             </BlackButton>
         </div>
     </div>
@@ -145,7 +146,7 @@ onUnmounted(() => {
                     <div class="flex items-center justify-end gap-4">
                         <BlackButton class="md:hidden" @click="openSearchModal" :aria-label="t('navigation.open_search')">
                             <span>{{ t('navigation.search') }}</span>
-                            <MagnifyingGlassRegular class="size-4 fill-white" />
+                            <MagnifyingGlassRegular class="size-4 fill-white dark:fill-gray-100" />
                         </BlackButton>
                         <BlackButton
                             @click="closeMenu"
@@ -154,7 +155,7 @@ onUnmounted(() => {
                             :aria-label="t('navigation.close_menu')"
                         >
                             <span>{{ t('navigation.close') }}</span>
-                            <BarStaggeredRegular class="size-4 fill-white" />
+                            <BarStaggeredRegular class="size-4 fill-white dark:fill-gray-100" />
                         </BlackButton>
                     </div>
 
@@ -178,6 +179,14 @@ onUnmounted(() => {
                                 @mouseleave="resetIndicator"
                             >
                                 <NavMenuItem :text="item.name" :active="isItemActive(index)" :to="item.path" />
+                            </div>
+                        </div>
+
+                        <!-- Theme Toggle Section -->
+                        <div class="mt-8 pl-12">
+                            <div class="flex items-center gap-4">
+                                <span class="text-lg text-gray-600 dark:text-gray-400">{{ t('navigation.theme') || 'Theme' }}</span>
+                                <ThemeToggle />
                             </div>
                         </div>
                     </div>

@@ -2,6 +2,9 @@
 
 @plugin "tailwindcss-motion";
 
+@custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
+
 @theme {
     --color-gray-990: rgb(19, 20, 21);
     --color-gray-975: rgb(39, 41, 43);
@@ -51,10 +54,11 @@
 
 @theme inline {
     --font-sans: 'Inter', sans-serif;
-    --color-border: var(--color-design-system-border);
-    --color-black: var(--color-gray-990);
-    --color-primary: var(--color-design-system-primary);
-    --color-background: var(--color-gray-100);
+    --color-border: var(--design-system-border);
+    --color-black: var(--gray-990);
+    --color-primary: var(--design-system-primary);
+    --color-background: var(--design-system-background);
+    --color-foreground: var(--design-system-foreground);
 }
 
 @layer base {
@@ -63,7 +67,7 @@
     }
 
     body {
-        @apply bg-background;
+        @apply bg-background text-foreground transition-colors duration-300;
     }
 }
 
@@ -78,10 +82,12 @@
 
 @utility action-container-outer-border {
     border: var(--design-system-border-width) solid var(--color-gray-200);
+    @apply dark:border-gray-700;
 }
 
 @utility action-container-outer-shadow {
     box-shadow: 0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.06);
+    @apply dark:shadow-[0_0.0625rem_0.125rem_0_rgba(0,0,0,0.3)];
 }
 
 @utility action-container-inner-shadow {
@@ -92,6 +98,84 @@
         0 1.75rem 1.25rem 0 rgba(0, 0, 0, 0.08),
         0 1rem 1rem 0 rgba(0, 0, 0, 0.13),
         0 0.625rem 0.75rem 0 rgba(0, 0, 0, 0.15);
+    @apply dark:[box-shadow:0_0_0_0.5rem_rgba(0,0,0,0.2),0_4rem_1.5rem_0_rgba(0,0,0,0),0_2.75rem_1.375rem_0_rgba(0,0,0,0.05),0_1.75rem_1.25rem_0_rgba(0,0,0,0.15),0_1rem_1rem_0_rgba(0,0,0,0.25),0_0.625rem_0.75rem_0_rgba(0,0,0,0.3)];
+}
+
+/* Light theme variables (default) */
+:root {
+    /* Grays for light theme */
+    --gray-0: rgb(255, 255, 255);
+    --gray-100: rgb(244, 245, 245);
+    --gray-200: rgb(223, 225, 226);
+    --gray-300: rgb(192, 194, 197);
+    --gray-400: rgb(169, 174, 177);
+    --gray-500: rgb(148, 153, 157);
+    --gray-600: rgb(121, 128, 134);
+    --gray-700: rgb(107, 113, 117);
+    --gray-800: rgb(87, 92, 96);
+    --gray-900: rgb(68, 72, 75);
+    --gray-950: rgb(49, 51, 54);
+    --gray-975: rgb(39, 41, 43);
+    --gray-990: rgb(19, 20, 21);
+    
+    /* Atomic tangerine for light theme */
+    --atomic-tangerine-50: rgb(254, 242, 236);
+    --atomic-tangerine-100: rgb(252, 216, 198);
+    --atomic-tangerine-200: rgb(250, 190, 158);
+    --atomic-tangerine-300: rgb(249, 177, 138);
+    --atomic-tangerine-400: rgb(247, 142, 87);
+    --atomic-tangerine-500: rgb(246, 124, 61);
+    --atomic-tangerine-600: rgb(244, 99, 22);
+    --atomic-tangerine-700: rgb(215, 82, 9);
+    --atomic-tangerine-800: rgb(175, 67, 8);
+    --atomic-tangerine-900: rgb(135, 52, 7);
+    --atomic-tangerine-950: rgb(117, 43, 5);
+    --atomic-tangerine-990: rgb(77, 29, 3);
+    
+    /* Design system colors for light theme */
+    --design-system-background: var(--gray-100);
+    --design-system-foreground: var(--gray-990);
+    --design-system-border: var(--gray-300);
+    --design-system-primary: var(--atomic-tangerine-400);
+    --design-system-title: var(--gray-990);
+    --design-system-paragraph: var(--gray-800);
+    
+    /* Action container colors for light theme */
+    --action-container-outer-color: rgba(244, 245, 245, 0.5);
+    --action-container-shadow-color: rgba(0, 0, 0, 0.2);
+    --action-container-border: var(--gray-200);
+    
+    /* SVG dot matrix background */
+    --dot-matrix-color: rgba(192, 194, 197, 0.3);
+}
+
+/* Dark theme variables */
+.dark {
+    /* Action container colors for dark theme */
+    --action-container-outer-color: rgba(31, 41, 55, 0.5); /* gray-800 with opacity */
+    --action-container-shadow-color: rgba(0, 0, 0, 0.5);
+    --action-container-border: var(--gray-700);
+}
+
+/* Ensure smooth transitions for theme changes */
+body,
+body * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, fill 0.3s ease;
+}
+
+/* Prevent transition on page load */
+.no-transition,
+.no-transition * {
+    transition: none !important;
+}
+
+/* Utility classes for design system text colors with dark mode support */
+@utility text-design-system-title {
+    @apply text-gray-990 dark:text-gray-100;
+}
+
+@utility text-design-system-paragraph {
+    @apply text-gray-800 dark:text-gray-200;
 }
 
 @utility markdown-view {

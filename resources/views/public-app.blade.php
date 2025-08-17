@@ -25,6 +25,24 @@
         @routes
         @vite(['resources/js/public-app.ts'])
         @inertiaHead
+        
+        <!-- Theme initialization script (prevent flash) -->
+        <script>
+            (function() {
+                // Add no-transition class to prevent transitions on load
+                document.documentElement.classList.add('no-transition');
+                
+                // Check for saved theme preference or use system preference
+                const savedTheme = localStorage.getItem('theme');
+                
+                if (savedTheme === 'light') {
+                    document.documentElement.classList.add('light');
+                } else if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+                // If no saved preference or 'system', let CSS media query handle it
+            })();
+        </script>
     </head>
     <body class="font-sans antialiased">
         @inertia

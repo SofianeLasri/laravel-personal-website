@@ -202,14 +202,16 @@ onUnmounted(() => {
                 <div
                     class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur mx-4 w-full max-w-4xl overflow-hidden rounded-3xl p-2"
                 >
-                    <div class="action-container-inner-shadow flex max-h-[80vh] flex-col overflow-hidden rounded-2xl border bg-white">
+                    <div
+                        class="action-container-inner-shadow flex max-h-[80vh] flex-col overflow-hidden rounded-2xl border bg-white dark:border-gray-700 dark:bg-gray-900"
+                    >
                         <!-- Header with search input -->
                         <div class="flex flex-col gap-4 border-b p-6">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-design-system-title text-2xl font-bold" id="searchModalTitle">{{ t('search.search') }}</h2>
                                 <button
                                     @click="closeModal"
-                                    class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
+                                    class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
                                     :aria-label="t('search.close_search')"
                                 >
                                     <X class="h-5 w-5" />
@@ -217,9 +219,9 @@ onUnmounted(() => {
                             </div>
 
                             <!-- Search input -->
-                            <div class="relative flex items-center gap-4 rounded-full bg-gray-100 pe-6">
+                            <div class="relative flex items-center gap-4 rounded-full bg-gray-100 pe-6 dark:bg-gray-800">
                                 <BlackButton class="w-12">
-                                    <MagnifyingGlassRegular class="absolute size-4 fill-white" />
+                                    <MagnifyingGlassRegular class="absolute size-4 fill-white dark:fill-gray-900" />
                                 </BlackButton>
                                 <input
                                     ref="searchInput"
@@ -236,7 +238,7 @@ onUnmounted(() => {
                             <div class="flex items-center justify-between">
                                 <button
                                     @click="showFilters = !showFilters"
-                                    class="text-design-system-paragraph flex items-center gap-2 text-sm font-medium transition-colors hover:text-gray-900"
+                                    class="text-design-system-paragraph flex items-center gap-2 text-sm font-medium transition-colors hover:text-gray-900 dark:hover:text-gray-100"
                                 >
                                     {{ showFilters ? t('search.hide_filters') : t('search.show_filters') }}
                                     <span class="transform transition-transform" :class="{ 'rotate-180': showFilters }"> ▼ </span>
@@ -249,7 +251,7 @@ onUnmounted(() => {
 
                         <!-- Filters section -->
                         <Transition name="slide-down">
-                            <div v-if="showFilters" class="max-h-80 overflow-y-auto border-b bg-gray-50 p-6">
+                            <div v-if="showFilters" class="max-h-80 overflow-y-auto border-b bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800">
                                 <div class="flex flex-col gap-6">
                                     <!-- Tags -->
                                     <div>
@@ -272,7 +274,7 @@ onUnmounted(() => {
                                                 :class="
                                                     selectedTags.includes(tag.id)
                                                         ? 'bg-primary border-primary text-white'
-                                                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+                                                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                                                 "
                                             >
                                                 {{ tag.name }}
@@ -305,7 +307,7 @@ onUnmounted(() => {
                                                 :class="
                                                     selectedTechnologies.includes(tech.id)
                                                         ? 'bg-primary border-primary text-white'
-                                                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+                                                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                                                 "
                                             >
                                                 <img
@@ -354,11 +356,11 @@ onUnmounted(() => {
                                         v-for="project in searchResults"
                                         :key="project.id"
                                         @click="goToProject(project.slug)"
-                                        class="group flex cursor-pointer items-start gap-4 rounded-lg border bg-white p-4 text-left transition-all hover:bg-gray-50 hover:shadow-md"
+                                        class="group dark:hover:bg-gray-750 flex cursor-pointer items-start gap-4 rounded-lg border bg-white p-4 text-left transition-all hover:bg-gray-50 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                                     >
                                         <!-- Project logo -->
                                         <div
-                                            class="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-gray-50"
+                                            class="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
                                         >
                                             <picture class="h-full w-full">
                                                 <source :srcset="project.logo.webp.small" type="image/webp" />

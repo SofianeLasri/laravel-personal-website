@@ -78,7 +78,7 @@ onMounted(() => {
                         {{ t('home.hero.download_cv') }}
                     </BlackLinkButton>
                     <LightLinkButton v-for="link in socialMediaLinks" :key="link.name" :href="link.url" :title="link.name" target="_blank">
-                        <SvgIcon :svg="link.icon_svg" class="absolute flex h-4 fill-black" />
+                        <SvgIcon :svg="link.icon_svg" class="absolute flex h-4 fill-black dark:fill-gray-100" />
                     </LightLinkButton>
                 </div>
                 <div class="flex flex-wrap items-center gap-4 self-stretch">
@@ -115,7 +115,9 @@ onMounted(() => {
                         </div>
                         <PlusRegular class="fill-design-system-title absolute top-0 left-0 size-4" />
                     </div>
-                    <LaravelCertification class="h-40" />
+                    <LaravelCertification
+                        class="h-40 transition-all duration-300 hover:scale-105 dark:drop-shadow-[0_0_25px_rgba(147,51,234,0.5)] dark:hover:drop-shadow-[0_0_45px_rgba(147,51,234,0.9)]"
+                    />
                 </div>
             </div>
             <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-0 right-4 md:top-16 md:right-auto md:left-[496px]" />

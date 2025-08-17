@@ -3,8 +3,8 @@ import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.v
 import BriefcaseSolid from '@/components/font-awesome/BriefcaseSolid.vue';
 import GraduationCapSolid from '@/components/font-awesome/GraduationCapSolid.vue';
 import LocationDotSolid from '@/components/font-awesome/LocationDotSolid.vue';
-import CareerBlackButton from '@/components/public/Career/CareerBlackButton.vue';
-import CareerWhiteButton from '@/components/public/Career/CareerWhiteButton.vue';
+import CareerActiveButton from '@/components/public/Career/CareerActiveButton.vue';
+import CareerInactiveButton from '@/components/public/Career/CareerInactiveButton.vue';
 import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
@@ -112,20 +112,20 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
             class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex flex-col gap-2 rounded-2xl p-2 sm:flex-row"
         >
             <BlackButton v-if="selectedType === 'formation'" class="rounded-lg">
-                <GraduationCapSolid class="h-4 fill-white" />
+                <GraduationCapSolid class="h-4 fill-white dark:fill-gray-900" />
                 <span>{{ t('career.education') }}</span>
             </BlackButton>
             <WhiteButton v-else class="rounded-lg" @click="changeType('formation')">
-                <GraduationCapSolid class="h-4 fill-black" />
+                <GraduationCapSolid class="h-4 fill-black dark:fill-gray-100" />
                 <span>{{ t('career.education') }}</span>
             </WhiteButton>
 
             <BlackButton v-if="selectedType === 'emploi'" class="rounded-lg">
-                <BriefcaseSolid class="h-4 fill-white" />
+                <BriefcaseSolid class="h-4 fill-white dark:fill-gray-900" />
                 <span>{{ t('career.professional') }}</span>
             </BlackButton>
             <WhiteButton v-else class="rounded-lg" @click="changeType('emploi')">
-                <BriefcaseSolid class="h-4 fill-black" />
+                <BriefcaseSolid class="h-4 fill-black dark:fill-gray-100" />
                 <span>{{ t('career.professional') }}</span>
             </WhiteButton>
         </div>
@@ -150,12 +150,12 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
 
                     <div class="flex flex-col items-start justify-start gap-3 self-stretch">
                         <template v-for="experience in yearGroup.experiences" :key="experience.id">
-                            <CareerBlackButton
+                            <CareerActiveButton
                                 v-if="selectedExperienceId === experience.id"
                                 :experience="experience"
                                 @click="selectExperience(experience.id)"
                             />
-                            <CareerWhiteButton v-else :experience="experience" @click="selectExperience(experience.id)" />
+                            <CareerInactiveButton v-else :experience="experience" @click="selectExperience(experience.id)" />
                         </template>
                     </div>
                 </div>
@@ -166,17 +166,19 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                 class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur inline-flex grow gap-2.5 self-stretch rounded-3xl p-2"
             >
                 <div
-                    class="outline-border action-container-inner-shadow inline-flex w-full flex-col items-start justify-start rounded-2xl bg-white outline-1"
+                    class="outline-border action-container-inner-shadow inline-flex w-full flex-col items-start justify-start rounded-2xl bg-white outline-1 dark:bg-gray-900"
                 >
                     <div class="relative inline-flex flex-col items-start justify-between self-stretch px-4 py-4 lg:flex-row lg:px-8 lg:py-6">
                         <div
-                            class="absolute top-1 right-1 -bottom-2 left-1 z-0 rounded-t-2xl bg-[url(/resources/images/public/shadowed-dots.svg)] bg-size-[.6rem]"
+                            class="absolute top-1 right-1 -bottom-2 left-1 z-0 rounded-t-2xl bg-[url(/resources/images/public/shadowed-dots.svg)] bg-size-[.6rem] dark:opacity-20"
                         >
-                            <div class="from-atomic-tangerine-50 h-[200%] w-full rounded-[50%] bg-radial to-white/0"></div>
+                            <div
+                                class="from-atomic-tangerine-50 dark:from-atomic-tangerine-500/50 h-[200%] w-full rounded-[50%] bg-radial to-white/0 dark:to-gray-900/0"
+                            ></div>
                         </div>
                         <div class="z-10 flex grow flex-col items-start justify-start gap-4 lg:flex-row lg:items-center">
                             <div
-                                class="outline-border flex size-16 items-center justify-center gap-2.5 rounded-xl bg-white p-3 outline-1 lg:size-24 lg:p-4"
+                                class="outline-border flex size-16 items-center justify-center gap-2.5 rounded-xl bg-white p-3 outline-1 lg:size-24 lg:p-4 dark:bg-gray-800"
                             >
                                 <picture class="flex h-full w-full items-center justify-center" v-if="selectedExperience.logo">
                                     <source :srcset="selectedExperience.logo.webp.thumbnail" type="image/webp" />
@@ -197,14 +199,14 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                     <Link
                                         v-if="selectedExperience.slug"
                                         :href="`/certifications-career/${selectedExperience.slug}`"
-                                        class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-black transition-colors hover:bg-gray-200"
+                                        class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-black transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                                     >
                                         <span>{{ t('career.view_details') }}</span>
-                                        <ArrowUpRightRegular class="h-3 fill-black" />
+                                        <ArrowUpRightRegular class="h-3 fill-black dark:fill-gray-100" />
                                     </Link>
                                     <WhiteLinkButtonSm v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
                                         <span>{{ t('career.visit_website') }}</span>
-                                        <ArrowUpRightRegular class="h-4 fill-black" />
+                                        <ArrowUpRightRegular class="h-4 fill-black dark:fill-gray-100" />
                                     </WhiteLinkButtonSm>
                                 </div>
                             </div>
@@ -214,7 +216,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                 {{ formatPeriod(selectedExperience.startedAtFormatted, selectedExperience.endedAtFormatted) }}
                             </div>
                             <div class="flex items-center justify-start gap-2">
-                                <LocationDotSolid class="size-4" />
+                                <LocationDotSolid class="size-4 fill-black dark:fill-gray-100" />
                                 <span class="text-design-system-title text-sm lg:text-base">{{ selectedExperience.location }}</span>
                             </div>
                         </div>
@@ -222,7 +224,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
 
                     <!-- Content -->
                     <div
-                        class="outline-border z-10 flex grow flex-col items-start justify-start gap-6 self-stretch rounded-2xl bg-white p-4 outline-1 lg:gap-8 lg:p-8"
+                        class="outline-border z-10 flex grow flex-col items-start justify-start gap-6 self-stretch rounded-2xl bg-white p-4 outline-1 lg:gap-8 lg:p-8 dark:bg-gray-900"
                     >
                         <div class="flex flex-col gap-3 self-stretch lg:gap-4">
                             <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">{{ t('career.description') }}</h3>
@@ -251,7 +253,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                 class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur inline-flex grow gap-2.5 self-stretch rounded-3xl p-2"
             >
                 <div
-                    class="outline-border action-container-inner-shadow flex w-full items-center justify-center rounded-2xl bg-white p-4 outline-1 lg:p-8"
+                    class="outline-border action-container-inner-shadow flex w-full items-center justify-center rounded-2xl bg-white p-4 outline-1 lg:p-8 dark:bg-gray-900"
                 >
                     <p class="text-design-system-paragraph text-center text-base lg:text-lg">
                         {{ t('career.select_experience') }}

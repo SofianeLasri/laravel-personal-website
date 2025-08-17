@@ -186,9 +186,9 @@ onBeforeUnmount(() => {
 <template>
     <div
         ref="navBarRef"
-        class="w-full border-b border-gray-200 transition-all duration-200"
+        class="w-full border-b border-gray-200 transition-all duration-200 dark:border-gray-800"
         :class="{
-            'fixed top-0 right-0 left-0 z-50 bg-gray-100 shadow-md': isNavSticky && sticky,
+            'fixed top-0 right-0 left-0 z-50 bg-gray-100 shadow-md dark:bg-gray-900': isNavSticky && sticky,
             'bg-transparent': !(isNavSticky && sticky),
         }"
     >
@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
                 @click="scrollNavLeft"
                 class="absolute top-1/2 left-0 z-10 w-12 -translate-y-1/2 transition-all"
             >
-                <ArrowLeftRegular class="absolute size-5 fill-white" />
+                <ArrowLeftRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
             </BlackButton>
 
             <div ref="navScrollContainer" class="no-scrollbar flex space-x-8 overflow-x-auto">
@@ -207,7 +207,11 @@ onBeforeUnmount(() => {
                     :key="item.id"
                     :data-item="item.id"
                     class="flex-shrink-0 cursor-pointer border-b-2 py-4 text-xl whitespace-nowrap transition-colors"
-                    :class="currentActiveItem === item.id ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-black'"
+                    :class="
+                        currentActiveItem === item.id
+                            ? 'border-black text-black dark:border-gray-100 dark:text-gray-100'
+                            : 'border-transparent text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-gray-100'
+                    "
                     @click="navigateToItem(item.id)"
                 >
                     {{ item.label }}
@@ -219,7 +223,7 @@ onBeforeUnmount(() => {
                 @click="scrollNavRight"
                 class="absolute top-1/2 right-0 z-10 w-12 -translate-y-1/2 transition-all"
             >
-                <ArrowRightRegular class="absolute size-5 fill-white" />
+                <ArrowRightRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
             </BlackButton>
         </div>
     </div>

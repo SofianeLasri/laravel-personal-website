@@ -106,3 +106,4 @@ com_crashlytics_export_strings.xml
 .phpunit.*
 /public/sitemap.xml
 /public/hot
+.vite/*

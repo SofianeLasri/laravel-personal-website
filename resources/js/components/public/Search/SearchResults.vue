@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRSimplifiedCreation } from '@/types';
 import { router } from '@inertiajs/vue3';
-import { ArrowRight } from 'lucide-vue-next';
 import { useRoute } from '@/composables/useRoute';
 
 defineProps<{
@@ -22,102 +22,98 @@ const handleProjectClick = (project: SSRSimplifiedCreation) => {
     emit('select', project);
     router.visit(route('public.projects.show', { slug: project.slug }));
 };
-
-const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' });
-};
 </script>
 
 <template>
-    <div class="flex flex-col gap-4">
-        <!-- Loading State -->
-        <div v-if="loading" class="flex items-center justify-center py-8">
-            <div class="border-t-atomic-tangerine-400 h-8 w-8 animate-spin rounded-full border-4 border-gray-300"></div>
+    <div>
+        <!-- Loading state -->
+        <div v-if="loading" class="flex items-center justify-center py-12">
+            <div class="text-design-system-paragraph">{{ t('search.searching') }}</div>
         </div>
 
-        <!-- No Results -->
-        <div v-else-if="hasQuery && results.length === 0" class="flex flex-col items-center justify-center py-8 text-gray-500">
-            <p class="text-lg">{{ t('search.no_results') }}</p>
-            <p class="text-sm">{{ t('search.try_different_keywords') }}</p>
+        <!-- No query state -->
+        <div v-else-if="!hasQuery" class="flex flex-col items-center justify-center py-12 text-center">
+            <MagnifyingGlassRegular class="mb-4 h-12 w-12 fill-gray-400" />
+            <h3 class="text-design-system-title mb-2 text-lg font-semibold">{{ t('search.start_search') }}</h3>
+            <p class="text-design-system-paragraph">{{ t('search.start_search_description') }}</p>
         </div>
 
-        <!-- Results List -->
-        <div v-else-if="results.length > 0" class="flex flex-col gap-2">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ t('search.found_results', { count: results.length }) }}
-            </p>
+        <!-- No results -->
+        <div v-else-if="results.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+            <div class="text-design-system-paragraph mb-2 text-lg font-semibold">{{ t('search.no_results') }}</div>
+            <p class="text-design-system-paragraph">{{ t('search.no_results_description') }}</p>
+        </div>
 
-            <div class="custom-scrollbar max-h-96 overflow-y-auto">
+        <!-- Results -->
+        <div v-else>
+            <div class="text-design-system-paragraph mb-4 text-sm">
+                {{ results.length }} {{ results.length > 1 ? t('search.results') : t('search.result') }}
+                {{ results.length > 1 ? t('search.found_plural') : t('search.found_singular') }}
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2">
                 <button
                     v-for="project in results"
                     :key="project.id"
                     @click="handleProjectClick(project)"
-                    class="group flex w-full items-start gap-4 rounded-lg p-4 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                    class="group dark:hover:bg-gray-750 flex cursor-pointer items-start gap-4 rounded-lg border bg-white p-4 text-left transition-all hover:bg-gray-50 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                 >
-                    <!-- Project Image -->
-                    <div v-if="project.mainPicture" class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
-                        <img :src="project.mainPicture.webp.thumbnail" :alt="project.title" class="h-full w-full object-cover" loading="lazy" />
+                    <!-- Project logo -->
+                    <div
+                        class="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+                    >
+                        <picture v-if="project.logo" class="h-full w-full">
+                            <source :srcset="project.logo.webp.small" type="image/webp" />
+                            <img
+                                :src="project.logo.avif.small"
+                                :alt="t('search.project_logo_alt', { name: project.name })"
+                                class="h-full w-full object-cover"
+                                loading="lazy"
+                            />
+                        </picture>
                     </div>
-                    <div v-else class="h-16 w-16 flex-shrink-0 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
 
-                    <!-- Project Info -->
-                    <div class="flex flex-1 flex-col gap-1">
-                        <h3 class="group-hover:text-atomic-tangerine-400 font-medium text-gray-900 dark:text-gray-100">
-                            {{ project.title }}
+                    <!-- Project info -->
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-design-system-title group-hover:text-primary mb-1 font-semibold">
+                            {{ project.name }}
                         </h3>
-                        <p v-if="project.shortDescription" class="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                        <p class="text-design-system-paragraph mb-2 text-sm">{{ project.type }}</p>
+                        <p class="text-design-system-paragraph line-clamp-2 text-sm">
                             {{ project.shortDescription }}
                         </p>
-                        <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-500">
-                            <span v-if="project.createdAt">{{ formatDate(project.createdAt) }}</span>
-                            <span v-if="project.tags && project.tags.length > 0" class="flex gap-1">
-                                <span v-for="(tag, index) in project.tags.slice(0, 3)" :key="tag.id">
-                                    {{ tag.name }}<span v-if="index < Math.min(2, project.tags.length - 1)">,</span>
-                                </span>
-                                <span v-if="project.tags.length > 3">+{{ project.tags.length - 3 }}</span>
+
+                        <!-- Technologies -->
+                        <div v-if="project.technologies && project.technologies.length > 0" class="mt-3 flex flex-wrap gap-1">
+                            <span
+                                v-for="tech in project.technologies.slice(0, 3)"
+                                :key="tech.id"
+                                class="inline-flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
+                            >
+                                <img
+                                    v-if="tech.iconPicture"
+                                    :src="tech.iconPicture.webp.thumbnail"
+                                    :alt="`${tech.name} icon`"
+                                    class="h-3 w-3 object-contain"
+                                    loading="lazy"
+                                />
+                                {{ tech.name }}
+                            </span>
+                            <span
+                                v-if="project.technologies.length > 3"
+                                class="inline-flex items-center rounded bg-gray-100 px-2 py-1 text-xs dark:bg-gray-700"
+                            >
+                                +{{ project.technologies.length - 3 }}
                             </span>
                         </div>
                     </div>
-
-                    <!-- Arrow Icon -->
-                    <ArrowRight
-                        class="group-hover:text-atomic-tangerine-400 h-5 w-5 flex-shrink-0 text-gray-400 transition-transform group-hover:translate-x-1"
-                    />
                 </button>
             </div>
-        </div>
-
-        <!-- Empty State (no search performed yet) -->
-        <div v-else class="flex flex-col items-center justify-center py-8 text-gray-500">
-            <p class="text-sm">{{ t('search.start_typing') }}</p>
         </div>
     </div>
 </template>
 
 <style scoped>
-.custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(156, 163, 175, 0.5);
-    border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(156, 163, 175, 0.7);
-}
-
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;

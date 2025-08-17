@@ -15,7 +15,7 @@ const { t } = useTranslation();
 <template>
     <div class="relative flex flex-col overflow-hidden bg-black dark:bg-gray-900">
         <div
-            class="border-border flex w-full flex-col items-center justify-start gap-2.5 rounded-br-2xl rounded-bl-2xl border-t bg-gray-100 py-8 md:py-16 dark:border-gray-800 dark:bg-gray-100"
+            class="border-border flex w-full flex-col items-center justify-start gap-2.5 rounded-br-2xl rounded-bl-2xl border-t bg-gray-100 py-8 md:py-16 dark:border-gray-800 dark:bg-gray-950"
         >
             <div class="container space-y-8 px-4 md:space-y-0">
                 <!-- Section principale du footer -->

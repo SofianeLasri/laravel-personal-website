@@ -158,21 +158,30 @@ body * {
     transition: none !important;
 }
 
+/* Utility classes for design system text colors with dark mode support */
+@utility text-design-system-title {
+    @apply text-gray-990 dark:text-gray-100;
+}
+
+@utility text-design-system-paragraph {
+    @apply text-gray-800 dark:text-gray-200;
+}
+
 @utility markdown-view {
-    @apply text-design-system-paragraph dark:text-gray-200;
+    @apply text-design-system-paragraph;
 
     /* Markdown view shouldn't have h1 title !*/
     h1,
     h2 {
-        @apply text-design-system-title dark:text-gray-100 mb-8 text-2xl font-bold;
+        @apply text-design-system-title mb-8 text-2xl font-bold;
     }
 
     h3 {
-        @apply text-design-system-paragraph dark:text-gray-200 mb-6 text-xl font-bold;
+        @apply text-design-system-paragraph mb-6 text-xl font-bold;
     }
 
     h4 {
-        @apply text-design-system-paragraph dark:text-gray-200 mb-3 text-lg font-bold;
+        @apply text-design-system-paragraph mb-3 text-lg font-bold;
     }
 
     h1:not(:first-child),

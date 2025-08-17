@@ -25,8 +25,8 @@ defineProps<{
                 class="size-32 object-contain"
                 loading="eager"
             />
-            <div v-else class="flex size-32 items-center justify-center rounded-lg bg-gray-200">
-                <span class="text-sm text-gray-500">{{ t('career.certifications') }}</span>
+            <div v-else class="flex size-32 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700">
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ t('career.certifications') }}</span>
             </div>
         </div>
 

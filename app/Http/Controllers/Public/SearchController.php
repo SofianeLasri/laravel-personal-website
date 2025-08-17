@@ -25,9 +25,11 @@ class SearchController extends Controller
         $data = Cache::remember('search.filters', 3600, function () {
             return [
                 'tags' => Tag::select('id', 'name', 'slug')
+                    ->whereHas('creations')
                     ->orderBy('name')
                     ->get(),
-                'technologies' => Technology::orderBy('name')
+                'technologies' => Technology::whereHas('creations')
+                    ->orderBy('name')
                     ->get()
                     ->map(function (Technology $tech) {
                         return $this->publicControllersService->formatTechnologyForSSR($tech);

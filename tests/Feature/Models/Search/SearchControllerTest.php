@@ -18,7 +18,7 @@ class SearchControllerTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function test_filters_endpoint_returns_tags_and_technologies()
+    public function test_filters_endpoint_returns_only_used_tags_and_technologies()
     {
         $this->mock(PublicControllersService::class, function ($mock) {
             $mock->shouldReceive('formatTechnologyForSSR')
@@ -32,8 +32,20 @@ class SearchControllerTest extends TestCase
                 ]);
         });
 
-        Tag::factory()->count(3)->create();
-        Technology::factory()->count(2)->create();
+        // Create tags and technologies not used in any creation
+        $unusedTags = Tag::factory()->count(2)->create();
+        $unusedTechnologies = Technology::factory()->count(2)->create();
+
+        // Create tags and technologies used in creations
+        $usedTags = Tag::factory()->count(3)->create();
+        $usedTechnologies = Technology::factory()->count(2)->create();
+
+        // Create creations and attach the used tags and technologies
+        $creations = Creation::factory()->count(2)->create();
+        foreach ($creations as $creation) {
+            $creation->tags()->attach($usedTags->pluck('id'));
+            $creation->technologies()->attach($usedTechnologies->pluck('id'));
+        }
 
         $response = $this->get(route('public.search.filters'));
 
@@ -48,8 +60,14 @@ class SearchControllerTest extends TestCase
         ]);
 
         $data = $response->json();
+        // Should only return the tags and technologies that are used in creations
         $this->assertCount(3, $data['tags']);
         $this->assertCount(2, $data['technologies']);
+
+        // Verify that the returned tags are the used ones
+        $returnedTagIds = collect($data['tags'])->pluck('id')->sort()->values();
+        $expectedTagIds = $usedTags->pluck('id')->sort()->values();
+        $this->assertEquals($expectedTagIds->toArray(), $returnedTagIds->toArray());
     }
 
     #[Test]

@@ -25,6 +25,7 @@ class ErrorController extends PublicController
                 'errors' => __('errors'),
                 'navigation' => __('navigation'),
                 'footer' => __('footer'),
+                'search' => __('search'),
             ],
             'socialMediaLinks' => $socialMediaLinks,
 

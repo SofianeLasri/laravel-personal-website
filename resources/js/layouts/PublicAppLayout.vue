@@ -14,7 +14,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <div class="dots-background relative flex min-h-screen flex-col items-center">
+    <div class="dots-background dark:bg-gray-990 relative flex min-h-screen flex-col items-center">
         <Navbar />
         <slot />
         <LanguagePopup />

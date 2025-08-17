@@ -45,17 +45,17 @@ const projectsUrl = computed(() => {
 
 <template>
     <div
-        class="motion-translate-x-in-[0%] motion-translate-y-in-[5%] motion-blur-in-[.5rem] motion-duration-[0.16s]/blur flex flex-col items-center justify-start rounded-2xl bg-black shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] xl:aspect-video"
+        class="motion-translate-x-in-[0%] motion-translate-y-in-[5%] motion-blur-in-[.5rem] motion-duration-[0.16s]/blur flex flex-col items-center justify-start rounded-2xl bg-black shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] xl:aspect-video dark:bg-gray-100 dark:shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.5)]"
     >
         <div class="flex shrink-0 items-center justify-end gap-2.5 self-stretch px-4 py-1">
-            <div class="justify-center text-sm text-white">
+            <div class="dark:text-gray-990 justify-center text-sm text-white">
                 {{ experience.typeLabel }}
             </div>
         </div>
-        <div class="flex grow flex-col items-start justify-between gap-4 self-stretch rounded-2xl bg-white px-4 py-6">
+        <div class="flex grow flex-col items-start justify-between gap-4 self-stretch rounded-2xl bg-white px-4 py-6 dark:bg-gray-950">
             <div class="flex flex-col items-start justify-start gap-4">
                 <div class="flex items-center justify-start gap-4">
-                    <div class="outline-border flex size-12 items-center justify-center gap-2.5 rounded-lg outline-1">
+                    <div class="outline-border flex size-12 items-center justify-center gap-2.5 rounded-lg outline-1 dark:bg-gray-900">
                         <div class="flex size-7 items-center justify-center">
                             <img
                                 v-if="experience.iconPicture"
@@ -80,7 +80,7 @@ const projectsUrl = computed(() => {
             </div>
             <BlackLinkButtonSm :href="projectsUrl">
                 <span>Voir les projets</span>
-                <ArrowUpRightRegular class="h-4 fill-white" />
+                <ArrowUpRightRegular class="dark:fill-gray-990 h-4 fill-white" />
             </BlackLinkButtonSm>
         </div>
     </div>

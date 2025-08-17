@@ -9,7 +9,7 @@ defineProps<{
 </script>
 
 <template>
-    <div class="flex items-center justify-center gap-2 rounded-lg p-2 outline-1 outline-gray-200">
+    <div class="flex items-center justify-center gap-2 rounded-lg p-2 outline-1 outline-gray-200 dark:outline-gray-700">
         <div class="flex size-10 items-center justify-center lg:size-16" v-if="iconPicture">
             <img :src="iconPicture.webp.small" :alt="`${name} icon`" class="h-full w-full object-contain" loading="lazy" />
         </div>

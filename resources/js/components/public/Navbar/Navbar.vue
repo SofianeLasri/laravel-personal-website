@@ -126,7 +126,7 @@ onUnmounted(() => {
             <NavSearchBar class="hidden md:flex" @click="openSearchModal" :placeholder="t('navigation.search_placeholder')" />
             <BlackButton @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
                 <span class="xs:block hidden">{{ t('navigation.menu') }}</span>
-                <BarStaggeredRegular class="xs:relative absolute size-4 fill-white dark:fill-gray-100" />
+                <BarStaggeredRegular class="xs:relative dark:fill-gray-990 absolute size-4 fill-white" />
             </BlackButton>
         </div>
     </div>

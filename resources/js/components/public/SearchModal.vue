@@ -221,7 +221,7 @@ onUnmounted(() => {
                             <!-- Search input -->
                             <div class="relative flex items-center gap-4 rounded-full bg-gray-100 pe-6 dark:bg-gray-800">
                                 <BlackButton class="w-12">
-                                    <MagnifyingGlassRegular class="absolute size-4 fill-white" />
+                                    <MagnifyingGlassRegular class="absolute size-4 fill-white dark:fill-gray-900" />
                                 </BlackButton>
                                 <input
                                     ref="searchInput"

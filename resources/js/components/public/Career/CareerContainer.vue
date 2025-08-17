@@ -3,8 +3,8 @@ import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.v
 import BriefcaseSolid from '@/components/font-awesome/BriefcaseSolid.vue';
 import GraduationCapSolid from '@/components/font-awesome/GraduationCapSolid.vue';
 import LocationDotSolid from '@/components/font-awesome/LocationDotSolid.vue';
-import CareerBlackButton from '@/components/public/Career/CareerBlackButton.vue';
-import CareerWhiteButton from '@/components/public/Career/CareerWhiteButton.vue';
+import CareerActiveButton from '@/components/public/Career/CareerActiveButton.vue';
+import CareerInactiveButton from '@/components/public/Career/CareerInactiveButton.vue';
 import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
 import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
@@ -112,20 +112,20 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
             class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex flex-col gap-2 rounded-2xl p-2 sm:flex-row"
         >
             <BlackButton v-if="selectedType === 'formation'" class="rounded-lg">
-                <GraduationCapSolid class="h-4 fill-white" />
+                <GraduationCapSolid class="h-4 fill-white dark:fill-gray-900" />
                 <span>{{ t('career.education') }}</span>
             </BlackButton>
             <WhiteButton v-else class="rounded-lg" @click="changeType('formation')">
-                <GraduationCapSolid class="h-4 fill-black dark:fill-gray-900" />
+                <GraduationCapSolid class="h-4 fill-black dark:fill-gray-100" />
                 <span>{{ t('career.education') }}</span>
             </WhiteButton>
 
             <BlackButton v-if="selectedType === 'emploi'" class="rounded-lg">
-                <BriefcaseSolid class="h-4 fill-white" />
+                <BriefcaseSolid class="h-4 fill-white dark:fill-gray-900" />
                 <span>{{ t('career.professional') }}</span>
             </BlackButton>
             <WhiteButton v-else class="rounded-lg" @click="changeType('emploi')">
-                <BriefcaseSolid class="h-4 fill-black dark:fill-gray-900" />
+                <BriefcaseSolid class="h-4 fill-black dark:fill-gray-100" />
                 <span>{{ t('career.professional') }}</span>
             </WhiteButton>
         </div>
@@ -150,12 +150,12 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
 
                     <div class="flex flex-col items-start justify-start gap-3 self-stretch">
                         <template v-for="experience in yearGroup.experiences" :key="experience.id">
-                            <CareerBlackButton
+                            <CareerActiveButton
                                 v-if="selectedExperienceId === experience.id"
                                 :experience="experience"
                                 @click="selectExperience(experience.id)"
                             />
-                            <CareerWhiteButton v-else :experience="experience" @click="selectExperience(experience.id)" />
+                            <CareerInactiveButton v-else :experience="experience" @click="selectExperience(experience.id)" />
                         </template>
                     </div>
                 </div>
@@ -206,7 +206,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                     </Link>
                                     <WhiteLinkButtonSm v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
                                         <span>{{ t('career.visit_website') }}</span>
-                                        <ArrowUpRightRegular class="h-4 fill-black dark:fill-gray-900" />
+                                        <ArrowUpRightRegular class="h-4 fill-black dark:fill-gray-100" />
                                     </WhiteLinkButtonSm>
                                 </div>
                             </div>
@@ -216,7 +216,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                 {{ formatPeriod(selectedExperience.startedAtFormatted, selectedExperience.endedAtFormatted) }}
                             </div>
                             <div class="flex items-center justify-start gap-2">
-                                <LocationDotSolid class="size-4" />
+                                <LocationDotSolid class="size-4 fill-black dark:fill-gray-100" />
                                 <span class="text-design-system-title text-sm lg:text-base">{{ selectedExperience.location }}</span>
                             </div>
                         </div>

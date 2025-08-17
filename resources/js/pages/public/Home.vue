@@ -131,7 +131,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
                     <div class="w-fit">
                         <BlackLinkButton :href="route('public.projects')">
                             <span>{{ t('home.laravel-section.view_other_projects') }}</span>
-                            <ArrowUpRightRegular class="h-4 fill-white" />
+                            <ArrowUpRightRegular class="dark:fill-gray-990 h-4 fill-white" />
                         </BlackLinkButton>
                     </div>
                 </div>

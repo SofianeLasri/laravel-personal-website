@@ -82,10 +82,12 @@
 
 @utility action-container-outer-border {
     border: var(--design-system-border-width) solid var(--color-gray-200);
+    @apply dark:border-gray-700;
 }
 
 @utility action-container-outer-shadow {
     box-shadow: 0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.06);
+    @apply dark:shadow-[0_0.0625rem_0.125rem_0_rgba(0,0,0,0.3)];
 }
 
 @utility action-container-inner-shadow {
@@ -96,6 +98,7 @@
         0 1.75rem 1.25rem 0 rgba(0, 0, 0, 0.08),
         0 1rem 1rem 0 rgba(0, 0, 0, 0.13),
         0 0.625rem 0.75rem 0 rgba(0, 0, 0, 0.15);
+    @apply dark:[box-shadow:0_0_0_0.5rem_rgba(0,0,0,0.2),0_4rem_1.5rem_0_rgba(0,0,0,0),0_2.75rem_1.375rem_0_rgba(0,0,0,0.05),0_1.75rem_1.25rem_0_rgba(0,0,0,0.15),0_1rem_1rem_0_rgba(0,0,0,0.25),0_0.625rem_0.75rem_0_rgba(0,0,0,0.3)];
 }
 
 /* Light theme variables (default) */
@@ -144,6 +147,14 @@
     
     /* SVG dot matrix background */
     --dot-matrix-color: rgba(192, 194, 197, 0.3);
+}
+
+/* Dark theme variables */
+.dark {
+    /* Action container colors for dark theme */
+    --action-container-outer-color: rgba(31, 41, 55, 0.5); /* gray-800 with opacity */
+    --action-container-shadow-color: rgba(0, 0, 0, 0.5);
+    --action-container-border: var(--gray-700);
 }
 
 /* Ensure smooth transitions for theme changes */

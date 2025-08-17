@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import ActiveButton from '@/components/public/Ui/Button/ActiveButton.vue';
-import WhiteButton from '@/components/public/Ui/Button/WhiteButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRTechnology } from '@/types';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -107,7 +106,12 @@ const toggleFilter = (techId: number) => {
         >
             <div class="custom-scrollbar flex flex-col items-start gap-2 overflow-y-auto bg-white p-2 dark:bg-gray-950">
                 <template v-for="tech in sortedTechnologies" :key="tech.id">
-                    <ActiveButton v-if="selectedFilters.has(tech.id)" class="w-full rounded-lg !px-3 py-2" @click="toggleFilter(tech.id)">
+                    <BaseButton
+                        v-if="selectedFilters.has(tech.id)"
+                        variant="active"
+                        class="w-full rounded-lg !px-3 py-2"
+                        @click="toggleFilter(tech.id)"
+                    >
                         <div class="flex grow items-center gap-2">
                             <div
                                 class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2 dark:border-gray-700 dark:bg-gray-900"
@@ -122,9 +126,9 @@ const toggleFilter = (techId: number) => {
                             <div>{{ tech.name }}</div>
                         </div>
                         <div class="text-design-system-paragraph shrink-0">{{ tech.creationCount }}</div>
-                    </ActiveButton>
+                    </BaseButton>
 
-                    <WhiteButton v-else class="w-full rounded-lg border-none !px-3 py-2" @click="toggleFilter(tech.id)">
+                    <BaseButton v-else variant="white" class="w-full rounded-lg border-none !px-3 py-2" @click="toggleFilter(tech.id)">
                         <div class="flex grow items-center gap-2">
                             <div
                                 class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2 dark:border-gray-700 dark:bg-gray-900"
@@ -139,7 +143,7 @@ const toggleFilter = (techId: number) => {
                             <div>{{ tech.name }}</div>
                         </div>
                         <div class="text-design-system-paragraph shrink-0">{{ tech.creationCount }}</div>
-                    </WhiteButton>
+                    </BaseButton>
                 </template>
 
                 <div v-if="sortedTechnologies.length === 0" class="w-full px-3 py-2 text-center text-gray-500 dark:text-gray-400">

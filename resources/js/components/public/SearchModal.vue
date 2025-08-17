@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
-import BlackButton from '@/components/public/Ui/Button/BlackButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRSimplifiedCreation, SSRTechnology, Tag } from '@/types';
 import { router } from '@inertiajs/vue3';
@@ -220,9 +220,9 @@ onUnmounted(() => {
 
                             <!-- Search input -->
                             <div class="relative flex items-center gap-4 rounded-full bg-gray-100 pe-6 dark:bg-gray-800">
-                                <BlackButton class="w-12">
+                                <BaseButton variant="black" class="w-12">
                                     <MagnifyingGlassRegular class="absolute size-4 fill-white dark:fill-gray-900" />
-                                </BlackButton>
+                                </BaseButton>
                                 <input
                                     ref="searchInput"
                                     type="text"

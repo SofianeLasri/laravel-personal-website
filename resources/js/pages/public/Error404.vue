@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import BlackLinkButton from '@/components/public/Ui/Button/BlackLinkButton.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import WhiteLinkButton from '@/components/public/Ui/Button/WhiteLinkButton.vue';
 
 const { t } = useTranslation();
 
@@ -48,13 +47,13 @@ const pageTitle = t('errors.404.page_name');
                     </p>
 
                     <div class="flex flex-col gap-4 sm:flex-row">
-                        <BlackLinkButton href="/">
+                        <BaseButton variant="black" as="link" href="/">
                             {{ t('errors.404.home_page_link') }}
-                        </BlackLinkButton>
+                        </BaseButton>
 
-                        <WhiteLinkButton href="https://old.sl-projects.com" target="_blank" rel="noopener noreferrer">
+                        <BaseButton variant="white" as="link" href="https://old.sl-projects.com" target="_blank" rel="noopener noreferrer">
                             {{ t('errors.404.old_website_link') }}
-                        </WhiteLinkButton>
+                        </BaseButton>
                     </div>
                 </div>
             </div>

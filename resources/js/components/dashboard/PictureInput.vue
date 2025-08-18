@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
+import { useRoute } from '@/composables/useRoute';
 import { Picture } from '@/types';
 import { useVModel } from '@vueuse/core';
 import axios from 'axios';
 import { Image } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
-import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     modelValue?: number;

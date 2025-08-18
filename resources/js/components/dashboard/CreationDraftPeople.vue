@@ -15,12 +15,12 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useRoute } from '@/composables/useRoute';
 import { Person } from '@/types';
 import axios from 'axios';
 import { Link, Loader2, Pencil, Plus, Search, Trash2, User, UserMinus, UserPlus } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
-import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     creationDraftId: number | null;

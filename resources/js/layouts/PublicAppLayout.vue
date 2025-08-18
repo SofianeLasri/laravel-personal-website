@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import LanguagePopup from '@/components/public/LanguagePopup.vue';
 import Navbar from '@/components/public/Navbar/Navbar.vue';
 import Footer from '@/components/public/Ui/Footer.vue';
-import LanguagePopup from '@/components/public/LanguagePopup.vue';
 import { SocialMediaLink } from '@/types';
 
 interface Props {

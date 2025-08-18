@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import SearchInput from '@/components/public/Search/SearchInput.vue';
 import SearchFilters from '@/components/public/Search/SearchFilters.vue';
+import SearchInput from '@/components/public/Search/SearchInput.vue';
 import SearchResults from '@/components/public/Search/SearchResults.vue';
 import { useSearch } from '@/composables/useSearch';
 import { useTranslation } from '@/composables/useTranslation';

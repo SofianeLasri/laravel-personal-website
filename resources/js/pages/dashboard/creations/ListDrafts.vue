@@ -21,6 +21,7 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, CreationDraftWithTranslations, TranslationKey } from '@/types';
 import { getTypeLabel } from '@/utils/creationTypes';
@@ -31,7 +32,6 @@ import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Clock, Edit, Eye, MoreHorizontal, Send, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
-import { useRoute } from '@/composables/useRoute';
 
 interface Props {
     creationDrafts: CreationDraftWithTranslations[];

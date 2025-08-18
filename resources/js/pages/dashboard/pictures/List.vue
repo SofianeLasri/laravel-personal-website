@@ -27,6 +27,7 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
@@ -34,7 +35,6 @@ import axios from 'axios';
 import { ArrowUpDown, Download, Eye, Image as ImageIcon, Loader2, MoreHorizontal, Search, Trash2 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
-import { useRoute } from '@/composables/useRoute';
 
 // Types
 interface OptimizedPicture {

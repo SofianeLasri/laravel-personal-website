@@ -17,12 +17,12 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useRoute } from '@/composables/useRoute';
 import { Technology } from '@/types';
 import axios from 'axios';
 import { Code, Loader2, Minus, Pencil, Plus, Search, Trash2 } from 'lucide-vue-next';
 import { computed, onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
-import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     creationDraftId: number | null;

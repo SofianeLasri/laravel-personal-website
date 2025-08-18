@@ -1,5 +1,5 @@
-import { route } from 'ziggy-js';
 import { inject } from 'vue';
+import { route } from 'ziggy-js';
 
 type Router = typeof route;
 

@@ -117,7 +117,7 @@
     --gray-950: rgb(49, 51, 54);
     --gray-975: rgb(39, 41, 43);
     --gray-990: rgb(19, 20, 21);
-    
+
     /* Atomic tangerine for light theme */
     --atomic-tangerine-50: rgb(254, 242, 236);
     --atomic-tangerine-100: rgb(252, 216, 198);
@@ -131,7 +131,7 @@
     --atomic-tangerine-900: rgb(135, 52, 7);
     --atomic-tangerine-950: rgb(117, 43, 5);
     --atomic-tangerine-990: rgb(77, 29, 3);
-    
+
     /* Design system colors for light theme */
     --design-system-background: var(--gray-100);
     --design-system-foreground: var(--gray-990);
@@ -139,12 +139,12 @@
     --design-system-primary: var(--atomic-tangerine-400);
     --design-system-title: var(--gray-990);
     --design-system-paragraph: var(--gray-800);
-    
+
     /* Action container colors for light theme */
     --action-container-outer-color: rgba(244, 245, 245, 0.5);
     --action-container-shadow-color: rgba(0, 0, 0, 0.2);
     --action-container-border: var(--gray-200);
-    
+
     /* SVG dot matrix background */
     --dot-matrix-color: rgba(192, 194, 197, 0.3);
 }
@@ -160,7 +160,12 @@
 /* Ensure smooth transitions for theme changes */
 body,
 body * {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, fill 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        fill 0.3s ease;
 }
 
 /* Prevent transition on page load */

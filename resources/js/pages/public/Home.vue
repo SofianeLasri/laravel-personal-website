@@ -11,11 +11,11 @@ import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import Cube from '@/components/shapes/cube.vue';
 import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
+import { useRoute } from '@/composables/useRoute';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRExperience, SSRSimplifiedCreation, SSRTechnologyExperience } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
-import { useRoute } from '@/composables/useRoute';
 
 const page = usePage();
 const route = useRoute();

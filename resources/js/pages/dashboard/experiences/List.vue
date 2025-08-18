@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
@@ -21,7 +22,6 @@ import { fr } from 'date-fns/locale';
 import { Briefcase, Edit, ExternalLink, GraduationCap, Plus, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
-import { useRoute } from '@/composables/useRoute';
 
 // Types pour notre page
 interface Experience {

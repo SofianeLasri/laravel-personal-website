@@ -1,5 +1,5 @@
-import { SSRSimplifiedCreation, SSRTechnology, Tag } from '@/types';
 import { useRoute } from '@/composables/useRoute';
+import { SSRSimplifiedCreation, SSRTechnology, Tag } from '@/types';
 import axios from 'axios';
 import debounce from 'lodash.debounce';
 import { computed, ref, watch } from 'vue';

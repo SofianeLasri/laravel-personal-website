@@ -3,6 +3,7 @@ import NavFooter from '@/components/dashboard/NavFooter.vue';
 import NavMain from '@/components/dashboard/NavMain.vue';
 import NavUser from '@/components/dashboard/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { useRoute } from '@/composables/useRoute';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import {
@@ -20,7 +21,6 @@ import {
     Logs,
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
-import { useRoute } from '@/composables/useRoute';
 
 const route = useRoute();
 

@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useRoute } from '@/composables/useRoute';
 import { Screenshot } from '@/types';
 import axios from 'axios';
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
-import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     creationDraftId: number | null;

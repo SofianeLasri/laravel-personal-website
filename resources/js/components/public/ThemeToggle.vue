@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
 import { Monitor, Moon, Sun } from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue';
 
 type Theme = 'light' | 'dark' | 'system';
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import TextLink from '@/components/dashboard/TextLink.vue';
 import { Button } from '@/components/ui/button';
+import { useRoute } from '@/composables/useRoute';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
-import { useRoute } from '@/composables/useRoute';
 
 defineProps<{
     status?: string;

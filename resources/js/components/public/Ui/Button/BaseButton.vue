@@ -67,19 +67,19 @@ const buttonClasses = computed(() => {
     const variant = variantClasses[props.variant];
     const size = sizeClasses[props.size];
     const base = 'flex flex-shrink-0 items-center justify-center rounded-full';
-    
+
     const classes = [base, variant.base, size];
-    
+
     if (!isDisabled.value) {
         classes.push('cursor-pointer', variant.hover);
     } else if (props.as === 'link') {
         classes.push('cursor-not-allowed opacity-70');
     }
-    
+
     if (props.as === 'link') {
         classes.push('no-underline focus:border-none');
     }
-    
+
     return classes;
 });
 

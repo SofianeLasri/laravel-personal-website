@@ -109,12 +109,22 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
         <div
             class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex flex-col gap-2 rounded-2xl p-2 sm:flex-row"
         >
-            <BaseButton :variant="selectedType === 'formation' ? 'black' : 'white'" class="rounded-lg" @click="selectedType !== 'formation' ? changeType('formation') : null">
-                <GraduationCapSolid :class="selectedType === 'formation' ? 'h-4 fill-white dark:fill-gray-900' : 'h-4 fill-black dark:fill-gray-100'" />
+            <BaseButton
+                :variant="selectedType === 'formation' ? 'black' : 'white'"
+                class="rounded-lg"
+                @click="selectedType !== 'formation' ? changeType('formation') : null"
+            >
+                <GraduationCapSolid
+                    :class="selectedType === 'formation' ? 'h-4 fill-white dark:fill-gray-900' : 'h-4 fill-black dark:fill-gray-100'"
+                />
                 <span>{{ t('career.education') }}</span>
             </BaseButton>
 
-            <BaseButton :variant="selectedType === 'emploi' ? 'black' : 'white'" class="rounded-lg" @click="selectedType !== 'emploi' ? changeType('emploi') : null">
+            <BaseButton
+                :variant="selectedType === 'emploi' ? 'black' : 'white'"
+                class="rounded-lg"
+                @click="selectedType !== 'emploi' ? changeType('emploi') : null"
+            >
                 <BriefcaseSolid :class="selectedType === 'emploi' ? 'h-4 fill-white dark:fill-gray-900' : 'h-4 fill-black dark:fill-gray-100'" />
                 <span>{{ t('career.professional') }}</span>
             </BaseButton>
@@ -194,7 +204,14 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                         <span>{{ t('career.view_details') }}</span>
                                         <ArrowUpRightRegular class="h-3 fill-black dark:fill-gray-100" />
                                     </Link>
-                                    <BaseButton variant="white" size="sm" as="link" v-if="selectedExperience.websiteUrl" :href="selectedExperience.websiteUrl" target="_blank">
+                                    <BaseButton
+                                        variant="white"
+                                        size="sm"
+                                        as="link"
+                                        v-if="selectedExperience.websiteUrl"
+                                        :href="selectedExperience.websiteUrl"
+                                        target="_blank"
+                                    >
                                         <span>{{ t('career.visit_website') }}</span>
                                         <ArrowUpRightRegular class="h-4 fill-black dark:fill-gray-100" />
                                     </BaseButton>

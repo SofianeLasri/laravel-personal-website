@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PlusRegular from '@/components/font-awesome/PlusRegular.vue';
-import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import SvgIcon from '@/components/public/SvgIcon.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import LaravelCertification from '@/components/shapes/LaravelCertification.vue';
 import Cube from '@/components/shapes/cube.vue';
 import { useTranslation } from '@/composables/useTranslation';

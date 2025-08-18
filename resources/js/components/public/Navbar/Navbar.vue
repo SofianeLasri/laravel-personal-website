@@ -5,12 +5,12 @@ import NavBrand from '@/components/public/Navbar/NavBrand.vue';
 import NavMenuItem from '@/components/public/Navbar/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/Navbar/NavSearchBar.vue';
 import SearchModal from '@/components/public/SearchModal.vue';
-import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import ThemeToggle from '@/components/public/ThemeToggle.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
+import { useRoute } from '@/composables/useRoute';
 import { useTranslation } from '@/composables/useTranslation';
 import { usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useRoute } from '@/composables/useRoute';
 
 const page = usePage();
 const route = useRoute();

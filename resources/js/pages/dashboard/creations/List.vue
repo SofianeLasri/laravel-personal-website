@@ -24,6 +24,7 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, CreationWithTranslationsAndDrafts, TranslationKey } from '@/types';
 import { getTypeLabel } from '@/utils/creationTypes';
@@ -33,7 +34,6 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Edit, Link as LinkIcon, MoreHorizontal, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
-import { useRoute } from '@/composables/useRoute';
 
 interface Props {
     creations: CreationWithTranslationsAndDrafts[];

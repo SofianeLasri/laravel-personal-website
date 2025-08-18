@@ -4,10 +4,10 @@ import TextLink from '@/components/dashboard/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useRoute } from '@/composables/useRoute';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
-import { useRoute } from '@/composables/useRoute';
 
 const route = useRoute();
 const form = useForm({

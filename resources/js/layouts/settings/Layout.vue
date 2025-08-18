@@ -2,9 +2,9 @@
 import Heading from '@/components/dashboard/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useRoute } from '@/composables/useRoute';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { useRoute } from '@/composables/useRoute';
 
 const page = usePage();
 const route = useRoute();

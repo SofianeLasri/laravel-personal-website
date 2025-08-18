@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import ArrowUpRightRegular from '@/components/font-awesome/ArrowUpRightRegular.vue';
 import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
+import { useRoute } from '@/composables/useRoute';
 import { SSRTechnologyExperience } from '@/types';
 import { computed } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
-import { useRoute } from '@/composables/useRoute';
 
 const props = defineProps<{
     experience: SSRTechnologyExperience;

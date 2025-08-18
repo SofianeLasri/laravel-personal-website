@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
+import { useRoute } from '@/composables/useRoute';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRSimplifiedCreation } from '@/types';
 import { router } from '@inertiajs/vue3';
-import { useRoute } from '@/composables/useRoute';
 
 defineProps<{
     results: SSRSimplifiedCreation[];

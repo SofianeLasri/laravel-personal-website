@@ -75,7 +75,7 @@ const includeIps = ref(props.filters.include_ips?.join('\n') || '');
 const excludeIps = ref(props.filters.exclude_ips?.join('\n') || '');
 const dateFrom = ref(props.filters.date_from || '');
 const dateTo = ref(props.filters.date_to || '');
-const excludeConnectedUsersIps = ref(props.filters.exclude_connected_users_ips || false);
+const excludeConnectedUsersIps = ref(props.filters.exclude_connected_users_ips);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -130,25 +130,22 @@ const search = () => {
     const includeIpArray = includeIps.value.split('\n').filter((ip) => ip.trim());
     const excludeIpArray = excludeIps.value.split('\n').filter((ip) => ip.trim());
 
-    router.get(
-        route('dashboard.request-logs.index'),
-        {
-            search: searchQuery.value || undefined,
-            per_page: perPage.value,
-            is_bot: isBotFilter.value !== 'all' ? isBotFilter.value : undefined,
-            include_user_agents: includeUAArray.length > 0 ? includeUAArray : undefined,
-            exclude_user_agents: excludeUAArray.length > 0 ? excludeUAArray : undefined,
-            include_ips: includeIpArray.length > 0 ? includeIpArray : undefined,
-            exclude_ips: excludeIpArray.length > 0 ? excludeIpArray : undefined,
-            date_from: dateFrom.value || undefined,
-            date_to: dateTo.value || undefined,
-            exclude_connected_users_ips: excludeConnectedUsersIps.value ? true : undefined,
-        },
-        {
-            preserveState: true,
-            replace: true,
-        },
-    );
+    const params = {
+        search: searchQuery.value || undefined,
+        per_page: perPage.value,
+        is_bot: isBotFilter.value !== 'all' ? isBotFilter.value : undefined,
+        include_user_agents: includeUAArray.length > 0 ? includeUAArray : undefined,
+        exclude_user_agents: excludeUAArray.length > 0 ? excludeUAArray : undefined,
+        include_ips: includeIpArray.length > 0 ? includeIpArray : undefined,
+        exclude_ips: excludeIpArray.length > 0 ? excludeIpArray : undefined,
+        date_from: dateFrom.value || undefined,
+        date_to: dateTo.value || undefined,
+        exclude_connected_users_ips: excludeConnectedUsersIps.value === true ? '1' : undefined,
+    };
+    router.get(route('dashboard.request-logs.index'), params, {
+        preserveState: true,
+        replace: true,
+    });
 };
 
 const resetFilters = () => {
@@ -184,7 +181,7 @@ const changePage = (page: number) => {
             exclude_ips: excludeIpArray.length > 0 ? excludeIpArray : undefined,
             date_from: dateFrom.value || undefined,
             date_to: dateTo.value || undefined,
-            exclude_connected_users_ips: excludeConnectedUsersIps.value ? true : undefined,
+            exclude_connected_users_ips: excludeConnectedUsersIps.value === true ? '1' : undefined,
         },
         {
             preserveState: true,
@@ -195,6 +192,14 @@ const changePage = (page: number) => {
 
 watch([perPage], () => {
     search();
+});
+
+// Watcher pour excludeConnectedUsersIps
+watch(excludeConnectedUsersIps, (newValue, oldValue) => {
+    // Vérifier si la valeur a vraiment changé
+    if (newValue !== oldValue) {
+        search();
+    }
 });
 
 const paginationInfo = computed(() => {
@@ -281,7 +286,7 @@ const paginationInfo = computed(() => {
                             <div class="md:col-span-2">
                                 <Label>Options de filtrage</Label>
                                 <div class="mt-2 flex items-center space-x-2">
-                                    <Switch id="exclude_connected_users" v-model:checked="excludeConnectedUsersIps" />
+                                    <Switch id="exclude_connected_users" v-model="excludeConnectedUsersIps" />
                                     <Label for="exclude_connected_users" class="cursor-pointer font-normal">
                                         Exclure les IP des utilisateurs connectés
                                     </Label>

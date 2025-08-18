@@ -16,7 +16,8 @@ class AnalyzeBotRequestsCommand extends Command
                             {--batch-size=100 : Number of requests to analyze per batch}
                             {--re-analyze : Re-analyze old requests instead of unanalyzed ones}
                             {--request-id= : Analyze a specific request ID}
-                            {--queue : Dispatch job to queue instead of running synchronously}';
+                            {--queue : Dispatch job to queue instead of running synchronously}
+                            {--include-authenticated : Include authenticated users in the analysis}';
 
     /**
      * The console command description.

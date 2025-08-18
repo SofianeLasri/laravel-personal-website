@@ -38,6 +38,30 @@ class BotDetectionService
      */
     public function analyzeRequest(LoggedRequest $request): array
     {
+        // Skip analysis for authenticated users
+        if ($request->user_id !== null) {
+            // Mark as analyzed but not as bot
+            DB::table('logged_requests')
+                ->where('id', $request->id)
+                ->update([
+                    'is_bot_by_frequency' => false,
+                    'is_bot_by_user_agent' => false,
+                    'is_bot_by_parameters' => false,
+                    'bot_detection_metadata' => json_encode([
+                        'skipped' => true,
+                        'reason' => 'Authenticated user',
+                    ]),
+                    'bot_analyzed_at' => now(),
+                ]);
+
+            return [
+                'is_bot' => false,
+                'reasons' => [],
+                'skipped' => true,
+                'skip_reason' => 'Authenticated user',
+            ];
+        }
+
         $reasons = [];
         $isBotByFrequency = false;
         $isBotByUserAgent = false;
@@ -359,11 +383,12 @@ class BotDetectionService
     }
 
     /**
-     * Batch analyze unanalyzed requests
+     * Batch analyze unanalyzed requests (excluding authenticated users)
      */
     public function analyzeUnanalyzedRequests(int $limit = 100): Collection
     {
         $requests = LoggedRequest::whereNull('bot_analyzed_at')
+            ->whereNull('user_id') // Exclude authenticated users
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
@@ -381,7 +406,7 @@ class BotDetectionService
     }
 
     /**
-     * Re-analyze requests for IPs that haven't been analyzed recently
+     * Re-analyze requests for IPs that haven't been analyzed recently (excluding authenticated users)
      */
     public function reanalyzeOldRequests(int $hoursAgo = 24, int $limit = 100): Collection
     {
@@ -394,6 +419,7 @@ class BotDetectionService
             ->pluck('ip_address_id');
 
         $requests = LoggedRequest::whereIn('ip_address_id', $ipIds)
+            ->whereNull('user_id') // Exclude authenticated users
             ->where('created_at', '>=', $cutoffTime)
             ->orderBy('created_at', 'desc')
             ->limit($limit)

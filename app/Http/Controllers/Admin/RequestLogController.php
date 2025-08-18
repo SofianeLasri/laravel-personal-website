@@ -70,6 +70,10 @@ class RequestLogController extends Controller
                 'ip_address_metadata.avg_request_interval',
                 'ip_address_metadata.total_requests as ip_total_requests',
                 'user_agent_metadata.is_bot',
+                'logged_requests.is_bot_by_frequency',
+                'logged_requests.is_bot_by_user_agent',
+                'logged_requests.is_bot_by_parameters',
+                'logged_requests.bot_detection_metadata',
             ])
             ->orderBy('logged_requests.created_at', 'desc');
 

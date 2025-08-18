@@ -30,9 +30,10 @@ class TriggerBotAnalysis
      */
     protected function triggerAnalysis(): void
     {
-        // Check if there are unanalyzed requests from the last minute
+        // Check if there are unanalyzed requests from the last minute (excluding authenticated users)
         $hasUnanalyzed = DB::table('logged_requests')
             ->whereNull('bot_analyzed_at')
+            ->whereNull('user_id') // Exclude authenticated users
             ->where('created_at', '>=', now()->subMinute())
             ->exists();
 

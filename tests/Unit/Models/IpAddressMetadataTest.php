@@ -20,6 +20,11 @@ class IpAddressMetadataTest extends TestCase
             'country_code',
             'lat',
             'lon',
+            'avg_request_interval',
+            'total_requests',
+            'first_seen_at',
+            'last_seen_at',
+            'last_bot_analysis_at',
         ];
 
         $model = new IpAddressMetadata;

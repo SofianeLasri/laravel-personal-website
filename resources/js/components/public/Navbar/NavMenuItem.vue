@@ -14,8 +14,8 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <Link :href="to" class="flex cursor-pointer gap-12 py-2">
+    <Link :href="to" class="hover:text-primary dark:hover:text-primary-400 flex cursor-pointer gap-12 py-2 transition-colors">
         <div class="w-1 opacity-0"></div>
-        <div class="text-2xl">{{ text }}</div>
+        <div class="text-2xl dark:text-gray-200">{{ text }}</div>
     </Link>
 </template>

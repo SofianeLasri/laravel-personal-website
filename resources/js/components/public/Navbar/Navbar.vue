@@ -141,12 +141,14 @@ onUnmounted(() => {
             :aria-label="t('navigation.main_menu')"
         >
             <div class="flex-grow-1 cursor-pointer" @click="closeMenu"></div>
-            <div class="bg-background motion-preset-slide-left flex w-full max-w-lg flex-shrink-0 flex-col items-start border-l py-16 pr-8">
+            <div
+                class="bg-background motion-preset-slide-left flex w-full max-w-lg flex-shrink-0 flex-col items-start border-l py-16 pr-8 dark:border-gray-800 dark:bg-gray-900"
+            >
                 <div class="flex w-full flex-col gap-12">
                     <div class="flex items-center justify-end gap-4">
                         <BaseButton variant="black" class="md:hidden" @click="openSearchModal" :aria-label="t('navigation.open_search')">
                             <span>{{ t('navigation.search') }}</span>
-                            <MagnifyingGlassRegular class="size-4 fill-white dark:fill-gray-100" />
+                            <MagnifyingGlassRegular class="dark:fill-gray-990 size-4 fill-white" />
                         </BaseButton>
                         <BaseButton
                             variant="black"
@@ -156,17 +158,17 @@ onUnmounted(() => {
                             :aria-label="t('navigation.close_menu')"
                         >
                             <span>{{ t('navigation.close') }}</span>
-                            <BarStaggeredRegular class="size-4 fill-white dark:fill-gray-100" />
+                            <BarStaggeredRegular class="dark:fill-gray-990 size-4 fill-white" />
                         </BaseButton>
                     </div>
 
                     <div class="flex flex-col gap-8">
                         <div class="pl-12">
-                            <h2 class="text-4xl font-bold">{{ t('navigation.portfolio') }}</h2>
+                            <h2 class="text-4xl font-bold dark:text-white">{{ t('navigation.portfolio') }}</h2>
                         </div>
                         <div class="relative flex flex-col gap-3">
                             <div
-                                class="bg-primary absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
+                                class="bg-primary dark:bg-primary-400 absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
                                 :style="{
                                     transform: `translateY(${indicatorPosition}px)`,
                                     opacity: indicatorVisible ? 1 : 0,

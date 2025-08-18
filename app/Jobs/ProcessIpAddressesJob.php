@@ -83,12 +83,12 @@ class ProcessIpAddressesJob implements ShouldQueue
             }
 
             // IPv6 private addresses (fc00::/7)
-            if (strpos($ip, 'fc') === 0 || strpos($ip, 'fd') === 0) {
+            if (str_starts_with($ip, 'fc') || str_starts_with($ip, 'fd')) {
                 return true;
             }
 
             // IPv6 link-local (fe80::/10)
-            if (strpos($ip, 'fe80:') === 0) {
+            if (str_starts_with($ip, 'fe80:')) {
                 return true;
             }
 

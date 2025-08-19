@@ -250,7 +250,7 @@ const getBotDetectionReasons = (request: RequestLog): string[] => {
                 reasons.push(metadata.reason);
             }
         } catch (e) {
-            // Ignore JSON parse errors
+            console.error('Erreur lors de la parsing des métadonnées bot:', e);
         }
     }
 

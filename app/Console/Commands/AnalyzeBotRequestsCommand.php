@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Jobs\AnalyzeBotRequestsJob;
+use App\Services\BotDetection\BotDetectionService;
+use Exception;
 use Illuminate\Console\Command;
 
 class AnalyzeBotRequestsCommand extends Command
@@ -52,9 +54,9 @@ class AnalyzeBotRequestsCommand extends Command
             $this->info('Running analysis synchronously...');
 
             try {
-                $job->handle(app(\App\Services\BotDetection\BotDetectionService::class));
+                $job->handle(app(BotDetectionService::class));
                 $this->info('Analysis completed successfully.');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->error('Analysis failed: '.$e->getMessage());
 
                 return Command::FAILURE;

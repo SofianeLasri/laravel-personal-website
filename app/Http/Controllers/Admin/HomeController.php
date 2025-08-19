@@ -53,7 +53,7 @@ class HomeController extends Controller
             'urls.url',
             'referer_url.url as referer_url',
             'origin_url.url as origin_url'])
-            ->distinct('logged_requests.url_id', 'logged_requests.ip_address_id')
+            ->distinct(['logged_requests.url_id', 'logged_requests.ip_address_id'])
             ->join('urls', 'logged_requests.url_id', '=', 'urls.id')
             ->leftJoin('urls as referer_url', 'logged_requests.referer_url_id', '=', 'referer_url.id')
             ->leftJoin('urls as origin_url', 'logged_requests.origin_url_id', '=', 'origin_url.id')
@@ -63,6 +63,9 @@ class HomeController extends Controller
             ->whereLike('urls.url', config('app.url').'%')
             ->whereNotIn('urls.url', $individualExcludedRoutes)
             ->where('user_agent_metadata.is_bot', false)
+            ->where('logged_requests.is_bot_by_frequency', false)
+            ->where('logged_requests.is_bot_by_user_agent', false)
+            ->where('logged_requests.is_bot_by_parameters', false)
             ->where('status_code', 200)
             ->whereNull('logged_requests.user_id')
             ->whereNotIn('ip_addresses.id', function ($query) {

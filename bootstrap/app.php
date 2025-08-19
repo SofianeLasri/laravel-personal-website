@@ -6,6 +6,7 @@ use App\Http\Middleware\HandleDashboardInertiaRequests;
 use App\Http\Middleware\HandlePublicInertiaRequests;
 use App\Http\Middleware\RestrictRegistration;
 use App\Http\Middleware\SetLocaleFromAcceptLanguage;
+use App\Http\Middleware\TriggerBotAnalysis;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'restrict.registration' => RestrictRegistration::class,
+            'bot.analyze' => TriggerBotAnalysis::class,
         ]);
 
         $middleware->web(append: [
@@ -36,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleDashboardInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SaveRequestMiddleware::class,
+            TriggerBotAnalysis::class,
         ]);
 
         // For Caddy reverse proxy

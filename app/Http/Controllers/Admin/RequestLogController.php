@@ -67,7 +67,13 @@ class RequestLogController extends Controller
                 'ip_address_metadata.country_code as geo_country_code',
                 'ip_address_metadata.lat as geo_lat',
                 'ip_address_metadata.lon as geo_lon',
+                'ip_address_metadata.avg_request_interval',
+                'ip_address_metadata.total_requests as ip_total_requests',
                 'user_agent_metadata.is_bot',
+                'logged_requests.is_bot_by_frequency',
+                'logged_requests.is_bot_by_user_agent',
+                'logged_requests.is_bot_by_parameters',
+                'logged_requests.bot_detection_metadata',
             ])
             ->orderBy('logged_requests.created_at', 'desc');
 
@@ -81,9 +87,24 @@ class RequestLogController extends Controller
             });
         }
 
-        // Bot status filter
+        // Bot status filter (combining old and new detection)
         if ($isBot !== 'all') {
-            $query->where('user_agent_metadata.is_bot', $isBot === 'true');
+            $query->where(function ($q) use ($isBot) {
+                if ($isBot === 'true') {
+                    $q->where('user_agent_metadata.is_bot', true)
+                        ->orWhere('logged_requests.is_bot_by_frequency', true)
+                        ->orWhere('logged_requests.is_bot_by_user_agent', true)
+                        ->orWhere('logged_requests.is_bot_by_parameters', true);
+                } else {
+                    $q->where(function ($subQ) {
+                        $subQ->whereNull('user_agent_metadata.is_bot')
+                            ->orWhere('user_agent_metadata.is_bot', false);
+                    })
+                        ->where('logged_requests.is_bot_by_frequency', false)
+                        ->where('logged_requests.is_bot_by_user_agent', false)
+                        ->where('logged_requests.is_bot_by_parameters', false);
+                }
+            });
         }
 
         // Include specific user agents

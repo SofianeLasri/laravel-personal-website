@@ -12,7 +12,8 @@
       "Bash(./vendor/bin/phpstan analyse)",
       "Bash(find:*)",
       "Bash(rg:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(php artisan make:migration:*)"
     ],
     "deny": []
   },

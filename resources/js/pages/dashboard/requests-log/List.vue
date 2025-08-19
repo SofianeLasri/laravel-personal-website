@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
@@ -34,6 +35,10 @@ interface RequestLog {
     geo_lat: number | null;
     geo_lon: number | null;
     is_bot: boolean | null;
+    is_bot_by_frequency: boolean;
+    is_bot_by_user_agent: boolean;
+    is_bot_by_parameters: boolean;
+    bot_detection_metadata: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -206,6 +211,51 @@ const paginationInfo = computed(() => {
     const { from, to, total } = props.requests;
     return `Affichage de ${from} à ${to} sur ${total} résultats`;
 });
+
+const isDetectedAsBot = (request: RequestLog): boolean => {
+    return request.is_bot || request.is_bot_by_frequency || request.is_bot_by_user_agent || request.is_bot_by_parameters;
+};
+
+const getBotDetectionReasons = (request: RequestLog): string[] => {
+    const reasons: string[] = [];
+
+    // Check old detection
+    if (request.is_bot) {
+        reasons.push('Détecté comme bot (analyse ancienne)');
+    }
+
+    // Check new detections
+    if (request.is_bot_by_frequency) {
+        reasons.push('Fréquence de requêtes élevée');
+    }
+    if (request.is_bot_by_user_agent) {
+        reasons.push('User-Agent suspect');
+    }
+    if (request.is_bot_by_parameters) {
+        reasons.push('Paramètres URL suspects');
+    }
+
+    // Parse metadata for more details
+    if (request.bot_detection_metadata) {
+        try {
+            const metadata = JSON.parse(request.bot_detection_metadata);
+            if (metadata.reasons && Array.isArray(metadata.reasons)) {
+                metadata.reasons.forEach((reason: string) => {
+                    if (!reasons.includes(reason)) {
+                        reasons.push(reason);
+                    }
+                });
+            }
+            if (metadata.skipped && metadata.reason) {
+                reasons.push(metadata.reason);
+            }
+        } catch (e) {
+            console.error('Erreur lors de la parsing des métadonnées bot:', e);
+        }
+    }
+
+    return reasons;
+};
 </script>
 
 <template>
@@ -443,11 +493,31 @@ const paginationInfo = computed(() => {
                                     </TableCell>
 
                                     <TableCell>
-                                        <div class="flex items-center">
-                                            <Bot v-if="request.is_bot" class="h-4 w-4 text-orange-500" />
-                                            <User v-else-if="request.is_bot === false" class="h-4 w-4 text-blue-500" />
-                                            <span v-else class="text-muted-foreground">-</span>
-                                        </div>
+                                        <TooltipProvider>
+                                            <Tooltip v-if="isDetectedAsBot(request)">
+                                                <TooltipTrigger asChild>
+                                                    <div class="flex cursor-help items-center">
+                                                        <Bot class="h-4 w-4 text-orange-500" />
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent side="left" class="max-w-xs">
+                                                    <div class="space-y-1">
+                                                        <p class="font-semibold">Raisons de détection:</p>
+                                                        <ul class="list-inside list-disc text-sm">
+                                                            <li v-for="(reason, index) in getBotDetectionReasons(request)" :key="index">
+                                                                {{ reason }}
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                            <div v-else-if="request.user_id" class="flex items-center" title="Utilisateur connecté">
+                                                <User class="h-4 w-4 text-green-500" />
+                                            </div>
+                                            <div v-else class="flex items-center" title="Visiteur humain">
+                                                <User class="h-4 w-4 text-blue-500" />
+                                            </div>
+                                        </TooltipProvider>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

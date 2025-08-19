@@ -12,6 +12,7 @@
         "ext-imagick": "*",
         "ext-zip": "*",
         "corbpie/bunny-cdn-api": "^1.9",
+        "foroco/php-browser-detection": "^2.8",
         "inertiajs/inertia-laravel": "^2.0",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",

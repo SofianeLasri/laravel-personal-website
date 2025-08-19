@@ -190,6 +190,10 @@
       <path value="$PROJECT_DIR$/vendor/spatie/laravel-backup" />
       <path value="$PROJECT_DIR$/vendor/spatie/laravel-signal-aware-command" />
       <path value="$PROJECT_DIR$/vendor/spatie/db-dumper" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php84" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php85" />
+      <path value="$PROJECT_DIR$/vendor/foroco/php-browser-detection" />
+      <path value="$PROJECT_DIR$/vendor/league/flysystem-ftp" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

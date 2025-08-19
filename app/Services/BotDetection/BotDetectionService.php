@@ -38,6 +38,24 @@ class BotDetectionService
      */
     public function analyzeRequest(LoggedRequest $request): array
     {
+        // Check if this request was manually flagged
+        $existingMetadata = DB::table('logged_requests')
+            ->where('id', $request->id)
+            ->value('bot_detection_metadata');
+
+        if ($existingMetadata) {
+            $metadata = json_decode($existingMetadata, true);
+            if (isset($metadata['manually_flagged']) && $metadata['manually_flagged'] === true) {
+                // Skip re-analysis for manually flagged requests
+                return [
+                    'is_bot' => true,
+                    'reasons' => [$metadata['reason'] ?? 'Manuellement marqué comme bot'],
+                    'skipped' => true,
+                    'skip_reason' => 'Manually flagged - skipping automatic analysis',
+                ];
+            }
+        }
+
         // Skip analysis for authenticated users
         if ($request->user_id !== null) {
             // Mark as analyzed but not as bot

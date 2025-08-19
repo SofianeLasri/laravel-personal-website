@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExtendedLoggedRequest as LoggedRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use SlProjects\LaravelRequestLogger\app\Models\LoggedRequest;
 
 class RequestLogController extends Controller
 {
@@ -167,6 +168,36 @@ class RequestLogController extends Controller
                 'date_to' => $dateTo,
                 'exclude_connected_users_ips' => $excludeConnectedUsersIps,
             ],
+        ]);
+    }
+
+    public function markAsBot(Request $request): JsonResponse
+    {
+        $request->validate([
+            'request_ids' => 'required|array',
+            'request_ids.*' => 'integer|exists:logged_requests,id',
+        ]);
+
+        $requestIds = $request->input('request_ids');
+
+        // Marquer les requêtes comme bot (manuellement détectées) - utilisation directe de DB
+        $updatedCount = \DB::table('logged_requests')
+            ->whereIn('id', $requestIds)
+            ->update([
+                'is_bot_by_user_agent' => 1,  // Utiliser 1 au lieu de true pour MySQL/SQLite
+                'bot_detection_metadata' => json_encode([
+                    'manually_flagged' => true,
+                    'flagged_at' => now()->toDateTimeString(),
+                    'flagged_by' => auth()->id(),
+                    'reason' => 'Manuellement marqué comme bot via le dashboard',
+                ]),
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'message' => $updatedCount.' requête(s) marquée(s) comme bot avec succès',
+            'updated_count' => $updatedCount,
+            'requested_ids' => $requestIds,
         ]);
     }
 }

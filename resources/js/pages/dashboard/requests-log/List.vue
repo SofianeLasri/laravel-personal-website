@@ -9,13 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Bot, ChevronLeft, ChevronRight, Globe, RotateCcw, Search, User } from 'lucide-vue-next';
+import { Bot, ChevronLeft, ChevronRight, Flag, Globe, RotateCcw, Search, User } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 interface RequestLog {
@@ -81,6 +83,10 @@ const excludeIps = ref(props.filters.exclude_ips?.join('\n') || '');
 const dateFrom = ref(props.filters.date_from || '');
 const dateTo = ref(props.filters.date_to || '');
 const excludeConnectedUsersIps = ref(props.filters.exclude_connected_users_ips);
+
+// Sélection de requêtes
+const selectedRequests = ref<Set<number>>(new Set());
+const lastSelectedIndex = ref<number | null>(null);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -256,6 +262,75 @@ const getBotDetectionReasons = (request: RequestLog): string[] => {
 
     return reasons;
 };
+
+// Fonctions de sélection
+const toggleSelection = (requestId: number, index: number, event: MouseEvent) => {
+    if (event.shiftKey && lastSelectedIndex.value !== null) {
+        // Sélection multiple avec Shift
+        const start = Math.min(lastSelectedIndex.value, index);
+        const end = Math.max(lastSelectedIndex.value, index);
+        
+        for (let i = start; i <= end; i++) {
+            if (props.requests.data[i]) {
+                selectedRequests.value.add(props.requests.data[i].id);
+            }
+        }
+    } else {
+        // Sélection simple
+        if (selectedRequests.value.has(requestId)) {
+            selectedRequests.value.delete(requestId);
+        } else {
+            selectedRequests.value.add(requestId);
+        }
+        lastSelectedIndex.value = index;
+    }
+    
+    // Forcer la réactivité
+    selectedRequests.value = new Set(selectedRequests.value);
+};
+
+const toggleSelectAll = () => {
+    if (selectedRequests.value.size === props.requests.data.length) {
+        selectedRequests.value.clear();
+    } else {
+        props.requests.data.forEach(request => {
+            selectedRequests.value.add(request.id);
+        });
+    }
+    selectedRequests.value = new Set(selectedRequests.value);
+};
+
+const isAllSelected = computed(() => {
+    return props.requests.data.length > 0 && selectedRequests.value.size === props.requests.data.length;
+});
+
+const isIndeterminate = computed(() => {
+    return selectedRequests.value.size > 0 && selectedRequests.value.size < props.requests.data.length;
+});
+
+// Fonction pour marquer les requêtes sélectionnées comme bot
+const markSelectedAsBot = async () => {
+    if (selectedRequests.value.size === 0) {
+        return;
+    }
+    
+    try {
+        await axios.post(route('dashboard.request-logs.mark-as-bot'), {
+            request_ids: Array.from(selectedRequests.value)
+        });
+        
+        // Rafraîchir la page
+        router.reload({
+            preserveState: true,
+            preserveScroll: true,
+        });
+        
+        // Vider la sélection
+        selectedRequests.value.clear();
+    } catch (error) {
+        console.error('Erreur lors du marquage comme bot:', error);
+    }
+};
 </script>
 
 <template>
@@ -406,6 +481,17 @@ const getBotDetectionReasons = (request: RequestLog): string[] => {
                 </CardContent>
             </Card>
 
+            <!-- Actions de sélection -->
+            <div v-if="selectedRequests.size > 0" class="mt-4 flex items-center justify-between rounded-lg bg-muted p-4">
+                <div class="text-sm text-muted-foreground">
+                    {{ selectedRequests.size }} requête(s) sélectionnée(s)
+                </div>
+                <Button size="sm" @click="markSelectedAsBot">
+                    <Flag class="mr-2 h-4 w-4" />
+                    Marquer comme bot
+                </Button>
+            </div>
+
             <!-- Tableau des requêtes -->
             <Card class="mt-6">
                 <CardContent class="p-0">
@@ -413,6 +499,13 @@ const getBotDetectionReasons = (request: RequestLog): string[] => {
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead class="w-12">
+                                        <Checkbox 
+                                            :checked="isAllSelected"
+                                            :indeterminate="isIndeterminate"
+                                            @update:checked="toggleSelectAll"
+                                        />
+                                    </TableHead>
                                     <TableHead>Date</TableHead>
                                     <TableHead>IP</TableHead>
                                     <TableHead>Pays</TableHead>
@@ -427,7 +520,13 @@ const getBotDetectionReasons = (request: RequestLog): string[] => {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow v-for="request in props.requests.data" :key="request.id">
+                                <TableRow v-for="(request, index) in props.requests.data" :key="request.id">
+                                    <TableCell>
+                                        <Checkbox 
+                                            :checked="selectedRequests.has(request.id)"
+                                            @click="(event: MouseEvent) => toggleSelection(request.id, index, event)"
+                                        />
+                                    </TableCell>
                                     <TableCell class="font-medium">
                                         {{ formatDate(request.created_at) }}
                                     </TableCell>

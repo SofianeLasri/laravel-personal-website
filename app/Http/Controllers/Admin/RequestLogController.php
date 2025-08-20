@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ExtendedLoggedRequest as LoggedRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -181,7 +182,7 @@ class RequestLogController extends Controller
         $requestIds = $request->input('request_ids');
 
         // Marquer les requêtes comme bot (manuellement détectées) - utilisation directe de DB
-        $updatedCount = \DB::table('logged_requests')
+        $updatedCount = DB::table('logged_requests')
             ->whereIn('id', $requestIds)
             ->update([
                 'is_bot_by_user_agent' => 1,  // Utiliser 1 au lieu de true pour MySQL/SQLite

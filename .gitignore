@@ -8,6 +8,15 @@ Homestead.json
 .env
 .npmrc
 /bootstrap/ssr
+/tests/output_anthropic_error.txt
+/tests/output_openai_error.txt
+/tests/output_anthropic_translation.md
+/tests/output_openai_translation.md
+/tests/debug_anthropic_response.json
+/tests/debug_anthropic_raw.txt
+/tests/test_json.php
+/tests/debug_anthropic.php
+/storage/logs/anthropic_raw_response.txt
 
 # ====== OS X ===========================================
 .DS_Store

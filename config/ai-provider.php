@@ -2,6 +2,13 @@
 
 return [
     'selected-provider' => env('AI_PROVIDER', 'openai'),
+
+    'cache' => [
+        'enabled' => env('AI_CACHE_ENABLED', true),
+        'ttl' => env('AI_CACHE_TTL', 2592000), // 30 days in seconds
+        'max_size' => env('AI_CACHE_MAX_SIZE', 1000), // Maximum number of cache entries
+    ],
+    
     'providers' => [
         'openai' => [
             'url' => env('OPENAI_URL', 'https://api.openai.com/v1/chat/completions'),

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\OptimizedPicture;
 use App\Models\Picture;
+use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +16,19 @@ use RuntimeException;
 class AiProviderService
 {
     /**
+     * @var AiTranslationCacheService
+     */
+    private AiTranslationCacheService $cacheService;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->cacheService = app(AiTranslationCacheService::class);
+    }
+
+    /**
      * Prompt the AI provider with a text and pictures
      *
      * @param  string  $systemRole  The system role to send to the AI provider. E.g. "You are a helpful assistant."
@@ -24,6 +38,8 @@ class AiProviderService
      */
     public function promptWithPictures(string $systemRole, string $prompt, Picture ...$pictures): array
     {
+        // Note: Currently not caching image-based prompts due to complexity
+        // This could be added in the future by including image hashes in the cache key
         $transcodingService = app(ImageTranscodingService::class);
 
         $transcodedPictures = [];
@@ -79,11 +95,33 @@ class AiProviderService
         $selectedProvider = config('ai-provider.selected-provider');
         $providerConfig = config('ai-provider.providers.'.$selectedProvider);
 
-        if ($selectedProvider === 'anthropic') {
-            return $this->callAnthropicApi($providerConfig, $systemRole, $prompt);
+        // Check cache if enabled
+        if ($this->cacheService->isEnabled()) {
+            $cacheKey = $this->cacheService->generateCacheKey($selectedProvider, $systemRole, $prompt);
+            $cached = $this->cacheService->get($cacheKey, $this->cacheService->getTtl());
+
+            if ($cached !== null) {
+                Log::info('Using cached AI response', [
+                    'provider' => $selectedProvider,
+                    'cache_key' => $cacheKey,
+                ]);
+                return $cached;
+            }
         }
 
-        return $this->callOpenAiApi($providerConfig, $systemRole, $prompt);
+        // Call the API
+        if ($selectedProvider === 'anthropic') {
+            $response = $this->callAnthropicApi($providerConfig, $systemRole, $prompt);
+        } else {
+            $response = $this->callOpenAiApi($providerConfig, $systemRole, $prompt);
+        }
+
+        // Store in cache if enabled
+        if ($this->cacheService->isEnabled()) {
+            $this->cacheService->put($selectedProvider, $systemRole, $prompt, $response);
+        }
+
+        return $response;
     }
 
     /**
@@ -289,7 +327,7 @@ class AiProviderService
 
         // Check if this is a JSON with unescaped newlines (common with AI responses)
         // Try to fix it by extracting and properly escaping the message content
-        if (preg_match('/^\s*\{\s*"message"\s*:\s*"(.*)"\s*\}\s*$/s', $jsonString, $matches)) {
+        if (preg_match('/^\s*\{\s*"message"\s*:\s*"(.*)"\s*}\s*$/s', $jsonString, $matches)) {
             $messageContent = $matches[1];
 
             // Properly escape the message content for JSON
@@ -350,7 +388,7 @@ class AiProviderService
 
                 return $result;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning('JSON Machine parsing failed, attempting fallback', [
                 'error' => $e->getMessage(),
             ]);

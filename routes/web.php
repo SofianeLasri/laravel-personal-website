@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\RequestLogController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Admin\TranslationPageController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CertificationsCareerController;
 use App\Http\Controllers\Public\ExperienceController as PublicExperienceController;
@@ -63,6 +64,11 @@ Route::name('public.')->group(function () {
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\HomeController::class, 'index'])->name('index');
     Route::get('/stats', [\App\Http\Controllers\Admin\HomeController::class, 'stats'])->name('stats');
+
+    // Notifications page
+    Route::get('/notifications', function () {
+        return inertia('dashboard/Notifications');
+    })->name('notifications');
 
     Route::name('creations.')->prefix('creations')->group(function () {
         Route::get('/', [CreationPageController::class, 'listPage'])
@@ -135,6 +141,24 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     });
 
     Route::name('api.')->prefix('api')->group(function () {
+        // Notifications routes
+        Route::get('notifications', [NotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])
+            ->name('notifications.unread-count');
+        Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])
+            ->name('notifications.mark-as-read');
+        Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+            ->name('notifications.mark-all-as-read');
+        Route::delete('notifications/{id}', [NotificationController::class, 'destroy'])
+            ->name('notifications.destroy');
+        Route::delete('notifications/clear', [NotificationController::class, 'clearAll'])
+            ->name('notifications.clear');
+        Route::post('notifications', [NotificationController::class, 'store'])
+            ->name('notifications.store');
+        Route::get('notifications/stream', [NotificationController::class, 'stream'])
+            ->name('notifications.stream');
+        
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
         Route::apiResource('pictures', PictureController::class)->except('update');

@@ -8,6 +8,8 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use JsonMachine\Items;
+use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use RuntimeException;
 
 class AiProviderService
@@ -140,7 +142,9 @@ class AiProviderService
                 'Authorization' => 'Bearer '.$providerConfig['api-key'],
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post($providerConfig['url'], $requestBody);
+            ])
+                ->timeout(120)
+                ->post($providerConfig['url'], $requestBody);
         } catch (ConnectionException $e) {
             Log::error('Failed to call OpenAI API', [
                 'exception' => $e,
@@ -157,7 +161,8 @@ class AiProviderService
             throw new RuntimeException('Failed to get response from AI provider');
         }
 
-        $decodedContent = json_decode($result['choices'][0]['message']['content'], true);
+        // Use JSON Machine for robust parsing
+        $decodedContent = $this->parseJsonWithJsonMachine($result['choices'][0]['message']['content']);
 
         if (! is_array($decodedContent)) {
             Log::error('OpenAI returned invalid JSON content', [
@@ -217,7 +222,9 @@ class AiProviderService
                 'anthropic-version' => '2023-06-01',
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post($providerConfig['url'], $requestBody);
+            ])
+                ->timeout(120) // Increase timeout for long responses
+                ->post($providerConfig['url'], $requestBody);
         } catch (ConnectionException $e) {
             Log::error('Failed to call Anthropic API', [
                 'exception' => $e,
@@ -234,7 +241,8 @@ class AiProviderService
             throw new RuntimeException('Failed to get response from AI provider');
         }
 
-        $decodedContent = json_decode($result['content'][0]['text'], true);
+        // Use JSON Machine for robust parsing
+        $decodedContent = $this->parseJsonWithJsonMachine($result['content'][0]['text']);
 
         if (! is_array($decodedContent)) {
             Log::error('Anthropic returned invalid JSON content', [
@@ -244,5 +252,73 @@ class AiProviderService
         }
 
         return $decodedContent;
+    }
+
+    /**
+     * Parse JSON using JSON Machine for robust handling of incomplete or malformed JSON
+     *
+     * @param string $jsonString The potentially incomplete JSON string
+     * @return array<string, mixed>|null The parsed JSON array or null if parsing fails
+     */
+    private function parseJsonWithJsonMachine(string $jsonString): ?array
+    {
+        // First, try standard JSON decode for performance
+        $decoded = json_decode($jsonString, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        // Try to parse with JSON Machine which handles incomplete JSON better
+        try {
+            // Clean the JSON string
+            $cleanedJson = trim($jsonString);
+
+            // Try to fix incomplete JSON by ensuring proper closure
+            $openBraces = substr_count($cleanedJson, '{');
+            $closeBraces = substr_count($cleanedJson, '}');
+            $openBrackets = substr_count($cleanedJson, '[');
+            $closeBrackets = substr_count($cleanedJson, ']');
+
+            // Add missing closing braces/brackets
+            $cleanedJson .= str_repeat(']', max(0, $openBrackets - $closeBrackets));
+            $cleanedJson .= str_repeat('}', max(0, $openBraces - $closeBraces));
+
+            // Use JSON Machine with ExtJsonDecoder for better error handling
+            $items = Items::fromString($cleanedJson, [
+                'decoder' => new ExtJsonDecoder(true),
+            ]);
+
+            $result = [];
+            foreach ($items as $key => $value) {
+                $result[$key] = $value;
+            }
+
+            if (!empty($result)) {
+                Log::info('JSON parsed successfully with JSON Machine', [
+                    'original_length' => strlen($jsonString),
+                    'cleaned_length' => strlen($cleanedJson),
+                ]);
+
+                return $result;
+            }
+        } catch (\Exception $e) {
+            Log::warning('JSON Machine parsing failed, attempting fallback', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Fallback: try to extract just the message field for translation responses
+        if (preg_match('/"message"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/', $jsonString, $matches)) {
+            $message = json_decode('"' . $matches[1] . '"');
+            if ($message !== null) {
+                Log::warning('JSON recovered by extracting message field', [
+                    'extracted_message' => $message,
+                ]);
+
+                return ['message' => $message];
+            }
+        }
+
+        return null;
     }
 }

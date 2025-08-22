@@ -42,3 +42,7 @@ COPY docker-init/php.ini $PHP_INI_DIR/php.ini
 
 # Setting Imagick Configuration
 COPY docker-init/imagick-policy.xml /etc/ImageMagick-6/policy.xml
+
+# Copy entrypoint script
+COPY docker-init/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN ["chmod", "+x", "/usr/local/bin/entrypoint.sh"]

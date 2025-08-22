@@ -9,7 +9,6 @@ services:
         INSTALL_XDEBUG: "true"
     restart: unless-stopped
     working_dir: /app
-    entrypoint: ["docker-init/entrypoint.sh"]
     ports:
       - '${APP_PORT:-80}:8000'
     volumes:

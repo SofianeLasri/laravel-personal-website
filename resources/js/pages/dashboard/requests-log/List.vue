@@ -3,13 +3,13 @@ import Heading from '@/components/dashboard/Heading.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
@@ -269,7 +269,7 @@ const toggleSelection = (requestId: number, index: number, event: MouseEvent) =>
         // Sélection multiple avec Shift
         const start = Math.min(lastSelectedIndex.value, index);
         const end = Math.max(lastSelectedIndex.value, index);
-        
+
         for (let i = start; i <= end; i++) {
             if (props.requests.data[i]) {
                 selectedRequests.value.add(props.requests.data[i].id);
@@ -284,7 +284,7 @@ const toggleSelection = (requestId: number, index: number, event: MouseEvent) =>
         }
         lastSelectedIndex.value = index;
     }
-    
+
     // Forcer la réactivité
     selectedRequests.value = new Set(selectedRequests.value);
 };
@@ -293,7 +293,7 @@ const toggleSelectAll = () => {
     if (selectedRequests.value.size === props.requests.data.length) {
         selectedRequests.value.clear();
     } else {
-        props.requests.data.forEach(request => {
+        props.requests.data.forEach((request) => {
             selectedRequests.value.add(request.id);
         });
     }
@@ -313,18 +313,18 @@ const markSelectedAsBot = async () => {
     if (selectedRequests.value.size === 0) {
         return;
     }
-    
+
     try {
         await axios.post(route('dashboard.request-logs.mark-as-bot'), {
-            request_ids: Array.from(selectedRequests.value)
+            request_ids: Array.from(selectedRequests.value),
         });
-        
+
         // Rafraîchir la page
         router.reload({
             preserveState: true,
             preserveScroll: true,
         });
-        
+
         // Vider la sélection
         selectedRequests.value.clear();
     } catch (error) {
@@ -482,10 +482,8 @@ const markSelectedAsBot = async () => {
             </Card>
 
             <!-- Actions de sélection -->
-            <div v-if="selectedRequests.size > 0" class="mt-4 flex items-center justify-between rounded-lg bg-muted p-4">
-                <div class="text-sm text-muted-foreground">
-                    {{ selectedRequests.size }} requête(s) sélectionnée(s)
-                </div>
+            <div v-if="selectedRequests.size > 0" class="bg-muted mt-4 flex items-center justify-between rounded-lg p-4">
+                <div class="text-muted-foreground text-sm">{{ selectedRequests.size }} requête(s) sélectionnée(s)</div>
                 <Button size="sm" @click="markSelectedAsBot">
                     <Flag class="mr-2 h-4 w-4" />
                     Marquer comme bot
@@ -500,11 +498,7 @@ const markSelectedAsBot = async () => {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead class="w-12">
-                                        <Checkbox 
-                                            :checked="isAllSelected"
-                                            :indeterminate="isIndeterminate"
-                                            @update:checked="toggleSelectAll"
-                                        />
+                                        <Checkbox :checked="isAllSelected" :indeterminate="isIndeterminate" @update:checked="toggleSelectAll" />
                                     </TableHead>
                                     <TableHead>Date</TableHead>
                                     <TableHead>IP</TableHead>
@@ -522,7 +516,7 @@ const markSelectedAsBot = async () => {
                             <TableBody>
                                 <TableRow v-for="(request, index) in props.requests.data" :key="request.id">
                                     <TableCell>
-                                        <Checkbox 
+                                        <Checkbox
                                             :checked="selectedRequests.has(request.id)"
                                             @click="(event: MouseEvent) => toggleSelection(request.id, index, event)"
                                         />

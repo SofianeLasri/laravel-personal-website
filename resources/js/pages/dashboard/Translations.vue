@@ -56,6 +56,10 @@
                                 <RefreshCwIcon class="mr-2 h-4 w-4" />
                                 Retraduire toutes
                             </Button>
+                            <Button variant="outline" @click="goToApiLogs">
+                                <ActivityIcon class="mr-2 h-4 w-4" />
+                                Logs API
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -135,7 +139,7 @@ import type { BreadcrumbItemType } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import debounce from 'lodash.debounce';
-import { LanguagesIcon, RefreshCwIcon } from 'lucide-vue-next';
+import { ActivityIcon, LanguagesIcon, RefreshCwIcon } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 // import { toast } from '@/components/ui/toast'
@@ -306,5 +310,9 @@ async function translateBatch(mode: 'missing' | 'all') {
     } finally {
         isTranslating.value = false;
     }
+}
+
+function goToApiLogs() {
+    router.get(route('dashboard.api-logs.index'));
 }
 </script>

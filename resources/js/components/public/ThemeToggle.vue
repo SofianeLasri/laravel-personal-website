@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { useAppearance } from '@/composables/useAppearance';
 import { Monitor, Moon, Sun } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
-import { useAppearance } from '@/composables/useAppearance';
 
 type Appearance = 'light' | 'dark' | 'system';
 

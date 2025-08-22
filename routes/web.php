@@ -110,6 +110,11 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     Route::post('/request-logs/mark-as-bot', [RequestLogController::class, 'markAsBot'])
         ->name('request-logs.mark-as-bot');
 
+    Route::get('/api-logs', [\App\Http\Controllers\Admin\ApiRequestLogController::class, 'index'])
+        ->name('api-logs.index');
+    Route::get('/api-logs/{apiRequestLog}', [\App\Http\Controllers\Admin\ApiRequestLogController::class, 'show'])
+        ->name('api-logs.show');
+
     Route::name('data-management.')->prefix('data-management')->group(function () {
         Route::get('/', [DataManagementController::class, 'index'])
             ->name('index');

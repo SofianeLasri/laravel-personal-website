@@ -21,11 +21,17 @@ class AiProviderService
     private AiTranslationCacheService $cacheService;
 
     /**
+     * @var ApiRequestLogger
+     */
+    private ApiRequestLogger $logger;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->cacheService = app(AiTranslationCacheService::class);
+        $this->logger = app(ApiRequestLogger::class);
     }
 
     /**
@@ -105,6 +111,21 @@ class AiProviderService
                     'provider' => $selectedProvider,
                     'cache_key' => $cacheKey,
                 ]);
+
+                // Log cached response
+                $this->logger->logSuccess(
+                    $selectedProvider,
+                    $providerConfig['model'],
+                    $providerConfig['url'],
+                    $systemRole,
+                    $prompt,
+                    $cached,
+                    0.001, // Minimal response time for cache hit
+                    200,
+                    true, // Mark as cached
+                    null
+                );
+                
                 return $cached;
             }
         }
@@ -135,6 +156,7 @@ class AiProviderService
      */
     private function callOpenAiApi(array $providerConfig, string $systemRole, string $prompt, array $transcodedPictures = []): array
     {
+        $startTime = microtime(true);
         $userContent = [
             [
                 'type' => 'text',
@@ -184,15 +206,44 @@ class AiProviderService
                 ->timeout(120)
                 ->post($providerConfig['url'], $requestBody);
         } catch (ConnectionException $e) {
+            $responseTime = microtime(true) - $startTime;
+
+            // Log the error
+            $this->logger->logError(
+                'openai',
+                $providerConfig['model'],
+                $providerConfig['url'],
+                $systemRole,
+                $prompt,
+                $e->getMessage(),
+                $responseTime,
+                null,
+                ['pictures_count' => count($transcodedPictures)]
+            );
+            
             Log::error('Failed to call OpenAI API', [
                 'exception' => $e,
             ]);
             throw new RuntimeException('Failed to call AI provider API');
         }
 
+        $responseTime = microtime(true) - $startTime;
         $result = $response->json();
 
         if (! isset($result['choices'][0]['message']['content'])) {
+            // Log the error
+            $this->logger->logError(
+                'openai',
+                $providerConfig['model'],
+                $providerConfig['url'],
+                $systemRole,
+                $prompt,
+                'Invalid response structure',
+                $responseTime,
+                $response->status(),
+                ['response' => $result]
+            );
+            
             Log::error('Failed to get response from OpenAI', [
                 'response' => $result,
             ]);
@@ -209,6 +260,20 @@ class AiProviderService
             throw new RuntimeException('AI provider returned invalid JSON content');
         }
 
+        // Log successful request
+        $this->logger->logSuccess(
+            'openai',
+            $providerConfig['model'],
+            $providerConfig['url'],
+            $systemRole,
+            $prompt,
+            $result,
+            $responseTime,
+            $response->status(),
+            false,
+            ['pictures_count' => count($transcodedPictures)]
+        );
+        
         return $decodedContent;
     }
 
@@ -223,6 +288,7 @@ class AiProviderService
      */
     private function callAnthropicApi(array $providerConfig, string $systemRole, string $prompt, array $transcodedPictures = []): array
     {
+        $startTime = microtime(true);
         $userContent = [
             [
                 'type' => 'text',
@@ -264,15 +330,44 @@ class AiProviderService
                 ->timeout(120) // Increase timeout for long responses
                 ->post($providerConfig['url'], $requestBody);
         } catch (ConnectionException $e) {
+            $responseTime = microtime(true) - $startTime;
+
+            // Log the error
+            $this->logger->logError(
+                'anthropic',
+                $providerConfig['model'],
+                $providerConfig['url'],
+                $systemRole,
+                $prompt,
+                $e->getMessage(),
+                $responseTime,
+                null,
+                ['pictures_count' => count($transcodedPictures)]
+            );
+            
             Log::error('Failed to call Anthropic API', [
                 'exception' => $e,
             ]);
             throw new RuntimeException('Failed to call AI provider API');
         }
 
+        $responseTime = microtime(true) - $startTime;
         $result = $response->json();
 
         if (! isset($result['content'][0]['text'])) {
+            // Log the error
+            $this->logger->logError(
+                'anthropic',
+                $providerConfig['model'],
+                $providerConfig['url'],
+                $systemRole,
+                $prompt,
+                'Invalid response structure',
+                $responseTime,
+                $response->status(),
+                ['response' => $result]
+            );
+            
             Log::error('Failed to get response from Anthropic', [
                 'response' => $result,
             ]);
@@ -301,6 +396,20 @@ class AiProviderService
             throw new RuntimeException('AI provider returned invalid JSON content');
         }
 
+        // Log successful request
+        $this->logger->logSuccess(
+            'anthropic',
+            $providerConfig['model'],
+            $providerConfig['url'],
+            $systemRole,
+            $prompt,
+            $result,
+            $responseTime,
+            $response->status(),
+            false,
+            ['pictures_count' => count($transcodedPictures)]
+        );
+        
         return $decodedContent;
     }
 

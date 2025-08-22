@@ -23,6 +23,9 @@ class CertificationsCareerController extends PublicController
                 'footer' => __('footer'),
                 'career' => __('career'),
                 'search' => __('search'),
+                'projects' => [
+                    'types' => __('projects.types'),
+                ],
             ],
             'certifications' => $careerData['certifications'],
             'educationExperiences' => $careerData['educationExperiences'],

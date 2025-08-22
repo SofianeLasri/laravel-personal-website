@@ -19,6 +19,9 @@ class AboutController extends PublicController
                 'navigation' => __('navigation'),
                 'footer' => __('footer'),
                 'search' => __('search'),
+                'projects' => [
+                    'types' => __('projects.types'),
+                ],
             ],
             'socialMediaLinks' => SocialMediaLink::all(),
         ]);

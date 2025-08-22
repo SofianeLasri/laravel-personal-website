@@ -16,7 +16,6 @@ services:
       - .:/app
       - /app/vendor
       - /app/node_modules
-      - /app/public/build
     depends_on:
       - mariadb
       - redis

@@ -18,6 +18,10 @@ const emit = defineEmits<{
 const { t } = useTranslation();
 const route = useRoute();
 
+const getCreationTypeLabel = (type: string) => {
+    return t(`projects.types.${type}`) || type;
+};
+
 const handleProjectClick = (project: SSRSimplifiedCreation) => {
     emit('select', project);
     router.visit(route('public.projects.show', { slug: project.slug }));
@@ -78,7 +82,7 @@ const handleProjectClick = (project: SSRSimplifiedCreation) => {
                         <h3 class="text-design-system-title group-hover:text-primary mb-1 font-semibold">
                             {{ project.name }}
                         </h3>
-                        <p class="text-design-system-paragraph mb-2 text-sm">{{ project.type }}</p>
+                        <p class="text-design-system-paragraph mb-2 text-sm">{{ getCreationTypeLabel(project.type) }}</p>
                         <p class="text-design-system-paragraph line-clamp-2 text-sm">
                             {{ project.shortDescription }}
                         </p>

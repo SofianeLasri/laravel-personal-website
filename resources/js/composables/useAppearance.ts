@@ -46,7 +46,10 @@ const getStoredAppearance = () => {
 const handleSystemThemeChange = () => {
     const currentAppearance = getStoredAppearance();
 
-    updateTheme(currentAppearance || 'system');
+    // Only update if we're in system mode
+    if (!currentAppearance || currentAppearance === 'system') {
+        updateTheme('system');
+    }
 };
 
 export function initializeTheme() {

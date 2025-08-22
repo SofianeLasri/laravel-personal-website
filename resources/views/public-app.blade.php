@@ -33,14 +33,17 @@
                 document.documentElement.classList.add('no-transition');
                 
                 // Check for saved theme preference or use system preference
-                const savedTheme = localStorage.getItem('theme');
-                
-                if (savedTheme === 'light') {
-                    document.documentElement.classList.add('light');
-                } else if (savedTheme === 'dark') {
+                const savedAppearance = localStorage.getItem('appearance');
+
+                if (savedAppearance === 'light') {
+                    document.documentElement.classList.remove('dark');
+                } else if (savedAppearance === 'dark') {
                     document.documentElement.classList.add('dark');
+                } else if (savedAppearance === 'system' || !savedAppearance) {
+                    // Use system preference
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    document.documentElement.classList.toggle('dark', prefersDark);
                 }
-                // If no saved preference or 'system', let CSS media query handle it
             })();
         </script>
     </head>

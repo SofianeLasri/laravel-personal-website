@@ -151,10 +151,21 @@
 
 /* Dark theme variables */
 .dark {
+    /* Design system colors for dark theme */
+    --design-system-background: var(--gray-950);
+    --design-system-foreground: var(--gray-100);
+    --design-system-border: var(--gray-700);
+    --design-system-primary: var(--atomic-tangerine-400);
+    --design-system-title: var(--gray-100);
+    --design-system-paragraph: var(--gray-300);
+    
     /* Action container colors for dark theme */
     --action-container-outer-color: rgba(31, 41, 55, 0.5); /* gray-800 with opacity */
     --action-container-shadow-color: rgba(0, 0, 0, 0.5);
     --action-container-border: var(--gray-700);
+
+    /* SVG dot matrix background */
+    --dot-matrix-color: rgba(107, 113, 117, 0.3);
 }
 
 /* Ensure smooth transitions for theme changes */

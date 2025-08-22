@@ -194,6 +194,7 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php85" />
       <path value="$PROJECT_DIR$/vendor/foroco/php-browser-detection" />
       <path value="$PROJECT_DIR$/vendor/league/flysystem-ftp" />
+      <path value="$PROJECT_DIR$/vendor/halaxa/json-machine" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

@@ -9,10 +9,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+      "ext-curl": "*",
         "ext-imagick": "*",
         "ext-zip": "*",
         "corbpie/bunny-cdn-api": "^1.9",
         "foroco/php-browser-detection": "^2.8",
+      "halaxa/json-machine": "^1.2",
         "inertiajs/inertia-laravel": "^2.0",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",

@@ -1,0 +1,89 @@
+name: API Integration Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: 'AI Provider to test'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - openai
+          - anthropic
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-22.04
+    
+    # Only run if secrets are available
+    if: |
+      (github.event.inputs.provider == 'all' && secrets.OPENAI_API_KEY && secrets.ANTHROPIC_API_KEY) ||
+      (github.event.inputs.provider == 'openai' && secrets.OPENAI_API_KEY) ||
+      (github.event.inputs.provider == 'anthropic' && secrets.ANTHROPIC_API_KEY)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: imagick
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Create SQLite Database
+        run: touch database/database.sqlite
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy Environment File
+        run: cp .env.example .env
+
+      - name: Configure API Keys
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+          echo "AI_PROVIDER=openai" >> .env
+
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      - name: Publish Ziggy Configuration
+        run: php artisan ziggy:generate
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Run All API Tests
+        if: github.event.inputs.provider == 'all'
+        run: php artisan test --group=real-api
+
+      - name: Run OpenAI Tests
+        if: github.event.inputs.provider == 'openai'
+        run: php artisan test --group=openai
+
+      - name: Run Anthropic Tests
+        if: github.event.inputs.provider == 'anthropic'
+        run: php artisan test --group=anthropic
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-results
+          path: |
+            tests/output_*.md
+            tests/output_*.txt

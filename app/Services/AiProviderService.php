@@ -242,11 +242,23 @@ class AiProviderService
         }
 
         // Use JSON Machine for robust parsing
-        $decodedContent = $this->parseJsonWithJsonMachine($result['content'][0]['text']);
+        $rawContent = $result['content'][0]['text'];
+
+        // Debug: save raw content for analysis
+        if (app()->environment('testing', 'local')) {
+            file_put_contents(storage_path('logs/anthropic_raw_response.txt'), $rawContent);
+            Log::info('Anthropic raw response saved to logs/anthropic_raw_response.txt', [
+                'length' => strlen($rawContent),
+                'first_500_chars' => substr($rawContent, 0, 500),
+            ]);
+        }
+
+        $decodedContent = $this->parseJsonWithJsonMachine($rawContent);
 
         if (! is_array($decodedContent)) {
             Log::error('Anthropic returned invalid JSON content', [
-                'content' => $result['content'][0]['text'],
+                'content' => $rawContent,
+                'content_length' => strlen($rawContent),
             ]);
             throw new RuntimeException('AI provider returned invalid JSON content');
         }
@@ -268,6 +280,32 @@ class AiProviderService
             return $decoded;
         }
 
+        // Log JSON error for debugging
+        $jsonError = json_last_error_msg();
+        Log::info('Standard JSON decode failed', [
+            'error' => $jsonError,
+            'first_100_chars' => substr($jsonString, 0, 100),
+        ]);
+
+        // Check if this is a JSON with unescaped newlines (common with AI responses)
+        // Try to fix it by extracting and properly escaping the message content
+        if (preg_match('/^\s*\{\s*"message"\s*:\s*"(.*)"\s*\}\s*$/s', $jsonString, $matches)) {
+            $messageContent = $matches[1];
+
+            // Properly escape the message content for JSON
+            $escapedMessage = json_encode($messageContent, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+            // Rebuild the JSON with properly escaped content
+            $fixedJson = '{"message":' . $escapedMessage . '}';
+
+            $decoded = json_decode($fixedJson, true);
+            if (is_array($decoded)) {
+                Log::info('JSON parsed successfully after fixing unescaped newlines');
+
+                return $decoded;
+            }
+        }
+
         // Try to parse with JSON Machine which handles incomplete JSON better
         try {
             // Clean the JSON string
@@ -282,6 +320,17 @@ class AiProviderService
             // Add missing closing braces/brackets
             $cleanedJson .= str_repeat(']', max(0, $openBrackets - $closeBrackets));
             $cleanedJson .= str_repeat('}', max(0, $openBraces - $closeBraces));
+
+            // Try standard decode again after cleanup
+            $decoded = json_decode($cleanedJson, true);
+            if (is_array($decoded)) {
+                Log::info('JSON parsed successfully after bracket completion', [
+                    'added_brackets' => max(0, $openBrackets - $closeBrackets),
+                    'added_braces' => max(0, $openBraces - $closeBraces),
+                ]);
+
+                return $decoded;
+            }
 
             // Use JSON Machine with ExtJsonDecoder for better error handling
             $items = Items::fromString($cleanedJson, [
@@ -307,12 +356,15 @@ class AiProviderService
             ]);
         }
 
-        // Fallback: try to extract just the message field for translation responses
-        if (preg_match('/"message"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/', $jsonString, $matches)) {
-            $message = json_decode('"' . $matches[1] . '"');
+        // Enhanced fallback: try to extract the message field with multiline support
+        // This regex handles multiline content in the message field
+        if (preg_match('/"message"\s*:\s*"((?:[^"\\\\]|\\\\.|\\\\n|\\\\r)*)"/s', $jsonString, $matches)) {
+            $escapedMessage = $matches[1];
+            // Decode the JSON-escaped string
+            $message = json_decode('"' . $escapedMessage . '"');
             if ($message !== null) {
                 Log::warning('JSON recovered by extracting message field', [
-                    'extracted_message' => $message,
+                    'message_length' => strlen($message),
                 ]);
 
                 return ['message' => $message];

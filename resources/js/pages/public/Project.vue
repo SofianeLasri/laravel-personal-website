@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LightShape from '@/components/public/LightShape.vue';
+import MarkdownViewer from '@/components/public/MarkdownViewer.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
 import ProjectScreenshotsContainer from '@/components/public/ProjectPage/ProjectScreenshotsContainer.vue';
 import ProjectVideoGallery from '@/components/public/ProjectPage/ProjectVideoGallery.vue';
@@ -12,7 +13,6 @@ import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import { User } from 'lucide-vue-next';
 import { ref } from 'vue';
-import VueMarkdown from 'vue-markdown-render';
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -94,7 +94,7 @@ if (props.creation.screenshots.length > 0) {
                 <div class="content-sections mt-8">
                     <section id="description" class="flex flex-col gap-8">
                         <ContentSectionTitle>{{ t('project.description') }}</ContentSectionTitle>
-                        <vue-markdown class="markdown-view" :source="creation.fullDescription" />
+                        <MarkdownViewer :source="creation.fullDescription" />
                     </section>
 
                     <section id="features" class="mt-16 flex flex-col gap-8" v-if="creation.features.length > 0">

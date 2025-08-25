@@ -24,22 +24,22 @@ withDefaults(defineProps<Props>(), {
 
 <style>
 .dots-background {
-    background-image: url('/images/dots-light.svg');
+    background-image: url('../../images/public/dots-light.svg');
     background-repeat: repeat;
     position: relative;
 }
 
 @media (prefers-color-scheme: dark) {
     html:not(.light) .dots-background {
-        background-image: url('/images/dots-dark.svg');
+        background-image: url('../../images/public/dots-dark.svg');
     }
 }
 
 html.dark .dots-background {
-    background-image: url('/images/dots-dark.svg');
+    background-image: url('../../images/public/dots-dark.svg');
 }
 
 html.light .dots-background {
-    background-image: url('/images/dots-light.svg');
+    background-image: url('../../images/public/dots-light.svg');
 }
 </style>

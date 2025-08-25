@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import hljs from 'highlight.js';
-import '../../../css/markdown-viewer.css';
+import '../../../css/public.css';
 import VueMarkdown from 'vue-markdown-render';
 
 defineProps<{

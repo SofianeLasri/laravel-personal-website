@@ -44,7 +44,7 @@
 
     /* Lists */
     & ul {
-        @apply mb-4 list-disc list-inside pt-2 pl-4;
+        @apply mb-4 list-disc list-outside pt-2 pl-8;
     }
 
     & ul li {
@@ -52,7 +52,7 @@
     }
 
     & ol {
-        @apply mb-4 list-decimal list-inside pt-2 pl-4;
+        @apply mb-4 list-decimal list-outside pt-2 pl-8;
     }
 
     & ol li {

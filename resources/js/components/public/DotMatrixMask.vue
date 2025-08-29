@@ -5,6 +5,7 @@ const mouseX = ref(-1000);
 const mouseY = ref(-1000);
 const isHovering = ref(false);
 const isDarkMode = ref(false);
+const fadeOut = ref(false);
 
 // Check if device is mobile
 const isMobile = computed(() => {
@@ -19,10 +20,10 @@ const showEffect = computed(() => {
 
 // CSS variables for the radial gradient mask
 const maskStyle = computed(() => {
-    if (!showEffect.value) {
+    if (!showEffect.value || fadeOut.value) {
         return {
-            '--mouse-x': '-1000px',
-            '--mouse-y': '-1000px',
+            '--mouse-x': `${mouseX.value}px`,
+            '--mouse-y': `${mouseY.value}px`,
             opacity: 0,
         };
     }
@@ -41,10 +42,19 @@ const handleMouseMove = (e: MouseEvent) => {
     mouseX.value = e.clientX;
     mouseY.value = e.clientY;
     isHovering.value = true;
+    fadeOut.value = false;
 };
 
-const handleMouseLeave = () => {
-    isHovering.value = false;
+const handleMouseLeave = (e: MouseEvent) => {
+    // Check if mouse is really leaving the window
+    if (e.clientY <= 0 || e.clientX <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+        fadeOut.value = true;
+    }
+};
+
+const handleMouseEnter = () => {
+    fadeOut.value = false;
+    isHovering.value = true;
 };
 
 // Update dark mode state
@@ -54,8 +64,9 @@ const updateDarkMode = () => {
 
 onMounted(() => {
     if (!isMobile.value) {
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseleave', handleMouseLeave);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseleave', handleMouseLeave);
+        document.addEventListener('mouseenter', handleMouseEnter);
     }
 
     // Initial dark mode check
@@ -77,8 +88,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    window.removeEventListener('mousemove', handleMouseMove);
-    window.removeEventListener('mouseleave', handleMouseLeave);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseleave', handleMouseLeave);
+    document.removeEventListener('mouseenter', handleMouseEnter);
 });
 </script>
 
@@ -116,7 +128,7 @@ onUnmounted(() => {
     position: absolute;
     inset: 0;
     background-repeat: repeat;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.5s ease-out;
     mix-blend-mode: screen; /* Use screen blend mode for better visibility */
 
     /* Radial gradient mask that follows the mouse */

@@ -76,7 +76,7 @@ onMounted(() => {
 
                 <div class="min-w-0 flex-1">
                     <p class="mb-2 text-sm font-medium text-gray-900 dark:text-gray-100">Current language: French</p>
-                    <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">Would you like to translate this page to English?</p>
+                    <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">The website is also available in english, would you like to switch?</p>
 
                     <div class="flex gap-2">
                         <button

@@ -92,7 +92,7 @@ if (props.creation.screenshots.length > 0) {
                 />
 
                 <div class="content-sections mt-8">
-                    <section id="description" class="flex flex-col gap-8">
+                    <section id="description" class="flex flex-col">
                         <ContentSectionTitle>{{ t('project.description') }}</ContentSectionTitle>
                         <MarkdownViewer :source="creation.fullDescription" />
                     </section>
@@ -135,7 +135,7 @@ if (props.creation.screenshots.length > 0) {
                         </div>
                     </section>
 
-                    <section id="technologies" class="mt-16 flex flex-col gap-8" v-if="creation.technologies.length > 0">
+                    <section id="technologies" class="mt-16 flex flex-col" v-if="creation.technologies.length > 0">
                         <ContentSectionTitle>{{ t('project.technologies_used') }}</ContentSectionTitle>
                         <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                             <TechnologyCard
@@ -149,12 +149,12 @@ if (props.creation.screenshots.length > 0) {
                         </div>
                     </section>
 
-                    <section id="videos" class="mt-16 flex flex-col gap-8" v-if="creation.videos.length > 0">
+                    <section id="videos" class="mt-16 flex flex-col" v-if="creation.videos.length > 0">
                         <ContentSectionTitle>{{ t('project.videos') }}</ContentSectionTitle>
                         <ProjectVideoGallery :videos="creation.videos" />
                     </section>
 
-                    <section id="screenshots" class="mt-16 flex flex-col gap-8" v-if="creation.screenshots.length > 0">
+                    <section id="screenshots" class="mt-16 flex flex-col" v-if="creation.screenshots.length > 0">
                         <ContentSectionTitle>{{ t('project.screenshots') }}</ContentSectionTitle>
                         <ProjectScreenshotsContainer :screenshots="creation.screenshots" />
                     </section>

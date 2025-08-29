@@ -134,13 +134,13 @@ const formatPeriod = () => {
             <!-- Content Sections -->
             <div class="flex flex-col gap-16">
                 <!-- Description Section -->
-                <section class="flex flex-col gap-8">
+                <section class="flex flex-col">
                     <ContentSectionTitle>{{ t('experience.description') }}</ContentSectionTitle>
                     <vue-markdown class="markdown-view" :source="experience.fullDescription" />
                 </section>
 
                 <!-- Technologies Section -->
-                <section v-if="experience.technologies.length > 0" class="flex flex-col gap-8">
+                <section v-if="experience.technologies.length > 0" class="flex flex-col">
                     <ContentSectionTitle>{{ t('experience.technologies_used') }}</ContentSectionTitle>
                     <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                         <TechnologyCard

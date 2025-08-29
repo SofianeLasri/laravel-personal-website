@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import hljs from 'highlight.js';
-import '../../../css/public.css';
 import VueMarkdown from 'vue-markdown-render';
+import '../../../css/public.css';
 
 defineProps<{
     source: string;

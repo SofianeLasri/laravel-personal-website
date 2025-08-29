@@ -76,6 +76,10 @@ if (props.creation.screenshots.length > 0) {
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
+            <LightShape class="absolute top-[40rem] right-[-27rem] xl:right-[-15rem]" />
+            <LightShape class="absolute top-[80rem] left-[-27rem] xl:left-[-15rem]" />
+            <LightShape class="absolute top-[140rem] right-[-27rem] xl:right-[-15rem]" />
+            <LightShape class="absolute bottom-[40rem] left-[-27rem] xl:left-[-15rem]" />
         </div>
 
         <div class="z-10 container mb-16 flex flex-col gap-16 px-4">

@@ -13,6 +13,7 @@ return [
     'main_menu' => 'Menu principal',
     'close_menu' => 'Fermer le menu',
     'theme' => 'Thème',
+    'dot_matrix_effect' => 'Effet Matrice de Points',
 
     // Search
     'search' => 'Rechercher',

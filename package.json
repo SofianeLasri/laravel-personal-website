@@ -55,6 +55,7 @@
         "lucide-vue-next": "^0.468.0",
         "photoswipe": "^5.4.4",
         "photoswipe-dynamic-caption-plugin": "^1.2.7",
+        "pinia": "^3.0.3",
         "prosemirror-state": "^1.4.3",
         "prosemirror-view": "^1.39.1",
         "radix-vue": "^1.9.17",

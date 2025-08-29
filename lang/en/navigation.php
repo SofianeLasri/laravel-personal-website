@@ -13,6 +13,7 @@ return [
     'main_menu' => 'Main menu',
     'close_menu' => 'Close menu',
     'theme' => 'Theme',
+    'dot_matrix_effect' => 'Dot Matrix Effect',
 
     // Search
     'search' => 'Search',

@@ -9,15 +9,12 @@ import ThemeToggle from '@/components/public/ThemeToggle.vue';
 import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import { useRoute } from '@/composables/useRoute';
 import { useTranslation } from '@/composables/useTranslation';
-import { useDotMatrixStore } from '@/stores/dotMatrix';
 import { usePage } from '@inertiajs/vue3';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { Switch } from '@/components/ui/switch';
 
 const page = usePage();
 const route = useRoute();
 const { t } = useTranslation();
-const dotMatrixStore = useDotMatrixStore();
 const currentUrl = computed(() => new URL(page.props.ziggy.location));
 const currentPath = computed(() => currentUrl.value.href);
 
@@ -193,20 +190,6 @@ onUnmounted(() => {
                             <div class="flex items-center gap-4">
                                 <span class="text-lg text-gray-600 dark:text-gray-400">{{ t('navigation.theme') || 'Theme' }}</span>
                                 <ThemeToggle />
-                            </div>
-                        </div>
-
-                        <!-- Dot Matrix Toggle Section (Hidden on mobile) -->
-                        <div class="mt-4 hidden pl-12 md:block">
-                            <div class="flex items-center gap-4">
-                                <span class="text-lg text-gray-600 dark:text-gray-400">{{
-                                    t('navigation.dot_matrix_effect') || 'Dot Matrix Effect'
-                                }}</span>
-                                <Switch
-                                    :checked="dotMatrixStore.isEnabled"
-                                    @update:checked="dotMatrixStore.setEnabled"
-                                    class="data-[state=checked]:bg-atomic-tangerine-400"
-                                />
                             </div>
                         </div>
                     </div>

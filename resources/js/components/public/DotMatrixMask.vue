@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useDotMatrixStore } from '@/stores/dotMatrix';
-
-const dotMatrixStore = useDotMatrixStore();
 
 const mouseX = ref(-1000);
 const mouseY = ref(-1000);
@@ -17,7 +14,7 @@ const isMobile = computed(() => {
 
 // Should show effect
 const showEffect = computed(() => {
-    return dotMatrixStore.isEnabled && !isMobile.value && isHovering.value;
+    return !isMobile.value && isHovering.value;
 });
 
 // CSS variables for the radial gradient mask
@@ -38,7 +35,7 @@ const maskStyle = computed(() => {
 });
 
 const handleMouseMove = (e: MouseEvent) => {
-    if (!dotMatrixStore.isEnabled || isMobile.value) return;
+    if (isMobile.value) return;
 
     // Use clientX/clientY since container is now fixed
     mouseX.value = e.clientX;

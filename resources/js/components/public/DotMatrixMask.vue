@@ -87,10 +87,15 @@ onUnmounted(() => {
 
 <template>
     <div class="dot-matrix-container">
-        <!-- Orange dots layer (bottom) -->
-        <div class="dot-matrix-orange" :style="maskStyle" aria-hidden="true" />
-        <!-- Normal dots layer (top) -->
-        <div class="dot-matrix-normal" :class="{ 'dot-matrix-dark': isDarkMode, 'dot-matrix-light': !isDarkMode }" aria-hidden="true" />
+        <!-- Base dots layer -->
+        <div class="dot-matrix-base" :class="{ 'dot-matrix-dark': isDarkMode, 'dot-matrix-light': !isDarkMode }" aria-hidden="true" />
+        <!-- Orange dots overlay with inverted mask -->
+        <div
+            class="dot-matrix-orange"
+            :class="{ 'dot-matrix-orange-dark': isDarkMode, 'dot-matrix-orange-light': !isDarkMode }"
+            :style="maskStyle"
+            aria-hidden="true"
+        />
     </div>
 </template>
 
@@ -104,26 +109,34 @@ onUnmounted(() => {
     overflow: hidden;
 }
 
+.dot-matrix-base {
+    position: absolute;
+    inset: 0;
+    background-repeat: repeat;
+}
+
 .dot-matrix-orange {
     position: absolute;
     inset: 0;
-    background-image: url('../../../images/public/dots-orange.svg');
     background-repeat: repeat;
     transition: opacity 0.3s ease;
+    mix-blend-mode: screen; /* Use screen blend mode for better visibility */
 
     /* Radial gradient mask that follows the mouse */
     mask-image: radial-gradient(
         circle 150px at var(--mouse-x) var(--mouse-y),
         rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.8) 30%,
-        rgba(0, 0, 0, 0.4) 60%,
+        rgba(0, 0, 0, 0.9) 25%,
+        rgba(0, 0, 0, 0.6) 50%,
+        rgba(0, 0, 0, 0.2) 75%,
         rgba(0, 0, 0, 0) 100%
     );
     -webkit-mask-image: radial-gradient(
         circle 150px at var(--mouse-x) var(--mouse-y),
         rgba(0, 0, 0, 1) 0%,
-        rgba(0, 0, 0, 0.8) 30%,
-        rgba(0, 0, 0, 0.4) 60%,
+        rgba(0, 0, 0, 0.9) 25%,
+        rgba(0, 0, 0, 0.6) 50%,
+        rgba(0, 0, 0, 0.2) 75%,
         rgba(0, 0, 0, 0) 100%
     );
     mask-size: 100% 100%;
@@ -132,19 +145,24 @@ onUnmounted(() => {
     -webkit-mask-repeat: no-repeat;
 }
 
-.dot-matrix-normal {
-    position: absolute;
-    inset: 0;
-    background-repeat: repeat;
-}
-
-/* Light theme */
+/* Light theme base dots */
 .dot-matrix-light {
     background-image: url('../../../images/public/dots-light.svg');
 }
 
-/* Dark theme */
+/* Dark theme base dots */
 .dot-matrix-dark {
     background-image: url('../../../images/public/dots-dark.svg');
+}
+
+/* Orange dots for light theme */
+.dot-matrix-orange-light {
+    background-image: url('../../../images/public/dots-orange.svg');
+    mix-blend-mode: multiply; /* Better blend for light theme */
+}
+
+/* Brighter orange dots for dark theme */
+.dot-matrix-orange-dark {
+    background-image: url('../../../images/public/dots-orange.svg');
 }
 </style>

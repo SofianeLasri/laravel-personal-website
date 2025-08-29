@@ -7,6 +7,7 @@ const dotMatrixStore = useDotMatrixStore();
 const mouseX = ref(-1000);
 const mouseY = ref(-1000);
 const isHovering = ref(false);
+const isDarkMode = ref(false);
 
 // Check if device is mobile
 const isMobile = computed(() => {
@@ -49,11 +50,33 @@ const handleMouseLeave = () => {
     isHovering.value = false;
 };
 
+// Update dark mode state
+const updateDarkMode = () => {
+    isDarkMode.value = document.documentElement.classList.contains('dark');
+};
+
 onMounted(() => {
     if (!isMobile.value) {
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseleave', handleMouseLeave);
     }
+
+    // Initial dark mode check
+    updateDarkMode();
+
+    // Watch for theme changes
+    const observer = new MutationObserver(() => {
+        updateDarkMode();
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class'],
+    });
+
+    onUnmounted(() => {
+        observer.disconnect();
+    });
 });
 
 onUnmounted(() => {
@@ -67,7 +90,7 @@ onUnmounted(() => {
         <!-- Orange dots layer (bottom) -->
         <div class="dot-matrix-orange" :style="maskStyle" aria-hidden="true" />
         <!-- Normal dots layer (top) -->
-        <div class="dot-matrix-normal" aria-hidden="true" />
+        <div class="dot-matrix-normal" :class="{ 'dot-matrix-dark': isDarkMode, 'dot-matrix-light': !isDarkMode }" aria-hidden="true" />
     </div>
 </template>
 
@@ -116,26 +139,12 @@ onUnmounted(() => {
 }
 
 /* Light theme */
-.dot-matrix-normal {
+.dot-matrix-light {
     background-image: url('../../../images/public/dots-light.svg');
 }
 
 /* Dark theme */
-:global(.dark) .dot-matrix-normal {
+.dot-matrix-dark {
     background-image: url('../../../images/public/dots-dark.svg');
-}
-
-/* System preference dark */
-@media (prefers-color-scheme: dark) {
-    :global(html:not(.light)) .dot-matrix-normal {
-        background-image: url('../../../images/public/dots-dark.svg');
-    }
-}
-
-/* System preference light */
-@media (prefers-color-scheme: light) {
-    :global(html:not(.dark)) .dot-matrix-normal {
-        background-image: url('../../../images/public/dots-light.svg');
-    }
 }
 </style>

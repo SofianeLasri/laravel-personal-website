@@ -177,7 +177,7 @@
 
     & .hljs-comment,
     & .hljs-quote {
-        color: #5c6370;
+        @apply text-gray-500;
         font-style: italic;
     }
 
@@ -249,7 +249,7 @@
 
     & .markdown-view {
         & pre {
-            @apply border-gray-600 bg-gray-800;
+            @apply border-gray-600 bg-gray-950;
         }
 
         & code:not(pre code) {

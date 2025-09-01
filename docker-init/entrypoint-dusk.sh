@@ -26,9 +26,15 @@ echo "✅ MariaDB is ready!"
 echo "🗃️ Running migrations..."
 php artisan migrate --env=dusk --force
 
-# Construire les assets frontend
-echo "📦 Building frontend assets..."
-npm run build
+# Vérifier que les assets ont été compilés
+echo "📦 Checking frontend assets..."
+if [ ! -f "/app/public/build/manifest.json" ]; then
+    echo "❌ ERROR: Frontend assets not built!"
+    echo "   Please run 'npm run build' on your host machine before starting Dusk containers."
+    echo "   This is required because building on WSL is too slow."
+    exit 1
+fi
+echo "✅ Frontend assets found!"
 
 # Installer Chrome Driver pour Dusk
 echo "🌐 Installing Chrome Driver..."

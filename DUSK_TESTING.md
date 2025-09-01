@@ -15,16 +15,24 @@ Tous les services Dusk sont intégrés dans le `docker-compose.yml` principal av
 
 ## Utilisation
 
+### Prérequis (IMPORTANT sur WSL)
+```bash
+# Compiler les assets AVANT de démarrer les containers Dusk
+npm run build
+```
+⚠️ **Note WSL** : La compilation des assets est très lente dans les containers sur WSL. 
+Il est donc obligatoire de faire `npm run build` sur la machine hôte avant de lancer Dusk.
+
 ### Démarrer l'environnement Dusk
 ```bash
 # Démarrer tous les services Dusk (avec initialisation automatique)
 docker-compose --profile dusk up -d
 
 # Le container va automatiquement :
+# - Vérifier la présence des assets compilés
 # - Configurer l'environnement Dusk
 # - Installer Chrome Driver
 # - Migrer la base de données
-# - Construire les assets
 # - Démarrer le serveur sur le port 8001
 ```
 

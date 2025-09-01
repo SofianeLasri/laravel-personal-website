@@ -15,7 +15,7 @@ class ExampleTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
                 ->assertPathIs('/')
-                ->waitForText('Développeur', 10)
+                ->waitFor('#app', 1)
                 ->assertSee('Développeur');
         });
     }

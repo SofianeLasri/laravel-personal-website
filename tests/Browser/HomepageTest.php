@@ -15,7 +15,7 @@ class HomepageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
                 ->assertPathIs('/')
-                ->waitForText('Full-Stack', 10)
+                ->waitFor('#app', 1)  // Attend que l'app Vue soit montée
                 ->assertSee('Full-Stack');
         });
     }
@@ -27,7 +27,7 @@ class HomepageTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
-                ->waitForText('Laravel', 10)
+                ->waitFor('#app', 1)
                 ->assertSee('Laravel')
                 ->assertSee('PHP');
         });
@@ -41,7 +41,8 @@ class HomepageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/projects')
                 ->assertPathIs('/projects')
-                ->waitForText('Projets', 10);
+                ->waitFor('#app', 1)
+                ->assertSee('Projets');
         });
     }
 }

@@ -123,11 +123,17 @@ jobs:
       - name: Publish Ziggy Configuration
         run: php artisan ziggy:generate
 
-      - name: Build Assets
-        run: npm run build
+      - name: Build SSR Assets
+        run: npm run build:ssr
 
       - name: Run Laravel Server
         run: php artisan serve --no-reload &
+
+      - name: Run Inertia SSR Server
+        run: php artisan inertia:start-ssr &
+
+      - name: Wait for servers to be ready
+        run: sleep 5
 
       - name: Run Laravel Dusk
         run: php artisan dusk

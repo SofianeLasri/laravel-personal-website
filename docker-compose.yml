@@ -19,7 +19,6 @@ services:
     depends_on:
       - mariadb
       - redis
-      - selenium
     networks:
       - app-network
 
@@ -43,14 +42,66 @@ services:
     networks:
       - app-network
 
+  # Services pour les tests Dusk E2E
+  app-dusk:
+    container_name: laravel.dusk
+    build:
+      context: .
+      args:
+        INSTALL_XDEBUG: "false"
+    restart: unless-stopped
+    working_dir: /app
+    entrypoint: ["docker-init/entrypoint-dusk.sh"]
+    ports:
+      - '8001:8000'
+    volumes:
+      - .:/app
+      - /app/vendor
+      - /app/node_modules
+    depends_on:
+      - mariadb-dusk
+      - redis-dusk
+      - selenium
+    networks:
+      - app-network
+    profiles:
+      - dusk
+
+  redis-dusk:
+    image: redis:alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "6380:6379"
+    networks:
+      - app-network
+    profiles:
+      - dusk
+
+  mariadb-dusk:
+    image: mariadb:latest
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: password
+      MARIADB_DATABASE: laravel_dusk
+    networks:
+      - app-network
+    profiles:
+      - dusk
+
   selenium:
     image: selenium/standalone-chrome
     restart: unless-stopped
     ports:
-      - "${SELENIUM_PORT:-4444}:4444"
-      - "${SELENIUM_VNC_PORT:-7900}:7900"
+      - "4444:4444"
+      - "7900:7900"
+    shm_size: 2gb
     networks:
       - app-network
+    profiles:
+      - dusk
 
 networks:
   app-network:

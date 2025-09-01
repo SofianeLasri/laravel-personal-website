@@ -14,9 +14,10 @@ npm install
 # Générer la clé d'application si nécessaire
 php artisan key:generate --env=dusk
 
-# Créer le fichier SQLite pour les tests (optionnel, sera créé automatiquement par DatabaseMigrations)
-echo "🗃️ Preparing SQLite database..."
-touch database/database.sqlite
+# Créer le fichier SQLite pour les tests Dusk
+echo "🗃️ Preparing SQLite database for Dusk..."
+touch database/dusk.sqlite
+chmod 666 database/dusk.sqlite
 
 # Vérifier que les assets ont été compilés
 echo "📦 Checking frontend assets..."

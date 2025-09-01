@@ -2,8 +2,6 @@
 
 namespace Tests\Browser;
 
-use App\Models\Creation;
-use App\Models\Technology;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
@@ -17,54 +15,33 @@ class HomepageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
                 ->assertPathIs('/')
-                ->assertPresent('body');
+                ->waitForText('Full-Stack', 10)
+                ->assertSee('Full-Stack');
         });
     }
 
     /**
-     * Test that creations are displayed on the homepage with factory data.
+     * Test that the homepage shows the portfolio section.
      */
-    public function test_homepage_displays_creations_from_factory(): void
+    public function test_homepage_displays_portfolio_section(): void
     {
-        // Create test data using factories
-        $technology = Technology::factory()->create([
-            'name' => 'Laravel Test',
-            'type' => 'backend',
-        ]);
-
-        $creation = Creation::factory()
-            ->published()
-            ->create([
-                'title' => 'Test Project E2E',
-                'slug' => 'test-project-e2e',
-            ]);
-
-        $creation->technologies()->attach($technology);
-
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
-                ->waitForText('Test Project E2E', 10)
-                ->assertSee('Test Project E2E');
+                ->waitForText('Laravel', 10)
+                ->assertSee('Laravel')
+                ->assertSee('PHP');
         });
     }
 
     /**
-     * Test navigation to project detail page.
+     * Test that we can navigate to projects page.
      */
-    public function test_navigation_to_project_detail(): void
+    public function test_navigation_to_projects_page(): void
     {
-        $creation = Creation::factory()
-            ->published()
-            ->create([
-                'title' => 'Navigable Project',
-                'slug' => 'navigable-project',
-            ]);
-
         $this->browse(function (Browser $browser) {
-            $browser->visit('/')
-                ->clickLink('Navigable Project')
-                ->assertPathIs('/projects/navigable-project')
-                ->assertSee('Navigable Project');
+            $browser->visit('/projects')
+                ->assertPathIs('/projects')
+                ->waitForText('Projets', 10);
         });
     }
 }

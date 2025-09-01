@@ -14,17 +14,9 @@ npm install
 # Générer la clé d'application si nécessaire
 php artisan key:generate --env=dusk
 
-# Attendre que MariaDB soit prête
-echo "⏳ Waiting for MariaDB to be ready..."
-until php artisan db:show --env=dusk 2>/dev/null; do
-    echo "   MariaDB is not ready yet..."
-    sleep 2
-done
-echo "✅ MariaDB is ready!"
-
-# Exécuter les migrations
-echo "🗃️ Running migrations..."
-php artisan migrate --env=dusk --force
+# Créer le fichier SQLite pour les tests (optionnel, sera créé automatiquement par DatabaseMigrations)
+echo "🗃️ Preparing SQLite database..."
+touch database/database.sqlite
 
 # Vérifier que les assets ont été compilés
 echo "📦 Checking frontend assets..."

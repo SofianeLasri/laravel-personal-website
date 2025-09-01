@@ -59,33 +59,7 @@ services:
       - /app/vendor
       - /app/node_modules
     depends_on:
-      - mariadb-dusk
-      - redis-dusk
       - selenium
-    networks:
-      - app-network
-    profiles:
-      - dusk
-
-  redis-dusk:
-    image: redis:alpine
-    restart: unless-stopped
-    tty: true
-    ports:
-      - "6380:6379"
-    networks:
-      - app-network
-    profiles:
-      - dusk
-
-  mariadb-dusk:
-    image: mariadb:latest
-    restart: unless-stopped
-    ports:
-      - "3307:3306"
-    environment:
-      MARIADB_ROOT_PASSWORD: password
-      MARIADB_DATABASE: laravel_dusk
     networks:
       - app-network
     profiles:

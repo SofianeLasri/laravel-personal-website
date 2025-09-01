@@ -2,15 +2,16 @@
 
 ## Architecture
 
-Les tests E2E Laravel Dusk sont configurés pour fonctionner avec une base de données MariaDB complètement isolée, permettant d'exécuter les tests sans affecter les données de développement.
+Les tests E2E Laravel Dusk utilisent une architecture simplifiée avec SQLite en mémoire, similaire aux tests PHPUnit, garantissant une isolation totale et des performances optimales.
 
 ### Composants Docker
 
 Tous les services Dusk sont intégrés dans le `docker-compose.yml` principal avec un profil `dusk` :
 
 - **laravel.dusk** : Container PHP/Laravel dédié aux tests (port 8001)
-- **mariadb-dusk** : Base de données MariaDB isolée (port 3307)
-- **redis-dusk** : Instance Redis dédiée (port 6380)
+  - Base de données : SQLite en mémoire (créée automatiquement pour chaque test)
+  - Cache : Système de fichiers local
+  - Queue : Synchrone (pas de workers)
 - **selenium** : Serveur Selenium pour l'exécution des tests browser (port 4444)
 
 ## Utilisation
@@ -30,9 +31,8 @@ docker-compose --profile dusk up -d
 
 # Le container va automatiquement :
 # - Vérifier la présence des assets compilés
-# - Configurer l'environnement Dusk
+# - Configurer l'environnement Dusk (SQLite, cache file)
 # - Installer Chrome Driver
-# - Migrer la base de données
 # - Démarrer le serveur sur le port 8001
 ```
 
@@ -63,10 +63,11 @@ Pour configurer PhpStorm pour exécuter les tests Dusk :
 
 ## Fonctionnement
 
-1. **Isolation complète** : Les tests utilisent une base MariaDB dédiée (`laravel_dusk`) qui est créée et détruite à chaque exécution
-2. **Migrations automatiques** : Le trait `DatabaseMigrations` assure que la base est migrée avant chaque test
-3. **Factories** : Vous pouvez utiliser les factories Laravel pour créer des données de test
-4. **Nettoyage automatique** : La base est réinitialisée entre chaque test
+1. **Isolation complète** : Chaque test utilise une base SQLite en mémoire, créée et détruite automatiquement
+2. **Migrations automatiques** : Le trait `DatabaseMigrations` migre la base avant chaque test
+3. **Factories** : Support complet des factories Laravel pour créer des données de test
+4. **Nettoyage automatique** : La base est réinitialisée entre chaque test (SQLite en mémoire)
+5. **Architecture légère** : Pas de services externes (MariaDB/Redis), tout est autonome
 
 ## Écriture de tests
 
@@ -107,8 +108,9 @@ docker logs laravel.dusk
 
 ## Avantages de cette configuration
 
-✅ **Isolation totale** : Aucun impact sur la base de développement  
-✅ **Reproductibilité** : Même environnement pour tous les développeurs  
-✅ **CI/CD Ready** : Configuration identique pour GitHub Actions  
+✅ **Architecture ultra-simple** : Seulement 2 containers (app-dusk + selenium)  
+✅ **Isolation totale** : SQLite en mémoire, aucun impact sur les données de dev  
+✅ **Performance optimale** : SQLite en mémoire = tests très rapides  
+✅ **Cohérence** : Même approche que les tests PHPUnit (SQLite)  
 ✅ **Factories support** : Utilisation complète des factories Laravel  
-✅ **Performance** : Base dédiée = tests plus rapides
+✅ **CI/CD Ready** : Configuration légère et portable

@@ -14,7 +14,9 @@ class ExampleTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
-                ->assertSee('Laravel');
+                ->assertPathIs('/')
+                ->waitForText('Laravel', 10) // Attendre que le contenu se charge
+                ->assertSee('Laravel'); // Vérifier que Laravel est visible
         });
     }
 }

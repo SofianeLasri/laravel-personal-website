@@ -90,24 +90,36 @@ return new class extends Migration
 
         // Suppression des index sur les tables associées
         Schema::table('ip_addresses', function (Blueprint $table) {
-            $table->dropIndexIfExists('idx_ip');
+            if (Schema::hasIndex('ip_addresses', 'idx_ip')) {
+                $table->dropIndex('idx_ip');
+            }
         });
 
         Schema::table('user_agents', function (Blueprint $table) {
-            $table->dropIndexIfExists('idx_user_agent');
+            if (Schema::hasIndex('user_agents', 'idx_user_agent')) {
+                $table->dropIndex('idx_user_agent');
+            }
         });
 
         Schema::table('urls', function (Blueprint $table) {
-            $table->dropIndexIfExists('idx_url');
+            if (Schema::hasIndex('urls', 'idx_url')) {
+                $table->dropIndex('idx_url');
+            }
         });
 
         Schema::table('ip_address_metadata', function (Blueprint $table) {
-            $table->dropIndexIfExists('idx_ip_metadata');
-            $table->dropIndexIfExists('idx_request_stats');
+            if (Schema::hasIndex('ip_address_metadata', 'idx_ip_metadata')) {
+                $table->dropIndex('idx_ip_metadata');
+            }
+            if (Schema::hasIndex('ip_address_metadata', 'idx_request_stats')) {
+                $table->dropIndex('idx_request_stats');
+            }
         });
 
         Schema::table('user_agent_metadata', function (Blueprint $table) {
-            $table->dropIndexIfExists('idx_ua_metadata');
+            if (Schema::hasIndex('user_agent_metadata', 'idx_ua_metadata')) {
+                $table->dropIndex('idx_ua_metadata');
+            }
         });
     }
 };

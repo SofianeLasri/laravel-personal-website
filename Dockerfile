@@ -11,6 +11,7 @@ RUN install-php-extensions \
     redis \
     pcntl \
     bcmath \
+    intl \
     xdebug
 
 RUN apt-get update

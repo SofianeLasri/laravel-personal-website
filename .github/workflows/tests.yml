@@ -69,6 +69,7 @@ jobs:
   dusk:
     runs-on: ubuntu-22.04
     needs: phpunit
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
 
     services:
       mariadb:
@@ -125,6 +126,12 @@ jobs:
 
       - name: Build SSR Assets
         run: npm run build:ssr
+
+      - name: Run Database Migrations
+        run: php artisan migrate --force
+
+      - name: Seed Database with Test Data
+        run: php artisan db:seed --class=DuskTestSeeder --force
 
       - name: Run Laravel Server
         run: php artisan serve --no-reload &

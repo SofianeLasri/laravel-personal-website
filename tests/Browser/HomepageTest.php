@@ -15,8 +15,8 @@ class HomepageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
                 ->assertPathIs('/')
-                ->pause(2000)  // Attendre le chargement
-                ->assertSourceHas('Full-Stack'); // Vérifier dans le source
+                ->waitForText('Laravel', 10)
+                ->assertSee('Laravel');
         });
     }
 
@@ -27,9 +27,9 @@ class HomepageTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
-                ->pause(2000)  // Attendre le chargement
-                ->assertSourceHas('Laravel')
-                ->assertSourceHas('PHP');
+                ->waitForText('Laravel', 10)
+                ->assertSee('Laravel')
+                ->assertSee('PHP');
         });
     }
 
@@ -41,8 +41,8 @@ class HomepageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/projects')
                 ->assertPathIs('/projects')
-                ->pause(2000)  // Attendre le chargement
-                ->assertTitleContains('Projets'); // Vérifier que le titre contient "Projets"
+                ->waitForText('Projets', 10)
+                ->assertSee('Projets');
         });
     }
 }

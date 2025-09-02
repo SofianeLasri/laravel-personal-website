@@ -54,7 +54,6 @@ class DuskTestSeeder extends Seeder
             'name' => 'Portfolio Website',
             'slug' => 'portfolio-website',
             'type' => 'website',
-            'is_published' => true,
         ]);
 
         // Attach technologies to the project
@@ -65,7 +64,6 @@ class DuskTestSeeder extends Seeder
             'name' => 'E-commerce Platform',
             'slug' => 'ecommerce-platform',
             'type' => 'application',
-            'is_published' => true,
         ]);
 
         $project2->technologies()->attach([$laravelTech->id, $phpTech->id, $jsTech->id]);
@@ -73,9 +71,22 @@ class DuskTestSeeder extends Seeder
         // Create minimal experience
         $this->command->info('Creating minimal experience...');
 
+        $titleKey = TranslationKey::create(['key' => 'experience.title']);
+        Translation::create([
+            'translation_key_id' => $titleKey->id,
+            'locale' => 'en',
+            'text' => 'Full-Stack Developer',
+        ]);
+
+        Translation::create([
+            'translation_key_id' => $titleKey->id,
+            'locale' => 'FR',
+            'text' => 'Développeur Full-Stack',
+        ]);
+
         $experience = Experience::factory()->emploi()->create([
-            'title' => 'Développeur Full-Stack',
-            'company' => 'Tech Company',
+            'organization_name' => 'Tech Company',
+            'title_translation_key_id' => $titleKey->id,
         ]);
 
         $experience->technologies()->attach([$laravelTech->id, $phpTech->id]);
@@ -88,36 +99,36 @@ class DuskTestSeeder extends Seeder
         Translation::create([
             'translation_key_id' => $devKey->id,
             'locale' => 'fr',
-            'value' => 'Développeur',
+            'text' => 'Développeur',
         ]);
         Translation::create([
             'translation_key_id' => $devKey->id,
             'locale' => 'en',
-            'value' => 'Developer',
+            'text' => 'Developer',
         ]);
 
         $fullStackKey = TranslationKey::create(['key' => 'developer.fullstack']);
         Translation::create([
             'translation_key_id' => $fullStackKey->id,
             'locale' => 'fr',
-            'value' => 'Full-Stack',
+            'text' => 'Full-Stack',
         ]);
         Translation::create([
             'translation_key_id' => $fullStackKey->id,
             'locale' => 'en',
-            'value' => 'Full-Stack',
+            'text' => 'Full-Stack',
         ]);
 
         $projectsKey = TranslationKey::create(['key' => 'navigation.projects']);
         Translation::create([
             'translation_key_id' => $projectsKey->id,
             'locale' => 'fr',
-            'value' => 'Projets',
+            'text' => 'Projets',
         ]);
         Translation::create([
             'translation_key_id' => $projectsKey->id,
             'locale' => 'en',
-            'value' => 'Projects',
+            'text' => 'Projects',
         ]);
 
         $this->command->info('Dusk test data seeding completed!');

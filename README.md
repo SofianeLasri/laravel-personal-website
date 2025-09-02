@@ -1,6 +1,6 @@
 <a href="https://sofianelasri.fr" target="_blank"><img src="a1readme-assets/orange-short.png" height="45"></a>
 
-[![tests](https://github.com/SofianeLasri/laravel-personal-website/actions/workflows/tests.yml/badge.svg)](https://github.com/SofianeLasri/laravel-personal-website/actions/workflows/tests.yml)
+[![phpunit](https://github.com/SofianeLasri/laravel-personal-website/actions/workflows/phpunit.yml/badge.svg)](https://github.com/SofianeLasri/laravel-personal-website/actions/workflows/tests.yml)
 [![dusk](https://github.com/SofianeLasri/laravel-personal-website/actions/workflows/dusk.yml/badge.svg)](https://github.com/SofianeLasri/laravel-personal-website/actions/workflows/dusk.yml)
 [![codecov](https://codecov.io/gh/SofianeLasri/laravel-personal-website/graph/badge.svg?token=Q2UNOVRD1P)](https://codecov.io/gh/SofianeLasri/laravel-personal-website)
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)

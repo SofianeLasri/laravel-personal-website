@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\CreationType;
 use App\Enums\TechnologyType;
 use App\Models\Creation;
 use App\Models\Experience;
@@ -53,7 +54,7 @@ class DuskTestSeeder extends Seeder
         $project = Creation::factory()->create([
             'name' => 'Portfolio Website',
             'slug' => 'portfolio-website',
-            'type' => 'website',
+            'type' => CreationType::WEBSITE,
         ]);
 
         // Attach technologies to the project
@@ -63,7 +64,7 @@ class DuskTestSeeder extends Seeder
         $project2 = Creation::factory()->create([
             'name' => 'E-commerce Platform',
             'slug' => 'ecommerce-platform',
-            'type' => 'application',
+            'type' => CreationType::WEBSITE,
         ]);
 
         $project2->technologies()->attach([$laravelTech->id, $phpTech->id, $jsTech->id]);

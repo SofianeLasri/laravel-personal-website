@@ -2,14 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Enums\TechnologyType;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\Experience;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,142 +16,117 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('1. Creating technologies');
-        $this->command->info('-- Type languages...');
-        $languages = [
-            'JavaScript', 'Python', 'PHP', 'Java', 'C#', 'TypeScript',
-            'Ruby', 'Go', 'Swift', 'Kotlin',
-        ];
-        $languageTechnologies = collect();
+        $this->command->info('1. Creating technologies with optimized pictures');
 
-        foreach ($languages as $language) {
-            $languageTechnologies->push(
-                Technology::factory()->create([
-                    'name' => $language,
-                    'type' => TechnologyType::LANGUAGE,
-                ])
-            );
-        }
+        // Utiliser la nouvelle méthode createSet() pour créer un ensemble cohérent de technologies
+        $technologies = Technology::factory()->createSet();
+        $this->command->info('-- Created '.$technologies->count().' technologies with optimized icons');
 
-        $this->command->info('-- Type frameworks...');
-        $frameworks = [
-            'Laravel', 'Symfony', 'Django', 'Flask', 'Ruby on Rails',
-            'Express.js', 'Spring', 'Angular', 'React', 'Vue.js',
-        ];
-        $frameworkTechnologies = collect();
-
-        foreach ($frameworks as $framework) {
-            $frameworkTechnologies->push(
-                Technology::factory()->create([
-                    'name' => $framework,
-                    'type' => TechnologyType::FRAMEWORK,
-                ])
-            );
-        }
-
-        $this->command->info('-- Type libraries...');
-        $libraries = [
-            'jQuery', 'Bootstrap', 'Tailwind CSS', 'Lodash', 'Moment.js',
-            'Axios', 'Chart.js', 'Three.js', 'Socket.IO', 'Redux',
-        ];
-        $libraryTechnologies = collect();
-        foreach ($libraries as $library) {
-            $libraryTechnologies->push(
-                Technology::factory()->create([
-                    'name' => $library,
-                    'type' => TechnologyType::LIBRARY,
-                ])
-            );
-        }
-
-        $this->command->info('-- Type game engines...');
-        $gameEngines = [
-            'Unity', 'Unreal Engine', 'Godot', 'CryEngine',
-            'Amazon Lumberyard', 'Bevy', 'Source Engine', 'Source 2',
-        ];
-        $gameEngineTechnologies = collect();
-        foreach ($gameEngines as $gameEngine) {
-            $gameEngineTechnologies->push(
-                Technology::factory()->create([
-                    'name' => $gameEngine,
-                    'type' => TechnologyType::GAME_ENGINE,
-                ])
-            );
-        }
-
-        $allTechnologies = $languageTechnologies->merge($frameworkTechnologies)->merge($libraryTechnologies);
-
-        $attachRandomTechnologies = function ($model) use ($gameEngineTechnologies, $allTechnologies, $languageTechnologies, $frameworkTechnologies, $libraryTechnologies) {
-            $selectedTechs = collect();
-
-            $selectedTechs->push($languageTechnologies->random());
-
-            $selectedTechs->push($frameworkTechnologies->random());
-
-            if (rand(0, 1)) {
-                $selectedTechs->push($libraryTechnologies->random());
-            }
-            if (rand(0, 1)) {
-                $selectedTechs->push($gameEngineTechnologies->random());
-            }
-
-            $remainingCount = rand(1, 3);
-            $remainingTechs = $allTechnologies->diff($selectedTechs)->random(min($remainingCount, $allTechnologies->diff($selectedTechs)->count()));
-            $selectedTechs = $selectedTechs->merge($remainingTechs);
-
-            $model->technologies()->attach($selectedTechs);
-        };
-
-        $this->command->info('2. Creating creations and drafts');
-
-        $creations = Creation::factory()
-            ->withPeople()
-            ->withFeatures()
-            ->withScreenshots()
-            ->withTags()
-            ->count(35)
+        // Créer quelques technologies supplémentaires pour avoir plus de diversité
+        $additionalTechnologies = Technology::factory()
+            ->count(10)
+            ->complete()
             ->create();
 
-        $this->command->info('-- Attaching random technologies to creations...');
+        $allTechnologies = collect($technologies)->merge($additionalTechnologies);
 
-        $creations->each($attachRandomTechnologies);
+        $this->command->info('2. Creating creations with complete relations');
+
+        // Créer des créations complètes avec la nouvelle méthode complete()
+        $creations = Creation::factory()
+            ->count(15)
+            ->complete()
+            ->create();
+
+        $this->command->info('-- Created '.$creations->count().' complete creations');
+
+        // Créer quelques créations avec des technologies spécifiques
+        $specificCreations = Creation::factory()
+            ->count(5)
+            ->create()
+            ->each(function ($creation) use ($allTechnologies) {
+                // Attacher 3-5 technologies aléatoires
+                $selectedTechs = $allTechnologies->random(rand(3, 5));
+                $creation->technologies()->attach($selectedTechs);
+
+                // Créer les optimized pictures
+                $this->createOptimizedPicturesFor($creation->logo);
+                $this->createOptimizedPicturesFor($creation->coverImage);
+            });
+
+        $this->command->info('-- Created '.$specificCreations->count().' creations with specific technologies');
+
+        // Créer quelques brouillons
+        $this->command->info('3. Creating drafts');
 
         $creations->random(3)->each(function ($creation) {
             CreationDraft::fromCreation($creation)->save();
         });
 
         $drafts = CreationDraft::factory()
+            ->count(2)
             ->withPeople()
             ->withFeatures()
             ->withScreenshots()
             ->withTags()
-            ->count(2)
-            ->create();
+            ->create()
+            ->each(function ($draft) use ($allTechnologies) {
+                $draft->technologies()->attach($allTechnologies->random(rand(2, 4)));
+            });
 
-        $this->command->info('-- Attaching random technologies to drafts...');
-        $drafts->each($attachRandomTechnologies);
+        $this->command->info('-- Created '.$drafts->count().' new drafts');
 
         $this->command->info('4. Creating Experiences');
 
         $formations = Experience::factory()->formation()->count(3)->create();
         $emplois = Experience::factory()->emploi()->count(3)->create();
 
-        $this->command->info('-- Attaching random technologies to experiences...');
+        $formations->each(function ($formation) use ($allTechnologies) {
+            $formation->technologies()->attach($allTechnologies->random(rand(2, 4)));
+        });
 
-        $formations->each($attachRandomTechnologies);
-        $emplois->each($attachRandomTechnologies);
+        $emplois->each(function ($emploi) use ($allTechnologies) {
+            $emploi->technologies()->attach($allTechnologies->random(rand(3, 5)));
+        });
 
-        $this->command->info('5. Creating Technologies Experiences');
+        $this->command->info('-- Created '.($formations->count() + $emplois->count()).' experiences');
 
-        $randomTechnologies = Technology::inRandomOrder()->take(3)->get();
+        $this->command->info('5. Creating Technology Experiences');
 
-        foreach ($randomTechnologies as $technology) {
+        $allTechnologies->random(5)->each(function ($technology) {
             TechnologyExperience::factory()->create([
                 'technology_id' => $technology->id,
             ]);
+        });
+
+        $this->command->info('-- Created technology experiences');
+
+        $this->command->info('6. Seeding complete!');
+        $this->command->info('-- Total technologies: '.Technology::count());
+        $this->command->info('-- Total creations: '.Creation::count());
+        $this->command->info('-- Total drafts: '.CreationDraft::count());
+        $this->command->info('-- Technologies with creations: '.
+            Technology::whereHas('creations')->count());
+    }
+
+    protected function createOptimizedPicturesFor($picture): void
+    {
+        if (! $picture) {
+            return;
         }
 
-        $this->command->info('6. Starting pictures optimization process');
-        Artisan::call('optimize:pictures', [], $this->command->getOutput());
+        $formats = ['avif', 'webp', 'jpg'];
+        $variants = ['thumbnail', 'small', 'medium', 'large', 'full'];
+
+        foreach ($formats as $format) {
+            foreach ($variants as $variant) {
+                \App\Models\OptimizedPicture::create([
+                    'picture_id' => $picture->id,
+                    'format' => $format,
+                    'variant' => $variant,
+                    'path' => "uploads/optimized/{$picture->filename}_{$variant}.{$format}",
+                ]);
+            }
+        }
     }
 }

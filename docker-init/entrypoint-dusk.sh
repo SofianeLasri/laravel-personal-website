@@ -2,10 +2,6 @@
 
 echo "🚀 Initializing Dusk testing environment..."
 
-# Copier le fichier d'environnement Dusk
-echo "📋 Setting up Dusk environment..."
-cp .env.dusk.docker .env.dusk.local
-
 # Installer les dépendances
 echo "📦 Installing dependencies..."
 composer install

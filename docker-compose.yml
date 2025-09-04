@@ -52,12 +52,15 @@ services:
     restart: unless-stopped
     working_dir: /app
     entrypoint: ["docker-init/entrypoint-dusk.sh"]
+    env_file:
+      - ./.env.dusk.docker
     ports:
       - '8001:8000'
     volumes:
       - .:/app
       - /app/vendor
       - /app/node_modules
+      - .env.dusk.docker:/app/.env
     depends_on:
       - selenium
     networks:

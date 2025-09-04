@@ -305,3 +305,5 @@ Key environment variables to configure:
 - `IMAGICK_*`: ImageMagick resource limits
 - `QUEUE_CONNECTION`: Queue driver (sync/database/redis)
 - `FILESYSTEM_DISK`: Storage driver (local/bunnycdn)
+- Pour les tests Laravel dusk, on utilise le container laravel.dusk
+- Lance toujours les commandes npm en local et non sur docker car WSL est très lent

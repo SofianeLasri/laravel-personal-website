@@ -72,27 +72,33 @@ class CreationFactory extends Factory
         });
     }
 
+    /**
+     * Complete the creation with a realistic set of related models:
+     * - 3 to 5 technologies (existing or new)
+     * - 2 to 4 features
+     * - 2 to 4 screenshots (with optimized pictures)
+     * - 0 to 3 people
+     * - 2 to 4 tags
+     *
+     * @return $this
+     */
     public function complete(): static
     {
         return $this->afterCreating(function (Creation $creation) {
-            // Créer des technologies variées si aucune n'existe
             $technologies = Technology::count() >= 5
                 ? Technology::inRandomOrder()->take(rand(3, 5))->get()
                 : Technology::factory()->count(5)->create();
 
             $creation->technologies()->attach($technologies);
 
-            // Ajouter des features
             Feature::factory()->count(rand(2, 4))->create([
                 'creation_id' => $creation->id,
             ]);
 
-            // Ajouter des screenshots avec optimized pictures
             $screenshots = Screenshot::factory()->count(rand(2, 4))->create([
                 'creation_id' => $creation->id,
             ]);
 
-            // Créer des optimized pictures pour chaque image
             foreach ([$creation->logo, $creation->coverImage] as $picture) {
                 if ($picture) {
                     $this->createOptimizedPicturesFor($picture);
@@ -105,13 +111,11 @@ class CreationFactory extends Factory
                 }
             }
 
-            // Ajouter des personnes si nécessaire
             if (rand(0, 1)) {
                 $people = Person::factory()->count(rand(1, 3))->create();
                 $creation->people()->attach($people);
             }
 
-            // Ajouter des tags
             $tags = Tag::factory()->count(rand(2, 4))->create();
             $creation->tags()->attach($tags);
         });

@@ -7,6 +7,7 @@ use App\Models\Picture;
 use App\Models\Technology;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Collection;
 
 class TechnologyFactory extends Factory
 {
@@ -121,7 +122,6 @@ class TechnologyFactory extends Factory
     public function complete(): static
     {
         return $this->afterCreating(function (Technology $technology) {
-            // Créer les optimized pictures pour l'icône
             if ($technology->iconPicture) {
                 $this->createOptimizedPicturesFor($technology->iconPicture);
             }
@@ -145,9 +145,11 @@ class TechnologyFactory extends Factory
         }
     }
 
-    public function createSet(): \Illuminate\Support\Collection
+    /**
+     * Create a complete set of technologies for testing purposes.
+     */
+    public function createSet(): Collection
     {
-        // Créer un ensemble complet de technologies pour les tests
         $technologies = collect([
             $this->language()->complete()->create(['name' => 'PHP']),
             $this->framework()->complete()->create(['name' => 'Laravel']),

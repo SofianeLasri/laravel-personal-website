@@ -7,9 +7,6 @@ echo "📦 Installing dependencies..."
 composer install
 npm install
 
-# Générer la clé d'application si nécessaire
-php artisan key:generate --env=dusk
-
 # Créer le fichier SQLite pour les tests Dusk
 echo "🗃️ Preparing SQLite database for Dusk..."
 touch database/dusk.sqlite

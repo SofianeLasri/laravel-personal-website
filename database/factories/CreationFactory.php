@@ -65,6 +65,75 @@ class CreationFactory extends Factory
         });
     }
 
+    public function withExistingTechnologies(array $technologies): static
+    {
+        return $this->afterCreating(function (Creation $creation) use ($technologies) {
+            $creation->technologies()->attach($technologies);
+        });
+    }
+
+    public function complete(): static
+    {
+        return $this->afterCreating(function (Creation $creation) {
+            // Créer des technologies variées si aucune n'existe
+            $technologies = Technology::count() >= 5
+                ? Technology::inRandomOrder()->take(rand(3, 5))->get()
+                : Technology::factory()->count(5)->create();
+
+            $creation->technologies()->attach($technologies);
+
+            // Ajouter des features
+            Feature::factory()->count(rand(2, 4))->create([
+                'creation_id' => $creation->id,
+            ]);
+
+            // Ajouter des screenshots avec optimized pictures
+            $screenshots = Screenshot::factory()->count(rand(2, 4))->create([
+                'creation_id' => $creation->id,
+            ]);
+
+            // Créer des optimized pictures pour chaque image
+            foreach ([$creation->logo, $creation->coverImage] as $picture) {
+                if ($picture) {
+                    $this->createOptimizedPicturesFor($picture);
+                }
+            }
+
+            foreach ($screenshots as $screenshot) {
+                if ($screenshot->picture) {
+                    $this->createOptimizedPicturesFor($screenshot->picture);
+                }
+            }
+
+            // Ajouter des personnes si nécessaire
+            if (rand(0, 1)) {
+                $people = Person::factory()->count(rand(1, 3))->create();
+                $creation->people()->attach($people);
+            }
+
+            // Ajouter des tags
+            $tags = Tag::factory()->count(rand(2, 4))->create();
+            $creation->tags()->attach($tags);
+        });
+    }
+
+    protected function createOptimizedPicturesFor(Picture $picture): void
+    {
+        $formats = ['avif', 'webp', 'jpg'];
+        $variants = ['thumbnail', 'small', 'medium', 'large', 'full'];
+
+        foreach ($formats as $format) {
+            foreach ($variants as $variant) {
+                \App\Models\OptimizedPicture::create([
+                    'picture_id' => $picture->id,
+                    'format' => $format,
+                    'variant' => $variant,
+                    'path' => "uploads/optimized/{$picture->filename}_{$variant}.{$format}",
+                ]);
+            }
+        }
+    }
+
     public function withPeople(int $count = 2): static
     {
         return $this->afterCreating(function (Creation $creation) use ($count) {

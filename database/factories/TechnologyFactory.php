@@ -108,4 +108,57 @@ class TechnologyFactory extends Factory
             'type' => TechnologyType::GAME_ENGINE,
         ]);
     }
+
+    public function withOptimizedIcon(): static
+    {
+        return $this->afterCreating(function (Technology $technology) {
+            if ($technology->iconPicture) {
+                $this->createOptimizedPicturesFor($technology->iconPicture);
+            }
+        });
+    }
+
+    public function complete(): static
+    {
+        return $this->afterCreating(function (Technology $technology) {
+            // Créer les optimized pictures pour l'icône
+            if ($technology->iconPicture) {
+                $this->createOptimizedPicturesFor($technology->iconPicture);
+            }
+        });
+    }
+
+    protected function createOptimizedPicturesFor(Picture $picture): void
+    {
+        $formats = ['avif', 'webp', 'jpg'];
+        $variants = ['thumbnail', 'small', 'medium', 'large', 'full'];
+
+        foreach ($formats as $format) {
+            foreach ($variants as $variant) {
+                \App\Models\OptimizedPicture::create([
+                    'picture_id' => $picture->id,
+                    'format' => $format,
+                    'variant' => $variant,
+                    'path' => "uploads/optimized/{$picture->filename}_{$variant}.{$format}",
+                ]);
+            }
+        }
+    }
+
+    public function createSet(): \Illuminate\Support\Collection
+    {
+        // Créer un ensemble complet de technologies pour les tests
+        $technologies = collect([
+            $this->language()->complete()->create(['name' => 'PHP']),
+            $this->framework()->complete()->create(['name' => 'Laravel']),
+            $this->language()->complete()->create(['name' => 'JavaScript']),
+            $this->framework()->complete()->create(['name' => 'Vue.js']),
+            $this->library()->complete()->create(['name' => 'Tailwind CSS']),
+            $this->language()->complete()->create(['name' => 'TypeScript']),
+            $this->framework()->complete()->create(['name' => 'React']),
+            $this->gameEngine()->complete()->create(['name' => 'Unity']),
+        ]);
+
+        return $technologies;
+    }
 }

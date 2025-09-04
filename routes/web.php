@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\RequestLogController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Admin\TranslationPageController;
+use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CertificationsCareerController;
 use App\Http\Controllers\Public\ExperienceController as PublicExperienceController;
@@ -31,6 +32,11 @@ use App\Http\Controllers\Public\ProjectsController;
 use App\Http\Controllers\Public\SearchController;
 use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
+
+// Debug route (only in non-production)
+if (config('app.env') !== 'production') {
+    Route::get('/debug', [DebugController::class, 'index'])->name('debug');
+}
 
 Route::name('public.')->group(function () {
     Route::get('/cv-pdf', function () {

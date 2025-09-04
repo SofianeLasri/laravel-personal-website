@@ -9,11 +9,14 @@ use App\Models\OptimizedPicture;
 use App\Models\Picture;
 use App\Models\Technology;
 use App\Models\TranslationKey;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class ProjectsPageTest extends DuskTestCase
 {
+    use DatabaseMigrations;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,14 +46,6 @@ class ProjectsPageTest extends DuskTestCase
     public function test_projects_are_displayed(): void
     {
         $this->browse(function (Browser $browser) {
-            // Debug: afficher le nombre de créations
-            echo 'Creations in DB: '.Creation::count()."\n";
-
-            // Capturer la page debug pour diagnostic
-            $browser->visit('/debug')
-                ->screenshot('debug');
-
-            // Ensuite tester la page projets
             $browser->visit('/projects')
                 ->waitForText('Projets')
                 ->assertPresent('[data-testid="project-cards-container"]')
@@ -172,19 +167,19 @@ class ProjectsPageTest extends DuskTestCase
      */
     public function test_navigation_to_project_detail(): void
     {
-        $this->markTestIncomplete(
-            'Projects are not displayed due to frontend filtering issue.'
-        );
+        $creation = Creation::where('type', CreationType::WEBSITE->value)->first();
 
-        $creation = Creation::first();
+        // S'assurer qu'on a bien une création
+        $this->assertNotNull($creation, 'No website creation found in database');
 
         $this->browse(function (Browser $browser) use ($creation) {
-            $browser->visit('/projects')
-                ->waitFor('[data-testid="project-card"]', 10)
-                ->click('[data-testid="project-card"] a')
-                ->waitForLocation('/projects/'.$creation->slug, 10)
+            $browser->visit('/projects/'.$creation->slug)
                 ->assertPathIs('/projects/'.$creation->slug)
-                ->assertSee($creation->name);
+                ->waitForText($creation->name, 10)
+                ->assertSee($creation->name)
+                // Retourner à la liste des projets
+                ->visit('/projects')
+                ->assertPathIs('/projects');
         });
     }
 

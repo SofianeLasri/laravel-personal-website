@@ -5,7 +5,7 @@ namespace Tests\Browser;
 use App\Enums\CreationType;
 use App\Enums\TechnologyType;
 use App\Models\Creation;
-use App\Models\CreationFeature;
+use App\Models\Feature;
 use App\Models\OptimizedPicture;
 use App\Models\Person;
 use App\Models\Picture;
@@ -13,11 +13,14 @@ use App\Models\Technology;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\Video;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class ProjectDetailPageTest extends DuskTestCase
 {
+    use DatabaseMigrations;
+
     protected Creation $testProject;
 
     protected array $screenshots = [];
@@ -512,7 +515,7 @@ class ProjectDetailPageTest extends DuskTestCase
 
         // Create features
         for ($i = 1; $i <= 3; $i++) {
-            $this->features[] = CreationFeature::create([
+            $this->features[] = Feature::create([
                 'creation_id' => $this->testProject->id,
                 'name' => "Feature $i",
                 'order' => $i,

@@ -9,14 +9,11 @@ use App\Models\OptimizedPicture;
 use App\Models\Picture;
 use App\Models\Technology;
 use App\Models\TranslationKey;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class ProjectsPageTest extends DuskTestCase
 {
-    use DatabaseMigrations;
-
     protected function setUp(): void
     {
         parent::setUp();

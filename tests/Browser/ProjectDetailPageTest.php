@@ -13,14 +13,11 @@ use App\Models\Technology;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class ProjectDetailPageTest extends DuskTestCase
 {
-    use DatabaseMigrations;
-
     protected Creation $testProject;
 
     protected array $screenshots = [];

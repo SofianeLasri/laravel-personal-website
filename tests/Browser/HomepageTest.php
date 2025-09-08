@@ -15,7 +15,7 @@ class HomepageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
                 ->assertPathIs('/')
-                ->waitForText('Laravel', 10)
+                ->waitForText('Laravel')
                 ->assertSee('Laravel');
         });
     }
@@ -27,7 +27,7 @@ class HomepageTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
-                ->waitForText('Laravel', 10)
+                ->waitForText('Laravel')
                 ->assertSee('Laravel')
                 ->assertSee('PHP');
         });
@@ -41,7 +41,7 @@ class HomepageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/projects')
                 ->assertPathIs('/projects')
-                ->waitForText('Projets', 10)
+                ->waitForText('Projets')
                 ->assertSee('Projets');
         });
     }

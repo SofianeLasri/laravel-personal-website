@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers\Public;
 
+use App\Http\Controllers\DebugController;
 use App\Models\Creation;
 use App\Models\Person;
 use App\Models\Technology;

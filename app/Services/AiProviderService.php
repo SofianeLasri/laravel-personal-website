@@ -338,9 +338,11 @@ class AiProviderService
                 'decoder' => new ExtJsonDecoder(true),
             ]);
 
-            $result = array_map(function ($value) {
-                return $value;
-            }, $items);
+            // Convert the iterator to an array
+            $result = [];
+            foreach ($items as $key => $value) {
+                $result[$key] = $value;
+            }
 
             if (! empty($result)) {
                 Log::info('JSON parsed successfully with JSON Machine', [

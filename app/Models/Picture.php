@@ -98,7 +98,7 @@ class Picture extends Model
                 $optimizedDimension = $this->getOptimizedDimension($size, $highestDimension);
                 $optimizedImage = $this->transcodeIfItIsWorthIt($imageTranscodingService, $optimizedDimension, $highestDimension, $format);
 
-                if (empty($optimizedImage)) {
+                if ($optimizedImage === null) {
                     Log::error('UploadedPicture optimization failed: transcoding failed', [
                         'path' => $this->path_original,
                     ]);
@@ -135,7 +135,7 @@ class Picture extends Model
 
         $originalImage = Storage::disk('public')->get($this->path_original);
 
-        if (empty($originalImage)) {
+        if ($originalImage === null || $originalImage === '') {
             Log::warning('UploadedPicture transcoding failed: original image is empty', [
                 'path' => $this->path_original,
             ]);

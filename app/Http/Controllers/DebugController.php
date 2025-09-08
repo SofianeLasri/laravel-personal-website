@@ -24,7 +24,7 @@ class DebugController extends Controller
     public function index()
     {
         // Vérifier que nous ne sommes pas en production
-        if (config('app.env') === 'production') {
+        if (! in_array(config('app.env'), ['local', 'development'])) {
             abort(404);
         }
 

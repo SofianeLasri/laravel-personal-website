@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Controllers;
+namespace Tests\Feature\Controllers\Public;
 
 use App\Enums\ExperienceType;
 use App\Models\Certification;

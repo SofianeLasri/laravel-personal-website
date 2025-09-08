@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -77,49 +78,75 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('logged_requests', function (Blueprint $table) {
-            $table->dropIndex('idx_stats_main');
-            $table->dropIndex('idx_user_agent_created');
-            $table->dropIndex('idx_status_user_created');
-            $table->dropIndex('idx_ip_user');
-            $table->dropIndex('idx_bot_flags_created');
-            $table->dropIndex('idx_created_at');
-            $table->dropIndex('idx_method_status');
-            $table->dropIndex('idx_created_status');
-        });
+        // Drop indexes only if they exist
+        $indexes = [
+            'idx_stats_main',
+            'idx_user_agent_created',
+            'idx_status_user_created',
+            'idx_ip_user',
+            'idx_bot_flags_created',
+            'idx_created_at',
+            'idx_method_status',
+            'idx_created_status'
+        ];
+
+        foreach ($indexes as $index) {
+            try {
+                Schema::table('logged_requests', function (Blueprint $table) use ($index) {
+                    $table->dropIndex($index);
+                });
+            } catch (\Exception $e) {
+                // Index doesn't exist, skip
+            }
+        }
 
         // Suppression des index sur les tables associées
-        Schema::table('ip_addresses', function (Blueprint $table) {
-            if (Schema::hasIndex('ip_addresses', 'idx_ip')) {
+        try {
+            Schema::table('ip_addresses', function (Blueprint $table) {
                 $table->dropIndex('idx_ip');
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            // Index doesn't exist, skip
+        }
 
-        Schema::table('user_agents', function (Blueprint $table) {
-            if (Schema::hasIndex('user_agents', 'idx_user_agent')) {
+        try {
+            Schema::table('user_agents', function (Blueprint $table) {
                 $table->dropIndex('idx_user_agent');
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            // Index doesn't exist, skip
+        }
 
-        Schema::table('urls', function (Blueprint $table) {
-            if (Schema::hasIndex('urls', 'idx_url')) {
+        try {
+            Schema::table('urls', function (Blueprint $table) {
                 $table->dropIndex('idx_url');
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            // Index doesn't exist, skip
+        }
 
-        Schema::table('ip_address_metadata', function (Blueprint $table) {
-            if (Schema::hasIndex('ip_address_metadata', 'idx_ip_metadata')) {
+        try {
+            Schema::table('ip_address_metadata', function (Blueprint $table) {
                 $table->dropIndex('idx_ip_metadata');
-            }
-            if (Schema::hasIndex('ip_address_metadata', 'idx_request_stats')) {
-                $table->dropIndex('idx_request_stats');
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            // Index doesn't exist, skip
+        }
 
-        Schema::table('user_agent_metadata', function (Blueprint $table) {
-            if (Schema::hasIndex('user_agent_metadata', 'idx_ua_metadata')) {
+        try {
+            Schema::table('ip_address_metadata', function (Blueprint $table) {
+                $table->dropIndex('idx_request_stats');
+            });
+        } catch (\Exception $e) {
+            // Index doesn't exist, skip
+        }
+
+        try {
+            Schema::table('user_agent_metadata', function (Blueprint $table) {
                 $table->dropIndex('idx_ua_metadata');
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            // Index doesn't exist, skip
+        }
     }
 };

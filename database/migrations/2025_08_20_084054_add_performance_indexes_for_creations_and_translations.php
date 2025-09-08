@@ -115,6 +115,46 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Drop foreign key constraints first for tables that have indexes on foreign key columns
+        Schema::table('creations', function (Blueprint $table) {
+            $table->dropForeign(['short_description_translation_key_id']);
+            $table->dropForeign(['full_description_translation_key_id']);
+        });
+
+        Schema::table('features', function (Blueprint $table) {
+            $table->dropForeign(['creation_id']);
+            $table->dropForeign(['title_translation_key_id']);
+            $table->dropForeign(['description_translation_key_id']);
+        });
+
+        Schema::table('experiences', function (Blueprint $table) {
+            $table->dropForeign(['title_translation_key_id']);
+            $table->dropForeign(['short_description_translation_key_id']);
+            $table->dropForeign(['full_description_translation_key_id']);
+        });
+
+        Schema::table('creation_technology', function (Blueprint $table) {
+            $table->dropForeign(['creation_id']);
+            $table->dropForeign(['technology_id']);
+        });
+
+        Schema::table('technologies', function (Blueprint $table) {
+            $table->dropForeign(['description_translation_key_id']);
+        });
+
+        Schema::table('screenshots', function (Blueprint $table) {
+            $table->dropForeign(['creation_id']);
+            if (Schema::hasColumn('screenshots', 'caption_translation_key_id')) {
+                $table->dropForeign(['caption_translation_key_id']);
+            }
+        });
+
+        Schema::table('creation_video', function (Blueprint $table) {
+            $table->dropForeign(['creation_id']);
+            $table->dropForeign(['video_id']);
+        });
+
+        // Now drop all indexes
         Schema::table('creations', function (Blueprint $table) {
             $table->dropIndex('idx_creation_type');
             $table->dropIndex('idx_creation_ended_at');
@@ -162,6 +202,45 @@ return new class extends Migration
         Schema::table('creation_video', function (Blueprint $table) {
             $table->dropIndex('idx_creation_video');
             $table->dropIndex('idx_video_creation');
+        });
+
+        // Re-add all foreign key constraints
+        Schema::table('creations', function (Blueprint $table) {
+            $table->foreign('short_description_translation_key_id')->references('id')->on('translation_keys');
+            $table->foreign('full_description_translation_key_id')->references('id')->on('translation_keys');
+        });
+
+        Schema::table('features', function (Blueprint $table) {
+            $table->foreign('creation_id')->references('id')->on('creations')->cascadeOnDelete();
+            $table->foreign('title_translation_key_id')->references('id')->on('translation_keys');
+            $table->foreign('description_translation_key_id')->references('id')->on('translation_keys');
+        });
+
+        Schema::table('experiences', function (Blueprint $table) {
+            $table->foreign('title_translation_key_id')->references('id')->on('translation_keys');
+            $table->foreign('short_description_translation_key_id')->references('id')->on('translation_keys');
+            $table->foreign('full_description_translation_key_id')->references('id')->on('translation_keys');
+        });
+
+        Schema::table('creation_technology', function (Blueprint $table) {
+            $table->foreign('creation_id')->references('id')->on('creations')->cascadeOnDelete();
+            $table->foreign('technology_id')->references('id')->on('technologies')->cascadeOnDelete();
+        });
+
+        Schema::table('technologies', function (Blueprint $table) {
+            $table->foreign('description_translation_key_id')->references('id')->on('translation_keys');
+        });
+
+        Schema::table('screenshots', function (Blueprint $table) {
+            $table->foreign('creation_id')->references('id')->on('creations')->cascadeOnDelete();
+            if (Schema::hasColumn('screenshots', 'caption_translation_key_id')) {
+                $table->foreign('caption_translation_key_id')->references('id')->on('translation_keys')->nullOnDelete();
+            }
+        });
+
+        Schema::table('creation_video', function (Blueprint $table) {
+            $table->foreign('creation_id')->references('id')->on('creations')->cascadeOnDelete();
+            $table->foreign('video_id')->references('id')->on('videos')->cascadeOnDelete();
         });
     }
 };

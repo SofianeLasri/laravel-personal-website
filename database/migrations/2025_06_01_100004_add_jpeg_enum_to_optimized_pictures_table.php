@@ -63,6 +63,10 @@ return new class extends Migration
             // Rename temp table
             Schema::rename('optimized_pictures_temp', 'optimized_pictures');
         } else {
+            // First, delete any jpg format entries that might exist
+            DB::table('optimized_pictures')->where('format', 'jpg')->delete();
+            
+            // Then change the enum
             Schema::table('optimized_pictures', function (Blueprint $table) {
                 $table->enum('format', ['avif', 'webp'])->change();
             });

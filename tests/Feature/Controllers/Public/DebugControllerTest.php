@@ -5,10 +5,10 @@ namespace Tests\Feature\Controllers\Public;
 use App\Models\Creation;
 use App\Models\Person;
 use App\Models\Technology;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 #[CoversClass(DebugController::class)]
 class DebugControllerTest extends TestCase
@@ -36,7 +36,7 @@ class DebugControllerTest extends TestCase
             'topTechnologies',
             'translationStats',
             'storageInfo',
-            'routes'
+            'routes',
         ]);
     }
 
@@ -99,14 +99,14 @@ class DebugControllerTest extends TestCase
         $response = $this->get('/debug');
 
         $response->assertStatus(200);
-        
+
         // Check that model stats are populated
         $viewData = $response->viewData('modelStats');
         $this->assertIsArray($viewData);
         $this->assertArrayHasKey('Creations', $viewData);
         $this->assertArrayHasKey('Technologies', $viewData);
         $this->assertArrayHasKey('People', $viewData);
-        
+
         // Check counts match
         $this->assertEquals(3, $viewData['Creations']);
         $this->assertEquals(5, $viewData['Technologies']);
@@ -122,14 +122,14 @@ class DebugControllerTest extends TestCase
         $response = $this->get('/debug');
 
         $response->assertStatus(200);
-        
+
         $envVars = $response->viewData('envVars');
-        
+
         // Check that only safe environment variables are shown
         $this->assertArrayHasKey('APP_ENV', $envVars);
         $this->assertArrayHasKey('APP_DEBUG', $envVars);
         $this->assertArrayHasKey('DB_CONNECTION', $envVars);
-        
+
         // Make sure sensitive data is not exposed
         $this->assertArrayNotHasKey('APP_KEY', $envVars);
         $this->assertArrayNotHasKey('DB_PASSWORD', $envVars);
@@ -146,9 +146,9 @@ class DebugControllerTest extends TestCase
         $response = $this->get('/debug');
 
         $response->assertStatus(200);
-        
+
         $dbInfo = $response->viewData('dbInfo');
-        
+
         $this->assertIsArray($dbInfo);
         $this->assertArrayHasKey('connection', $dbInfo);
         $this->assertArrayHasKey('database', $dbInfo);
@@ -165,9 +165,9 @@ class DebugControllerTest extends TestCase
         $response = $this->get('/debug');
 
         $response->assertStatus(200);
-        
+
         $routes = $response->viewData('routes');
-        
+
         // Check that internal routes are filtered out
         foreach ($routes as $route) {
             $this->assertStringStartsNotWith('_', $route['uri']);

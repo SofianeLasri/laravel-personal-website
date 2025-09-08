@@ -270,7 +270,7 @@ class AiProviderService
     /**
      * Parse JSON using JSON Machine for robust handling of incomplete or malformed JSON
      *
-     * @param string $jsonString The potentially incomplete JSON string
+     * @param  string  $jsonString  The potentially incomplete JSON string
      * @return array<string, mixed>|null The parsed JSON array or null if parsing fails
      */
     private function parseJsonWithJsonMachine(string $jsonString): ?array
@@ -297,7 +297,7 @@ class AiProviderService
             $escapedMessage = json_encode($messageContent, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
             // Rebuild the JSON with properly escaped content
-            $fixedJson = '{"message":' . $escapedMessage . '}';
+            $fixedJson = '{"message":'.$escapedMessage.'}';
 
             $decoded = json_decode($fixedJson, true);
             if (is_array($decoded)) {
@@ -343,7 +343,7 @@ class AiProviderService
                 $result[$key] = $value;
             }
 
-            if (!empty($result)) {
+            if (! empty($result)) {
                 Log::info('JSON parsed successfully with JSON Machine', [
                     'original_length' => strlen($jsonString),
                     'cleaned_length' => strlen($cleanedJson),
@@ -362,7 +362,7 @@ class AiProviderService
         if (preg_match('/"message"\s*:\s*"((?:[^"\\\\]|\\\\.|\\\\n|\\\\r)*)"/s', $jsonString, $matches)) {
             $escapedMessage = $matches[1];
             // Decode the JSON-escaped string
-            $message = json_decode('"' . $escapedMessage . '"');
+            $message = json_decode('"'.$escapedMessage.'"');
             if ($message !== null) {
                 Log::warning('JSON recovered by extracting message field', [
                     'message_length' => strlen($message),

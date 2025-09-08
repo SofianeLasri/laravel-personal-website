@@ -14,6 +14,7 @@ use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
+use ReflectionClass;
 use Tests\TestCase;
 
 #[CoversClass(Picture::class)]
@@ -434,7 +435,7 @@ class PictureTest extends TestCase
      */
     protected function invokePrivateMethod($object, $methodName, array $parameters = [])
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);
 
         return $method->invokeArgs($object, $parameters);

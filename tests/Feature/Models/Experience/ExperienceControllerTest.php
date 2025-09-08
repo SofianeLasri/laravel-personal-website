@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\Api\ExperienceController;
 use App\Models\Experience;
 use App\Models\Picture;
 use App\Models\Technology;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -482,7 +483,7 @@ class ExperienceControllerTest extends TestCase
         ]);
 
         // Directly update database to simulate missing slug (bypassing model validation)
-        \DB::table('experiences')->where('id', $experience->id)->update(['slug' => '']);
+        DB::table('experiences')->where('id', $experience->id)->update(['slug' => '']);
         $experience->refresh();
 
         $logo = Picture::factory()->create();

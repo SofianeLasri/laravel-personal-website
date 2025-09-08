@@ -35,11 +35,22 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('optimized_pictures', function (Blueprint $table) {
+            // Drop foreign key constraint temporarily to allow dropping indexes
+            $table->dropForeign(['picture_id']);
+        });
+
+        Schema::table('optimized_pictures', function (Blueprint $table) {
+            // Now we can drop the indexes
             $table->dropIndex('idx_picture_variant_format');
             $table->dropIndex('idx_picture_id');
             $table->dropIndex('idx_variant');
             $table->dropIndex('idx_format');
             $table->dropIndex('idx_picture_id_with_id');
+        });
+
+        Schema::table('optimized_pictures', function (Blueprint $table) {
+            // Re-add the foreign key constraint
+            $table->foreign('picture_id')->references('id')->on('pictures');
         });
     }
 };

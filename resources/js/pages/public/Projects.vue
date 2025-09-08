@@ -224,6 +224,14 @@ const handleLanguageFilterChange = (ids: number[]) => {
     selectedLanguages.value = ids;
     updateUrlParams();
 };
+
+const clearAllFilters = () => {
+    selectedFrameworks.value = [];
+    selectedLibraries.value = [];
+    selectedGameEngines.value = [];
+    selectedLanguages.value = [];
+    updateUrlParams();
+};
 </script>
 
 <template>
@@ -299,6 +307,19 @@ const handleLanguageFilterChange = (ids: number[]) => {
                             @filter-change="handleGameEngineFilterChange"
                         />
                     </template>
+
+                    <button
+                        v-if="
+                            (activeTab === 'development' &&
+                                (selectedFrameworks.length > 0 || selectedLibraries.length > 0 || selectedLanguages.length > 0)) ||
+                            (activeTab === 'games' && selectedGameEngines.length > 0)
+                        "
+                        @click="clearAllFilters"
+                        data-testid="clear-filters-button"
+                        class="w-full rounded-lg bg-gray-200 px-4 py-2 text-center hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+                    >
+                        {{ t('projects.clear_filters') }}
+                    </button>
                 </div>
 
                 <div v-else class="w-full lg:w-72"></div>
@@ -306,12 +327,12 @@ const handleLanguageFilterChange = (ids: number[]) => {
                 <div class="flex-1">
                     <Transition name="projects-fade" mode="out-in">
                         <div :key="containerKey">
-                            <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                                <div v-for="creation in filteredCreations" :key="creation.id">
+                            <div class="grid grid-cols-1 gap-6 xl:grid-cols-2" data-testid="project-cards-container">
+                                <div v-for="creation in filteredCreations" :key="creation.id" data-testid="project-card">
                                     <ProjectCard class="md:w-full" :creation="creation" />
                                 </div>
 
-                                <div v-if="filteredCreations.length === 0" class="col-span-full py-12 text-center">
+                                <div v-if="filteredCreations.length === 0" class="col-span-full py-12 text-center" data-testid="no-projects-message">
                                     <p class="text-lg text-gray-500">{{ t('projects.no_projects') }}</p>
                                 </div>
                             </div>

@@ -3,7 +3,11 @@
 namespace Tests\Feature\Http\Controllers\Admin;
 
 use App\Models\User;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use SlProjects\LaravelRequestLogger\app\Models\IpAddress;
+use SlProjects\LaravelRequestLogger\app\Models\Url;
+use SlProjects\LaravelRequestLogger\app\Models\UserAgent;
 use Tests\TestCase;
 
 class RequestLogControllerTest extends TestCase
@@ -25,12 +29,12 @@ class RequestLogControllerTest extends TestCase
         // Créer quelques requêtes de test directement
         $requestIds = [];
         for ($i = 0; $i < 3; $i++) {
-            $ipAddress = \SlProjects\LaravelRequestLogger\app\Models\IpAddress::create(['ip' => '127.0.0.'.$i]);
-            $userAgent = \SlProjects\LaravelRequestLogger\app\Models\UserAgent::create(['user_agent' => 'Test User Agent '.$i]);
-            $url = \SlProjects\LaravelRequestLogger\app\Models\Url::create(['url' => 'http://example.com/test'.$i]);
+            $ipAddress = IpAddress::create(['ip' => '127.0.0.'.$i]);
+            $userAgent = UserAgent::create(['user_agent' => 'Test User Agent '.$i]);
+            $url = Url::create(['url' => 'http://example.com/test'.$i]);
 
             // Créer directement dans la base de données
-            $requestId = \DB::table('logged_requests')->insertGetId([
+            $requestId = DB::table('logged_requests')->insertGetId([
                 'ip_address_id' => $ipAddress->id,
                 'user_agent_id' => $userAgent->id,
                 'url_id' => $url->id,
@@ -61,7 +65,7 @@ class RequestLogControllerTest extends TestCase
         // Vérifier que les requêtes ont été marquées comme bot
         foreach ($requestIds as $requestId) {
             // Force a fresh query
-            $request = \DB::connection()->table('logged_requests')->where('id', $requestId)->first();
+            $request = DB::connection()->table('logged_requests')->where('id', $requestId)->first();
             $this->assertNotNull($request, "Request with ID $requestId not found");
 
             // Debug output

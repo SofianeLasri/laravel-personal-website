@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 use ZipArchive;
@@ -37,7 +38,7 @@ class DataManagementControllerExportTest extends TestCase
         $response = $this
             ->get('/dashboard/data-management');
 
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(ResponseAlias::HTTP_OK);
         $response->assertInertia(fn ($page) => $page->component('dashboard/DataManagement')
             ->has('exportTables')
             ->has('importTables')

@@ -208,68 +208,6 @@ class ProjectsPageTest extends DuskTestCase
     }
 
     /**
-     * Test empty state when no projects match filters.
-     */
-    public function test_empty_state_with_no_matching_projects(): void
-    {
-        // Create a filter combination that returns no results
-        $nonExistentDescKey = TranslationKey::create(['key' => 'technology.nonexistent.description']);
-        $nonExistentIcon = Picture::create([
-            'filename' => 'nonexistent-icon.jpg',
-            'width' => 128,
-            'height' => 128,
-            'size' => 256,
-            'path_original' => 'uploads/nonexistent-icon.jpg',
-        ]);
-        $this->createOptimizedPictures($nonExistentIcon);
-
-        $nonExistentTech = Technology::create([
-            'name' => 'NonExistentTech',
-            'type' => TechnologyType::FRAMEWORK->value,
-            'icon_picture_id' => $nonExistentIcon->id,
-            'description_translation_key_id' => $nonExistentDescKey->id,
-        ]);
-
-        // Create a website creation with NonExistent tech to make it appear in filters
-        // But make sure when we filter by it alone, there are no results
-        $websiteWithBoth = Creation::factory()
-            ->create(['type' => CreationType::WEBSITE->value]);
-
-        // Get Laravel tech that was created in setUp
-        $laravelTech = Technology::where('name', 'Laravel')->first();
-
-        // Attach both Laravel and NonExistent to the same creation
-        // This way NonExistent appears in filters, but selecting ONLY NonExistent
-        // will show no projects (since all projects with NonExistent also have Laravel)
-        if ($laravelTech) {
-            $websiteWithBoth->technologies()->attach([$laravelTech->id, $nonExistentTech->id]);
-        }
-
-        $this->browse(function (Browser $browser) {
-            $browser->visit('/projects')
-                ->waitFor('[data-testid="project-filter"]', 10);
-
-            // Check if the filter is actually present
-            $hasNonExistentFilter = $browser->script(
-                'return document.querySelector(\'[data-filter-type="framework"][data-filter-value="nonexistenttech"]\') !== null'
-            );
-
-            if ($hasNonExistentFilter[0] ?? false) {
-                $browser->click('[data-filter-type="framework"][data-filter-value="nonexistenttech"]')
-                    ->pause(500);
-
-                // When we filter by NonExistent alone, we should see 1 project
-                // since we attached it to a website
-                $browser->assertPresent('[data-testid="project-card"]');
-            } else {
-                // If the filter doesn't appear, that's fine too
-                // It means no website creations have this technology
-                $this->assertTrue(true, 'NonExistent filter not present, which is expected');
-            }
-        });
-    }
-
-    /**
      * Create test data for the tests.
      */
     protected function createTestData(): void

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 use ZipArchive;
@@ -40,7 +41,7 @@ class DataManagementControllerImportTest extends TestCase
                 'import_file' => $invalidFile,
             ]);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertJsonValidationErrors(['import_file']);
     }
 
@@ -54,7 +55,7 @@ class DataManagementControllerImportTest extends TestCase
                 'import_file' => $largeFile,
             ]);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertJsonValidationErrors(['import_file']);
     }
 
@@ -68,7 +69,7 @@ class DataManagementControllerImportTest extends TestCase
                 'import_file' => $invalidZip,
             ]);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertJsonValidationErrors(['import_file']);
     }
 
@@ -105,7 +106,7 @@ class DataManagementControllerImportTest extends TestCase
                 'confirm_import' => true,
             ]);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertJsonValidationErrors(['file_path']);
     }
 
@@ -117,7 +118,7 @@ class DataManagementControllerImportTest extends TestCase
                 'file_path' => 'temp/test-import.zip',
             ]);
 
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         $response->assertJsonValidationErrors(['confirm_import']);
     }
 
@@ -130,7 +131,7 @@ class DataManagementControllerImportTest extends TestCase
                 'confirm_import' => true,
             ]);
 
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
+        $response->assertStatus(ResponseAlias::HTTP_NOT_FOUND);
         $response->assertJson([
             'message' => 'Import file not found',
         ]);
@@ -304,7 +305,7 @@ class DataManagementControllerImportTest extends TestCase
                 'confirm_import' => true,
             ]);
 
-        $response->assertStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
+        $response->assertStatus(ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
         $response->assertJson([
             'message' => 'Import failed: Import failed',
         ]);

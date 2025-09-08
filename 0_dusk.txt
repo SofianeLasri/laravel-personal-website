@@ -1,0 +1,1752 @@
+2025-09-08T17:49:13.8293740Z Current runner version: '2.328.0'
+2025-09-08T17:49:13.8316853Z ##[group]Runner Image Provisioner
+2025-09-08T17:49:13.8317662Z Hosted Compute Agent
+2025-09-08T17:49:13.8318224Z Version: 20250908.385
+2025-09-08T17:49:13.8318960Z Commit: cfce01a78eb650f23de9981e2e79cb8dc83e6056
+2025-09-08T17:49:13.8319775Z Build Date: 2025-09-08T16:07:37Z
+2025-09-08T17:49:13.8320332Z ##[endgroup]
+2025-09-08T17:49:13.8320845Z ##[group]Operating System
+2025-09-08T17:49:13.8321485Z Ubuntu
+2025-09-08T17:49:13.8321935Z 22.04.5
+2025-09-08T17:49:13.8322380Z LTS
+2025-09-08T17:49:13.8322872Z ##[endgroup]
+2025-09-08T17:49:13.8323363Z ##[group]Runner Image
+2025-09-08T17:49:13.8323853Z Image: ubuntu-22.04
+2025-09-08T17:49:13.8324423Z Version: 20250901.41.1
+2025-09-08T17:49:13.8325391Z Included Software: https://github.com/actions/runner-images/blob/ubuntu22/20250901.41/images/ubuntu/Ubuntu2204-Readme.md
+2025-09-08T17:49:13.8326979Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu22%2F20250901.41
+2025-09-08T17:49:13.8328000Z ##[endgroup]
+2025-09-08T17:49:13.8329288Z ##[group]GITHUB_TOKEN Permissions
+2025-09-08T17:49:13.8331109Z Contents: read
+2025-09-08T17:49:13.8331647Z Metadata: read
+2025-09-08T17:49:13.8332220Z Packages: read
+2025-09-08T17:49:13.8332739Z ##[endgroup]
+2025-09-08T17:49:13.8334715Z Secret source: Actions
+2025-09-08T17:49:13.8335484Z Prepare workflow directory
+2025-09-08T17:49:13.8765837Z Prepare all required actions
+2025-09-08T17:49:13.8803975Z Getting action download info
+2025-09-08T17:49:14.2675823Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-09-08T17:49:14.5005234Z Download action repository 'shivammathur/setup-php@v2' (SHA:ec406be512d7077f68eed36e63f4d91bc006edc4)
+2025-09-08T17:49:14.9105166Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2025-09-08T17:49:15.0080497Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2025-09-08T17:49:15.2862063Z Complete job name: dusk
+2025-09-08T17:49:15.3492787Z ##[group]Checking docker version
+2025-09-08T17:49:15.3507710Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+2025-09-08T17:49:15.4376365Z '1.48'
+2025-09-08T17:49:15.4393099Z Docker daemon API version: '1.48'
+2025-09-08T17:49:15.4394391Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+2025-09-08T17:49:15.4560412Z '1.48'
+2025-09-08T17:49:15.4573849Z Docker client API version: '1.48'
+2025-09-08T17:49:15.4580438Z ##[endgroup]
+2025-09-08T17:49:15.4583938Z ##[group]Clean up resources from previous jobs
+2025-09-08T17:49:15.4590567Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=c79ddb"
+2025-09-08T17:49:15.4736006Z ##[command]/usr/bin/docker network prune --force --filter "label=c79ddb"
+2025-09-08T17:49:15.4870942Z ##[endgroup]
+2025-09-08T17:49:15.4871737Z ##[group]Create local container network
+2025-09-08T17:49:15.4883038Z ##[command]/usr/bin/docker network create --label c79ddb github_network_9f2d74fe372c4196ba17c14d12590fe5
+2025-09-08T17:49:15.5375554Z 0ddcc90a6c8b83efbfa21888b111ea23f08645b7d4da5c2ca7cef4e78ab26061
+2025-09-08T17:49:15.5396541Z ##[endgroup]
+2025-09-08T17:49:15.5421675Z ##[group]Starting mariadb service container
+2025-09-08T17:49:15.5442034Z ##[command]/usr/bin/docker pull mariadb:latest
+2025-09-08T17:49:16.1612856Z latest: Pulling from library/mariadb
+2025-09-08T17:49:16.2837569Z 76249c7cd503: Pulling fs layer
+2025-09-08T17:49:16.2839418Z 2d8cff3e3cb6: Pulling fs layer
+2025-09-08T17:49:16.2840914Z 4f6fbbc50826: Pulling fs layer
+2025-09-08T17:49:16.2841949Z b9fecd364e7a: Pulling fs layer
+2025-09-08T17:49:16.2842829Z 420bcadcb59f: Pulling fs layer
+2025-09-08T17:49:16.2843719Z cdac09aaab61: Pulling fs layer
+2025-09-08T17:49:16.2844631Z ef6def1cca19: Pulling fs layer
+2025-09-08T17:49:16.2845483Z 5eb5ed4a1ef8: Pulling fs layer
+2025-09-08T17:49:16.2846318Z cdac09aaab61: Waiting
+2025-09-08T17:49:16.2847065Z ef6def1cca19: Waiting
+2025-09-08T17:49:16.2847854Z 5eb5ed4a1ef8: Waiting
+2025-09-08T17:49:16.2849269Z b9fecd364e7a: Waiting
+2025-09-08T17:49:16.2850074Z 420bcadcb59f: Waiting
+2025-09-08T17:49:16.5161919Z 2d8cff3e3cb6: Verifying Checksum
+2025-09-08T17:49:16.5163838Z 2d8cff3e3cb6: Download complete
+2025-09-08T17:49:16.7334465Z b9fecd364e7a: Verifying Checksum
+2025-09-08T17:49:16.7336643Z b9fecd364e7a: Download complete
+2025-09-08T17:49:16.9151032Z 420bcadcb59f: Verifying Checksum
+2025-09-08T17:49:16.9153992Z 420bcadcb59f: Download complete
+2025-09-08T17:49:16.9835231Z 4f6fbbc50826: Verifying Checksum
+2025-09-08T17:49:16.9836972Z 4f6fbbc50826: Download complete
+2025-09-08T17:49:17.0833048Z 76249c7cd503: Verifying Checksum
+2025-09-08T17:49:17.0834842Z 76249c7cd503: Download complete
+2025-09-08T17:49:17.1683231Z ef6def1cca19: Verifying Checksum
+2025-09-08T17:49:17.1684988Z ef6def1cca19: Download complete
+2025-09-08T17:49:17.3138437Z 5eb5ed4a1ef8: Verifying Checksum
+2025-09-08T17:49:17.3139777Z 5eb5ed4a1ef8: Download complete
+2025-09-08T17:49:17.9040480Z cdac09aaab61: Verifying Checksum
+2025-09-08T17:49:17.9041566Z cdac09aaab61: Download complete
+2025-09-08T17:49:18.1718629Z 76249c7cd503: Pull complete
+2025-09-08T17:49:18.3110283Z 2d8cff3e3cb6: Pull complete
+2025-09-08T17:49:18.6386611Z 4f6fbbc50826: Pull complete
+2025-09-08T17:49:18.6488392Z b9fecd364e7a: Pull complete
+2025-09-08T17:49:18.6613356Z 420bcadcb59f: Pull complete
+2025-09-08T17:49:20.5999565Z cdac09aaab61: Pull complete
+2025-09-08T17:49:20.6145968Z ef6def1cca19: Pull complete
+2025-09-08T17:49:20.6289172Z 5eb5ed4a1ef8: Pull complete
+2025-09-08T17:49:20.6332453Z Digest: sha256:a5af517d52262da1583cebe6b7c970d7bbeaf1f016938c2fc3cf2e95c52d8c08
+2025-09-08T17:49:20.6346904Z Status: Downloaded newer image for mariadb:latest
+2025-09-08T17:49:20.6356270Z docker.io/library/mariadb:latest
+2025-09-08T17:49:20.6421957Z ##[command]/usr/bin/docker create --name d422953c9f7040af904e15033e2d4831_mariadblatest_cb84ed --label c79ddb --network github_network_9f2d74fe372c4196ba17c14d12590fe5 --network-alias mariadb -p 3306:3306  -e "MYSQL_ROOT_PASSWORD=password" -e "MYSQL_DATABASE=laravel" -e GITHUB_ACTIONS=true -e CI=true mariadb:latest
+2025-09-08T17:49:20.6689902Z 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba
+2025-09-08T17:49:20.6714173Z ##[command]/usr/bin/docker start 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba
+2025-09-08T17:49:20.9016483Z 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba
+2025-09-08T17:49:20.9039830Z ##[command]/usr/bin/docker ps --all --filter id=4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2025-09-08T17:49:20.9163000Z 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba Up Less than a second
+2025-09-08T17:49:20.9189213Z ##[command]/usr/bin/docker port 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba
+2025-09-08T17:49:20.9318674Z 3306/tcp -> 0.0.0.0:3306
+2025-09-08T17:49:20.9320173Z 3306/tcp -> [::]:3306
+2025-09-08T17:49:20.9365210Z ##[endgroup]
+2025-09-08T17:49:20.9366129Z ##[group]Starting redis service container
+2025-09-08T17:49:20.9367542Z ##[command]/usr/bin/docker pull redis:alpine
+2025-09-08T17:49:21.4938187Z alpine: Pulling from library/redis
+2025-09-08T17:49:21.6554136Z 9824c27679d3: Already exists
+2025-09-08T17:49:21.6620492Z 9880d81ff87a: Pulling fs layer
+2025-09-08T17:49:21.6623816Z 168694ef5d62: Pulling fs layer
+2025-09-08T17:49:21.6624721Z f8eab6d4856e: Pulling fs layer
+2025-09-08T17:49:21.6625207Z 1f79dac8d2d4: Pulling fs layer
+2025-09-08T17:49:21.6625632Z 4f4fb700ef54: Pulling fs layer
+2025-09-08T17:49:21.6626098Z 61cfb50eeff3: Pulling fs layer
+2025-09-08T17:49:21.6626513Z 1f79dac8d2d4: Waiting
+2025-09-08T17:49:21.6627049Z 4f4fb700ef54: Waiting
+2025-09-08T17:49:21.6627473Z 61cfb50eeff3: Waiting
+2025-09-08T17:49:21.8879244Z 9880d81ff87a: Verifying Checksum
+2025-09-08T17:49:21.8883665Z 9880d81ff87a: Download complete
+2025-09-08T17:49:21.9406354Z 9880d81ff87a: Pull complete
+2025-09-08T17:49:21.9566834Z 168694ef5d62: Download complete
+2025-09-08T17:49:22.1680746Z 4f4fb700ef54: Verifying Checksum
+2025-09-08T17:49:22.1684469Z 4f4fb700ef54: Download complete
+2025-09-08T17:49:22.1784649Z 168694ef5d62: Pull complete
+2025-09-08T17:49:22.1849183Z 1f79dac8d2d4: Verifying Checksum
+2025-09-08T17:49:22.1849741Z 1f79dac8d2d4: Download complete
+2025-09-08T17:49:22.1935650Z f8eab6d4856e: Download complete
+2025-09-08T17:49:22.3743690Z 61cfb50eeff3: Verifying Checksum
+2025-09-08T17:49:22.3744284Z 61cfb50eeff3: Download complete
+2025-09-08T17:49:22.5885509Z f8eab6d4856e: Pull complete
+2025-09-08T17:49:22.6035397Z 1f79dac8d2d4: Pull complete
+2025-09-08T17:49:22.6156403Z 4f4fb700ef54: Pull complete
+2025-09-08T17:49:22.6250421Z 61cfb50eeff3: Pull complete
+2025-09-08T17:49:22.6287590Z Digest: sha256:987c376c727652f99625c7d205a1cba3cb2c53b92b0b62aade2bd48ee1593232
+2025-09-08T17:49:22.6300379Z Status: Downloaded newer image for redis:alpine
+2025-09-08T17:49:22.6308575Z docker.io/library/redis:alpine
+2025-09-08T17:49:22.6327603Z ##[command]/usr/bin/docker create --name 4948e7846c3944b68bfa4f104390de80_redisalpine_45c97c --label c79ddb --network github_network_9f2d74fe372c4196ba17c14d12590fe5 --network-alias redis -p 6379:6379  -e GITHUB_ACTIONS=true -e CI=true redis:alpine
+2025-09-08T17:49:22.6601067Z b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178
+2025-09-08T17:49:22.6613358Z ##[command]/usr/bin/docker start b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178
+2025-09-08T17:49:22.8131243Z b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178
+2025-09-08T17:49:22.8145986Z ##[command]/usr/bin/docker ps --all --filter id=b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2025-09-08T17:49:22.8276870Z b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178 Up Less than a second
+2025-09-08T17:49:22.8296411Z ##[command]/usr/bin/docker port b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178
+2025-09-08T17:49:22.8419954Z 6379/tcp -> 0.0.0.0:6379
+2025-09-08T17:49:22.8424820Z 6379/tcp -> [::]:6379
+2025-09-08T17:49:22.8440080Z ##[endgroup]
+2025-09-08T17:49:22.8452691Z ##[group]Waiting for all services to be ready
+2025-09-08T17:49:22.8470733Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba
+2025-09-08T17:49:22.8627705Z mariadb service is healthy.
+2025-09-08T17:49:22.8629532Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178
+2025-09-08T17:49:22.8765083Z redis service is healthy.
+2025-09-08T17:49:22.8765433Z ##[endgroup]
+2025-09-08T17:49:22.9030553Z ##[group]Run actions/checkout@v4
+2025-09-08T17:49:22.9031089Z with:
+2025-09-08T17:49:22.9031327Z   repository: SofianeLasri/laravel-personal-website
+2025-09-08T17:49:22.9031784Z   token: ***
+2025-09-08T17:49:22.9031964Z   ssh-strict: true
+2025-09-08T17:49:22.9032135Z   ssh-user: git
+2025-09-08T17:49:22.9032339Z   persist-credentials: true
+2025-09-08T17:49:22.9032545Z   clean: true
+2025-09-08T17:49:22.9032729Z   sparse-checkout-cone-mode: true
+2025-09-08T17:49:22.9032940Z   fetch-depth: 1
+2025-09-08T17:49:22.9033106Z   fetch-tags: false
+2025-09-08T17:49:22.9033278Z   show-progress: true
+2025-09-08T17:49:22.9033454Z   lfs: false
+2025-09-08T17:49:22.9033606Z   submodules: false
+2025-09-08T17:49:22.9033788Z   set-safe-directory: true
+2025-09-08T17:49:22.9034176Z ##[endgroup]
+2025-09-08T17:49:23.0175106Z Syncing repository: SofianeLasri/laravel-personal-website
+2025-09-08T17:49:23.0176982Z ##[group]Getting Git version info
+2025-09-08T17:49:23.0177794Z Working directory is '/home/runner/work/laravel-personal-website/laravel-personal-website'
+2025-09-08T17:49:23.0178756Z [command]/usr/bin/git version
+2025-09-08T17:49:23.0302053Z git version 2.51.0
+2025-09-08T17:49:23.0333909Z ##[endgroup]
+2025-09-08T17:49:23.0355058Z Temporarily overriding HOME='/home/runner/work/_temp/9d427bd9-cf49-4021-b4c9-882039bd27cd' before making global git config changes
+2025-09-08T17:49:23.0356687Z Adding repository directory to the temporary git global config as a safe directory
+2025-09-08T17:49:23.0357956Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/laravel-personal-website/laravel-personal-website
+2025-09-08T17:49:23.0394410Z Deleting the contents of '/home/runner/work/laravel-personal-website/laravel-personal-website'
+2025-09-08T17:49:23.0398542Z ##[group]Initializing the repository
+2025-09-08T17:49:23.0403603Z [command]/usr/bin/git init /home/runner/work/laravel-personal-website/laravel-personal-website
+2025-09-08T17:49:23.0515561Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-09-08T17:49:23.0516575Z hint: is subject to change. To configure the initial branch name to use in all
+2025-09-08T17:49:23.0517327Z hint: of your new repositories, which will suppress this warning, call:
+2025-09-08T17:49:23.0517845Z hint:
+2025-09-08T17:49:23.0518269Z hint: 	git config --global init.defaultBranch <name>
+2025-09-08T17:49:23.0518724Z hint:
+2025-09-08T17:49:23.0519350Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-09-08T17:49:23.0520088Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-09-08T17:49:23.0520651Z hint:
+2025-09-08T17:49:23.0520923Z hint: 	git branch -m <name>
+2025-09-08T17:49:23.0521248Z hint:
+2025-09-08T17:49:23.0521725Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-09-08T17:49:23.0522759Z Initialized empty Git repository in /home/runner/work/laravel-personal-website/laravel-personal-website/.git/
+2025-09-08T17:49:23.0534677Z [command]/usr/bin/git remote add origin https://github.com/SofianeLasri/laravel-personal-website
+2025-09-08T17:49:23.0570549Z ##[endgroup]
+2025-09-08T17:49:23.0571088Z ##[group]Disabling automatic garbage collection
+2025-09-08T17:49:23.0576351Z [command]/usr/bin/git config --local gc.auto 0
+2025-09-08T17:49:23.0609493Z ##[endgroup]
+2025-09-08T17:49:23.0610514Z ##[group]Setting up auth
+2025-09-08T17:49:23.0616960Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-09-08T17:49:23.0651074Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-09-08T17:49:23.1284861Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-09-08T17:49:23.1317190Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-09-08T17:49:23.1560345Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-09-08T17:49:23.1609494Z ##[endgroup]
+2025-09-08T17:49:23.1610078Z ##[group]Fetching the repository
+2025-09-08T17:49:23.1620718Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +7f3a7f7aefcf75dfad665964995a588af0b38ef7:refs/remotes/pull/67/merge
+2025-09-08T17:49:23.8695693Z From https://github.com/SofianeLasri/laravel-personal-website
+2025-09-08T17:49:23.8696438Z  * [new ref]         7f3a7f7aefcf75dfad665964995a588af0b38ef7 -> pull/67/merge
+2025-09-08T17:49:23.8728706Z ##[endgroup]
+2025-09-08T17:49:23.8729311Z ##[group]Determining the checkout info
+2025-09-08T17:49:23.8731619Z ##[endgroup]
+2025-09-08T17:49:23.8736292Z [command]/usr/bin/git sparse-checkout disable
+2025-09-08T17:49:23.8776432Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-09-08T17:49:23.8808736Z ##[group]Checking out the ref
+2025-09-08T17:49:23.8809507Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/67/merge
+2025-09-08T17:49:23.9549605Z Note: switching to 'refs/remotes/pull/67/merge'.
+2025-09-08T17:49:23.9550173Z
+2025-09-08T17:49:23.9550602Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-09-08T17:49:23.9552026Z changes and commit them, and you can discard any commits you make in this
+2025-09-08T17:49:23.9553071Z state without impacting any branches by switching back to a branch.
+2025-09-08T17:49:23.9553660Z
+2025-09-08T17:49:23.9553923Z If you want to create a new branch to retain commits you create, you may
+2025-09-08T17:49:23.9554433Z do so (now or later) by using -c with the switch command. Example:
+2025-09-08T17:49:23.9554743Z
+2025-09-08T17:49:23.9554858Z   git switch -c <new-branch-name>
+2025-09-08T17:49:23.9555055Z
+2025-09-08T17:49:23.9555166Z Or undo this operation with:
+2025-09-08T17:49:23.9555418Z
+2025-09-08T17:49:23.9555566Z   git switch -
+2025-09-08T17:49:23.9555939Z
+2025-09-08T17:49:23.9556331Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-09-08T17:49:23.9556853Z
+2025-09-08T17:49:23.9557595Z HEAD is now at 7f3a7f7 Merge fa4942c5fe64525df971124b14594331b47dc22e into ca456cf4f1016724cf0af6c235fca5cccf83a5f0
+2025-09-08T17:49:23.9561505Z ##[endgroup]
+2025-09-08T17:49:23.9600390Z [command]/usr/bin/git log -1 --format=%H
+2025-09-08T17:49:23.9622862Z 7f3a7f7aefcf75dfad665964995a588af0b38ef7
+2025-09-08T17:49:23.9791729Z ##[group]Run shivammathur/setup-php@v2
+2025-09-08T17:49:23.9792004Z with:
+2025-09-08T17:49:23.9792182Z   php-version: 8.4
+2025-09-08T17:49:23.9792365Z   extensions: imagick
+2025-09-08T17:49:23.9792557Z   tools: composer:v2
+2025-09-08T17:49:23.9792733Z   coverage: xdebug
+2025-09-08T17:49:23.9792917Z   ini-file: production
+2025-09-08T17:49:23.9793236Z   github-token: ***
+2025-09-08T17:49:23.9793420Z ##[endgroup]
+2025-09-08T17:49:24.0526441Z [command]/usr/bin/bash /home/runner/work/_actions/shivammathur/setup-php/v2/src/scripts/run.sh
+2025-09-08T17:49:24.0716477Z
+2025-09-08T17:49:24.0717339Z [90;1m==> [0m[37;1mSetup PHP[0m
+2025-09-08T17:49:29.0474322Z [32;1m✓ [0m[34;1mPHP [0m[90;1mInstalled PHP 8.4.12[0m
+2025-09-08T17:49:29.0474790Z
+2025-09-08T17:49:29.0475023Z [90;1m==> [0m[37;1mSetup Extensions[0m
+2025-09-08T17:49:29.1227029Z [32;1m✓ [0m[34;1mimagick [0m[90;1mEnabled[0m
+2025-09-08T17:49:29.1227433Z
+2025-09-08T17:49:29.1227783Z [90;1m==> [0m[37;1mSetup Tools[0m
+2025-09-08T17:49:29.7004235Z [32;1m✓ [0m[34;1mcomposer [0m[90;1mAdded composer 2.8.11[0m
+2025-09-08T17:49:29.7006763Z
+2025-09-08T17:49:29.7007301Z [90;1m==> [0m[37;1mSetup Coverage[0m
+2025-09-08T17:49:29.8150759Z [32;1m✓ [0m[34;1mxdebug [0m[90;1mXdebug 3.4.5 enabled as coverage driver[0m
+2025-09-08T17:49:29.8152030Z
+2025-09-08T17:49:29.8152421Z [90;1m==> [0m[37;1mSponsor setup-php[0m
+2025-09-08T17:49:29.8152955Z [32;1m✓ [0m[34;1msetup-php [0m[90;1mhttps://setup-php.com/sponsor[0m
+2025-09-08T17:49:29.8292402Z ##[group]Run actions/setup-node@v4
+2025-09-08T17:49:29.8292671Z with:
+2025-09-08T17:49:29.8292854Z   node-version: 22
+2025-09-08T17:49:29.8293049Z   cache: npm
+2025-09-08T17:49:29.8293228Z   always-auth: false
+2025-09-08T17:49:29.8293430Z   check-latest: false
+2025-09-08T17:49:29.8293834Z   token: ***
+2025-09-08T17:49:29.8294014Z env:
+2025-09-08T17:49:29.8294188Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:49:29.8294421Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:49:29.8294628Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:49:29.8294819Z ##[endgroup]
+2025-09-08T17:49:30.0080324Z Found in cache @ /opt/hostedtoolcache/node/22.19.0/x64
+2025-09-08T17:49:30.0087223Z ##[group]Environment details
+2025-09-08T17:49:30.4053136Z node: v22.19.0
+2025-09-08T17:49:30.4053528Z npm: 10.9.3
+2025-09-08T17:49:30.4053832Z yarn: 1.22.22
+2025-09-08T17:49:30.4055238Z ##[endgroup]
+2025-09-08T17:49:30.4076946Z [command]/opt/hostedtoolcache/node/22.19.0/x64/bin/npm config get cache
+2025-09-08T17:49:30.6021626Z /home/runner/.npm
+2025-09-08T17:49:30.7687805Z npm cache is not found
+2025-09-08T17:49:30.7801333Z ##[group]Run npm ci
+2025-09-08T17:49:30.7801624Z [36;1mnpm ci[0m
+2025-09-08T17:49:30.7839319Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:49:30.7839563Z env:
+2025-09-08T17:49:30.7839743Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:49:30.7840201Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:49:30.7840415Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:49:30.7840599Z ##[endgroup]
+2025-09-08T17:50:03.5452252Z
+2025-09-08T17:50:03.5463645Z added 442 packages, and audited 443 packages in 33s
+2025-09-08T17:50:03.5464089Z
+2025-09-08T17:50:03.5464341Z 144 packages are looking for funding
+2025-09-08T17:50:03.5464639Z   run `npm fund` for details
+2025-09-08T17:50:03.7091937Z
+2025-09-08T17:50:03.7092923Z 24 critical severity vulnerabilities
+2025-09-08T17:50:03.7093869Z
+2025-09-08T17:50:03.7094462Z To address issues that do not require attention, run:
+2025-09-08T17:50:03.7095372Z   npm audit fix
+2025-09-08T17:50:03.7095619Z
+2025-09-08T17:50:03.7096181Z To address all issues possible (including breaking changes), run:
+2025-09-08T17:50:03.7096791Z   npm audit fix --force
+2025-09-08T17:50:03.7097025Z
+2025-09-08T17:50:03.7097346Z Some issues need review, and may require choosing
+2025-09-08T17:50:03.7097874Z a different dependency.
+2025-09-08T17:50:03.7098127Z
+2025-09-08T17:50:03.7098335Z Run `npm audit` for details.
+2025-09-08T17:50:03.7918330Z ##[group]Run composer install --no-interaction --prefer-dist --optimize-autoloader
+2025-09-08T17:50:03.7930888Z [36;1mcomposer install --no-interaction --prefer-dist --optimize-autoloader[0m
+2025-09-08T17:50:03.7959252Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:03.7959482Z env:
+2025-09-08T17:50:03.7959669Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:03.7959896Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:03.7960110Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:03.7960305Z ##[endgroup]
+2025-09-08T17:50:03.9950604Z Installing dependencies from lock file (including require-dev)
+2025-09-08T17:50:04.0022737Z Verifying lock file contents can be installed on current platform.
+2025-09-08T17:50:04.0281765Z Warning: The lock file is not up to date with the latest changes in composer.json. You may be getting outdated dependencies. It is recommended that you run `composer update` or `composer update <package name>`.
+2025-09-08T17:50:04.0479094Z Package operations: 155 installs, 0 updates, 0 removals
+2025-09-08T17:50:04.0497403Z   - Downloading symfony/process (v7.3.0)
+2025-09-08T17:50:04.0506239Z   - Downloading symfony/polyfill-mbstring (v1.33.0)
+2025-09-08T17:50:04.0509270Z   - Downloading symfony/polyfill-intl-normalizer (v1.33.0)
+2025-09-08T17:50:04.0512058Z   - Downloading symfony/polyfill-intl-grapheme (v1.33.0)
+2025-09-08T17:50:04.0514463Z   - Downloading symfony/polyfill-ctype (v1.33.0)
+2025-09-08T17:50:04.0516825Z   - Downloading symfony/string (v7.3.2)
+2025-09-08T17:50:04.0519418Z   - Downloading symfony/deprecation-contracts (v3.6.0)
+2025-09-08T17:50:04.0522389Z   - Downloading psr/container (2.0.2)
+2025-09-08T17:50:04.0524584Z   - Downloading symfony/service-contracts (v3.6.0)
+2025-09-08T17:50:04.0526784Z   - Downloading symfony/console (v7.3.2)
+2025-09-08T17:50:04.0530285Z   - Downloading sebastian/environment (7.2.1)
+2025-09-08T17:50:04.0532876Z   - Downloading staabm/side-effects-detector (1.0.5)
+2025-09-08T17:50:04.0535095Z   - Downloading sebastian/version (5.0.2)
+2025-09-08T17:50:04.0536963Z   - Downloading sebastian/type (5.1.3)
+2025-09-08T17:50:04.0538132Z   - Downloading sebastian/recursion-context (6.0.3)
+2025-09-08T17:50:04.0549957Z   - Downloading sebastian/object-reflector (4.0.1)
+2025-09-08T17:50:04.0550984Z   - Downloading sebastian/object-enumerator (6.0.1)
+2025-09-08T17:50:04.0551605Z   - Downloading sebastian/global-state (7.0.2)
+2025-09-08T17:50:04.0552178Z   - Downloading sebastian/exporter (6.3.0)
+2025-09-08T17:50:04.0552698Z   - Downloading sebastian/diff (6.0.2)
+2025-09-08T17:50:04.0553235Z   - Downloading sebastian/comparator (6.3.2)
+2025-09-08T17:50:04.0553809Z   - Downloading sebastian/code-unit (3.0.3)
+2025-09-08T17:50:04.0554354Z   - Downloading sebastian/cli-parser (3.0.2)
+2025-09-08T17:50:04.0554882Z   - Downloading phpunit/php-timer (7.0.1)
+2025-09-08T17:50:04.0555729Z   - Downloading phpunit/php-text-template (4.0.1)
+2025-09-08T17:50:04.0556463Z   - Downloading phpunit/php-invoker (5.0.1)
+2025-09-08T17:50:04.0557510Z   - Downloading phpunit/php-file-iterator (5.1.0)
+2025-09-08T17:50:04.0558090Z   - Downloading theseer/tokenizer (1.2.3)
+2025-09-08T17:50:04.0562673Z   - Downloading nikic/php-parser (v5.6.1)
+2025-09-08T17:50:04.0563289Z   - Downloading sebastian/lines-of-code (3.0.1)
+2025-09-08T17:50:04.0563843Z   - Downloading sebastian/complexity (4.0.1)
+2025-09-08T17:50:04.0564469Z   - Downloading sebastian/code-unit-reverse-lookup (4.0.1)
+2025-09-08T17:50:04.0565144Z   - Downloading phpunit/php-code-coverage (11.0.10)
+2025-09-08T17:50:04.0566372Z   - Downloading phar-io/version (3.2.1)
+2025-09-08T17:50:04.0568095Z   - Downloading phar-io/manifest (2.0.4)
+2025-09-08T17:50:04.0570599Z   - Downloading myclabs/deep-copy (1.13.4)
+2025-09-08T17:50:04.0571876Z   - Downloading phpunit/phpunit (11.5.33)
+2025-09-08T17:50:04.0574277Z   - Downloading jean85/pretty-package-versions (2.1.1)
+2025-09-08T17:50:04.0576206Z   - Downloading fidry/cpu-core-counter (1.3.0)
+2025-09-08T17:50:04.0578188Z   - Downloading brianium/paratest (v7.8.4)
+2025-09-08T17:50:04.0580816Z   - Downloading carbonphp/carbon-doctrine-types (3.2.0)
+2025-09-08T17:50:04.0582238Z   - Downloading corbpie/bunny-cdn-api (v1.9.7)
+2025-09-08T17:50:04.0584425Z   - Downloading doctrine/inflector (2.1.0)
+2025-09-08T17:50:04.0585699Z   - Downloading doctrine/lexer (3.0.1)
+2025-09-08T17:50:04.0587951Z   - Downloading webmozart/assert (1.11.0)
+2025-09-08T17:50:04.0590383Z   - Downloading dragonmantank/cron-expression (v3.4.0)
+2025-09-08T17:50:04.0592252Z   - Downloading fakerphp/faker (v1.24.1)
+2025-09-08T17:50:04.0594483Z   - Downloading foroco/php-browser-detection (v2.8)
+2025-09-08T17:50:04.0596035Z   - Downloading symfony/polyfill-php83 (v1.33.0)
+2025-09-08T17:50:04.0598042Z   - Downloading symfony/http-foundation (v7.3.2)
+2025-09-08T17:50:04.0600523Z   - Downloading fruitcake/php-cors (v1.3.0)
+2025-09-08T17:50:04.0602500Z   - Downloading guzzlehttp/promises (2.2.0)
+2025-09-08T17:50:04.0604588Z   - Downloading ralouphie/getallheaders (3.0.3)
+2025-09-08T17:50:04.0605944Z   - Downloading psr/http-message (2.0)
+2025-09-08T17:50:04.0607751Z   - Downloading psr/http-factory (1.1.0)
+2025-09-08T17:50:04.0609280Z   - Downloading guzzlehttp/psr7 (2.7.1)
+2025-09-08T17:50:04.0611215Z   - Downloading symfony/polyfill-php80 (v1.33.0)
+2025-09-08T17:50:04.0612570Z   - Downloading guzzlehttp/uri-template (v1.0.4)
+2025-09-08T17:50:04.0614944Z   - Downloading halaxa/json-machine (1.2.5)
+2025-09-08T17:50:04.0617026Z   - Downloading voku/portable-ascii (2.0.3)
+2025-09-08T17:50:04.0619303Z   - Downloading phpoption/phpoption (1.9.3)
+2025-09-08T17:50:04.0621468Z   - Downloading graham-campbell/result-type (v1.1.3)
+2025-09-08T17:50:04.0623554Z   - Downloading vlucas/phpdotenv (v5.6.2)
+2025-09-08T17:50:04.0624876Z   - Downloading symfony/css-selector (v7.3.0)
+2025-09-08T17:50:04.0627317Z   - Downloading tijsverkoyen/css-to-inline-styles (v2.3.0)
+2025-09-08T17:50:04.0628506Z   - Downloading symfony/var-dumper (v7.3.2)
+2025-09-08T17:50:04.0630659Z   - Downloading symfony/polyfill-uuid (v1.33.0)
+2025-09-08T17:50:04.0631960Z   - Downloading symfony/uid (v7.3.1)
+2025-09-08T17:50:04.0633735Z   - Downloading symfony/routing (v7.3.2)
+2025-09-08T17:50:04.0635205Z   - Downloading symfony/polyfill-php85 (v1.33.0)
+2025-09-08T17:50:04.0637252Z   - Downloading symfony/polyfill-php84 (v1.33.0)
+2025-09-08T17:50:04.0638621Z   - Downloading symfony/polyfill-intl-idn (v1.33.0)
+2025-09-08T17:50:04.0640442Z   - Downloading symfony/mime (v7.3.2)
+2025-09-08T17:50:04.0644231Z   - Downloading psr/event-dispatcher (1.0.0)
+2025-09-08T17:50:04.0645526Z   - Downloading symfony/event-dispatcher-contracts (v3.6.0)
+2025-09-08T17:50:04.0647622Z   - Downloading symfony/event-dispatcher (v7.3.0)
+2025-09-08T17:50:04.0649141Z   - Downloading psr/log (3.0.2)
+2025-09-08T17:50:04.0651427Z   - Downloading egulias/email-validator (4.0.4)
+2025-09-08T17:50:04.0652719Z   - Downloading symfony/mailer (v7.3.2)
+2025-09-08T17:50:04.0654849Z   - Downloading symfony/error-handler (v7.3.2)
+2025-09-08T17:50:04.0656212Z   - Downloading symfony/http-kernel (v7.3.2)
+2025-09-08T17:50:04.0658095Z   - Downloading symfony/finder (v7.3.2)
+2025-09-08T17:50:04.0660385Z   - Downloading ramsey/collection (2.1.1)
+2025-09-08T17:50:04.0662442Z   - Downloading brick/math (0.13.1)
+2025-09-08T17:50:04.0663802Z   - Downloading ramsey/uuid (4.9.0)
+2025-09-08T17:50:04.0665688Z   - Downloading psr/simple-cache (3.0.0)
+2025-09-08T17:50:04.0667908Z   - Downloading nunomaduro/termwind (v2.3.1)
+2025-09-08T17:50:04.0669565Z   - Downloading symfony/translation-contracts (v3.6.0)
+2025-09-08T17:50:04.0670958Z   - Downloading symfony/translation (v7.3.2)
+2025-09-08T17:50:04.0672480Z   - Downloading psr/clock (1.0.0)
+2025-09-08T17:50:04.0674198Z   - Downloading symfony/clock (v7.3.0)
+2025-09-08T17:50:04.0676271Z   - Downloading nesbot/carbon (3.10.2)
+2025-09-08T17:50:04.0678308Z   - Downloading monolog/monolog (3.9.0)
+2025-09-08T17:50:04.0680699Z   - Downloading league/uri-interfaces (7.5.0)
+2025-09-08T17:50:04.0682001Z   - Downloading league/uri (7.5.1)
+2025-09-08T17:50:04.0684224Z   - Downloading league/mime-type-detection (1.16.0)
+2025-09-08T17:50:04.0685364Z   - Downloading league/flysystem-local (3.30.0)
+2025-09-08T17:50:04.0687080Z   - Downloading league/flysystem (3.30.0)
+2025-09-08T17:50:04.0689487Z   - Downloading nette/utils (v4.0.8)
+2025-09-08T17:50:04.0690832Z   - Downloading nette/schema (v1.3.2)
+2025-09-08T17:50:04.0693301Z   - Downloading dflydev/dot-access-data (v3.0.3)
+2025-09-08T17:50:04.0694567Z   - Downloading league/config (v1.2.0)
+2025-09-08T17:50:04.0696600Z   - Downloading league/commonmark (2.7.1)
+2025-09-08T17:50:04.0698965Z   - Downloading laravel/serializable-closure (v2.0.4)
+2025-09-08T17:50:04.0700193Z   - Downloading laravel/prompts (v0.3.6)
+2025-09-08T17:50:04.0702052Z   - Downloading psr/http-client (1.0.3)
+2025-09-08T17:50:04.0703467Z   - Downloading guzzlehttp/guzzle (7.9.3)
+2025-09-08T17:50:04.0705352Z   - Downloading laravel/framework (v12.25.0)
+2025-09-08T17:50:04.0707559Z   - Downloading inertiajs/inertia-laravel (v2.0.5)
+2025-09-08T17:50:04.0709974Z   - Downloading intervention/gif (4.2.2)
+2025-09-08T17:50:04.0711360Z   - Downloading intervention/image (3.11.4)
+2025-09-08T17:50:04.0713728Z   - Downloading phpstan/phpstan (2.1.22)
+2025-09-08T17:50:04.0715782Z   - Downloading iamcal/sql-parser (v0.6)
+2025-09-08T17:50:04.0717992Z   - Downloading larastan/larastan (v3.6.0)
+2025-09-08T17:50:04.0720279Z   - Downloading php-webdriver/webdriver (1.15.2)
+2025-09-08T17:50:04.0721622Z   - Downloading laravel/dusk (v8.3.3)
+2025-09-08T17:50:04.0723515Z   - Downloading symfony/psr-http-message-bridge (v7.3.0)
+2025-09-08T17:50:04.0725754Z   - Downloading laminas/laminas-diactoros (3.6.0)
+2025-09-08T17:50:04.0727108Z   - Downloading laravel/octane (v2.12.1)
+2025-09-08T17:50:04.0729097Z   - Downloading laravel/pail (v1.2.3)
+2025-09-08T17:50:04.0730866Z   - Downloading laravel/pint (v1.24.0)
+2025-09-08T17:50:04.0732258Z   - Downloading symfony/yaml (v7.3.2)
+2025-09-08T17:50:04.0734240Z   - Downloading laravel/sail (v1.44.0)
+2025-09-08T17:50:04.0736515Z   - Downloading psy/psysh (v0.12.10)
+2025-09-08T17:50:04.0737677Z   - Downloading laravel/tinker (v2.10.1)
+2025-09-08T17:50:04.0739396Z   - Downloading league/flysystem-ftp (3.29.0)
+2025-09-08T17:50:04.0741750Z   - Downloading hamcrest/hamcrest-php (v2.1.1)
+2025-09-08T17:50:04.0743704Z   - Downloading mockery/mockery (1.6.12)
+2025-09-08T17:50:04.0745795Z   - Downloading nicmart/tree (0.9.0)
+2025-09-08T17:50:04.0748142Z   - Downloading filp/whoops (2.18.4)
+2025-09-08T17:50:04.0749824Z   - Downloading nunomaduro/collision (v8.8.2)
+2025-09-08T17:50:04.0760047Z   - Downloading symfony/polyfill-php81 (v1.33.0)
+2025-09-08T17:50:04.0760746Z   - Downloading phootwork/lang (v3.2.3)
+2025-09-08T17:50:04.0761268Z   - Downloading phootwork/collection (v3.2.3)
+2025-09-08T17:50:04.0761923Z   - Downloading platformcommunity/flysystem-bunnycdn (v3.3.5)
+2025-09-08T17:50:04.0762591Z   - Downloading phpowermove/docblock (v4.0)
+2025-09-08T17:50:04.0763167Z   - Downloading romanzipp/laravel-model-doc (3.3.0)
+2025-09-08T17:50:04.0764178Z   - Downloading symfony/options-resolver (v7.3.2)
+2025-09-08T17:50:04.0764850Z   - Downloading sentry/sentry (4.14.2)
+2025-09-08T17:50:04.0766089Z   - Downloading nyholm/psr7 (1.8.2)
+2025-09-08T17:50:04.0767559Z   - Downloading sentry/sentry-laravel (4.15.1)
+2025-09-08T17:50:04.0770382Z   - Downloading sl-projects/laravel-request-logger (v1.0.10)
+2025-09-08T17:50:04.0772290Z   - Downloading spatie/temporary-directory (2.3.0)
+2025-09-08T17:50:04.0773744Z   - Downloading spatie/browsershot (5.0.10)
+2025-09-08T17:50:04.0775775Z   - Downloading spatie/laravel-package-tools (1.92.7)
+2025-09-08T17:50:04.0777274Z   - Downloading spatie/laravel-signal-aware-command (2.1.0)
+2025-09-08T17:50:04.0779267Z   - Downloading spatie/db-dumper (3.8.0)
+2025-09-08T17:50:04.0780762Z   - Downloading spatie/laravel-backup (9.3.4)
+2025-09-08T17:50:04.0783112Z   - Downloading masterminds/html5 (2.10.0)
+2025-09-08T17:50:04.0784465Z   - Downloading symfony/dom-crawler (v7.3.1)
+2025-09-08T17:50:04.0786210Z   - Downloading spatie/robots-txt (2.5.1)
+2025-09-08T17:50:04.0788280Z   - Downloading spatie/crawler (8.4.3)
+2025-09-08T17:50:04.0789704Z   - Downloading spatie/laravel-sitemap (7.3.6)
+2025-09-08T17:50:04.0792113Z   - Downloading tightenco/ziggy (v2.5.3)
+2025-09-08T17:50:04.0794257Z   - Downloading verschuur/laravel-robotstxt (5.2.0)
+2025-09-08T17:50:07.1003616Z   - Installing symfony/process (v7.3.0): Extracting archive
+2025-09-08T17:50:07.1022114Z   - Installing symfony/polyfill-mbstring (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1027737Z   - Installing symfony/polyfill-intl-normalizer (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1033736Z   - Installing symfony/polyfill-intl-grapheme (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1039270Z   - Installing symfony/polyfill-ctype (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1045101Z   - Installing symfony/string (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1050770Z   - Installing symfony/deprecation-contracts (v3.6.0): Extracting archive
+2025-09-08T17:50:07.1056404Z   - Installing psr/container (2.0.2): Extracting archive
+2025-09-08T17:50:07.1062040Z   - Installing symfony/service-contracts (v3.6.0): Extracting archive
+2025-09-08T17:50:07.1067728Z   - Installing symfony/console (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1073193Z   - Installing sebastian/environment (7.2.1): Extracting archive
+2025-09-08T17:50:07.1075820Z   - Installing staabm/side-effects-detector (1.0.5): Extracting archive
+2025-09-08T17:50:07.1078197Z   - Installing sebastian/version (5.0.2): Extracting archive
+2025-09-08T17:50:07.1082523Z   - Installing sebastian/type (5.1.3): Extracting archive
+2025-09-08T17:50:07.1084095Z   - Installing sebastian/recursion-context (6.0.3): Extracting archive
+2025-09-08T17:50:07.1086780Z   - Installing sebastian/object-reflector (4.0.1): Extracting archive
+2025-09-08T17:50:07.1089677Z   - Installing sebastian/object-enumerator (6.0.1): Extracting archive
+2025-09-08T17:50:07.1091699Z   - Installing sebastian/global-state (7.0.2): Extracting archive
+2025-09-08T17:50:07.1093734Z   - Installing sebastian/exporter (6.3.0): Extracting archive
+2025-09-08T17:50:07.1095704Z   - Installing sebastian/diff (6.0.2): Extracting archive
+2025-09-08T17:50:07.1097733Z   - Installing sebastian/comparator (6.3.2): Extracting archive
+2025-09-08T17:50:07.1100030Z   - Installing sebastian/code-unit (3.0.3): Extracting archive
+2025-09-08T17:50:07.1102036Z   - Installing sebastian/cli-parser (3.0.2): Extracting archive
+2025-09-08T17:50:07.1104100Z   - Installing phpunit/php-timer (7.0.1): Extracting archive
+2025-09-08T17:50:07.1106201Z   - Installing phpunit/php-text-template (4.0.1): Extracting archive
+2025-09-08T17:50:07.1108309Z   - Installing phpunit/php-invoker (5.0.1): Extracting archive
+2025-09-08T17:50:07.1111007Z   - Installing phpunit/php-file-iterator (5.1.0): Extracting archive
+2025-09-08T17:50:07.1113599Z   - Installing theseer/tokenizer (1.2.3): Extracting archive
+2025-09-08T17:50:07.1116590Z   - Installing nikic/php-parser (v5.6.1): Extracting archive
+2025-09-08T17:50:07.1119709Z   - Installing sebastian/lines-of-code (3.0.1): Extracting archive
+2025-09-08T17:50:07.1122181Z   - Installing sebastian/complexity (4.0.1): Extracting archive
+2025-09-08T17:50:07.1124799Z   - Installing sebastian/code-unit-reverse-lookup (4.0.1): Extracting archive
+2025-09-08T17:50:07.1127248Z   - Installing phpunit/php-code-coverage (11.0.10): Extracting archive
+2025-09-08T17:50:07.1130091Z   - Installing phar-io/version (3.2.1): Extracting archive
+2025-09-08T17:50:07.1133297Z   - Installing phar-io/manifest (2.0.4): Extracting archive
+2025-09-08T17:50:07.1136423Z   - Installing myclabs/deep-copy (1.13.4): Extracting archive
+2025-09-08T17:50:07.1152709Z   - Installing phpunit/phpunit (11.5.33): Extracting archive
+2025-09-08T17:50:07.1153641Z   - Installing jean85/pretty-package-versions (2.1.1): Extracting archive
+2025-09-08T17:50:07.1154556Z   - Installing fidry/cpu-core-counter (1.3.0): Extracting archive
+2025-09-08T17:50:07.1155245Z   - Installing brianium/paratest (v7.8.4): Extracting archive
+2025-09-08T17:50:07.1156267Z   - Installing carbonphp/carbon-doctrine-types (3.2.0): Extracting archive
+2025-09-08T17:50:07.1157109Z   - Installing corbpie/bunny-cdn-api (v1.9.7): Extracting archive
+2025-09-08T17:50:07.1157792Z   - Installing doctrine/inflector (2.1.0): Extracting archive
+2025-09-08T17:50:07.1159263Z   - Installing doctrine/lexer (3.0.1): Extracting archive
+2025-09-08T17:50:07.1160689Z   - Installing webmozart/assert (1.11.0): Extracting archive
+2025-09-08T17:50:07.1163530Z   - Installing dragonmantank/cron-expression (v3.4.0): Extracting archive
+2025-09-08T17:50:07.1165447Z   - Installing fakerphp/faker (v1.24.1): Extracting archive
+2025-09-08T17:50:07.1167923Z   - Installing foroco/php-browser-detection (v2.8): Extracting archive
+2025-09-08T17:50:07.1170448Z   - Installing symfony/polyfill-php83 (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1172480Z   - Installing symfony/http-foundation (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1174548Z   - Installing fruitcake/php-cors (v1.3.0): Extracting archive
+2025-09-08T17:50:07.1176671Z   - Installing guzzlehttp/promises (2.2.0): Extracting archive
+2025-09-08T17:50:07.1178952Z   - Installing ralouphie/getallheaders (3.0.3): Extracting archive
+2025-09-08T17:50:07.1181116Z   - Installing psr/http-message (2.0): Extracting archive
+2025-09-08T17:50:07.1183214Z   - Installing psr/http-factory (1.1.0): Extracting archive
+2025-09-08T17:50:07.1185283Z   - Installing guzzlehttp/psr7 (2.7.1): Extracting archive
+2025-09-08T17:50:07.1187394Z   - Installing symfony/polyfill-php80 (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1189952Z   - Installing guzzlehttp/uri-template (v1.0.4): Extracting archive
+2025-09-08T17:50:07.1191963Z   - Installing halaxa/json-machine (1.2.5): Extracting archive
+2025-09-08T17:50:07.1194126Z   - Installing voku/portable-ascii (2.0.3): Extracting archive
+2025-09-08T17:50:07.1210076Z   - Installing phpoption/phpoption (1.9.3): Extracting archive
+2025-09-08T17:50:07.1211289Z   - Installing graham-campbell/result-type (v1.1.3): Extracting archive
+2025-09-08T17:50:07.1213808Z   - Installing vlucas/phpdotenv (v5.6.2): Extracting archive
+2025-09-08T17:50:07.1214507Z   - Installing symfony/css-selector (v7.3.0): Extracting archive
+2025-09-08T17:50:07.1215315Z   - Installing tijsverkoyen/css-to-inline-styles (v2.3.0): Extracting archive
+2025-09-08T17:50:07.1216090Z   - Installing symfony/var-dumper (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1222937Z   - Installing symfony/polyfill-uuid (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1225250Z   - Installing symfony/uid (v7.3.1): Extracting archive
+2025-09-08T17:50:07.1227707Z   - Installing symfony/routing (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1230372Z   - Installing symfony/polyfill-php85 (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1232816Z   - Installing symfony/polyfill-php84 (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1235276Z   - Installing symfony/polyfill-intl-idn (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1237516Z   - Installing symfony/mime (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1240439Z   - Installing psr/event-dispatcher (1.0.0): Extracting archive
+2025-09-08T17:50:07.1242945Z   - Installing symfony/event-dispatcher-contracts (v3.6.0): Extracting archive
+2025-09-08T17:50:07.1245256Z   - Installing symfony/event-dispatcher (v7.3.0): Extracting archive
+2025-09-08T17:50:07.1247621Z   - Installing psr/log (3.0.2): Extracting archive
+2025-09-08T17:50:07.1250532Z   - Installing egulias/email-validator (4.0.4): Extracting archive
+2025-09-08T17:50:07.1252864Z   - Installing symfony/mailer (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1255529Z   - Installing symfony/error-handler (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1257839Z   - Installing symfony/http-kernel (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1262071Z   - Installing symfony/finder (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1262786Z   - Installing ramsey/collection (2.1.1): Extracting archive
+2025-09-08T17:50:07.1264771Z   - Installing brick/math (0.13.1): Extracting archive
+2025-09-08T17:50:07.1267110Z   - Installing ramsey/uuid (4.9.0): Extracting archive
+2025-09-08T17:50:07.1269284Z   - Installing psr/simple-cache (3.0.0): Extracting archive
+2025-09-08T17:50:07.1271462Z   - Installing nunomaduro/termwind (v2.3.1): Extracting archive
+2025-09-08T17:50:07.1273593Z   - Installing symfony/translation-contracts (v3.6.0): Extracting archive
+2025-09-08T17:50:07.1275659Z   - Installing symfony/translation (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1277805Z   - Installing psr/clock (1.0.0): Extracting archive
+2025-09-08T17:50:07.1280281Z   - Installing symfony/clock (v7.3.0): Extracting archive
+2025-09-08T17:50:07.1282270Z   - Installing nesbot/carbon (3.10.2): Extracting archive
+2025-09-08T17:50:07.1284438Z   - Installing monolog/monolog (3.9.0): Extracting archive
+2025-09-08T17:50:07.1286720Z   - Installing league/uri-interfaces (7.5.0): Extracting archive
+2025-09-08T17:50:07.1289019Z   - Installing league/uri (7.5.1): Extracting archive
+2025-09-08T17:50:07.1291443Z   - Installing league/mime-type-detection (1.16.0): Extracting archive
+2025-09-08T17:50:07.1293739Z   - Installing league/flysystem-local (3.30.0): Extracting archive
+2025-09-08T17:50:07.1295906Z   - Installing league/flysystem (3.30.0): Extracting archive
+2025-09-08T17:50:07.1297973Z   - Installing nette/utils (v4.0.8): Extracting archive
+2025-09-08T17:50:07.1300402Z   - Installing nette/schema (v1.3.2): Extracting archive
+2025-09-08T17:50:07.1302413Z   - Installing dflydev/dot-access-data (v3.0.3): Extracting archive
+2025-09-08T17:50:07.1304606Z   - Installing league/config (v1.2.0): Extracting archive
+2025-09-08T17:50:07.1306635Z   - Installing league/commonmark (2.7.1): Extracting archive
+2025-09-08T17:50:07.1308718Z   - Installing laravel/serializable-closure (v2.0.4): Extracting archive
+2025-09-08T17:50:07.1311354Z   - Installing laravel/prompts (v0.3.6): Extracting archive
+2025-09-08T17:50:07.1313947Z   - Installing psr/http-client (1.0.3): Extracting archive
+2025-09-08T17:50:07.1316439Z   - Installing guzzlehttp/guzzle (7.9.3): Extracting archive
+2025-09-08T17:50:07.1319070Z   - Installing laravel/framework (v12.25.0): Extracting archive
+2025-09-08T17:50:07.1321459Z   - Installing inertiajs/inertia-laravel (v2.0.5): Extracting archive
+2025-09-08T17:50:07.1323851Z   - Installing intervention/gif (4.2.2): Extracting archive
+2025-09-08T17:50:07.1326249Z   - Installing intervention/image (3.11.4): Extracting archive
+2025-09-08T17:50:07.1328585Z   - Installing phpstan/phpstan (2.1.22): Extracting archive
+2025-09-08T17:50:07.1331277Z   - Installing iamcal/sql-parser (v0.6): Extracting archive
+2025-09-08T17:50:07.1359759Z   - Installing larastan/larastan (v3.6.0): Extracting archive
+2025-09-08T17:50:07.1360538Z   - Installing php-webdriver/webdriver (1.15.2): Extracting archive
+2025-09-08T17:50:07.1360990Z   - Installing laravel/dusk (v8.3.3): Extracting archive
+2025-09-08T17:50:07.1361440Z   - Installing symfony/psr-http-message-bridge (v7.3.0): Extracting archive
+2025-09-08T17:50:07.1362426Z   - Installing laminas/laminas-diactoros (3.6.0): Extracting archive
+2025-09-08T17:50:07.1362926Z   - Installing laravel/octane (v2.12.1): Extracting archive
+2025-09-08T17:50:07.1363305Z   - Installing laravel/pail (v1.2.3): Extracting archive
+2025-09-08T17:50:07.1363659Z   - Installing laravel/pint (v1.24.0): Extracting archive
+2025-09-08T17:50:07.1364006Z   - Installing symfony/yaml (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1364348Z   - Installing laravel/sail (v1.44.0): Extracting archive
+2025-09-08T17:50:07.1364686Z   - Installing psy/psysh (v0.12.10): Extracting archive
+2025-09-08T17:50:07.1440105Z   - Installing laravel/tinker (v2.10.1): Extracting archive
+2025-09-08T17:50:07.1441068Z   - Installing league/flysystem-ftp (3.29.0): Extracting archive
+2025-09-08T17:50:07.1441833Z   - Installing hamcrest/hamcrest-php (v2.1.1): Extracting archive
+2025-09-08T17:50:07.1444833Z   - Installing mockery/mockery (1.6.12): Extracting archive
+2025-09-08T17:50:07.1459578Z   - Installing nicmart/tree (0.9.0): Extracting archive
+2025-09-08T17:50:07.1461368Z   - Installing filp/whoops (2.18.4): Extracting archive
+2025-09-08T17:50:07.1463656Z   - Installing nunomaduro/collision (v8.8.2): Extracting archive
+2025-09-08T17:50:07.1464432Z   - Installing symfony/polyfill-php81 (v1.33.0): Extracting archive
+2025-09-08T17:50:07.1464969Z   - Installing phootwork/lang (v3.2.3): Extracting archive
+2025-09-08T17:50:07.1465653Z   - Installing phootwork/collection (v3.2.3): Extracting archive
+2025-09-08T17:50:07.1466371Z   - Installing platformcommunity/flysystem-bunnycdn (v3.3.5): Extracting archive
+2025-09-08T17:50:07.1468083Z   - Installing phpowermove/docblock (v4.0): Extracting archive
+2025-09-08T17:50:07.1470988Z   - Installing romanzipp/laravel-model-doc (3.3.0): Extracting archive
+2025-09-08T17:50:07.1473380Z   - Installing symfony/options-resolver (v7.3.2): Extracting archive
+2025-09-08T17:50:07.1475613Z   - Installing sentry/sentry (4.14.2): Extracting archive
+2025-09-08T17:50:07.1477976Z   - Installing nyholm/psr7 (1.8.2): Extracting archive
+2025-09-08T17:50:07.1480669Z   - Installing sentry/sentry-laravel (4.15.1): Extracting archive
+2025-09-08T17:50:07.1483065Z   - Installing sl-projects/laravel-request-logger (v1.0.10): Extracting archive
+2025-09-08T17:50:07.1485346Z   - Installing spatie/temporary-directory (2.3.0): Extracting archive
+2025-09-08T17:50:07.1487739Z   - Installing spatie/browsershot (5.0.10): Extracting archive
+2025-09-08T17:50:07.1490480Z   - Installing spatie/laravel-package-tools (1.92.7): Extracting archive
+2025-09-08T17:50:07.1492803Z   - Installing spatie/laravel-signal-aware-command (2.1.0): Extracting archive
+2025-09-08T17:50:07.1497284Z   - Installing spatie/db-dumper (3.8.0): Extracting archive
+2025-09-08T17:50:07.1499955Z   - Installing spatie/laravel-backup (9.3.4): Extracting archive
+2025-09-08T17:50:07.1502218Z   - Installing masterminds/html5 (2.10.0): Extracting archive
+2025-09-08T17:50:07.1504534Z   - Installing symfony/dom-crawler (v7.3.1): Extracting archive
+2025-09-08T17:50:07.1506789Z   - Installing spatie/robots-txt (2.5.1): Extracting archive
+2025-09-08T17:50:07.1509169Z   - Installing spatie/crawler (8.4.3): Extracting archive
+2025-09-08T17:50:07.1511551Z   - Installing spatie/laravel-sitemap (7.3.6): Extracting archive
+2025-09-08T17:50:07.1514009Z   - Installing tightenco/ziggy (v2.5.3): Extracting archive
+2025-09-08T17:50:07.1516375Z   - Installing verschuur/laravel-robotstxt (5.2.0): Extracting archive
+2025-09-08T17:50:08.9072155Z Generating optimized autoload files
+2025-09-08T17:50:10.8266883Z > Illuminate\Foundation\ComposerScripts::postAutoloadDump
+2025-09-08T17:50:10.8453782Z > @php artisan package:discover --ansi
+2025-09-08T17:50:11.0894935Z
+2025-09-08T17:50:11.0895749Z   [37;44m INFO [39;49m Discovering packages.
+2025-09-08T17:50:11.0896044Z
+2025-09-08T17:50:11.0968040Z   inertiajs/inertia-laravel [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1016502Z   laravel/dusk [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1062113Z   laravel/octane [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1110521Z   laravel/pail [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1158443Z   laravel/sail [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1205354Z   laravel/tinker [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1252091Z   nesbot/carbon [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1292943Z   nunomaduro/collision [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1335086Z   nunomaduro/termwind [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1369742Z   romanzipp/laravel-model-doc [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1410183Z   sentry/sentry-laravel [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1441436Z   sl-projects/laravel-request-logger [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1481716Z   spatie/laravel-backup [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1510342Z   spatie/laravel-signal-aware-command [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1550609Z   spatie/laravel-sitemap [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1596808Z   tightenco/ziggy [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1632149Z   verschuur/laravel-robotstxt [90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m[90m.[39m [32;1mDONE[39;22m
+2025-09-08T17:50:11.1634258Z
+2025-09-08T17:50:11.1755122Z 106 packages you are using are looking for funding.
+2025-09-08T17:50:11.1755610Z Use the `composer fund` command to find out more!
+2025-09-08T17:50:11.2121127Z ##[group]Run cp .env.ci .env
+2025-09-08T17:50:11.2121413Z [36;1mcp .env.ci .env[0m
+2025-09-08T17:50:11.2150454Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:11.2150683Z env:
+2025-09-08T17:50:11.2150861Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:11.2151111Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:11.2151322Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:11.2151506Z ##[endgroup]
+2025-09-08T17:50:11.2234370Z ##[group]Run php artisan key:generate
+2025-09-08T17:50:11.2234661Z [36;1mphp artisan key:generate[0m
+2025-09-08T17:50:11.2259416Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:11.2259645Z env:
+2025-09-08T17:50:11.2259811Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:11.2260053Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:11.2260252Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:11.2260438Z ##[endgroup]
+2025-09-08T17:50:11.4489403Z
+2025-09-08T17:50:11.4489985Z    INFO  Application key set successfully.
+2025-09-08T17:50:11.4490454Z
+2025-09-08T17:50:11.4624755Z ##[group]Run php artisan dusk:chrome-driver --detect
+2025-09-08T17:50:11.4625148Z [36;1mphp artisan dusk:chrome-driver --detect[0m
+2025-09-08T17:50:11.4654259Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:11.4654503Z env:
+2025-09-08T17:50:11.4654681Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:11.4654920Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:11.4655136Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:11.4655334Z ##[endgroup]
+2025-09-08T17:50:14.6691115Z
+2025-09-08T17:50:14.6691939Z    INFO  ChromeDriver binary successfully installed for version 139.0.7258.154.
+2025-09-08T17:50:14.6692365Z
+2025-09-08T17:50:14.6836168Z ##[group]Run ./vendor/laravel/dusk/bin/chromedriver-linux &
+2025-09-08T17:50:14.6836586Z [36;1m./vendor/laravel/dusk/bin/chromedriver-linux &[0m
+2025-09-08T17:50:14.6865289Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:14.6865511Z env:
+2025-09-08T17:50:14.6865682Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:14.6865908Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:14.6866121Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:14.6866301Z ##[endgroup]
+2025-09-08T17:50:14.6947083Z Starting ChromeDriver 139.0.7258.154 (9e0d6b2b47ffb17007b713429c9a302f9e43847f-refs/branch-heads/7258@{#2926}) on port 0
+2025-09-08T17:50:14.6948059Z Only local connections are allowed.
+2025-09-08T17:50:14.6949344Z Please see https://chromedriver.chromium.org/security-considerations for suggestions on keeping ChromeDriver safe.
+2025-09-08T17:50:14.6976376Z ChromeDriver was started successfully on port 44821.
+2025-09-08T17:50:19.6993532Z ##[group]Run php artisan ziggy:generate
+2025-09-08T17:50:19.6994043Z [36;1mphp artisan ziggy:generate[0m
+2025-09-08T17:50:19.7031949Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:19.7032334Z env:
+2025-09-08T17:50:19.7032643Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:19.7033029Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:19.7033392Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:19.7033718Z ##[endgroup]
+2025-09-08T17:50:19.9458339Z Files generated!
+2025-09-08T17:50:19.9612233Z ##[group]Run npm run build:ssr
+2025-09-08T17:50:19.9612705Z [36;1mnpm run build:ssr[0m
+2025-09-08T17:50:19.9647559Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:19.9647809Z env:
+2025-09-08T17:50:19.9647985Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:19.9648228Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:19.9648448Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:19.9648637Z ##[endgroup]
+2025-09-08T17:50:20.0691373Z
+2025-09-08T17:50:20.0691869Z > build:ssr
+2025-09-08T17:50:20.0692230Z > vite build && vite build --ssr
+2025-09-08T17:50:20.0692449Z
+2025-09-08T17:50:20.6274331Z [36mvite v6.3.6 [32mbuilding for production...[36m[39m
+2025-09-08T17:50:20.7381951Z transforming...
+2025-09-08T17:50:31.0633993Z [32m✓[39m 4601 modules transformed.
+2025-09-08T17:50:31.5769434Z rendering chunks...
+2025-09-08T17:50:31.9932215Z computing gzip size...
+2025-09-08T17:50:32.1070952Z [2mpublic/build/[22m[2massets/[22m[32mdots-dark-DBsSqnFQ.svg                                              [39m[1m[2m    0.78 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2025-09-08T17:50:32.1072730Z [2mpublic/build/[22m[2massets/[22m[32mdots-orange-BpZT5N4H.svg                                            [39m[1m[2m    0.78 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2025-09-08T17:50:32.1074437Z [2mpublic/build/[22m[2massets/[22m[32mdots-light-BPEpAOFW.svg                                             [39m[1m[2m    0.79 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2025-09-08T17:50:32.1076127Z [2mpublic/build/[22m[2massets/[22m[32mshadowed-dots-8QU8NZG_.svg                                          [39m[1m[2m    1.06 kB[22m[1m[22m[2m │ gzip:   0.48 kB[22m
+2025-09-08T17:50:32.1077651Z [2mpublic/build/[22m[32mmanifest.json                                                              [39m[1m[2m   57.02 kB[22m[1m[22m[2m │ gzip:   5.07 kB[22m
+2025-09-08T17:50:32.1079397Z [2mpublic/build/[22m[2massets/[22m[32mbig-head-geneva-may-2025-BTJTcYo9.avif                              [39m[1m[2m  322.90 kB[22m[1m[22m
+2025-09-08T17:50:32.1081004Z [2mpublic/build/[22m[2massets/[22m[32mbig-head-geneva-may-2025-CWH-Dcxg.jpg                               [39m[1m[2m  841.42 kB[22m[1m[22m
+2025-09-08T17:50:32.1082700Z [2mpublic/build/[22m[2massets/[22m[35mHorizontalNavbar-2aPyNVED.css                                       [39m[1m[2m    0.15 kB[22m[1m[22m[2m │ gzip:   0.11 kB[22m
+2025-09-08T17:50:32.1084373Z [2mpublic/build/[22m[2massets/[22m[35mLightShape-DdeQo7QP.css                                             [39m[1m[2m    0.26 kB[22m[1m[22m[2m │ gzip:   0.19 kB[22m
+2025-09-08T17:50:32.1085979Z [2mpublic/build/[22m[2massets/[22m[35mProjects-QsAqm3E3.css                                               [39m[1m[2m    0.89 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2025-09-08T17:50:32.1088029Z [2mpublic/build/[22m[2massets/[22m[35mMarkdownEditor-gzWnT2IY.css                                         [39m[1m[2m    1.18 kB[22m[1m[22m[2m │ gzip:   0.50 kB[22m
+2025-09-08T17:50:32.1089879Z [2mpublic/build/[22m[2massets/[22m[35mPublicAppLayout-B45yYTV6.css                                        [39m[1m[2m    1.86 kB[22m[1m[22m[2m │ gzip:   0.62 kB[22m
+2025-09-08T17:50:32.1091538Z [2mpublic/build/[22m[2massets/[22m[35mProject-BhfasVbA.css                                                [39m[1m[2m    5.74 kB[22m[1m[22m[2m │ gzip:   1.77 kB[22m
+2025-09-08T17:50:32.1093185Z [2mpublic/build/[22m[2massets/[22m[35mdashboard-app-tVH55S3u.css                                          [39m[1m[2m  121.61 kB[22m[1m[22m[2m │ gzip:  19.87 kB[22m
+2025-09-08T17:50:32.1094777Z [2mpublic/build/[22m[2massets/[22m[35mpublic-BfkJbH3v.css                                                 [39m[1m[2m  134.80 kB[22m[1m[22m[2m │ gzip:  22.23 kB[22m
+2025-09-08T17:50:32.1096698Z [2mpublic/build/[22m[2massets/[22m[36mnullish-CHIgUVhi.js                                                 [39m[1m[2m    0.05 kB[22m[1m[22m[2m │ gzip:   0.07 kB[22m
+2025-09-08T17:50:32.1098409Z [2mpublic/build/[22m[2massets/[22m[36mbig-head-geneva-may-2025-D-5JfE_Z.js                                [39m[1m[2m    0.08 kB[22m[1m[22m[2m │ gzip:   0.10 kB[22m
+2025-09-08T17:50:32.1115750Z [2mpublic/build/[22m[2massets/[22m[36mcreationTypes-C5UU3591.js                                           [39m[1m[2m    0.17 kB[22m[1m[22m[2m │ gzip:   0.16 kB[22m
+2025-09-08T17:50:32.1117641Z [2mpublic/build/[22m[2massets/[22m[36mInputError.vue_vue_type_script_setup_true_lang-CnmBAfFP.js          [39m[1m[2m    0.29 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+2025-09-08T17:50:32.1118678Z [33m
+2025-09-08T17:50:32.1119438Z (!) Some chunks are larger than 500 kB after minification. Consider:
+2025-09-08T17:50:32.1120165Z - Using dynamic import() to code-split the application
+2025-09-08T17:50:32.1121365Z - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+2025-09-08T17:50:32.1122755Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+2025-09-08T17:50:32.1124338Z [2mpublic/build/[22m[2massets/[22m[36mContentSectionTitle-BjMqdzBT.js                                     [39m[1m[2m    0.31 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2025-09-08T17:50:32.1126202Z [2mpublic/build/[22m[2massets/[22m[36mCardContent.vue_vue_type_script_setup_true_lang-rJuqY4ol.js         [39m[1m[2m    0.32 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+2025-09-08T17:50:32.1128038Z [2mpublic/build/[22m[2massets/[22m[36mchevron-left-BealzwE9.js                                            [39m[1m[2m    0.32 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2025-09-08T17:50:32.1129999Z [2mpublic/build/[22m[2massets/[22m[36mSkeleton.vue_vue_type_script_setup_true_lang--QTVxDEL.js            [39m[1m[2m    0.32 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+2025-09-08T17:50:32.1131811Z [2mpublic/build/[22m[2massets/[22m[36mloader-circle-C5aVd5Th.js                                           [39m[1m[2m    0.33 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2025-09-08T17:50:32.1133377Z [2mpublic/build/[22m[2massets/[22m[36mx-xGjshJ7k.js                                                       [39m[1m[2m    0.34 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2025-09-08T17:50:32.1134901Z [2mpublic/build/[22m[2massets/[22m[36mplus-oYlerweG.js                                                    [39m[1m[2m    0.34 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2025-09-08T17:50:32.1136653Z [2mpublic/build/[22m[2massets/[22m[36mCardDescription.vue_vue_type_script_setup_true_lang-CFOckYkr.js     [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2025-09-08T17:50:32.1138631Z [2mpublic/build/[22m[2massets/[22m[36mCardFooter.vue_vue_type_script_setup_true_lang-DFU_XnU7.js          [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2025-09-08T17:50:32.1141096Z [2mpublic/build/[22m[2massets/[22m[36mTableCaption.vue_vue_type_script_setup_true_lang-CLOJTI5n.js        [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2025-09-08T17:50:32.1142871Z [2mpublic/build/[22m[2massets/[22m[36msearch-CVNjxfTh.js                                                  [39m[1m[2m    0.35 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2025-09-08T17:50:32.1144621Z [2mpublic/build/[22m[2massets/[22m[36mDialogFooter.vue_vue_type_script_setup_true_lang-CvdO2seo.js        [39m[1m[2m    0.37 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2025-09-08T17:50:32.1146565Z [2mpublic/build/[22m[2massets/[22m[36mHeadingSmall.vue_vue_type_script_setup_true_lang-zP02GDpd.js        [39m[1m[2m    0.38 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2025-09-08T17:50:32.1148425Z [2mpublic/build/[22m[2massets/[22m[36mCard.vue_vue_type_script_setup_true_lang-YJFIO9TM.js                [39m[1m[2m    0.38 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2025-09-08T17:50:32.1150551Z [2mpublic/build/[22m[2massets/[22m[36muser-BEXy_IN7.js                                                    [39m[1m[2m    0.38 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2025-09-08T17:50:32.1152244Z [2mpublic/build/[22m[2massets/[22m[36mHeading.vue_vue_type_script_setup_true_lang-BltdnBWT.js             [39m[1m[2m    0.40 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2025-09-08T17:50:32.1153943Z [2mpublic/build/[22m[2massets/[22m[36mglobe-rPo3boLD.js                                                   [39m[1m[2m    0.42 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2025-09-08T17:50:32.1155593Z [2mpublic/build/[22m[2massets/[22m[36mexternal-link-BL1sFTQR.js                                           [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2025-09-08T17:50:32.1157227Z [2mpublic/build/[22m[2massets/[22m[36meye-DA9QFUCy.js                                                     [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2025-09-08T17:50:32.1158748Z [2mpublic/build/[22m[2massets/[22m[36mupload-DPt20i5l.js                                                  [39m[1m[2m    0.44 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2025-09-08T17:50:32.1160463Z [2mpublic/build/[22m[2massets/[22m[36mdownload-MWNSyZbM.js                                                [39m[1m[2m    0.45 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2025-09-08T17:50:32.1162049Z [2mpublic/build/[22m[2massets/[22m[36msquare-pen-Cag8J6Fh.js                                              [39m[1m[2m    0.51 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2025-09-08T17:50:32.1163775Z [2mpublic/build/[22m[2massets/[22m[36mTextLink.vue_vue_type_script_setup_true_lang-DpqWl_5j.js            [39m[1m[2m    0.52 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2025-09-08T17:50:32.1165561Z [2mpublic/build/[22m[2massets/[22m[36mtrash-2-iZLAjxRT.js                                                 [39m[1m[2m    0.54 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2025-09-08T17:50:32.1167212Z [2mpublic/build/[22m[2massets/[22m[36mSectionParagraph-Bmn4lVxc.js                                        [39m[1m[2m    0.55 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2025-09-08T17:50:32.1169058Z [2mpublic/build/[22m[2massets/[22m[36mchevron-up-CwsYYdmL.js                                              [39m[1m[2m    0.57 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2025-09-08T17:50:32.1170873Z [2mpublic/build/[22m[2massets/[22m[36mDialogDescription.vue_vue_type_script_setup_true_lang-BSwr0ai3.js   [39m[1m[2m    0.61 kB[22m[1m[22m[2m │ gzip:   0.41 kB[22m
+2025-09-08T17:50:32.1172692Z [2mpublic/build/[22m[2massets/[22m[36marrow-up-BCfTSys3.js                                                [39m[1m[2m    0.63 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2025-09-08T17:50:32.1174698Z [2mpublic/build/[22m[2massets/[22m[36mCardTitle.vue_vue_type_script_setup_true_lang-DVZKdwwc.js           [39m[1m[2m    0.67 kB[22m[1m[22m[2m │ gzip:   0.39 kB[22m
+2025-09-08T17:50:32.1176499Z [2mpublic/build/[22m[2massets/[22m[36mArrowRightRegular-bzQqncUF.js                                       [39m[1m[2m    0.96 kB[22m[1m[22m[2m │ gzip:   0.49 kB[22m
+2025-09-08T17:50:32.1178150Z [2mpublic/build/[22m[2massets/[22m[36mLightShape-CU9Wogmz.js                                              [39m[1m[2m    1.00 kB[22m[1m[22m[2m │ gzip:   0.62 kB[22m
+2025-09-08T17:50:32.1180069Z [2mpublic/build/[22m[2massets/[22m[36mTextarea.vue_vue_type_script_setup_true_lang-C1jis65L.js            [39m[1m[2m    1.00 kB[22m[1m[22m[2m │ gzip:   0.59 kB[22m
+2025-09-08T17:50:32.1181871Z [2mpublic/build/[22m[2massets/[22m[36museAppearance-BW5gokKj.js                                           [39m[1m[2m    1.01 kB[22m[1m[22m[2m │ gzip:   0.51 kB[22m
+2025-09-08T17:50:32.1183619Z [2mpublic/build/[22m[2massets/[22m[36mLabel.vue_vue_type_script_setup_true_lang-BRjZ5gPM.js               [39m[1m[2m    1.11 kB[22m[1m[22m[2m │ gzip:   0.60 kB[22m
+2025-09-08T17:50:32.1185668Z [2mpublic/build/[22m[2massets/[22m[36mInput.vue_vue_type_script_setup_true_lang-SqxVIOuz.js               [39m[1m[2m    1.18 kB[22m[1m[22m[2m │ gzip:   0.65 kB[22m
+2025-09-08T17:50:32.1187426Z [2mpublic/build/[22m[2massets/[22m[36mVueMarkdown-CeZ0NzgH.js                                             [39m[1m[2m    1.28 kB[22m[1m[22m[2m │ gzip:   0.71 kB[22m
+2025-09-08T17:50:32.1189369Z [2mpublic/build/[22m[2massets/[22m[36mAuthLayout.vue_vue_type_script_setup_true_lang-CCIFO9kj.js          [39m[1m[2m    1.30 kB[22m[1m[22m[2m │ gzip:   0.64 kB[22m
+2025-09-08T17:50:32.1191090Z [2mpublic/build/[22m[2massets/[22m[36msun-15WAk4tT.js                                                     [39m[1m[2m    1.31 kB[22m[1m[22m[2m │ gzip:   0.51 kB[22m
+2025-09-08T17:50:32.1192621Z [2mpublic/build/[22m[2massets/[22m[36mindex-CQvRpMdt.js                                                   [39m[1m[2m    1.46 kB[22m[1m[22m[2m │ gzip:   0.73 kB[22m
+2025-09-08T17:50:32.1194218Z [2mpublic/build/[22m[2massets/[22m[36mVerifyEmail-aJv21eRw.js                                             [39m[1m[2m    1.50 kB[22m[1m[22m[2m │ gzip:   0.83 kB[22m
+2025-09-08T17:50:32.1195957Z [2mpublic/build/[22m[2massets/[22m[36mLayout.vue_vue_type_script_setup_true_lang-Duz87HDH.js              [39m[1m[2m    1.52 kB[22m[1m[22m[2m │ gzip:   0.80 kB[22m
+2025-09-08T17:50:32.1197746Z [2mpublic/build/[22m[2massets/[22m[36mcreateLucideIcon-BopN_5rs.js                                        [39m[1m[2m    1.55 kB[22m[1m[22m[2m │ gzip:   0.68 kB[22m
+2025-09-08T17:50:32.1199708Z [2mpublic/build/[22m[2massets/[22m[36mTableHeader.vue_vue_type_script_setup_true_lang-BMg4Gnw6.js         [39m[1m[2m    1.68 kB[22m[1m[22m[2m │ gzip:   0.60 kB[22m
+2025-09-08T17:50:32.1201652Z [2mpublic/build/[22m[2massets/[22m[36mSeparator.vue_vue_type_script_setup_true_lang-Cj35iZZ1.js           [39m[1m[2m    1.70 kB[22m[1m[22m[2m │ gzip:   0.70 kB[22m
+2025-09-08T17:50:32.1203387Z [2mpublic/build/[22m[2massets/[22m[36mindex-DXcQ1zj6.js                                                   [39m[1m[2m    1.80 kB[22m[1m[22m[2m │ gzip:   0.94 kB[22m
+2025-09-08T17:50:32.1205043Z [2mpublic/build/[22m[2massets/[22m[36mConfirmPassword-BR0P2kFS.js                                         [39m[1m[2m    1.83 kB[22m[1m[22m[2m │ gzip:   0.92 kB[22m
+2025-09-08T17:50:32.1206692Z [2mpublic/build/[22m[2massets/[22m[36mAppearance-D5i12SMa.js                                              [39m[1m[2m    2.04 kB[22m[1m[22m[2m │ gzip:   0.99 kB[22m
+2025-09-08T17:50:32.1208288Z [2mpublic/build/[22m[2massets/[22m[36mError404-B0QS1lq9.js                                                [39m[1m[2m    2.08 kB[22m[1m[22m[2m │ gzip:   0.97 kB[22m
+2025-09-08T17:50:32.1210324Z [2mpublic/build/[22m[2massets/[22m[36mForgotPassword-r7TYzCw5.js                                          [39m[1m[2m    2.22 kB[22m[1m[22m[2m │ gzip:   1.09 kB[22m
+2025-09-08T17:50:32.1212026Z [2mpublic/build/[22m[2massets/[22m[36mResetPassword-txmcOPId.js                                           [39m[1m[2m    2.76 kB[22m[1m[22m[2m │ gzip:   1.07 kB[22m
+2025-09-08T17:50:32.1213840Z [2mpublic/build/[22m[2massets/[22m[36mProjectCard.vue_vue_type_script_setup_true_lang-CGMEzpN2.js         [39m[1m[2m    2.81 kB[22m[1m[22m[2m │ gzip:   1.19 kB[22m
+2025-09-08T17:50:32.1215788Z [2mpublic/build/[22m[2massets/[22m[36mDialogTitle.vue_vue_type_script_setup_true_lang-D6vH50OH.js         [39m[1m[2m    3.02 kB[22m[1m[22m[2m │ gzip:   1.24 kB[22m
+2025-09-08T17:50:32.1217731Z [2mpublic/build/[22m[2massets/[22m[36mPictureInput.vue_vue_type_script_setup_true_lang-D_G93jQy.js        [39m[1m[2m    3.16 kB[22m[1m[22m[2m │ gzip:   1.52 kB[22m
+2025-09-08T17:50:32.1219679Z [2mpublic/build/[22m[2massets/[22m[36mLogin-Vc2MT_d0.js                                                   [39m[1m[2m    3.25 kB[22m[1m[22m[2m │ gzip:   1.36 kB[22m
+2025-09-08T17:50:32.1221761Z [2mpublic/build/[22m[2massets/[22m[36mcheck-m7zvVj19.js                                                   [39m[1m[2m    3.44 kB[22m[1m[22m[2m │ gzip:   1.57 kB[22m
+2025-09-08T17:50:32.1223422Z [2mpublic/build/[22m[2massets/[22m[36mRegister-DFa4PqOZ.js                                                [39m[1m[2m    3.50 kB[22m[1m[22m[2m │ gzip:   1.29 kB[22m
+2025-09-08T17:50:32.1225061Z [2mpublic/build/[22m[2massets/[22m[36mPassword-XXgnMXNw.js                                                [39m[1m[2m    3.71 kB[22m[1m[22m[2m │ gzip:   1.33 kB[22m
+2025-09-08T17:50:32.1226750Z [2mpublic/build/[22m[2massets/[22m[36mHorizontalNavbar-DRsPm3z5.js                                        [39m[1m[2m    4.13 kB[22m[1m[22m[2m │ gzip:   1.76 kB[22m
+2025-09-08T17:50:32.1228615Z [2mpublic/build/[22m[2massets/[22m[36mAppLogoIcon.vue_vue_type_script_setup_true_lang-BGUNCyrl.js         [39m[1m[2m    4.15 kB[22m[1m[22m[2m │ gzip:   1.97 kB[22m
+2025-09-08T17:50:32.1230559Z [2mpublic/build/[22m[2massets/[22m[36mEdit-DMXLLmuq.js                                                    [39m[1m[2m    5.39 kB[22m[1m[22m[2m │ gzip:   1.97 kB[22m
+2025-09-08T17:50:32.1232087Z [2mpublic/build/[22m[2massets/[22m[36mfr-DyVen_IA.js                                                      [39m[1m[2m    5.53 kB[22m[1m[22m[2m │ gzip:   2.12 kB[22m
+2025-09-08T17:50:32.1233619Z [2mpublic/build/[22m[2massets/[22m[36mList-b69Mk-67.js                                                    [39m[1m[2m    5.74 kB[22m[1m[22m[2m │ gzip:   2.22 kB[22m
+2025-09-08T17:50:32.1235258Z [2mpublic/build/[22m[2massets/[22m[36mProfile-xjdRhh4I.js                                                 [39m[1m[2m    5.89 kB[22m[1m[22m[2m │ gzip:   2.20 kB[22m
+2025-09-08T17:50:32.1237044Z [2mpublic/build/[22m[2massets/[22m[36mAlertDialogTitle.vue_vue_type_script_setup_true_lang-D-tMeMrB.js    [39m[1m[2m    6.25 kB[22m[1m[22m[2m │ gzip:   1.69 kB[22m
+2025-09-08T17:50:32.1239120Z [2mpublic/build/[22m[2massets/[22m[36mExperience-Cq_18r3e.js                                              [39m[1m[2m    6.32 kB[22m[1m[22m[2m │ gzip:   2.37 kB[22m
+2025-09-08T17:50:32.1240789Z [2mpublic/build/[22m[2massets/[22m[36mCertificationsCareer-CzJlTCNY.js                                    [39m[1m[2m    7.09 kB[22m[1m[22m[2m │ gzip:   2.38 kB[22m
+2025-09-08T17:50:32.1242462Z [2mpublic/build/[22m[2massets/[22m[36mAbout-DyFrwiah.js                                                   [39m[1m[2m    7.24 kB[22m[1m[22m[2m │ gzip:   2.80 kB[22m
+2025-09-08T17:50:32.1244100Z [2mpublic/build/[22m[2massets/[22m[36museForwardExpose-BfTqSZV6.js                                        [39m[1m[2m    7.44 kB[22m[1m[22m[2m │ gzip:   3.31 kB[22m
+2025-09-08T17:50:32.1245953Z [2mpublic/build/[22m[2massets/[22m[36mList-DJKKnb5C.js                                                    [39m[1m[2m    8.02 kB[22m[1m[22m[2m │ gzip:   2.84 kB[22m
+2025-09-08T17:50:32.1247663Z [2mpublic/build/[22m[2massets/[22m[36mCheckbox.vue_vue_type_script_setup_true_lang-Bmv98UB5.js            [39m[1m[2m    8.22 kB[22m[1m[22m[2m │ gzip:   3.03 kB[22m
+2025-09-08T17:50:32.1255359Z [2mpublic/build/[22m[2massets/[22m[36mPaginationPrevious.vue_vue_type_script_setup_true_lang-AhLF-8Dm.js  [39m[1m[2m    9.14 kB[22m[1m[22m[2m │ gzip:   2.38 kB[22m
+2025-09-08T17:50:32.1257248Z [2mpublic/build/[22m[2massets/[22m[36mList-1k08F3W-.js                                                    [39m[1m[2m    9.27 kB[22m[1m[22m[2m │ gzip:   3.07 kB[22m
+2025-09-08T17:50:32.1259066Z [2mpublic/build/[22m[2massets/[22m[36mdashboard-app-CuagJBKk.js                                           [39m[1m[2m    9.56 kB[22m[1m[22m[2m │ gzip:   2.82 kB[22m
+2025-09-08T17:50:32.1260795Z [2mpublic/build/[22m[2massets/[22m[36mVisuallyHidden-BjR-o-DF.js                                          [39m[1m[2m    9.62 kB[22m[1m[22m[2m │ gzip:   4.02 kB[22m
+2025-09-08T17:50:32.1262692Z [2mpublic/build/[22m[2massets/[22m[36mpublic-app-DzM75VMa.js                                              [39m[1m[2m   10.02 kB[22m[1m[22m[2m │ gzip:   3.13 kB[22m
+2025-09-08T17:50:32.1264297Z [2mpublic/build/[22m[2massets/[22m[36mList-CPcBuI5l.js                                                    [39m[1m[2m   10.20 kB[22m[1m[22m[2m │ gzip:   3.15 kB[22m
+2025-09-08T17:50:32.1265943Z [2mpublic/build/[22m[2massets/[22m[36mListDrafts-bfHBPoQz.js                                              [39m[1m[2m   10.35 kB[22m[1m[22m[2m │ gzip:   3.52 kB[22m
+2025-09-08T17:50:32.1267546Z [2mpublic/build/[22m[2massets/[22m[36mProjects-iDwgwNfz.js                                                [39m[1m[2m   11.30 kB[22m[1m[22m[2m │ gzip:   3.99 kB[22m
+2025-09-08T17:50:32.1269298Z [2mpublic/build/[22m[2massets/[22m[36mDashboard-CyCWinch.js                                               [39m[1m[2m   11.53 kB[22m[1m[22m[2m │ gzip:   2.91 kB[22m
+2025-09-08T17:50:32.1270904Z [2mpublic/build/[22m[2massets/[22m[36mList-B4JSEf27.js                                                    [39m[1m[2m   12.14 kB[22m[1m[22m[2m │ gzip:   4.45 kB[22m
+2025-09-08T17:50:32.1272494Z [2mpublic/build/[22m[2massets/[22m[36mTranslations-DSLpMK5c.js                                            [39m[1m[2m   12.21 kB[22m[1m[22m[2m │ gzip:   4.01 kB[22m
+2025-09-08T17:50:32.1274087Z [2mpublic/build/[22m[2massets/[22m[36mEdit-BygP1BXz.js                                                    [39m[1m[2m   15.40 kB[22m[1m[22m[2m │ gzip:   4.79 kB[22m
+2025-09-08T17:50:32.1275654Z [2mpublic/build/[22m[2massets/[22m[36mDataManagement--zPuq_yB.js                                          [39m[1m[2m   17.61 kB[22m[1m[22m[2m │ gzip:   5.62 kB[22m
+2025-09-08T17:50:32.1277243Z [2mpublic/build/[22m[2massets/[22m[36mList-CzS6yh8w.js                                                    [39m[1m[2m   19.96 kB[22m[1m[22m[2m │ gzip:   4.69 kB[22m
+2025-09-08T17:50:32.1279007Z [2mpublic/build/[22m[2massets/[22m[36mutils-CytzSlOG.js                                                   [39m[1m[2m   20.32 kB[22m[1m[22m[2m │ gzip:   6.85 kB[22m
+2025-09-08T17:50:32.1280559Z [2mpublic/build/[22m[2massets/[22m[36mformat-DF3zju1I.js                                                  [39m[1m[2m   20.78 kB[22m[1m[22m[2m │ gzip:   5.86 kB[22m
+2025-09-08T17:50:32.1282102Z [2mpublic/build/[22m[2massets/[22m[36mList-oeNIfDJx.js                                                    [39m[1m[2m   21.05 kB[22m[1m[22m[2m │ gzip:   6.42 kB[22m
+2025-09-08T17:50:32.1283829Z [2mpublic/build/[22m[2massets/[22m[36mSelectValue.vue_vue_type_script_setup_true_lang-CZzxXJ1_.js         [39m[1m[2m   30.89 kB[22m[1m[22m[2m │ gzip:   9.11 kB[22m
+2025-09-08T17:50:32.1286045Z [2mpublic/build/[22m[2massets/[22m[36mPublicAppLayout.vue_vue_type_style_index_0_lang-CLtquE_9.js         [39m[1m[2m   32.52 kB[22m[1m[22m[2m │ gzip:  10.37 kB[22m
+2025-09-08T17:50:32.1287775Z [2mpublic/build/[22m[2massets/[22m[36mWelcome-BZ9tKy1P.js                                                 [39m[1m[2m   47.60 kB[22m[1m[22m[2m │ gzip:   8.81 kB[22m
+2025-09-08T17:50:32.1289557Z [2mpublic/build/[22m[2massets/[22m[36mphotoswipe.esm-D2Nf-uDI.js                                          [39m[1m[2m   60.45 kB[22m[1m[22m[2m │ gzip:  17.49 kB[22m
+2025-09-08T17:50:32.1291222Z [2mpublic/build/[22m[2massets/[22m[36mvee-validate-zod-C-hw1rJq.js                                        [39m[1m[2m   92.02 kB[22m[1m[22m[2m │ gzip:  25.40 kB[22m
+2025-09-08T17:50:32.1292840Z [2mpublic/build/[22m[2massets/[22m[36mEditPage-qvCqao73.js                                                [39m[1m[2m   95.70 kB[22m[1m[22m[2m │ gzip:  21.83 kB[22m
+2025-09-08T17:50:32.1294686Z [2mpublic/build/[22m[2massets/[22m[36mindex-BMSQkwth.js                                                   [39m[1m[2m  103.11 kB[22m[1m[22m[2m │ gzip:  46.05 kB[22m
+2025-09-08T17:50:32.1296265Z [2mpublic/build/[22m[2massets/[22m[36mHome-DeUklt5w.js                                                    [39m[1m[2m  123.37 kB[22m[1m[22m[2m │ gzip:  78.71 kB[22m
+2025-09-08T17:50:32.1298006Z [2mpublic/build/[22m[2massets/[22m[36mAppLayout.vue_vue_type_script_setup_true_lang-Bf4D8s3Q.js           [39m[1m[2m  161.55 kB[22m[1m[22m[2m │ gzip:  43.70 kB[22m
+2025-09-08T17:50:32.1300053Z [2mpublic/build/[22m[2massets/[22m[36mindex-Dj_-OwzN.js                                                   [39m[1m[2m  244.05 kB[22m[1m[22m[2m │ gzip:  87.00 kB[22m
+2025-09-08T17:50:32.1301778Z [2mpublic/build/[22m[2massets/[22m[36mMarkdownEditor.vue_vue_type_style_index_0_lang-DCnGXpcD.js          [39m[1m[2m  369.03 kB[22m[1m[22m[2m │ gzip: 116.76 kB[22m
+2025-09-08T17:50:32.1303533Z [2mpublic/build/[22m[2massets/[22m[36mProject-C0dKuyGG.js                                                 [39m[1m[33m1,007.74 kB[39m[22m[2m │ gzip: 323.33 kB[22m
+2025-09-08T17:50:32.1304426Z [32m✓ built in 11.45s[39m
+2025-09-08T17:50:32.9074351Z [36mvite v6.3.6 [32mbuilding SSR bundle for production...[36m[39m
+2025-09-08T17:50:32.9845795Z transforming...
+2025-09-08T17:50:36.8378165Z [32m✓[39m 549 modules transformed.
+2025-09-08T17:50:37.2790656Z rendering chunks...
+2025-09-08T17:50:37.4913224Z [2mbootstrap/ssr/[22m[32mssr-manifest.json                            [39m[1m[2m 76.77 kB[22m[1m[22m
+2025-09-08T17:50:37.4914666Z [2mbootstrap/ssr/[22m[2massets/[22m[36mbig-head-geneva-may-2025-BCgslNnN.js  [39m[1m[2m  0.11 kB[22m[1m[22m
+2025-09-08T17:50:37.4916015Z [2mbootstrap/ssr/[22m[2massets/[22m[36mutils-H80jjgLf.js                     [39m[1m[2m  0.15 kB[22m[1m[22m
+2025-09-08T17:50:37.4917649Z [2mbootstrap/ssr/[22m[2massets/[22m[36museRoute-DHV8h1Pv.js                  [39m[1m[2m  0.26 kB[22m[1m[22m
+2025-09-08T17:50:37.4919570Z [2mbootstrap/ssr/[22m[2massets/[22m[36mcreationTypes-BvdpSV3S.js             [39m[1m[2m  0.32 kB[22m[1m[22m
+2025-09-08T17:50:37.4921229Z [2mbootstrap/ssr/[22m[2massets/[22m[36mInputError-DilClerT.js                [39m[1m[2m  0.90 kB[22m[1m[22m
+2025-09-08T17:50:37.4922950Z [2mbootstrap/ssr/[22m[2massets/[22m[36mContentSectionTitle-M_f7TLJJ.js       [39m[1m[2m  0.92 kB[22m[1m[22m
+2025-09-08T17:50:37.4924484Z [2mbootstrap/ssr/[22m[2massets/[22m[36mSkeleton-jRB9dm7p.js                  [39m[1m[2m  0.93 kB[22m[1m[22m
+2025-09-08T17:50:37.4926065Z [2mbootstrap/ssr/[22m[2massets/[22m[36mHeadingSmall-C44yUaqH.js              [39m[1m[2m  1.02 kB[22m[1m[22m
+2025-09-08T17:50:37.4927627Z [2mbootstrap/ssr/[22m[2massets/[22m[36mHeading-wmpClZw1.js                   [39m[1m[2m  1.07 kB[22m[1m[22m
+2025-09-08T17:50:37.4929153Z [2mbootstrap/ssr/[22m[2massets/[22m[36mTextLink-CQlKW0-E.js                  [39m[1m[2m  1.49 kB[22m[1m[22m
+2025-09-08T17:50:37.4930031Z [2mbootstrap/ssr/[22m[2massets/[22m[36mSectionParagraph-D_3YMyTu.js          [39m[1m[2m  1.71 kB[22m[1m[22m
+2025-09-08T17:50:37.4930859Z [2mbootstrap/ssr/[22m[2massets/[22m[36mTextarea-h3RugHsW.js                  [39m[1m[2m  1.71 kB[22m[1m[22m
+2025-09-08T17:50:37.4932044Z [2mbootstrap/ssr/[22m[2massets/[22m[36mTechnologyCard-D3HDvchc.js            [39m[1m[2m  1.72 kB[22m[1m[22m
+2025-09-08T17:50:37.4932861Z [2mbootstrap/ssr/[22m[2massets/[22m[36mLabel-C0W0EmxP.js                     [39m[1m[2m  1.74 kB[22m[1m[22m
+2025-09-08T17:50:37.4933690Z [2mbootstrap/ssr/[22m[2massets/[22m[36mArrowRightRegular-DMPChJOC.js         [39m[1m[2m  1.97 kB[22m[1m[22m
+2025-09-08T17:50:37.4934530Z [2mbootstrap/ssr/[22m[2massets/[22m[36museAppearance-DT6ZJb1S.js             [39m[1m[2m  1.97 kB[22m[1m[22m
+2025-09-08T17:50:37.4935338Z [2mbootstrap/ssr/[22m[2massets/[22m[36mInput-DpEFNX4K.js                     [39m[1m[2m  1.98 kB[22m[1m[22m
+2025-09-08T17:50:37.4936309Z [2mbootstrap/ssr/[22m[2massets/[22m[36mLightShape-Djn38sKj.js                [39m[1m[2m  2.61 kB[22m[1m[22m
+2025-09-08T17:50:37.4937114Z [2mbootstrap/ssr/[22m[2massets/[22m[36mindex-DS9I-PqO.js                     [39m[1m[2m  2.64 kB[22m[1m[22m
+2025-09-08T17:50:37.4937894Z [2mbootstrap/ssr/[22m[2massets/[22m[36mAuthLayout-DbhsISSB.js                [39m[1m[2m  3.55 kB[22m[1m[22m
+2025-09-08T17:50:37.4938698Z [2mbootstrap/ssr/[22m[2massets/[22m[36mCheckbox-Gbpi7deW.js                  [39m[1m[2m  3.62 kB[22m[1m[22m
+2025-09-08T17:50:37.4939876Z [2mbootstrap/ssr/[22m[2massets/[22m[36mLayout-G8Nhf0zh.js                    [39m[1m[2m  3.70 kB[22m[1m[22m
+2025-09-08T17:50:37.4940567Z [2mbootstrap/ssr/[22m[36mssr.js                                       [39m[1m[2m  3.72 kB[22m[1m[22m
+2025-09-08T17:50:37.4941315Z [2mbootstrap/ssr/[22m[2massets/[22m[36mAppLogoIcon-DfRjRiis.js               [39m[1m[2m  4.46 kB[22m[1m[22m
+2025-09-08T17:50:37.4942132Z [2mbootstrap/ssr/[22m[2massets/[22m[36mAppearance-LfOc3FXm.js                [39m[1m[2m  5.26 kB[22m[1m[22m
+2025-09-08T17:50:37.4942935Z [2mbootstrap/ssr/[22m[2massets/[22m[36mPictureInput-eB_Xa1zd.js              [39m[1m[2m  5.33 kB[22m[1m[22m
+2025-09-08T17:50:37.4943744Z [2mbootstrap/ssr/[22m[2massets/[22m[36mVerifyEmail-BK5o1ow8.js               [39m[1m[2m  5.52 kB[22m[1m[22m
+2025-09-08T17:50:37.4944537Z [2mbootstrap/ssr/[22m[2massets/[22m[36mCardTitle-CHTV10zw.js                 [39m[1m[2m  6.27 kB[22m[1m[22m
+2025-09-08T17:50:37.4945324Z [2mbootstrap/ssr/[22m[2massets/[22m[36mProjectCard-CKoYvL21.js               [39m[1m[2m  6.31 kB[22m[1m[22m
+2025-09-08T17:50:37.4946123Z [2mbootstrap/ssr/[22m[2massets/[22m[36mFormMessage-BZ1LICYU.js               [39m[1m[2m  6.49 kB[22m[1m[22m
+2025-09-08T17:50:37.4946939Z [2mbootstrap/ssr/[22m[2massets/[22m[36mConfirmPassword-BYlXNIsD.js           [39m[1m[2m  6.51 kB[22m[1m[22m
+2025-09-08T17:50:37.4947740Z [2mbootstrap/ssr/[22m[2massets/[22m[36mError404-CXrVukJf.js                  [39m[1m[2m  7.00 kB[22m[1m[22m
+2025-09-08T17:50:37.4948540Z [2mbootstrap/ssr/[22m[2massets/[22m[36mForgotPassword-DHlJ7w_Z.js            [39m[1m[2m  8.14 kB[22m[1m[22m
+2025-09-08T17:50:37.4949520Z [2mbootstrap/ssr/[22m[2massets/[22m[36mHorizontalNavbar-lQ1O7Azl.js          [39m[1m[2m  8.85 kB[22m[1m[22m
+2025-09-08T17:50:37.4950333Z [2mbootstrap/ssr/[22m[2massets/[22m[36mTableHeader-BYPVOmh0.js               [39m[1m[2m  9.79 kB[22m[1m[22m
+2025-09-08T17:50:37.4951138Z [2mbootstrap/ssr/[22m[2massets/[22m[36mResetPassword-CjFNn7Mk.js             [39m[1m[2m 10.98 kB[22m[1m[22m
+2025-09-08T17:50:37.4952295Z [2mbootstrap/ssr/[22m[2massets/[22m[36mLogin-CQngjD8Q.js                     [39m[1m[2m 13.30 kB[22m[1m[22m
+2025-09-08T17:50:37.4953990Z [2mbootstrap/ssr/[22m[2massets/[22m[36mPaginationPrevious-DfSzibmL.js        [39m[1m[2m 13.68 kB[22m[1m[22m
+2025-09-08T17:50:37.4955473Z [2mbootstrap/ssr/[22m[2massets/[22m[36mAlertDialogTrigger-DKXbG_uG.js        [39m[1m[2m 13.71 kB[22m[1m[22m
+2025-09-08T17:50:37.4956885Z [2mbootstrap/ssr/[22m[2massets/[22m[36mRegister-BT4uktbQ.js                  [39m[1m[2m 14.56 kB[22m[1m[22m
+2025-09-08T17:50:37.4958216Z [2mbootstrap/ssr/[22m[2massets/[22m[36mExperience-DfDWSZoM.js                [39m[1m[2m 15.61 kB[22m[1m[22m
+2025-09-08T17:50:37.4959758Z [2mbootstrap/ssr/[22m[2massets/[22m[36mPassword-7pbW1vJj.js                  [39m[1m[2m 19.40 kB[22m[1m[22m
+2025-09-08T17:50:37.4961119Z [2mbootstrap/ssr/[22m[2massets/[22m[36mAbout-C4BIkn8I.js                     [39m[1m[2m 20.83 kB[22m[1m[22m
+2025-09-08T17:50:37.4962555Z [2mbootstrap/ssr/[22m[2massets/[22m[36mCertificationsCareer-LRC1Nr9Z.js      [39m[1m[2m 21.00 kB[22m[1m[22m
+2025-09-08T17:50:37.4964089Z [2mbootstrap/ssr/[22m[2massets/[22m[36mDialogTrigger-DwDopMsS.js             [39m[1m[2m 23.05 kB[22m[1m[22m
+2025-09-08T17:50:37.4965725Z [2mbootstrap/ssr/[22m[2massets/[22m[36mSelectValue-CyQG8YZA.js               [39m[1m[2m 23.19 kB[22m[1m[22m
+2025-09-08T17:50:37.4967218Z [2mbootstrap/ssr/[22m[2massets/[22m[36mMarkdownEditor-B9ouhr3u.js            [39m[1m[2m 28.34 kB[22m[1m[22m
+2025-09-08T17:50:37.4968633Z [2mbootstrap/ssr/[22m[2massets/[22m[36mProfile-DKUwkkTa.js                   [39m[1m[2m 30.05 kB[22m[1m[22m
+2025-09-08T17:50:37.4970124Z [2mbootstrap/ssr/[22m[2massets/[22m[36mProjects-BwHrVcG9.js                  [39m[1m[2m 32.80 kB[22m[1m[22m
+2025-09-08T17:50:37.4971497Z [2mbootstrap/ssr/[22m[2massets/[22m[36mEdit-D25GK6df.js                      [39m[1m[2m 41.59 kB[22m[1m[22m
+2025-09-08T17:50:37.4972844Z [2mbootstrap/ssr/[22m[2massets/[22m[36mProject-CCEp5BVT.js                   [39m[1m[2m 42.04 kB[22m[1m[22m
+2025-09-08T17:50:37.4974225Z [2mbootstrap/ssr/[22m[2massets/[22m[36mWelcome-C9GzXUEg.js                   [39m[1m[2m 49.75 kB[22m[1m[22m
+2025-09-08T17:50:37.4975566Z [2mbootstrap/ssr/[22m[2massets/[22m[36mList-4_M8A_bX.js                      [39m[1m[2m 50.17 kB[22m[1m[22m
+2025-09-08T17:50:37.4976944Z [2mbootstrap/ssr/[22m[2massets/[22m[36mPublicAppLayout-jCfL5A2u.js           [39m[1m[2m 60.12 kB[22m[1m[22m
+2025-09-08T17:50:37.4978393Z [2mbootstrap/ssr/[22m[2massets/[22m[36mTranslations-DTcmJnij.js              [39m[1m[2m 65.94 kB[22m[1m[22m
+2025-09-08T17:50:37.4979952Z [2mbootstrap/ssr/[22m[2massets/[22m[36mList-j65ZwvbD.js                      [39m[1m[2m 89.39 kB[22m[1m[22m
+2025-09-08T17:50:37.4981280Z [2mbootstrap/ssr/[22m[2massets/[22m[36mList-BPE3CxTN.js                      [39m[1m[2m 94.29 kB[22m[1m[22m
+2025-09-08T17:50:37.4982620Z [2mbootstrap/ssr/[22m[2massets/[22m[36mList-BkMWMLnQ.js                      [39m[1m[2m110.11 kB[22m[1m[22m
+2025-09-08T17:50:37.4984032Z [2mbootstrap/ssr/[22m[2massets/[22m[36mDataManagement-DZ51GR7J.js            [39m[1m[2m130.67 kB[22m[1m[22m
+2025-09-08T17:50:37.4985383Z [2mbootstrap/ssr/[22m[2massets/[22m[36mList-GXI9qdH4.js                      [39m[1m[2m145.09 kB[22m[1m[22m
+2025-09-08T17:50:37.4986711Z [2mbootstrap/ssr/[22m[2massets/[22m[36mEdit-BmRAZ9lv.js                      [39m[1m[2m148.01 kB[22m[1m[22m
+2025-09-08T17:50:37.4988062Z [2mbootstrap/ssr/[22m[2massets/[22m[36mListDrafts-Bd04Ro02.js                [39m[1m[2m148.03 kB[22m[1m[22m
+2025-09-08T17:50:37.4989587Z [2mbootstrap/ssr/[22m[2massets/[22m[36mHome-3Lgl3Bpk.js                      [39m[1m[2m163.77 kB[22m[1m[22m
+2025-09-08T17:50:37.4990946Z [2mbootstrap/ssr/[22m[2massets/[22m[36mDashboard-DdOUftE3.js                 [39m[1m[2m175.60 kB[22m[1m[22m
+2025-09-08T17:50:37.4991867Z [2mbootstrap/ssr/[22m[2massets/[22m[36mList-Bf-7CMYJ.js                      [39m[1m[2m199.24 kB[22m[1m[22m
+2025-09-08T17:50:37.4992905Z [2mbootstrap/ssr/[22m[2massets/[22m[36mAppLayout-Dnhnn7kG.js                 [39m[1m[2m210.53 kB[22m[1m[22m
+2025-09-08T17:50:37.4993691Z [2mbootstrap/ssr/[22m[2massets/[22m[36mList-DXh0yGFL.js                      [39m[1m[2m271.95 kB[22m[1m[22m
+2025-09-08T17:50:37.4994475Z [2mbootstrap/ssr/[22m[2massets/[22m[36mEditPage-1wJor7ha.js                  [39m[1m[33m617.29 kB[39m[22m
+2025-09-08T17:50:37.4994990Z [32m✓ built in 4.57s[39m
+2025-09-08T17:50:37.5623855Z ##[group]Run php artisan migrate --force
+2025-09-08T17:50:37.5624186Z [36;1mphp artisan migrate --force[0m
+2025-09-08T17:50:37.5652148Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:37.5652375Z env:
+2025-09-08T17:50:37.5652547Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:37.5652772Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:37.5652991Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:37.5653175Z ##[endgroup]
+2025-09-08T17:50:37.7958217Z
+2025-09-08T17:50:37.7958709Z    INFO  Preparing database.
+2025-09-08T17:50:37.7959116Z
+2025-09-08T17:50:37.8086302Z   Creating migration table ....................................... 9.46ms DONE
+2025-09-08T17:50:37.8086883Z
+2025-09-08T17:50:37.8185459Z    INFO  Running migrations.
+2025-09-08T17:50:37.8185778Z
+2025-09-08T17:50:37.8436626Z   0001_01_01_000000_create_users_table .......................... 22.77ms DONE
+2025-09-08T17:50:37.8523262Z   0001_01_01_000001_create_cache_table ........................... 4.75ms DONE
+2025-09-08T17:50:37.8716203Z   0001_01_01_000002_create_jobs_table ........................... 15.76ms DONE
+2025-09-08T17:50:37.8803955Z   2024_10_06_103406_create_ip_addresses_table .................... 6.28ms DONE
+2025-09-08T17:50:37.8889443Z   2024_10_06_103919_create_user_agents_table ..................... 6.06ms DONE
+2025-09-08T17:50:37.8981783Z   2024_10_06_104010_create_mime_types_table ...................... 6.64ms DONE
+2025-09-08T17:50:37.9085407Z   2024_10_06_104430_create_urls_table ............................ 7.31ms DONE
+2025-09-08T17:50:37.9166715Z   2024_10_06_104546_create_logged_requests_table ................. 5.72ms DONE
+2025-09-08T17:50:37.9229314Z   2025_02_16_212109_create_user_agent_metadata_table ............. 4.22ms DONE
+2025-09-08T17:50:37.9320082Z   2025_02_18_135324_change_mime_type_column_type_on_mime_types ... 7.66ms DONE
+2025-09-08T17:50:37.9483635Z   2025_02_19_141925_create_ip_address_metadata_table ............ 14.12ms DONE
+2025-09-08T17:50:37.9533521Z   2025_02_25_083557_add_propfind_enum_to_logged_requests ......... 2.70ms DONE
+2025-09-08T17:50:37.9620027Z   2025_03_04_085434_create_translation_keys_table ................ 6.33ms DONE
+2025-09-08T17:50:37.9879689Z   2025_03_04_090806_create_translations_table ................... 23.21ms DONE
+2025-09-08T17:50:37.9937627Z   2025_03_04_144330_create_pictures_table ........................ 3.03ms DONE
+2025-09-08T17:50:38.0059959Z   2025_03_04_150141_create_optimized_pictures_table .............. 9.98ms DONE
+2025-09-08T17:50:38.0185955Z   2025_03_08_145125_create_technologies_table .................... 9.95ms DONE
+2025-09-08T17:50:38.0315979Z   2025_03_08_145313_create_people_table .......................... 9.89ms DONE
+2025-09-08T17:50:38.0468073Z   2025_03_08_145331_create_tags_table ........................... 11.58ms DONE
+2025-09-08T17:50:38.0852513Z   2025_03_08_145347_create_creations_table ...................... 35.59ms DONE
+2025-09-08T17:50:38.1167716Z   2025_03_08_145404_create_features_table ....................... 28.44ms DONE
+2025-09-08T17:50:38.1401321Z   2025_03_08_145433_create_screenshots_table .................... 20.37ms DONE
+2025-09-08T17:50:38.1651662Z   2025_03_08_145452_create_creation_technology_table ............ 22.54ms DONE
+2025-09-08T17:50:38.1876123Z   2025_03_08_145516_create_creation_person_table ................ 19.94ms DONE
+2025-09-08T17:50:38.2093405Z   2025_03_08_145533_create_creation_tag_table ................... 18.89ms DONE
+2025-09-08T17:50:38.2637896Z   2025_03_08_180734_create_experiences_table .................... 51.69ms DONE
+2025-09-08T17:50:38.3049267Z   2025_03_11_154940_create_creation_drafts_table ................ 38.59ms DONE
+2025-09-08T17:50:38.3353792Z   2025_03_11_155332_create_creation_draft_features_table ........ 28.52ms DONE
+2025-09-08T17:50:38.3577041Z   2025_03_11_155449_create_creation_draft_screenshots_table ..... 20.67ms DONE
+2025-09-08T17:50:38.3827644Z   2025_03_11_155718_create_creation_draft_technology ............ 22.95ms DONE
+2025-09-08T17:50:38.4061757Z   2025_03_11_155927_create_creation_draft_person ................ 20.69ms DONE
+2025-09-08T17:50:38.4234675Z   2025_03_11_160023_create_creation_draft_tag ................... 14.85ms DONE
+2025-09-08T17:50:38.4389775Z   2025_04_19_101133_create_technology_experiences_table ......... 13.69ms DONE
+2025-09-08T17:50:38.4444015Z   2025_04_21_141558_create_social_media_links_table .............. 2.86ms DONE
+2025-09-08T17:50:38.4501972Z   2025_05_23_193235_add_url_column_to_people_table ............... 3.72ms DONE
+2025-09-08T17:50:38.4604619Z   2025_05_26_091621_create_certifications_table .................. 7.94ms DONE
+2025-09-08T17:50:38.4735403Z   2025_05_31_090901_create_videos_table ......................... 10.25ms DONE
+2025-09-08T17:50:38.4967721Z   2025_05_31_112007_create_creation_draft_video_table ........... 21.16ms DONE
+2025-09-08T17:50:38.5175279Z   2025_05_31_112159_create_creation_video_table ................. 18.05ms DONE
+2025-09-08T17:50:38.5221137Z   2025_06_01_100004_add_jpeg_enum_to_optimized_pictures_table .... 2.84ms DONE
+2025-09-08T17:50:38.5438695Z   2025_06_04_132855_edit_videos_table ........................... 18.78ms DONE
+2025-09-08T17:50:38.5662119Z   2025_06_25_105101_replaced_svg_icon_field_with_icon_picture_id_in_technologies  20.85ms DONE
+2025-09-08T17:50:38.5727393Z   2025_07_13_173801_add_slug_index_to_creations_table ............ 4.55ms DONE
+2025-09-08T17:50:38.5962396Z   2025_08_14_164900_add_slug_to_experiences_table ............... 21.13ms DONE
+2025-09-08T17:50:38.6423965Z   2025_08_18_134827_add_bot_detection_metadata_to_ip_address_metadata_table  44.79ms DONE
+2025-09-08T17:50:38.6676402Z   2025_08_18_134909_add_bot_detection_to_logged_requests_table .. 23.77ms DONE
+2025-09-08T17:50:38.7452437Z   2025_08_20_081422_add_performance_indexes_to_logged_requests_table  76.08ms DONE
+2025-09-08T17:50:38.7683049Z   2025_08_20_083100_add_indexes_to_optimized_pictures_table ..... 21.45ms DONE
+2025-09-08T17:50:38.8832163Z   2025_08_20_084054_add_performance_indexes_for_creations_and_translations  113.38ms DONE
+2025-09-08T17:50:38.8840658Z
+2025-09-08T17:50:38.8981596Z ##[group]Run php artisan db:seed --class=DuskTestSeeder --force
+2025-09-08T17:50:38.8982259Z [36;1mphp artisan db:seed --class=DuskTestSeeder --force[0m
+2025-09-08T17:50:38.9010085Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:38.9010314Z env:
+2025-09-08T17:50:38.9010489Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:38.9010730Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:38.9010943Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:38.9011142Z ##[endgroup]
+2025-09-08T17:50:39.1241697Z
+2025-09-08T17:50:39.1242046Z    INFO  Seeding database.
+2025-09-08T17:50:39.1242276Z
+2025-09-08T17:50:39.1247998Z Setting up minimal test data for Dusk tests...
+2025-09-08T17:50:39.1249805Z Creating essential technologies...
+2025-09-08T17:50:39.3331338Z Creating minimal projects...
+2025-09-08T17:50:39.3753599Z Creating minimal experience...
+2025-09-08T17:50:39.4034531Z Creating UI translations...
+2025-09-08T17:50:39.4171218Z Dusk test data seeding completed!
+2025-09-08T17:50:39.4364732Z ##[group]Run php artisan serve --no-reload &
+2025-09-08T17:50:39.4365107Z [36;1mphp artisan serve --no-reload &[0m
+2025-09-08T17:50:39.4392547Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:39.4392765Z env:
+2025-09-08T17:50:39.4392936Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:39.4393165Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:39.4393380Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:39.4393556Z ##[endgroup]
+2025-09-08T17:50:40.1614388Z   PHP Warning:  JIT is incompatible with third party extensions that override zend_execute_ex(). JIT disabled. in Unknown on line 0
+2025-09-08T17:50:40.1648224Z
+2025-09-08T17:50:40.1648682Z    INFO  Server running on [http://127.0.0.1:8000].
+2025-09-08T17:50:40.1649335Z
+2025-09-08T17:50:40.1651526Z   Press Ctrl+C to stop the server
+2025-09-08T17:50:40.1652274Z
+2025-09-08T17:50:44.4479791Z ##[group]Run php artisan inertia:start-ssr &
+2025-09-08T17:50:44.4480348Z [36;1mphp artisan inertia:start-ssr &[0m
+2025-09-08T17:50:44.4519193Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:44.4519581Z env:
+2025-09-08T17:50:44.4519866Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:44.4520256Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:44.4520624Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:44.4520957Z ##[endgroup]
+2025-09-08T17:50:45.1152161Z Primary Inertia SSR server process started...
+2025-09-08T17:50:46.1142498Z [1 / 3395] Starting SSR server on port 13714...
+2025-09-08T17:50:46.1143254Z [1 / 3395] Inertia SSR server started.
+2025-09-08T17:50:46.1143708Z [4 / 3408] Starting SSR server on port 13714...
+2025-09-08T17:50:46.1144069Z [4 / 3408] Inertia SSR server started.
+2025-09-08T17:50:46.1144431Z [2 / 3396] Starting SSR server on port 13714...
+2025-09-08T17:50:46.1144919Z [2 / 3396] Inertia SSR server started.
+2025-09-08T17:50:46.1145544Z [3 / 3398] Starting SSR server on port 13714...
+2025-09-08T17:50:46.1145958Z [3 / 3398] Inertia SSR server started.
+2025-09-08T17:50:50.1186517Z ##[group]Run sleep 5
+2025-09-08T17:50:50.1186891Z [36;1msleep 5[0m
+2025-09-08T17:50:50.1226086Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:50.1226541Z env:
+2025-09-08T17:50:50.1226839Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:50.1227216Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:50.1227588Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:50.1227908Z ##[endgroup]
+2025-09-08T17:50:55.1344250Z ##[group]Run php artisan dusk
+2025-09-08T17:50:55.1344542Z [36;1mphp artisan dusk[0m
+2025-09-08T17:50:55.1379675Z shell: /usr/bin/bash -e {0}
+2025-09-08T17:50:55.1379926Z env:
+2025-09-08T17:50:55.1380098Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:50:55.1380341Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:50:55.1380541Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:50:55.1380727Z ##[endgroup]
+2025-09-08T17:50:55.3637575Z Warning: TTY mode requires /dev/tty to be read/writable.
+2025-09-08T17:51:13.3514735Z
+2025-09-08T17:51:13.3515553Z    FAIL  Tests\Browser\HomepageTest
+2025-09-08T17:51:13.4102664Z   ⨯ homepage loads                                                      13.67s
+2025-09-08T17:51:13.4115795Z   ⨯ homepage displays portfolio section                                  2.15s
+2025-09-08T17:51:13.4128175Z   ⨯ navigation to projects page                                          1.97s
+2025-09-08T17:52:09.2313067Z
+2025-09-08T17:52:09.2314207Z    FAIL  Tests\Browser\ProjectDetailPageTest
+2025-09-08T17:52:09.2327702Z   ⨯ project detail page loads                                            3.13s
+2025-09-08T17:52:09.2342784Z   ⨯ project metadata display                                             3.13s
+2025-09-08T17:52:09.2360956Z   ⨯ section navigation                                                   4.06s
+2025-09-08T17:52:09.2380306Z   ⨯ project description with markdown                                    3.82s
+2025-09-08T17:52:09.2392583Z   ⨯ project features display                                             4.08s
+2025-09-08T17:52:09.2404908Z   ⨯ project people display                                               4.18s
+2025-09-08T17:52:09.2417410Z   ⨯ technologies display                                                 3.50s
+2025-09-08T17:52:09.2429674Z   ⨯ screenshot gallery                                                   3.84s
+2025-09-08T17:52:09.2442117Z   ⨯ video gallery                                                        3.82s
+2025-09-08T17:52:09.2454571Z   ⨯ responsive project detail                                            3.94s
+2025-09-08T17:52:09.2466804Z   ⨯ back to projects navigation                                         12.82s
+2025-09-08T17:52:09.2479507Z   ⨯ keyboard navigation in gallery                                       3.21s
+2025-09-08T17:52:09.2491734Z   ⨯ external links open in new tab                                       2.29s
+2025-09-08T17:52:35.4218143Z
+2025-09-08T17:52:35.4218740Z    FAIL  Tests\Browser\ProjectsPageTest
+2025-09-08T17:52:35.4232261Z   ⨯ projects page loads                                                  2.70s
+2025-09-08T17:52:35.4244095Z   ⨯ projects are displayed                                               2.24s
+2025-09-08T17:52:35.4256065Z   ⨯ tab navigation                                                       3.68s
+2025-09-08T17:52:35.4268051Z   ⨯ framework filters                                                    3.23s
+2025-09-08T17:52:35.4280430Z   ⨯ multiple filters                                                     3.17s
+2025-09-08T17:52:35.4293109Z   ⨯ clear filters                                                        3.47s
+2025-09-08T17:52:35.4306828Z   ⨯ navigation to project detail                                         2.45s
+2025-09-08T17:52:35.4318438Z   ⨯ filters persist on refresh                                           2.07s
+2025-09-08T17:52:35.4330215Z   ⨯ responsive project grid                                              3.13s
+2025-09-08T17:52:35.4337931Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.4353276Z    FAILED  Tests\Browser\HomepageTest > homepage loads         QueryException
+2025-09-08T17:52:35.4377034Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.4553296Z
+2025-09-08T17:52:35.4554627Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.4660586Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.4661414Z     821▕                 );
+2025-09-08T17:52:35.4661920Z     822▕             }
+2025-09-08T17:52:35.4662222Z     823▕
+2025-09-08T17:52:35.4662608Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.4663280Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.4663811Z     826▕             );
+2025-09-08T17:52:35.4664108Z     827▕         }
+2025-09-08T17:52:35.4664379Z     828▕     }
+2025-09-08T17:52:35.4664530Z
+2025-09-08T17:52:35.4664728Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.4670683Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.4671363Z
+2025-09-08T17:52:35.4671945Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.4687541Z    FAILED  Tests\Browser\HomepageTest > homepage displays po…  QueryException
+2025-09-08T17:52:35.4691130Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.4854002Z
+2025-09-08T17:52:35.4855353Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.4958015Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.4958722Z     821▕                 );
+2025-09-08T17:52:35.4959342Z     822▕             }
+2025-09-08T17:52:35.4959659Z     823▕
+2025-09-08T17:52:35.4960080Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.4960850Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.4961435Z     826▕             );
+2025-09-08T17:52:35.4961848Z     827▕         }
+2025-09-08T17:52:35.4962201Z     828▕     }
+2025-09-08T17:52:35.4962377Z
+2025-09-08T17:52:35.4962628Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.4964151Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.4964798Z
+2025-09-08T17:52:35.4968009Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.4984325Z    FAILED  Tests\Browser\HomepageTest > navigation to projec…  QueryException
+2025-09-08T17:52:35.4988054Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.5151245Z
+2025-09-08T17:52:35.5152217Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.5250621Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.5251771Z     821▕                 );
+2025-09-08T17:52:35.5252445Z     822▕             }
+2025-09-08T17:52:35.5253040Z     823▕
+2025-09-08T17:52:35.5253764Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.5254607Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.5255164Z     826▕             );
+2025-09-08T17:52:35.5255480Z     827▕         }
+2025-09-08T17:52:35.5255778Z     828▕     }
+2025-09-08T17:52:35.5255931Z
+2025-09-08T17:52:35.5256154Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.5256943Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.5257687Z
+2025-09-08T17:52:35.5259545Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.5274562Z    FAILED  Tests\Browser\ProjectDetailPageTest > project det…  QueryException
+2025-09-08T17:52:35.5278082Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.5436353Z
+2025-09-08T17:52:35.5437228Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.5541951Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.5542916Z     821▕                 );
+2025-09-08T17:52:35.5543410Z     822▕             }
+2025-09-08T17:52:35.5543862Z     823▕
+2025-09-08T17:52:35.5544411Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.5545460Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.5546288Z     826▕             );
+2025-09-08T17:52:35.5546749Z     827▕         }
+2025-09-08T17:52:35.5547091Z     828▕     }
+2025-09-08T17:52:35.5547237Z
+2025-09-08T17:52:35.5547475Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.5548205Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.5549080Z
+2025-09-08T17:52:35.5553567Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.5569233Z    FAILED  Tests\Browser\ProjectDetailPageTest > project met…  QueryException
+2025-09-08T17:52:35.5572530Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.5734540Z
+2025-09-08T17:52:35.5735637Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.5839547Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.5840337Z     821▕                 );
+2025-09-08T17:52:35.5840712Z     822▕             }
+2025-09-08T17:52:35.5841215Z     823▕
+2025-09-08T17:52:35.5841769Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.5842758Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.5843880Z     826▕             );
+2025-09-08T17:52:35.5844164Z     827▕         }
+2025-09-08T17:52:35.5844422Z     828▕     }
+2025-09-08T17:52:35.5844564Z
+2025-09-08T17:52:35.5844766Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.5845444Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.5845947Z
+2025-09-08T17:52:35.5849249Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.5864810Z    FAILED  Tests\Browser\ProjectDetailPageTest > sec…  NoSuchElementException
+2025-09-08T17:52:35.5867253Z   Unable to locate element with selector [[data-section="people"]].
+2025-09-08T17:52:35.5872060Z
+2025-09-08T17:52:35.5874092Z   at tests/Browser/ProjectDetailPageTest.php:92
+2025-09-08T17:52:35.5940395Z      88▕                 ->pause(500)
+2025-09-08T17:52:35.5941437Z      89▕                 ->assertPresent('[data-section="features"][data-active="true"]')
+2025-09-08T17:52:35.5942574Z      90▕                 ->assertVisible('[data-testid="features-section"]')
+2025-09-08T17:52:35.5943514Z      91▕                 // Navigate to people section
+2025-09-08T17:52:35.5944309Z   ➜  92▕                 ->click('[data-section="people"]')
+2025-09-08T17:52:35.5945010Z      93▕                 ->pause(500)
+2025-09-08T17:52:35.5945685Z      94▕                 ->assertPresent('[data-section="people"][data-active="true"]')
+2025-09-08T17:52:35.5946385Z      95▕                 ->assertVisible('[data-testid="people-section"]')
+2025-09-08T17:52:35.5946941Z      96▕                 // Navigate to technologies section
+2025-09-08T17:52:35.5947207Z
+2025-09-08T17:52:35.5947420Z   1   tests/Browser/ProjectDetailPageTest.php:81
+2025-09-08T17:52:35.5947689Z
+2025-09-08T17:52:35.5950008Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.5963243Z    FAILED  Tests\Browser\ProjectDetailPageTest > project description with ma…
+2025-09-08T17:52:35.5965772Z   Element [body [data-testid="project-description"] h2] is not present.
+2025-09-08T17:52:35.5966508Z Failed asserting that false is true.
+2025-09-08T17:52:35.5970343Z
+2025-09-08T17:52:35.5972134Z   at tests/Browser/ProjectDetailPageTest.php:119
+2025-09-08T17:52:35.6037824Z     115▕             $browser->visit('/projects/'.$this->testProject->slug)
+2025-09-08T17:52:35.6039097Z     116▕                 ->waitFor('[data-testid="project-description"]', 10)
+2025-09-08T17:52:35.6040118Z     117▕                 ->assertPresent('[data-testid="project-description"]')
+2025-09-08T17:52:35.6041096Z     118▕                 // Check markdown elements are rendered
+2025-09-08T17:52:35.6042058Z   ➜ 119▕                 ->assertPresent('[data-testid="project-description"] h2')
+2025-09-08T17:52:35.6043111Z     120▕                 ->assertPresent('[data-testid="project-description"] p')
+2025-09-08T17:52:35.6044119Z     121▕                 ->assertPresent('[data-testid="project-description"] ul')
+2025-09-08T17:52:35.6045542Z     122▕                 ->assertSeeIn('[data-testid="project-description"]', 'Overview')
+2025-09-08T17:52:35.6046564Z     123▕                 ->assertSeeIn('[data-testid="project-description"]', 'detailed description');
+2025-09-08T17:52:35.6046961Z
+2025-09-08T17:52:35.6047148Z   1   tests/Browser/ProjectDetailPageTest.php:114
+2025-09-08T17:52:35.6047402Z
+2025-09-08T17:52:35.6047713Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.6058286Z    FAILED  Tests\Browser\ProjectDetailPageTest > project features display
+2025-09-08T17:52:35.6061267Z   Did not see expected text [Feature 1] within element [body [data-testid="feature-card"]:first-child].
+2025-09-08T17:52:35.6062075Z Failed asserting that false is true.
+2025-09-08T17:52:35.6065630Z
+2025-09-08T17:52:35.6067578Z   at tests/Browser/ProjectDetailPageTest.php:138
+2025-09-08T17:52:35.6134595Z     134▕                 ->waitFor('[data-section="features"]', 10)
+2025-09-08T17:52:35.6135512Z     135▕                 ->click('[data-section="features"]')
+2025-09-08T17:52:35.6136016Z     136▕                 ->pause(500)
+2025-09-08T17:52:35.6136846Z     137▕                 ->assertPresent('[data-testid="feature-card"]')
+2025-09-08T17:52:35.6137972Z   ➜ 138▕                 ->assertSeeIn('[data-testid="feature-card"]:first-child', 'Feature 1')
+2025-09-08T17:52:35.6138992Z     139▕                 ->assertSeeIn('[data-testid="feature-card"]:first-child', 'Feature 1 description');
+2025-09-08T17:52:35.6139510Z     140▕         });
+2025-09-08T17:52:35.6139765Z     141▕     }
+2025-09-08T17:52:35.6139976Z     142▕
+2025-09-08T17:52:35.6140092Z
+2025-09-08T17:52:35.6140276Z   1   tests/Browser/ProjectDetailPageTest.php:132
+2025-09-08T17:52:35.6140571Z
+2025-09-08T17:52:35.6143028Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.6155441Z    FAILED  Tests\Browser\ProjectDetailPageTest > project people display
+2025-09-08T17:52:35.6158211Z   Did not see expected text [John Doe] within element [body [data-testid="person-card"]:first-child].
+2025-09-08T17:52:35.6159103Z Failed asserting that false is true.
+2025-09-08T17:52:35.6162928Z
+2025-09-08T17:52:35.6164668Z   at tests/Browser/ProjectDetailPageTest.php:154
+2025-09-08T17:52:35.6230138Z     150▕                 ->waitFor('[data-section="people"]', 10)
+2025-09-08T17:52:35.6231082Z     151▕                 ->click('[data-section="people"]')
+2025-09-08T17:52:35.6231835Z     152▕                 ->pause(500)
+2025-09-08T17:52:35.6232673Z     153▕                 ->assertPresent('[data-testid="person-card"]')
+2025-09-08T17:52:35.6233876Z   ➜ 154▕                 ->assertSeeIn('[data-testid="person-card"]:first-child', 'John Doe');
+2025-09-08T17:52:35.6234763Z     155▕         });
+2025-09-08T17:52:35.6235201Z     156▕     }
+2025-09-08T17:52:35.6235605Z     157▕
+2025-09-08T17:52:35.6235992Z     158▕     /**
+2025-09-08T17:52:35.6236226Z
+2025-09-08T17:52:35.6236566Z   1   tests/Browser/ProjectDetailPageTest.php:148
+2025-09-08T17:52:35.6237009Z
+2025-09-08T17:52:35.6238023Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.6253698Z    FAILED  Tests\Browser\ProjectDetailPageTest > technologie…  QueryException
+2025-09-08T17:52:35.6256884Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.6418350Z
+2025-09-08T17:52:35.6419795Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.6532207Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.6533202Z     821▕                 );
+2025-09-08T17:52:35.6533753Z     822▕             }
+2025-09-08T17:52:35.6534242Z     823▕
+2025-09-08T17:52:35.6534871Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.6536547Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.6537417Z     826▕             );
+2025-09-08T17:52:35.6537916Z     827▕         }
+2025-09-08T17:52:35.6538384Z     828▕     }
+2025-09-08T17:52:35.6538623Z
+2025-09-08T17:52:35.6539210Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.6540106Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.6540715Z
+2025-09-08T17:52:35.6541975Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.6555157Z    FAILED  Tests\Browser\ProjectDetailPageTest > screenshot gallery
+2025-09-08T17:52:35.6557875Z   Element [body [data-testid="screenshot-thumbnail"]] is not present.
+2025-09-08T17:52:35.6558587Z Failed asserting that false is true.
+2025-09-08T17:52:35.6562964Z
+2025-09-08T17:52:35.6564763Z   at tests/Browser/ProjectDetailPageTest.php:186
+2025-09-08T17:52:35.6641720Z     182▕             $browser->visit('/projects/'.$this->testProject->slug)
+2025-09-08T17:52:35.6642918Z     183▕                 ->waitFor('[data-section="screenshots"]', 10)
+2025-09-08T17:52:35.6643933Z     184▕                 ->click('[data-section="screenshots"]')
+2025-09-08T17:52:35.6644776Z     185▕                 ->pause(500)
+2025-09-08T17:52:35.6645810Z   ➜ 186▕                 ->assertPresent('[data-testid="screenshot-thumbnail"]')
+2025-09-08T17:52:35.6646947Z     187▕                 // Click on first screenshot to open lightbox
+2025-09-08T17:52:35.6648004Z     188▕                 ->click('[data-testid="screenshot-thumbnail"]:first-child')
+2025-09-08T17:52:35.6649064Z     189▕                 ->waitFor('[data-testid="lightbox-container"]', 10)
+2025-09-08T17:52:35.6650705Z     190▕                 ->assertPresent('[data-testid="lightbox-container"]')
+2025-09-08T17:52:35.6651130Z
+2025-09-08T17:52:35.6651374Z   1   tests/Browser/ProjectDetailPageTest.php:181
+2025-09-08T17:52:35.6651704Z
+2025-09-08T17:52:35.6652112Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.6663350Z    FAILED  Tests\Browser\ProjectDetailPageTest > video gallery
+2025-09-08T17:52:35.6665951Z   Element [body [data-testid="video-thumbnail"]] is not present.
+2025-09-08T17:52:35.6666621Z Failed asserting that false is true.
+2025-09-08T17:52:35.6670973Z
+2025-09-08T17:52:35.6672722Z   at tests/Browser/ProjectDetailPageTest.php:215
+2025-09-08T17:52:35.6746346Z     211▕             $browser->visit('/projects/'.$this->testProject->slug)
+2025-09-08T17:52:35.6747344Z     212▕                 ->waitFor('[data-section="videos"]', 10)
+2025-09-08T17:52:35.6748095Z     213▕                 ->click('[data-section="videos"]')
+2025-09-08T17:52:35.6748629Z     214▕                 ->pause(500)
+2025-09-08T17:52:35.6749639Z   ➜ 215▕                 ->assertPresent('[data-testid="video-thumbnail"]')
+2025-09-08T17:52:35.6750259Z     216▕                 // Click on video to open modal
+2025-09-08T17:52:35.6751087Z     217▕                 ->click('[data-testid="video-thumbnail"]:first-child')
+2025-09-08T17:52:35.6751646Z     218▕                 ->waitFor('[data-testid="video-modal"]', 10)
+2025-09-08T17:52:35.6752238Z     219▕                 ->assertPresent('[data-testid="video-modal"]')
+2025-09-08T17:52:35.6752518Z
+2025-09-08T17:52:35.6752696Z   1   tests/Browser/ProjectDetailPageTest.php:210
+2025-09-08T17:52:35.6752928Z
+2025-09-08T17:52:35.6754803Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.6767772Z    FAILED  Tests\Browser\ProjectDetailPageTest > responsive project detail
+2025-09-08T17:52:35.6770645Z   Element [body [data-testid="mobile-section-nav"]] is not present.
+2025-09-08T17:52:35.6771323Z Failed asserting that false is true.
+2025-09-08T17:52:35.6775114Z
+2025-09-08T17:52:35.6776818Z   at tests/Browser/ProjectDetailPageTest.php:248
+2025-09-08T17:52:35.6847062Z     244▕                 ->resize(375, 812)
+2025-09-08T17:52:35.6847776Z     245▕                 ->pause(500)
+2025-09-08T17:52:35.6848574Z     246▕                 ->assertPresent('[data-testid="project-content"]')
+2025-09-08T17:52:35.6849432Z     247▕                 // Check that mobile navigation works
+2025-09-08T17:52:35.6850012Z   ➜ 248▕                 ->assertPresent('[data-testid="mobile-section-nav"]');
+2025-09-08T17:52:35.6850443Z     249▕         });
+2025-09-08T17:52:35.6850695Z     250▕     }
+2025-09-08T17:52:35.6850927Z     251▕
+2025-09-08T17:52:35.6851154Z     252▕     /**
+2025-09-08T17:52:35.6852729Z
+2025-09-08T17:52:35.6853042Z   1   tests/Browser/ProjectDetailPageTest.php:233
+2025-09-08T17:52:35.6853459Z
+2025-09-08T17:52:35.6860138Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.6877576Z    FAILED  Tests\Browser\ProjectDetailPageTest > back to p…  TimeoutException
+2025-09-08T17:52:35.6878537Z   Waited 10 seconds for selector [[data-testid="back-to-projects"]].
+2025-09-08T17:52:35.6884549Z
+2025-09-08T17:52:35.6886348Z   at vendor/php-webdriver/webdriver/lib/WebDriverWait.php:71
+2025-09-08T17:52:35.6893843Z      67▕         if ($last_exception) {
+2025-09-08T17:52:35.6894431Z      68▕             throw $last_exception;
+2025-09-08T17:52:35.6894911Z      69▕         }
+2025-09-08T17:52:35.6895250Z      70▕
+2025-09-08T17:52:35.6895748Z   ➜  71▕         throw new TimeoutException($message);
+2025-09-08T17:52:35.6896248Z      72▕     }
+2025-09-08T17:52:35.6896569Z      73▕ }
+2025-09-08T17:52:35.6896864Z      74▕
+2025-09-08T17:52:35.6897027Z
+2025-09-08T17:52:35.6897274Z       [2m+1 vendor frames [22m
+2025-09-08T17:52:35.6897785Z   2   tests/Browser/ProjectDetailPageTest.php:259
+2025-09-08T17:52:35.6898440Z   3   tests/Browser/ProjectDetailPageTest.php:257
+2025-09-08T17:52:35.6899306Z
+2025-09-08T17:52:35.6904222Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.6920047Z    FAILED  Tests\Browser\ProjectDetailPageTest > key…  NoSuchElementException
+2025-09-08T17:52:35.6922550Z   Unable to locate element with selector [[data-testid="screenshot-thumbnail"]:first-child].
+2025-09-08T17:52:35.6926860Z
+2025-09-08T17:52:35.6928591Z   at tests/Browser/ProjectDetailPageTest.php:277
+2025-09-08T17:52:35.7009490Z     273▕                 ->waitFor('[data-section="screenshots"]', 10)
+2025-09-08T17:52:35.7010469Z     274▕                 ->click('[data-section="screenshots"]')
+2025-09-08T17:52:35.7011176Z     275▕                 ->pause(500)
+2025-09-08T17:52:35.7011579Z     276▕                 // Open gallery
+2025-09-08T17:52:35.7012432Z   ➜ 277▕                 ->click('[data-testid="screenshot-thumbnail"]:first-child')
+2025-09-08T17:52:35.7013158Z     278▕                 ->waitFor('[data-testid="lightbox-container"]', 10)
+2025-09-08T17:52:35.7013704Z     279▕                 // Test arrow key navigation
+2025-09-08T17:52:35.7014160Z     280▕                 ->keys('', ['{arrow_right}'])
+2025-09-08T17:52:35.7014557Z     281▕                 ->pause(500)
+2025-09-08T17:52:35.7015149Z
+2025-09-08T17:52:35.7015341Z   1   tests/Browser/ProjectDetailPageTest.php:271
+2025-09-08T17:52:35.7015599Z
+2025-09-08T17:52:35.7017821Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.7034065Z    FAILED  Tests\Browser\ProjectDetailPageTest > external li…  QueryException
+2025-09-08T17:52:35.7037438Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.7193806Z
+2025-09-08T17:52:35.7195116Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.7343180Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.7343940Z     821▕                 );
+2025-09-08T17:52:35.7344382Z     822▕             }
+2025-09-08T17:52:35.7344797Z     823▕
+2025-09-08T17:52:35.7345292Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.7346194Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.7346885Z     826▕             );
+2025-09-08T17:52:35.7347283Z     827▕         }
+2025-09-08T17:52:35.7347661Z     828▕     }
+2025-09-08T17:52:35.7347853Z
+2025-09-08T17:52:35.7348135Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.7349246Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.7349741Z
+2025-09-08T17:52:35.7352166Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.7367825Z    FAILED  Tests\Browser\ProjectsPageTest > projects page lo…  QueryException
+2025-09-08T17:52:35.7371705Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.7529013Z
+2025-09-08T17:52:35.7530322Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.7628133Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.7629098Z     821▕                 );
+2025-09-08T17:52:35.7629449Z     822▕             }
+2025-09-08T17:52:35.7629758Z     823▕
+2025-09-08T17:52:35.7630156Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.7630871Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.7631423Z     826▕             );
+2025-09-08T17:52:35.7631736Z     827▕         }
+2025-09-08T17:52:35.7632030Z     828▕     }
+2025-09-08T17:52:35.7632182Z
+2025-09-08T17:52:35.7632730Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.7633972Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.7634935Z
+2025-09-08T17:52:35.7637604Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.7653260Z    FAILED  Tests\Browser\ProjectsPageTest > projects are dis…  QueryException
+2025-09-08T17:52:35.7656520Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.7814218Z
+2025-09-08T17:52:35.7815369Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.7919416Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.7920223Z     821▕                 );
+2025-09-08T17:52:35.7920616Z     822▕             }
+2025-09-08T17:52:35.7920918Z     823▕
+2025-09-08T17:52:35.7921317Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.7922036Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.7922597Z     826▕             );
+2025-09-08T17:52:35.7922914Z     827▕         }
+2025-09-08T17:52:35.7923239Z     828▕     }
+2025-09-08T17:52:35.7923396Z
+2025-09-08T17:52:35.7923894Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.7924998Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.7925551Z
+2025-09-08T17:52:35.7928479Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.7943487Z    FAILED  Tests\Browser\ProjectsPageTest > tab navigation     QueryException
+2025-09-08T17:52:35.7947227Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.8107366Z
+2025-09-08T17:52:35.8108394Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.8213854Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.8214555Z     821▕                 );
+2025-09-08T17:52:35.8214917Z     822▕             }
+2025-09-08T17:52:35.8215230Z     823▕
+2025-09-08T17:52:35.8215627Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.8216346Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.8216897Z     826▕             );
+2025-09-08T17:52:35.8217209Z     827▕         }
+2025-09-08T17:52:35.8217499Z     828▕     }
+2025-09-08T17:52:35.8217649Z
+2025-09-08T17:52:35.8218183Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.8219668Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.8220380Z
+2025-09-08T17:52:35.8223215Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.8238711Z    FAILED  Tests\Browser\ProjectsPageTest > framework filter…  QueryException
+2025-09-08T17:52:35.8242226Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.8403091Z
+2025-09-08T17:52:35.8404207Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.8510584Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.8511342Z     821▕                 );
+2025-09-08T17:52:35.8511660Z     822▕             }
+2025-09-08T17:52:35.8511943Z     823▕
+2025-09-08T17:52:35.8512314Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.8513007Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.8513512Z     826▕             );
+2025-09-08T17:52:35.8514244Z     827▕         }
+2025-09-08T17:52:35.8514516Z     828▕     }
+2025-09-08T17:52:35.8514658Z
+2025-09-08T17:52:35.8515228Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.8516307Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.8516851Z
+2025-09-08T17:52:35.8519853Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.8534595Z    FAILED  Tests\Browser\ProjectsPageTest > multiple filters   QueryException
+2025-09-08T17:52:35.8537984Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.8698669Z
+2025-09-08T17:52:35.8700079Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.8804309Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.8805004Z     821▕                 );
+2025-09-08T17:52:35.8805321Z     822▕             }
+2025-09-08T17:52:35.8805570Z     823▕
+2025-09-08T17:52:35.8805909Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.8806559Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.8806962Z     826▕             );
+2025-09-08T17:52:35.8807198Z     827▕         }
+2025-09-08T17:52:35.8807413Z     828▕     }
+2025-09-08T17:52:35.8807531Z
+2025-09-08T17:52:35.8807996Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.8809191Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.8809734Z
+2025-09-08T17:52:35.8814166Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.8828564Z    FAILED  Tests\Browser\ProjectsPageTest > clear filters      QueryException
+2025-09-08T17:52:35.8831995Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.8991922Z
+2025-09-08T17:52:35.8993170Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.9095365Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.9096035Z     821▕                 );
+2025-09-08T17:52:35.9096390Z     822▕             }
+2025-09-08T17:52:35.9096705Z     823▕
+2025-09-08T17:52:35.9097102Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.9097795Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.9098339Z     826▕             );
+2025-09-08T17:52:35.9098628Z     827▕         }
+2025-09-08T17:52:35.9099189Z     828▕     }
+2025-09-08T17:52:35.9099336Z
+2025-09-08T17:52:35.9099824Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.9101393Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.9102048Z
+2025-09-08T17:52:35.9104721Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.9120609Z    FAILED  Tests\Browser\ProjectsPageTest > navigation to pr…  QueryException
+2025-09-08T17:52:35.9123726Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.9284466Z
+2025-09-08T17:52:35.9285119Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.9388401Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.9389273Z     821▕                 );
+2025-09-08T17:52:35.9389603Z     822▕             }
+2025-09-08T17:52:35.9389914Z     823▕
+2025-09-08T17:52:35.9390285Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.9390949Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.9391457Z     826▕             );
+2025-09-08T17:52:35.9391746Z     827▕         }
+2025-09-08T17:52:35.9392018Z     828▕     }
+2025-09-08T17:52:35.9392158Z
+2025-09-08T17:52:35.9392691Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.9393869Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.9394519Z
+2025-09-08T17:52:35.9396861Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.9429324Z    FAILED  Tests\Browser\ProjectsPageTest > filters persist…   QueryException
+2025-09-08T17:52:35.9431274Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.9577536Z
+2025-09-08T17:52:35.9578621Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.9682541Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.9683287Z     821▕                 );
+2025-09-08T17:52:35.9683640Z     822▕             }
+2025-09-08T17:52:35.9683945Z     823▕
+2025-09-08T17:52:35.9684337Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.9685055Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.9685599Z     826▕             );
+2025-09-08T17:52:35.9685908Z     827▕         }
+2025-09-08T17:52:35.9686198Z     828▕     }
+2025-09-08T17:52:35.9686350Z
+2025-09-08T17:52:35.9686943Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.9688093Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.9688679Z
+2025-09-08T17:52:35.9692048Z   ────────────────────────────────────────────────────────────────────────────
+2025-09-08T17:52:35.9707432Z    FAILED  Tests\Browser\ProjectsPageTest > responsive proje…  QueryException
+2025-09-08T17:52:35.9710902Z   SQLSTATE[HY000]: General error: 1553 Cannot drop index 'idx_creation_short_desc_key': needed in a foreign key constraint (Connection: mariadb, SQL: alter table `creations` drop index `idx_creation_short_desc_key`)
+2025-09-08T17:52:35.9869585Z
+2025-09-08T17:52:35.9871108Z   at vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+2025-09-08T17:52:35.9970231Z     820▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.9971184Z     821▕                 );
+2025-09-08T17:52:35.9971794Z     822▕             }
+2025-09-08T17:52:35.9972263Z     823▕
+2025-09-08T17:52:35.9972890Z   ➜ 824▕             throw new QueryException(
+2025-09-08T17:52:35.9974009Z     825▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+2025-09-08T17:52:35.9975401Z     826▕             );
+2025-09-08T17:52:35.9975905Z     827▕         }
+2025-09-08T17:52:35.9976363Z     828▕     }
+2025-09-08T17:52:35.9976609Z
+2025-09-08T17:52:35.9976932Z       [2m+10 vendor frames [22m
+2025-09-08T17:52:35.9978167Z   11  database/migrations/2025_08_20_084054_add_performance_indexes_for_creations_and_translations.php:118
+2025-09-08T17:52:35.9979147Z
+2025-09-08T17:52:35.9979157Z
+2025-09-08T17:52:35.9979381Z   Tests:    25 failed (88 assertions)
+2025-09-08T17:52:35.9979852Z   Duration: 99.99s
+2025-09-08T17:52:35.9980247Z
+2025-09-08T17:52:36.0235879Z ##[error]Process completed with exit code 2.
+2025-09-08T17:52:36.0294570Z ##[group]Run actions/upload-artifact@v4
+2025-09-08T17:52:36.0294840Z with:
+2025-09-08T17:52:36.0294999Z   name: screenshots
+2025-09-08T17:52:36.0295195Z   path: tests/Browser/screenshots
+2025-09-08T17:52:36.0295427Z   if-no-files-found: warn
+2025-09-08T17:52:36.0295669Z   compression-level: 6
+2025-09-08T17:52:36.0295860Z   overwrite: false
+2025-09-08T17:52:36.0296048Z   include-hidden-files: false
+2025-09-08T17:52:36.0296245Z env:
+2025-09-08T17:52:36.0296405Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:52:36.0296608Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:52:36.0296809Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:52:36.0296983Z ##[endgroup]
+2025-09-08T17:52:36.2602209Z With the provided path, there will be 10 files uploaded
+2025-09-08T17:52:36.2607828Z Artifact name is valid!
+2025-09-08T17:52:36.2609538Z Root directory input is valid!
+2025-09-08T17:52:36.4342544Z Beginning upload of artifact content to blob storage
+2025-09-08T17:52:37.1962822Z Uploaded bytes 3807388
+2025-09-08T17:52:37.2514677Z Finished uploading artifact content to blob storage!
+2025-09-08T17:52:37.2517814Z SHA256 digest of uploaded artifact zip is 4a2342c494cc1a6bebc8e76240930d35f8e2000eef62a2e93d463f56c568f43f
+2025-09-08T17:52:37.2519523Z Finalizing artifact upload
+2025-09-08T17:52:37.3626178Z Artifact screenshots.zip successfully finalized. Artifact ID 3956662499
+2025-09-08T17:52:37.3627989Z Artifact screenshots has been successfully uploaded! Final size is 3807388 bytes. Artifact ID is 3956662499
+2025-09-08T17:52:37.3635888Z Artifact download URL: https://github.com/SofianeLasri/laravel-personal-website/actions/runs/17559474986/artifacts/3956662499
+2025-09-08T17:52:37.3756485Z ##[group]Run actions/upload-artifact@v4
+2025-09-08T17:52:37.3756762Z with:
+2025-09-08T17:52:37.3756924Z   name: console
+2025-09-08T17:52:37.3757107Z   path: tests/Browser/console
+2025-09-08T17:52:37.3757323Z   if-no-files-found: warn
+2025-09-08T17:52:37.3757530Z   compression-level: 6
+2025-09-08T17:52:37.3757721Z   overwrite: false
+2025-09-08T17:52:37.3757905Z   include-hidden-files: false
+2025-09-08T17:52:37.3758110Z env:
+2025-09-08T17:52:37.3758271Z   COMPOSER_PROCESS_TIMEOUT: 0
+2025-09-08T17:52:37.3758479Z   COMPOSER_NO_INTERACTION: 1
+2025-09-08T17:52:37.3758690Z   COMPOSER_NO_AUDIT: 1
+2025-09-08T17:52:37.3759404Z ##[endgroup]
+2025-09-08T17:52:37.6030533Z With the provided path, there will be 22 files uploaded
+2025-09-08T17:52:37.6036189Z Artifact name is valid!
+2025-09-08T17:52:37.6037324Z Root directory input is valid!
+2025-09-08T17:52:37.7539774Z Beginning upload of artifact content to blob storage
+2025-09-08T17:52:38.0333414Z Uploaded bytes 15152
+2025-09-08T17:52:38.0843452Z Finished uploading artifact content to blob storage!
+2025-09-08T17:52:38.0846053Z SHA256 digest of uploaded artifact zip is 1a38175f54667876d6756c476c86b932e2ea42143f15eb3b38d67a978ce2b8b0
+2025-09-08T17:52:38.0846909Z Finalizing artifact upload
+2025-09-08T17:52:38.2179201Z Artifact console.zip successfully finalized. Artifact ID 3956662638
+2025-09-08T17:52:38.2180383Z Artifact console has been successfully uploaded! Final size is 15152 bytes. Artifact ID is 3956662638
+2025-09-08T17:52:38.2187098Z Artifact download URL: https://github.com/SofianeLasri/laravel-personal-website/actions/runs/17559474986/artifacts/3956662638
+2025-09-08T17:52:38.2341345Z Post job cleanup.
+2025-09-08T17:52:38.3313671Z [command]/usr/bin/git version
+2025-09-08T17:52:38.3354560Z git version 2.51.0
+2025-09-08T17:52:38.3408334Z Temporarily overriding HOME='/home/runner/work/_temp/c432b20a-e5aa-4786-affd-4a45653f90f8' before making global git config changes
+2025-09-08T17:52:38.3409879Z Adding repository directory to the temporary git global config as a safe directory
+2025-09-08T17:52:38.3414687Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/laravel-personal-website/laravel-personal-website
+2025-09-08T17:52:38.3452411Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-09-08T17:52:38.3488452Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-09-08T17:52:38.3741389Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-09-08T17:52:38.3765539Z http.https://github.com/.extraheader
+2025-09-08T17:52:38.3779511Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-09-08T17:52:38.3813225Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-09-08T17:52:38.4161950Z Print service container logs: d422953c9f7040af904e15033e2d4831_mariadblatest_cb84ed
+2025-09-08T17:52:38.4167738Z ##[command]/usr/bin/docker logs --details 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba
+2025-09-08T17:52:38.4300259Z  2025-09-08 17:49:20+00:00 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:12.0.2+maria~ubu2404 started.
+2025-09-08T17:52:38.4303316Z  2025-09-08 17:49:21+00:00 [Warn] [Entrypoint]: /sys/fs/cgroup///memory.pressure not writable, functionality unavailable to MariaDB
+2025-09-08T17:52:38.4309198Z  2025-09-08 17:49:21 0 [Warning] mariadbd: io_uring_queue_init() failed with EPERM: sysctl kernel.io_uring_disabled has the value 2, or 1 and the user of the process is not a member of sysctl kernel.io_uring_group. (see man 2 io_uring_setup).
+2025-09-08T17:52:38.4310697Z  2025-09-08 17:49:21+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2025-09-08T17:52:38.4311640Z  2025-09-08 17:49:21+00:00 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:12.0.2+maria~ubu2404 started.
+2025-09-08T17:52:38.4312477Z  2025-09-08 17:49:21+00:00 [Note] [Entrypoint]: Initializing database files
+2025-09-08T17:52:38.4313142Z  2025-09-08 17:49:22+00:00 [Note] [Entrypoint]: Database files initialized
+2025-09-08T17:52:38.4313779Z  2025-09-08 17:49:22+00:00 [Note] [Entrypoint]: Starting temporary server
+2025-09-08T17:52:38.4314409Z  2025-09-08 17:49:22+00:00 [Note] [Entrypoint]: Waiting for server startup
+2025-09-08T17:52:38.4315029Z  2025-09-08 17:49:24+00:00 [Note] [Entrypoint]: Temporary server started.
+2025-09-08T17:52:38.4315645Z  2025-09-08 17:49:24+00:00 [Note] [Entrypoint]: Creating database laravel
+2025-09-08T17:52:38.4316500Z  2025-09-08 17:49:24+00:00 [Note] [Entrypoint]: Securing system users (equivalent to running mysql_secure_installation)
+2025-09-08T17:52:38.4317220Z
+2025-09-08T17:52:38.4317589Z  2025-09-08 17:49:24+00:00 [Note] [Entrypoint]: Stopping temporary server
+2025-09-08T17:52:38.4318217Z  2025-09-08 17:49:24+00:00 [Note] [Entrypoint]: Temporary server stopped
+2025-09-08T17:52:38.4318705Z
+2025-09-08T17:52:38.4319351Z  2025-09-08 17:49:24+00:00 [Note] [Entrypoint]: MariaDB init process done. Ready for start up.
+2025-09-08T17:52:38.4319943Z
+2025-09-08T17:52:38.4320264Z  create_uring failed: falling back to libaio
+2025-09-08T17:52:38.4321430Z  2025-09-08 17:49:22 0 [Note] Starting MariaDB 12.0.2-MariaDB-ubu2404 source revision aab83aecdca15738d114cf5a2f223f1d12e4e6bd server_uid evfPGjhbVw9Z0ZzKRo6G25yLfCE= as process 93
+2025-09-08T17:52:38.4322838Z  2025-09-08 17:49:22 0 [Note] InnoDB: Compressed tables use zlib 1.3
+2025-09-08T17:52:38.4323735Z  2025-09-08 17:49:22 0 [Note] InnoDB: Number of transaction pools: 1
+2025-09-08T17:52:38.4324350Z  2025-09-08 17:49:22 0 [Note] InnoDB: Using crc32 + pclmulqdq instructions
+2025-09-08T17:52:38.4325113Z  2025-09-08 17:49:22 0 [Note] mariadbd: O_TMPFILE is not supported on /tmp (disabling future attempts)
+2025-09-08T17:52:38.4326662Z  2025-09-08 17:49:22 0 [Warning] mariadbd: io_uring_queue_init() failed with EPERM: sysctl kernel.io_uring_disabled has the value 2, or 1 and the user of the process is not a member of sysctl kernel.io_uring_group. (see man 2 io_uring_setup).
+2025-09-08T17:52:38.4327986Z  create_uring failed: falling back to libaio
+2025-09-08T17:52:38.4328487Z  2025-09-08 17:49:22 0 [Note] InnoDB: Using Linux native AIO
+2025-09-08T17:52:38.4329338Z  2025-09-08 17:49:22 0 [Note] InnoDB: innodb_buffer_pool_size_max=128m, innodb_buffer_pool_size=128m
+2025-09-08T17:52:38.4330117Z  2025-09-08 17:49:22 0 [Note] InnoDB: Completed initialization of buffer pool
+2025-09-08T17:52:38.4330890Z  2025-09-08 17:49:22 0 [Note] InnoDB: File system buffers for log disabled (block size=4096 bytes)
+2025-09-08T17:52:38.4331613Z  2025-09-08 17:49:22 0 [Note] InnoDB: End of log at LSN=46300
+2025-09-08T17:52:38.4332177Z  2025-09-08 17:49:22 0 [Note] InnoDB: Opened 3 undo tablespaces
+2025-09-08T17:52:38.4333141Z  2025-09-08 17:49:22 0 [Note] InnoDB: 128 rollback segments in 3 undo tablespaces are active.
+2025-09-08T17:52:38.4334120Z  2025-09-08 17:49:22 0 [Note] InnoDB: Setting file './ibtmp1' size to 12.000MiB. Physically writing the file full; Please wait ...
+2025-09-08T17:52:38.4334994Z  2025-09-08 17:49:22 0 [Note] InnoDB: File './ibtmp1' size is now 12.000MiB.
+2025-09-08T17:52:38.4335644Z  2025-09-08 17:49:22 0 [Note] InnoDB: log sequence number 46300; transaction id 14
+2025-09-08T17:52:38.4336253Z  2025-09-08 17:49:22 0 [Note] Plugin 'FEEDBACK' is disabled.
+2025-09-08T17:52:38.4336818Z  2025-09-08 17:49:22 0 [Note] Plugin 'wsrep-provider' is disabled.
+2025-09-08T17:52:38.4337420Z  2025-09-08 17:49:23 0 [Note] mariadbd: Event Scheduler: Loaded 0 events
+2025-09-08T17:52:38.4338217Z  2025-09-08 17:49:23 0 [Note] Replication not automatically started: --skip-slave-start was specified
+2025-09-08T17:52:38.4339126Z  2025-09-08 17:49:23 0 [Note] mariadbd: ready for connections.
+2025-09-08T17:52:38.4339965Z  Version: '12.0.2-MariaDB-ubu2404'  socket: '/run/mysqld/mysqld.sock'  port: 0  mariadb.org binary distribution
+2025-09-08T17:52:38.4340866Z  2025-09-08 17:49:24 0 [Note] mariadbd (initiated by: unknown): Normal shutdown
+2025-09-08T17:52:38.4341498Z  2025-09-08 17:49:24 0 [Note] InnoDB: FTS optimize thread exiting.
+2025-09-08T17:52:38.4342050Z  2025-09-08 17:49:24 0 [Note] InnoDB: Starting shutdown...
+2025-09-08T17:52:38.4342717Z  2025-09-08 17:49:24 0 [Note] InnoDB: Dumping buffer pool(s) to /var/lib/mysql/ib_buffer_pool
+2025-09-08T17:52:38.4343499Z  2025-09-08 17:49:24 0 [Note] InnoDB: Buffer pool(s) dump completed at 250908 17:49:24
+2025-09-08T17:52:38.4344261Z  2025-09-08 17:49:24 0 [Note] InnoDB: Removed temporary tablespace data file: "./ibtmp1"
+2025-09-08T17:52:38.4345109Z  2025-09-08 17:49:24 0 [Note] InnoDB: Shutdown completed; log sequence number 47875; transaction id 15
+2025-09-08T17:52:38.4345828Z  2025-09-08 17:49:24 0 [Note] mariadbd: Shutdown complete
+2025-09-08T17:52:38.4347032Z  2025-09-08 17:49:24 0 [Note] Starting MariaDB 12.0.2-MariaDB-ubu2404 source revision aab83aecdca15738d114cf5a2f223f1d12e4e6bd server_uid evfPGjhbVw9Z0ZzKRo6G25yLfCE= as process 1
+2025-09-08T17:52:38.4348323Z  2025-09-08 17:49:24 0 [Note] InnoDB: Compressed tables use zlib 1.3
+2025-09-08T17:52:38.4349061Z  2025-09-08 17:49:24 0 [Note] InnoDB: Number of transaction pools: 1
+2025-09-08T17:52:38.4349679Z  2025-09-08 17:49:24 0 [Note] InnoDB: Using crc32 + pclmulqdq instructions
+2025-09-08T17:52:38.4350446Z  2025-09-08 17:49:24 0 [Note] mariadbd: O_TMPFILE is not supported on /tmp (disabling future attempts)
+2025-09-08T17:52:38.4351989Z  2025-09-08 17:49:24 0 [Warning] mariadbd: io_uring_queue_init() failed with EPERM: sysctl kernel.io_uring_disabled has the value 2, or 1 and the user of the process is not a member of sysctl kernel.io_uring_group. (see man 2 io_uring_setup).
+2025-09-08T17:52:38.4353523Z  create_uring failed: falling back to libaio
+2025-09-08T17:52:38.4354027Z  2025-09-08 17:49:24 0 [Note] InnoDB: Using Linux native AIO
+2025-09-08T17:52:38.4354747Z  2025-09-08 17:49:24 0 [Note] InnoDB: innodb_buffer_pool_size_max=128m, innodb_buffer_pool_size=128m
+2025-09-08T17:52:38.4355527Z  2025-09-08 17:49:24 0 [Note] InnoDB: Completed initialization of buffer pool
+2025-09-08T17:52:38.4356293Z  2025-09-08 17:49:24 0 [Note] InnoDB: File system buffers for log disabled (block size=4096 bytes)
+2025-09-08T17:52:38.4356996Z  2025-09-08 17:49:24 0 [Note] InnoDB: End of log at LSN=47875
+2025-09-08T17:52:38.4357547Z  2025-09-08 17:49:24 0 [Note] InnoDB: Opened 3 undo tablespaces
+2025-09-08T17:52:38.4358228Z  2025-09-08 17:49:24 0 [Note] InnoDB: 128 rollback segments in 3 undo tablespaces are active.
+2025-09-08T17:52:38.4359334Z  2025-09-08 17:49:24 0 [Note] InnoDB: Setting file './ibtmp1' size to 12.000MiB. Physically writing the file full; Please wait ...
+2025-09-08T17:52:38.4359881Z  2025-09-08 17:49:24 0 [Note] InnoDB: File './ibtmp1' size is now 12.000MiB.
+2025-09-08T17:52:38.4360277Z  2025-09-08 17:49:24 0 [Note] InnoDB: log sequence number 47875; transaction id 15
+2025-09-08T17:52:38.4360825Z  2025-09-08 17:49:24 0 [Note] Plugin 'FEEDBACK' is disabled.
+2025-09-08T17:52:38.4361198Z  2025-09-08 17:49:24 0 [Note] Plugin 'wsrep-provider' is disabled.
+2025-09-08T17:52:38.4361635Z  2025-09-08 17:49:24 0 [Note] InnoDB: Loading buffer pool(s) from /var/lib/mysql/ib_buffer_pool
+2025-09-08T17:52:38.4362093Z  2025-09-08 17:49:24 0 [Note] InnoDB: Buffer pool(s) load completed at 250908 17:49:24
+2025-09-08T17:52:38.4362512Z  2025-09-08 17:49:27 0 [Note] Server socket created on IP: '0.0.0.0', port: '3306'.
+2025-09-08T17:52:38.4362907Z  2025-09-08 17:49:27 0 [Note] Server socket created on IP: '::', port: '3306'.
+2025-09-08T17:52:38.4363284Z  2025-09-08 17:49:27 0 [Note] mariadbd: Event Scheduler: Loaded 0 events
+2025-09-08T17:52:38.4363639Z  2025-09-08 17:49:27 0 [Note] mariadbd: ready for connections.
+2025-09-08T17:52:38.4364146Z  Version: '12.0.2-MariaDB-ubu2404'  socket: '/run/mysqld/mysqld.sock'  port: 3306  mariadb.org binary distribution
+2025-09-08T17:52:38.4370679Z Stop and remove container: d422953c9f7040af904e15033e2d4831_mariadblatest_cb84ed
+2025-09-08T17:52:38.4375470Z ##[command]/usr/bin/docker rm --force 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba
+2025-09-08T17:52:38.6346582Z 4c3860d48253b3788be4a7e55324fa1d5a682cfebb814bb471caabab004391ba
+2025-09-08T17:52:38.6382028Z Print service container logs: 4948e7846c3944b68bfa4f104390de80_redisalpine_45c97c
+2025-09-08T17:52:38.6383726Z ##[command]/usr/bin/docker logs --details b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178
+2025-09-08T17:52:38.6520609Z  Starting Redis Server
+2025-09-08T17:52:38.6523117Z  1:C 08 Sep 2025 17:49:23.267 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+2025-09-08T17:52:38.6525376Z  1:C 08 Sep 2025 17:49:23.267 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+2025-09-08T17:52:38.6525857Z  1:C 08 Sep 2025 17:49:23.267 * Redis version=8.2.1, bits=64, commit=00000000, modified=1, pid=1, just started
+2025-09-08T17:52:38.6526274Z  1:C 08 Sep 2025 17:49:23.267 * Configuration loaded
+2025-09-08T17:52:38.6526601Z  1:M 08 Sep 2025 17:49:23.268 * monotonic clock: POSIX clock_gettime
+2025-09-08T17:52:38.6526956Z  1:M 08 Sep 2025 17:49:23.268 * Running mode=standalone, port=6379.
+2025-09-08T17:52:38.6527313Z  1:M 08 Sep 2025 17:49:23.269 * <bf> RedisBloom version 8.2.0 (Git=unknown)
+2025-09-08T17:52:38.6528030Z  1:M 08 Sep 2025 17:49:23.269 * <bf> Registering configuration options: [
+2025-09-08T17:52:38.6528384Z  1:M 08 Sep 2025 17:49:23.269 * <bf> 	{ bf-error-rate       :      0.01 }
+2025-09-08T17:52:38.6528737Z  1:M 08 Sep 2025 17:49:23.269 * <bf> 	{ bf-initial-size     :       100 }
+2025-09-08T17:52:38.6529388Z  1:M 08 Sep 2025 17:49:23.269 * <bf> 	{ bf-expansion-factor :         2 }
+2025-09-08T17:52:38.6529726Z  1:M 08 Sep 2025 17:49:23.269 * <bf> 	{ cf-bucket-size      :         2 }
+2025-09-08T17:52:38.6530051Z  1:M 08 Sep 2025 17:49:23.269 * <bf> 	{ cf-initial-size     :      1024 }
+2025-09-08T17:52:38.6530380Z  1:M 08 Sep 2025 17:49:23.269 * <bf> 	{ cf-max-iterations   :        20 }
+2025-09-08T17:52:38.6530709Z  1:M 08 Sep 2025 17:49:23.269 * <bf> 	{ cf-expansion-factor :         1 }
+2025-09-08T17:52:38.6531044Z  1:M 08 Sep 2025 17:49:23.269 * <bf> 	{ cf-max-expansions   :        32 }
+2025-09-08T17:52:38.6531333Z  1:M 08 Sep 2025 17:49:23.269 * <bf> ]
+2025-09-08T17:52:38.6531693Z  1:M 08 Sep 2025 17:49:23.269 * Module 'bf' loaded from /usr/local/lib/redis/modules//redisbloom.so
+2025-09-08T17:52:38.6532170Z  1:M 08 Sep 2025 17:49:23.272 * <search> Redis version found by RedisSearch : 8.2.1 - oss
+2025-09-08T17:52:38.6532595Z  1:M 08 Sep 2025 17:49:23.272 * <search> RediSearch version 8.2.1 (Git=dba8dd0)
+2025-09-08T17:52:38.6533211Z  1:M 08 Sep 2025 17:49:23.272 * <search> Low level api version 1 initialized successfully
+2025-09-08T17:52:38.6534173Z  1:M 08 Sep 2025 17:49:23.272 * <search> gc: ON, prefix min length: 2, min word length to stem: 4, prefix max expansions: 200, query timeout (ms): 500, timeout policy: return, cursor read size: 1000, cursor max idle (ms): 300000, max doctable size: 1000000, max number of search results:  1000000,
+2025-09-08T17:52:38.6535072Z  1:M 08 Sep 2025 17:49:23.272 * <search> Initialized thread pools!
+2025-09-08T17:52:38.6535436Z  1:M 08 Sep 2025 17:49:23.272 * <search> Disabled workers threadpool of size 0
+2025-09-08T17:52:38.6535797Z  1:M 08 Sep 2025 17:49:23.272 * <search> Subscribe to config changes
+2025-09-08T17:52:38.6536147Z  1:M 08 Sep 2025 17:49:23.272 * <search> Enabled role change notification
+2025-09-08T17:52:38.6536970Z  1:M 08 Sep 2025 17:49:23.273 * <search> Cluster configuration: AUTO partitions, type: 0, coordinator timeout: 0ms
+2025-09-08T17:52:38.6537795Z  1:M 08 Sep 2025 17:49:23.273 * <search> Register write commands
+2025-09-08T17:52:38.6538358Z  1:M 08 Sep 2025 17:49:23.273 * Module 'search' loaded from /usr/local/lib/redis/modules//redisearch.so
+2025-09-08T17:52:38.6539205Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> RedisTimeSeries version 80200, git_sha=1439d4a439ca9c063e6ef124a510abff09a5d493
+2025-09-08T17:52:38.6539791Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> Redis version found by RedisTimeSeries : 8.2.1 - oss
+2025-09-08T17:52:38.6540240Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> Registering configuration options: [
+2025-09-08T17:52:38.6540662Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> 	{ ts-compaction-policy   :              }
+2025-09-08T17:52:38.6541095Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> 	{ ts-num-threads         :            3 }
+2025-09-08T17:52:38.6541497Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> 	{ ts-retention-policy    :            0 }
+2025-09-08T17:52:38.6541913Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> 	{ ts-duplicate-policy    :        block }
+2025-09-08T17:52:38.6542335Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> 	{ ts-chunk-size-bytes    :         4096 }
+2025-09-08T17:52:38.6542738Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> 	{ ts-encoding            :   compressed }
+2025-09-08T17:52:38.6543144Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> 	{ ts-ignore-max-time-diff:            0 }
+2025-09-08T17:52:38.6543553Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> 	{ ts-ignore-max-val-diff :     0.000000 }
+2025-09-08T17:52:38.6543892Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> ]
+2025-09-08T17:52:38.6544188Z  1:M 08 Sep 2025 17:49:23.273 * <timeseries> Detected redis oss
+2025-09-08T17:52:38.6544712Z  1:M 08 Sep 2025 17:49:23.274 * <timeseries> Enabled diskless replication
+2025-09-08T17:52:38.6545182Z  1:M 08 Sep 2025 17:49:23.274 * Module 'timeseries' loaded from /usr/local/lib/redis/modules//redistimeseries.so
+2025-09-08T17:52:38.6545659Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> Created new data type 'ReJSON-RL'
+2025-09-08T17:52:38.6546055Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> version: 80200 git sha: unknown branch: unknown
+2025-09-08T17:52:38.6546443Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> Exported RedisJSON_V1 API
+2025-09-08T17:52:38.6546783Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> Exported RedisJSON_V2 API
+2025-09-08T17:52:38.6547111Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> Exported RedisJSON_V3 API
+2025-09-08T17:52:38.6547435Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> Exported RedisJSON_V4 API
+2025-09-08T17:52:38.6547758Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> Exported RedisJSON_V5 API
+2025-09-08T17:52:38.6548096Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> Enabled diskless replication
+2025-09-08T17:52:38.6548515Z  1:M 08 Sep 2025 17:49:23.274 * <ReJSON> Initialized shared string cache, thread safe: false.
+2025-09-08T17:52:38.6549184Z  1:M 08 Sep 2025 17:49:23.274 * Module 'ReJSON' loaded from /usr/local/lib/redis/modules//rejson.so
+2025-09-08T17:52:38.6549602Z  1:M 08 Sep 2025 17:49:23.274 * <search> Acquired RedisJSON_V5 API
+2025-09-08T17:52:38.6550042Z  1:M 08 Sep 2025 17:49:23.275 * Server initialized
+2025-09-08T17:52:38.6550353Z  1:M 08 Sep 2025 17:49:23.275 * Ready to accept connections tcp
+2025-09-08T17:52:38.6551510Z Stop and remove container: 4948e7846c3944b68bfa4f104390de80_redisalpine_45c97c
+2025-09-08T17:52:38.6552247Z ##[command]/usr/bin/docker rm --force b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178
+2025-09-08T17:52:38.7948163Z b90674b025031f132e17fa54290a1cbc6841a68fe2bfb13161440b703b14d178
+2025-09-08T17:52:38.7974671Z Remove container network: github_network_9f2d74fe372c4196ba17c14d12590fe5
+2025-09-08T17:52:38.7980296Z ##[command]/usr/bin/docker network rm github_network_9f2d74fe372c4196ba17c14d12590fe5
+2025-09-08T17:52:38.8976202Z github_network_9f2d74fe372c4196ba17c14d12590fe5
+2025-09-08T17:52:38.9035344Z Cleaning up orphan processes
+2025-09-08T17:52:38.9401995Z Terminate orphan process: pid (3286) (chromedriver-linux)
+2025-09-08T17:52:38.9429428Z Terminate orphan process: pid (3375) (php)
+2025-09-08T17:52:38.9461675Z Terminate orphan process: pid (3378) (php8.4)
+2025-09-08T17:52:38.9488414Z Terminate orphan process: pid (3379) (php8.4)
+2025-09-08T17:52:38.9545302Z Terminate orphan process: pid (3380) (php8.4)
+2025-09-08T17:52:38.9592052Z Terminate orphan process: pid (3385) (php)
+2025-09-08T17:52:38.9643822Z Terminate orphan process: pid (3388) (node)
+2025-09-08T17:52:38.9677760Z Terminate orphan process: pid (3395) (node)
+2025-09-08T17:52:38.9711166Z Terminate orphan process: pid (3396) (node)
+2025-09-08T17:52:38.9745501Z Terminate orphan process: pid (3398) (node)

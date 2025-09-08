@@ -52,7 +52,7 @@ class SetLocaleFromAcceptLanguage
             $part = trim($part);
 
             // Check if there's a quality value (q=x.x)
-            if (strpos($part, ';q=') !== false) {
+            if (str_contains($part, ';q=')) {
                 [$language, $quality] = explode(';q=', $part, 2);
                 $quality = (float) $quality;
             } else {

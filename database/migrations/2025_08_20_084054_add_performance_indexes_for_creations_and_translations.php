@@ -23,9 +23,8 @@ return new class extends Migration
             $table->index(['featured', 'type'], 'idx_creation_featured_type');
 
             // Index pour les clés étrangères fréquemment jointes
-            // Note: Ces index sont créés automatiquement par MySQL/MariaDB pour les contraintes de clé étrangère
-            // $table->index(['short_description_translation_key_id'], 'idx_creation_short_desc_key');
-            // $table->index(['full_description_translation_key_id'], 'idx_creation_full_desc_key');
+            $table->index(['short_description_translation_key_id'], 'idx_creation_short_desc_key');
+            $table->index(['full_description_translation_key_id'], 'idx_creation_full_desc_key');
 
             // Index composite pour optimiser les requêtes de tri avec type
             $table->index(['type', 'ended_at'], 'idx_creation_type_ended');
@@ -38,13 +37,11 @@ return new class extends Migration
         // Indexes pour la table features
         Schema::table('features', function (Blueprint $table) {
             // Index pour les jointures avec creations
-            // Note: Cet index est créé automatiquement par MySQL/MariaDB pour la contrainte de clé étrangère
-            // $table->index(['creation_id'], 'idx_feature_creation');
+            $table->index(['creation_id'], 'idx_feature_creation');
 
             // Index pour les clés de traduction
-            // Note: Ces index sont créés automatiquement par MySQL/MariaDB pour les contraintes de clé étrangère
-            // $table->index(['title_translation_key_id'], 'idx_feature_title_key');
-            // $table->index(['description_translation_key_id'], 'idx_feature_desc_key');
+            $table->index(['title_translation_key_id'], 'idx_feature_title_key');
+            $table->index(['description_translation_key_id'], 'idx_feature_desc_key');
         });
 
         // Indexes pour la table experiences
@@ -56,10 +53,9 @@ return new class extends Migration
             $table->index(['started_at', 'ended_at'], 'idx_experience_dates');
 
             // Index pour les clés de traduction
-            // Note: Ces index sont créés automatiquement par MySQL/MariaDB pour les contraintes de clé étrangère
-            // $table->index(['title_translation_key_id'], 'idx_experience_title_key');
-            // $table->index(['short_description_translation_key_id'], 'idx_experience_short_desc_key');
-            // $table->index(['full_description_translation_key_id'], 'idx_experience_full_desc_key');
+            $table->index(['title_translation_key_id'], 'idx_experience_title_key');
+            $table->index(['short_description_translation_key_id'], 'idx_experience_short_desc_key');
+            $table->index(['full_description_translation_key_id'], 'idx_experience_full_desc_key');
 
             // Index composite pour type et dates (requêtes fréquentes)
             $table->index(['type', 'started_at'], 'idx_experience_type_started');
@@ -70,10 +66,11 @@ return new class extends Migration
 
         // Indexes pour la table creation_technology
         Schema::table('creation_technology', function (Blueprint $table) {
-            // Note: Les index sur les colonnes de clé étrangère sont créés automatiquement
-            // L'index unique existant sert déjà d'index composite pour les requêtes
-            // $table->index(['technology_id', 'creation_id'], 'idx_tech_creation');
-            // $table->index(['creation_id'], 'idx_creation_tech');
+            // Index pour les jointures inverses (technology vers creations)
+            $table->index(['technology_id', 'creation_id'], 'idx_tech_creation');
+
+            // Index pour les jointures depuis creation
+            $table->index(['creation_id'], 'idx_creation_tech');
         });
 
         // Indexes pour la table technologies
@@ -85,19 +82,16 @@ return new class extends Migration
             $table->index(['type'], 'idx_technology_type');
 
             // Index pour la clé de description
-            // Note: Cet index est créé automatiquement par MySQL/MariaDB pour la contrainte de clé étrangère
-            // $table->index(['description_translation_key_id'], 'idx_technology_desc_key');
+            $table->index(['description_translation_key_id'], 'idx_technology_desc_key');
         });
 
         // Indexes pour la table screenshots
         Schema::table('screenshots', function (Blueprint $table) {
             // Index pour les jointures avec creations
-            // Note: Cet index est créé automatiquement par MySQL/MariaDB pour la contrainte de clé étrangère
-            // $table->index(['creation_id'], 'idx_screenshot_creation');
+            $table->index(['creation_id'], 'idx_screenshot_creation');
 
             // Index pour la clé de caption
-            // Note: Cet index est créé automatiquement par MySQL/MariaDB pour la contrainte de clé étrangère
-            // $table->index(['caption_translation_key_id'], 'idx_screenshot_caption_key');
+            $table->index(['caption_translation_key_id'], 'idx_screenshot_caption_key');
         });
 
         // Indexes pour la table videos
@@ -108,9 +102,11 @@ return new class extends Migration
 
         // Indexes pour la table creation_video
         Schema::table('creation_video', function (Blueprint $table) {
-            // Note: Les index sur les colonnes de clé étrangère sont créés automatiquement
-            // $table->index(['creation_id'], 'idx_creation_video');
-            // $table->index(['video_id', 'creation_id'], 'idx_video_creation');
+            // Index pour les jointures depuis creation
+            $table->index(['creation_id'], 'idx_creation_video');
+
+            // Index pour les jointures depuis video
+            $table->index(['video_id', 'creation_id'], 'idx_video_creation');
         });
     }
 
@@ -123,46 +119,40 @@ return new class extends Migration
             $table->dropIndex('idx_creation_type');
             $table->dropIndex('idx_creation_ended_at');
             $table->dropIndex('idx_creation_featured_type');
-            // These indexes are on foreign key columns, skip them as they're managed by the foreign key constraint
-            // $table->dropIndex('idx_creation_short_desc_key');
-            // $table->dropIndex('idx_creation_full_desc_key');
+            $table->dropIndex('idx_creation_short_desc_key');
+            $table->dropIndex('idx_creation_full_desc_key');
             $table->dropIndex('idx_creation_type_ended');
         });
 
         Schema::table('features', function (Blueprint $table) {
-            // All these indexes are on foreign key columns, skip them as they're managed by the foreign key constraint
-            // $table->dropIndex('idx_feature_creation');
-            // $table->dropIndex('idx_feature_title_key');
-            // $table->dropIndex('idx_feature_desc_key');
+            $table->dropIndex('idx_feature_creation');
+            $table->dropIndex('idx_feature_title_key');
+            $table->dropIndex('idx_feature_desc_key');
         });
 
         Schema::table('experiences', function (Blueprint $table) {
             $table->dropIndex('idx_experience_type');
             $table->dropIndex('idx_experience_dates');
-            // These indexes are on foreign key columns, skip them as they're managed by the foreign key constraint
-            // $table->dropIndex('idx_experience_title_key');
-            // $table->dropIndex('idx_experience_short_desc_key');
-            // $table->dropIndex('idx_experience_full_desc_key');
+            $table->dropIndex('idx_experience_title_key');
+            $table->dropIndex('idx_experience_short_desc_key');
+            $table->dropIndex('idx_experience_full_desc_key');
             $table->dropIndex('idx_experience_type_started');
         });
 
         Schema::table('creation_technology', function (Blueprint $table) {
-            // All these indexes are on foreign key columns, skip them
-            // $table->dropIndex('idx_tech_creation');
-            // $table->dropIndex('idx_creation_tech');
+            $table->dropIndex('idx_tech_creation');
+            $table->dropIndex('idx_creation_tech');
         });
 
         Schema::table('technologies', function (Blueprint $table) {
             $table->dropIndex('idx_technology_name');
             $table->dropIndex('idx_technology_type');
-            // This index is on a foreign key column, skip it as it's managed by the foreign key constraint
-            // $table->dropIndex('idx_technology_desc_key');
+            $table->dropIndex('idx_technology_desc_key');
         });
 
         Schema::table('screenshots', function (Blueprint $table) {
-            // All these indexes are on foreign key columns, skip them as they're managed by the foreign key constraint
-            // $table->dropIndex('idx_screenshot_creation');
-            // $table->dropIndex('idx_screenshot_caption_key');
+            $table->dropIndex('idx_screenshot_creation');
+            $table->dropIndex('idx_screenshot_caption_key');
         });
 
         Schema::table('videos', function (Blueprint $table) {
@@ -170,9 +160,8 @@ return new class extends Migration
         });
 
         Schema::table('creation_video', function (Blueprint $table) {
-            // All these indexes are on foreign key columns, skip them
-            // $table->dropIndex('idx_creation_video');
-            // $table->dropIndex('idx_video_creation');
+            $table->dropIndex('idx_creation_video');
+            $table->dropIndex('idx_video_creation');
         });
     }
 };

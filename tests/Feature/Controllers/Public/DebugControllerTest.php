@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Controllers\Public;
 
+use App\Models\Creation;
+use App\Models\Person;
+use App\Models\Technology;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -89,9 +92,9 @@ class DebugControllerTest extends TestCase
         config(['app.env' => 'local']);
 
         // Create some test data
-        \App\Models\Creation::factory()->count(3)->create();
-        \App\Models\Technology::factory()->count(5)->create();
-        \App\Models\Person::factory()->count(2)->create();
+        Creation::factory()->count(3)->create();
+        Technology::factory()->count(5)->create();
+        Person::factory()->count(2)->create();
 
         $response = $this->get('/debug');
 

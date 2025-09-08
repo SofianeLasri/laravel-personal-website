@@ -27,6 +27,7 @@ use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CertificationsCareerController;
 use App\Http\Controllers\Public\ExperienceController as PublicExperienceController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\LanguageController;
 use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ProjectsController;
 use App\Http\Controllers\Public\SearchController;
@@ -63,7 +64,7 @@ Route::name('public.')->group(function () {
     Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
     // Language preference
-    Route::post('/set-language', [\App\Http\Controllers\Public\LanguageController::class, 'setLanguage'])->name('set-language');
+    Route::post('/set-language', [LanguageController::class, 'setLanguage'])->name('set-language');
 });
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {

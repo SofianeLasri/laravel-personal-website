@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Services\BotDetection\BotDetectionService;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -10,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use SlProjects\LaravelRequestLogger\app\Models\LoggedRequest;
+use Throwable;
 
 class AnalyzeBotRequestsJob implements ShouldQueue
 {
@@ -84,7 +86,7 @@ class AnalyzeBotRequestsJob implements ShouldQueue
                     ]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Bot analysis job failed', [
                 'request_id' => $this->requestId,
                 'error' => $e->getMessage(),
@@ -98,7 +100,7 @@ class AnalyzeBotRequestsJob implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         Log::error('Bot analysis job permanently failed', [
             'request_id' => $this->requestId,

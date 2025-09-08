@@ -2,7 +2,11 @@
 
 namespace App\Services\BotDetection;
 
+use Exception;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Route;
+use ReflectionMethod;
+use ReflectionNamedType;
 
 class RouteParameterWhitelistService
 {
@@ -81,15 +85,15 @@ class RouteParameterWhitelistService
         }
 
         try {
-            $reflection = new \ReflectionMethod($controller, $method);
+            $reflection = new ReflectionMethod($controller, $method);
             $docComment = $reflection->getDocComment();
 
             // Look for FormRequest validation
             foreach ($reflection->getParameters() as $param) {
                 $type = $param->getType();
-                if ($type && $type instanceof \ReflectionNamedType && ! $type->isBuiltin()) {
+                if ($type && $type instanceof ReflectionNamedType && ! $type->isBuiltin()) {
                     $className = $type->getName();
-                    if (is_subclass_of($className, \Illuminate\Foundation\Http\FormRequest::class)) {
+                    if (is_subclass_of($className, FormRequest::class)) {
                         $parameters = array_merge(
                             $parameters,
                             self::extractParametersFromFormRequest($className)
@@ -109,7 +113,7 @@ class RouteParameterWhitelistService
                 }
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Silently fail and return common parameters
         }
 
@@ -136,7 +140,7 @@ class RouteParameterWhitelistService
                     return explode('.', $param)[0];
                 }, $parameters);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Silently fail
         }
 

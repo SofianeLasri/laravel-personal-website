@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\Experience;
+use App\Models\OptimizedPicture;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use Illuminate\Database\Seeder;
@@ -120,7 +121,7 @@ class DatabaseSeeder extends Seeder
 
         foreach ($formats as $format) {
             foreach ($variants as $variant) {
-                \App\Models\OptimizedPicture::create([
+                OptimizedPicture::create([
                     'picture_id' => $picture->id,
                     'format' => $format,
                     'variant' => $variant,

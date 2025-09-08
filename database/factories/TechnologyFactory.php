@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\TechnologyType;
+use App\Models\OptimizedPicture;
 use App\Models\Picture;
 use App\Models\Technology;
 use App\Models\TranslationKey;
@@ -135,7 +136,7 @@ class TechnologyFactory extends Factory
 
         foreach ($formats as $format) {
             foreach ($variants as $variant) {
-                \App\Models\OptimizedPicture::create([
+                OptimizedPicture::create([
                     'picture_id' => $picture->id,
                     'format' => $format,
                     'variant' => $variant,

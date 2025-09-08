@@ -12,6 +12,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 use ZipArchive;
@@ -286,7 +287,7 @@ class DataManagementControllerImportTest extends TestCase
 
             $mock->shouldReceive('importWebsite')
                 ->once()
-                ->andThrow(new \RuntimeException('Import failed'));
+                ->andThrow(new RuntimeException('Import failed'));
         });
 
         $validZip = $this->createValidZipFile();

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\AiProviderService;
+use Exception;
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
@@ -66,7 +67,7 @@ class RealApiTranslationTest extends TestCase
             File::put(base_path('tests/output_openai_translation.md'), $response['message']);
             echo "- Full translation saved to: tests/output_openai_translation.md\n";
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "\n❌ OpenAI Translation Failed:\n";
             echo "- Error: " . $e->getMessage() . "\n";
             echo "- Error class: " . get_class($e) . "\n";
@@ -128,7 +129,7 @@ class RealApiTranslationTest extends TestCase
             File::put(base_path('tests/output_anthropic_translation.md'), $response['message']);
             echo "- Full translation saved to: tests/output_anthropic_translation.md\n";
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "\n❌ Anthropic Translation Failed:\n";
             echo "- Error: " . $e->getMessage() . "\n";
             echo "- Error class: " . get_class($e) . "\n";

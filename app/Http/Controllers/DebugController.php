@@ -17,7 +17,9 @@ use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\User;
 use App\Models\Video;
+use Exception;
 use Illuminate\Support\Facades\DB;
+use Route;
 
 class DebugController extends Controller
 {
@@ -107,7 +109,7 @@ class DebugController extends Controller
             } elseif ($dbConnection === 'pgsql') {
                 $tablesCount = count(DB::select("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public'"));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $tablesCount = 'Error: '.$e->getMessage();
         }
 
@@ -145,7 +147,7 @@ class DebugController extends Controller
         ];
 
         // Routes disponibles
-        $routes = collect(\Route::getRoutes())->map(function ($route) {
+        $routes = collect(Route::getRoutes())->map(function ($route) {
             return [
                 'uri' => $route->uri(),
                 'methods' => implode('|', $route->methods()),

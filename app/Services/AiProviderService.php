@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\OptimizedPicture;
 use App\Models\Picture;
+use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -350,7 +351,7 @@ class AiProviderService
 
                 return $result;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning('JSON Machine parsing failed, attempting fallback', [
                 'error' => $e->getMessage(),
             ]);

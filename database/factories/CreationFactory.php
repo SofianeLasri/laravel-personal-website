@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\CreationType;
 use App\Models\Creation;
 use App\Models\Feature;
+use App\Models\OptimizedPicture;
 use App\Models\Person;
 use App\Models\Picture;
 use App\Models\Screenshot;
@@ -128,7 +129,7 @@ class CreationFactory extends Factory
 
         foreach ($formats as $format) {
             foreach ($variants as $variant) {
-                \App\Models\OptimizedPicture::create([
+                OptimizedPicture::create([
                     'picture_id' => $picture->id,
                     'format' => $format,
                     'variant' => $variant,

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Pages\Public;
 
 use App\Http\Controllers\Public\ProjectsController;
+use App\Models\Creation;
 use App\Models\Technology;
 use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,7 +38,7 @@ class ProjectsControllerTest extends TestCase
         $technologies = Technology::factory()->count(3)->create();
 
         // Create creations and attach technologies to them so they appear in the filter
-        $creations = \App\Models\Creation::factory()->count(2)->create();
+        $creations = Creation::factory()->count(2)->create();
         foreach ($creations as $creation) {
             $creation->technologies()->attach($technologies->pluck('id'));
         }

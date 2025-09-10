@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Browser;
+namespace Tests\Browser\Pages;
 
 use App\Enums\CreationType;
 use App\Models\Creation;

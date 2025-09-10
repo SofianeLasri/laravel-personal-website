@@ -165,7 +165,7 @@ class NotificationsMarkReadCommandTest extends TestCase
         ]);
 
         $result = $this->artisan('notifications:mark-read', ['--older-than' => $period]);
-        
+
         // For months format, we need to handle it differently as it might not find notifications
         if ($period === '1month') {
             $result->assertSuccessful();

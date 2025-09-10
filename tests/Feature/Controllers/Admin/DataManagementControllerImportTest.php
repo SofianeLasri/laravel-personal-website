@@ -45,6 +45,40 @@ class DataManagementControllerImportTest extends TestCase
     }
 
     #[Test]
+    public function test_upload_import_file_requires_file(): void
+    {
+        $response = $this
+            ->postJson('/dashboard/data-management/upload', []);
+
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonValidationErrors(['import_file']);
+    }
+
+    #[Test]
+    public function test_upload_import_file_handles_invalid_zip_content(): void
+    {
+        // Create a mock for WebsiteImportService that returns invalid validation
+        $mockImportService = $this->mock(WebsiteImportService::class);
+        $mockImportService->shouldReceive('validateImportFile')
+            ->once()
+            ->andReturn([
+                'valid' => false,
+                'errors' => ['Invalid archive structure'],
+                'metadata' => null,
+            ]);
+
+        $file = UploadedFile::fake()->create('test.zip', 100);
+
+        $response = $this
+            ->postJson('/dashboard/data-management/upload', [
+                'import_file' => $file,
+            ]);
+
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonValidationErrors(['import_file']);
+    }
+
+    #[Test]
     public function test_upload_import_file_validates_file_size(): void
     {
         $largeFile = UploadedFile::fake()->create('test.zip', 200000); // 200MB
@@ -251,6 +285,51 @@ class DataManagementControllerImportTest extends TestCase
     }
 
     #[Test]
+    public function test_get_import_metadata_validates_file_path(): void
+    {
+        $response = $this
+            ->postJson('/dashboard/data-management/metadata', []);
+
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonValidationErrors(['file_path']);
+    }
+
+    #[Test]
+    public function test_get_import_metadata_handles_missing_file(): void
+    {
+        $response = $this
+            ->postJson('/dashboard/data-management/metadata', [
+                'file_path' => 'temp/nonexistent.zip',
+            ]);
+
+        $response->assertStatus(ResponseAlias::HTTP_NOT_FOUND);
+        $response->assertJson([
+            'message' => 'File not found',
+        ]);
+    }
+
+    #[Test]
+    public function test_get_import_metadata_handles_invalid_file(): void
+    {
+        Storage::put('temp/invalid.zip', 'invalid content');
+        
+        $mockImportService = $this->mock(WebsiteImportService::class);
+        $mockImportService->shouldReceive('getImportMetadata')
+            ->once()
+            ->andReturn(null);
+
+        $response = $this
+            ->postJson('/dashboard/data-management/metadata', [
+                'file_path' => 'temp/invalid.zip',
+            ]);
+
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJson([
+            'message' => 'Cannot read metadata from file',
+        ]);
+    }
+
+    #[Test]
     public function test_cancel_import_deletes_uploaded_file(): void
     {
         $validZip = $this->createValidZipFile();
@@ -275,6 +354,30 @@ class DataManagementControllerImportTest extends TestCase
         ]);
 
         $this->assertFalse(Storage::disk('local')->exists($filePath));
+    }
+
+    #[Test]
+    public function test_cancel_import_validates_file_path(): void
+    {
+        $response = $this
+            ->deleteJson('/dashboard/data-management/cancel', []);
+
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonValidationErrors(['file_path']);
+    }
+
+    #[Test]
+    public function test_cancel_import_handles_already_deleted_file(): void
+    {
+        $response = $this
+            ->deleteJson('/dashboard/data-management/cancel', [
+                'file_path' => 'temp/already-deleted.zip',
+            ]);
+
+        $response->assertSuccessful();
+        $response->assertJson([
+            'message' => 'Import cancelled successfully',
+        ]);
     }
 
     #[Test]
@@ -308,6 +411,45 @@ class DataManagementControllerImportTest extends TestCase
         $response->assertJson([
             'message' => 'Import failed: Import failed',
         ]);
+    }
+
+    #[Test]
+    public function test_import_deletes_file_after_successful_import(): void
+    {
+        $validZip = $this->createValidZipFile();
+        $uploadResponse = $this
+            ->postJson('/dashboard/data-management/upload', [
+                'import_file' => $validZip,
+            ]);
+
+        $filePath = $uploadResponse->json('file_path');
+
+        // Verify file exists before import
+        $this->assertTrue(Storage::exists($filePath));
+
+        $response = $this
+            ->postJson('/dashboard/data-management/import', [
+                'file_path' => $filePath,
+                'confirm_import' => true,
+            ]);
+
+        $response->assertSuccessful();
+
+        // Verify file is deleted after import
+        $this->assertFalse(Storage::exists($filePath));
+    }
+
+    #[Test]
+    public function test_import_validates_confirm_import_must_be_true(): void
+    {
+        $response = $this
+            ->postJson('/dashboard/data-management/import', [
+                'file_path' => 'temp/test.zip',
+                'confirm_import' => false,
+            ]);
+
+        $response->assertStatus(ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonValidationErrors(['confirm_import']);
     }
 
     #[Test]

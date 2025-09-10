@@ -13,7 +13,6 @@ use Tests\TestCase;
 #[CoversClass(AiCacheClearCommand::class)]
 class AiCacheClearCommandTest extends TestCase
 {
-
     protected function tearDown(): void
     {
         Mockery::close();

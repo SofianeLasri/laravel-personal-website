@@ -24,10 +24,28 @@ export const useNotificationStore = defineStore('notification', () => {
 
         try {
             const response = await axios.get('/dashboard/api/notifications');
-            notifications.value = response.data.data;
+            // Handle both paginated and non-paginated responses
+            if (response.data.data) {
+                // Check if data is an array (non-paginated) or object with data property (paginated)
+                if (Array.isArray(response.data.data)) {
+                    notifications.value = response.data.data;
+                } else if (response.data.data.data && Array.isArray(response.data.data.data)) {
+                    // Paginated response
+                    notifications.value = response.data.data.data;
+                } else {
+                    // Fallback to empty array if structure is unexpected
+                    console.warn('Unexpected notification response structure:', response.data);
+                    notifications.value = [];
+                }
+            } else {
+                // Fallback to empty array if no data
+                notifications.value = [];
+            }
         } catch (err) {
             console.error('Failed to fetch notifications:', err);
             error.value = 'Failed to fetch notifications';
+            // Ensure notifications is always an array even on error
+            notifications.value = [];
         } finally {
             loading.value = false;
         }

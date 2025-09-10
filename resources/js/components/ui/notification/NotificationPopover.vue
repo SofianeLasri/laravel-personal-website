@@ -1,10 +1,11 @@
 <template>
   <Popover>
     <PopoverTrigger as-child>
-      <Button variant="ghost" size="icon" class="relative">
+      <Button variant="ghost" size="icon" class="relative" data-testid="notification-bell">
         <Bell class="h-5 w-5" />
         <span
           v-if="unreadCount > 0"
+          data-testid="notification-count"
           class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
         >
           {{ unreadCount > 99 ? '99+' : unreadCount }}
@@ -12,7 +13,7 @@
       </Button>
     </PopoverTrigger>
     
-    <PopoverContent class="w-96 p-0" align="end">
+    <PopoverContent class="w-96 p-0" align="end" data-testid="notification-popup">
       <div class="flex items-center justify-between border-b px-4 py-3">
         <h3 class="font-semibold">Notifications</h3>
         
@@ -23,6 +24,7 @@
             size="sm"
             @click="markAllAsRead"
             :disabled="loading"
+            data-testid="mark-all-read"
           >
             Mark all as read
           </Button>

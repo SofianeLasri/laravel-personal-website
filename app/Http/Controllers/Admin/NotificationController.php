@@ -8,6 +8,7 @@ use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class NotificationController extends Controller
 {
@@ -158,7 +159,7 @@ class NotificationController extends Controller
     /**
      * Stream notifications using Server-Sent Events
      */
-    public function stream(): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function stream(): StreamedResponse
     {
         return response()->stream(function () {
             $maxIterations = 100; // Prevent infinite loop for static analysis

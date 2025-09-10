@@ -5,6 +5,7 @@ namespace Tests\Feature\Models\Notification;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -464,8 +465,8 @@ class NotificationTest extends TestCase
         $this->assertTrue($notification->is_persistent);
 
         // Test datetime casting
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $notification->read_at);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $notification->expires_at);
+        $this->assertInstanceOf(Carbon::class, $notification->read_at);
+        $this->assertInstanceOf(Carbon::class, $notification->expires_at);
     }
 
     #[Test]

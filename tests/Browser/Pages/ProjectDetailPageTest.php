@@ -3,6 +3,8 @@
 namespace Tests\Browser\Pages;
 
 use App\Enums\CreationType;
+use App\Enums\VideoStatus;
+use App\Enums\VideoVisibility;
 use App\Models\Creation;
 use App\Models\Feature;
 use App\Models\OptimizedPicture;
@@ -564,8 +566,8 @@ class ProjectDetailPageTest extends DuskTestCase
         $this->assertCount(2, $this->videos);
         foreach ($this->videos as $video) {
             $this->assertNotNull($video->bunny_video_id);
-            $this->assertEquals(\App\Enums\VideoStatus::READY, $video->status);
-            $this->assertEquals(\App\Enums\VideoVisibility::PUBLIC, $video->visibility);
+            $this->assertEquals(VideoStatus::READY, $video->status);
+            $this->assertEquals(VideoVisibility::PUBLIC, $video->visibility);
         }
 
         // Validate relationships

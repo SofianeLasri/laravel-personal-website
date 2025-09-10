@@ -8,6 +8,7 @@ use App\Services\NotificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -45,7 +46,7 @@ class NotificationServiceTest extends TestCase
 
         Log::shouldReceive('info')
             ->once()
-            ->with('Notification created', \Mockery::type('array'));
+            ->with('Notification created', Mockery::type('array'));
 
         $notification = $this->service->create($data);
 
@@ -592,7 +593,7 @@ class NotificationServiceTest extends TestCase
         // No users in database
         Log::shouldReceive('info')
             ->once()
-            ->with('Broadcast notification sent', \Mockery::type('array'));
+            ->with('Broadcast notification sent', Mockery::type('array'));
 
         $count = $this->service->broadcast(
             'info',

@@ -94,7 +94,7 @@ return new class extends Migration
                 Schema::table('logged_requests', function (Blueprint $table) use ($index) {
                     $table->dropIndex($index);
                 });
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Index doesn't exist, skip
             }
         }
@@ -104,7 +104,7 @@ return new class extends Migration
             Schema::table('ip_addresses', function (Blueprint $table) {
                 $table->dropIndex('idx_ip');
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index doesn't exist, skip
         }
 
@@ -112,7 +112,7 @@ return new class extends Migration
             Schema::table('user_agents', function (Blueprint $table) {
                 $table->dropIndex('idx_user_agent');
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index doesn't exist, skip
         }
 
@@ -120,7 +120,7 @@ return new class extends Migration
             Schema::table('urls', function (Blueprint $table) {
                 $table->dropIndex('idx_url');
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index doesn't exist, skip
         }
 
@@ -128,7 +128,7 @@ return new class extends Migration
             Schema::table('ip_address_metadata', function (Blueprint $table) {
                 $table->dropIndex('idx_ip_metadata');
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index doesn't exist, skip
         }
 
@@ -136,7 +136,7 @@ return new class extends Migration
             Schema::table('ip_address_metadata', function (Blueprint $table) {
                 $table->dropIndex('idx_request_stats');
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index doesn't exist, skip
         }
 
@@ -144,7 +144,7 @@ return new class extends Migration
             Schema::table('user_agent_metadata', function (Blueprint $table) {
                 $table->dropIndex('idx_ua_metadata');
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index doesn't exist, skip
         }
     }

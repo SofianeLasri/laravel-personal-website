@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
+use App\Http\Controllers\Admin\ApiRequestLogController;
 use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\DataManagementController;
@@ -123,9 +124,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     Route::post('/request-logs/mark-as-bot', [RequestLogController::class, 'markAsBot'])
         ->name('request-logs.mark-as-bot');
 
-    Route::get('/api-logs', [\App\Http\Controllers\Admin\ApiRequestLogController::class, 'index'])
+    Route::get('/api-logs', [ApiRequestLogController::class, 'index'])
         ->name('api-logs.index');
-    Route::get('/api-logs/{apiRequestLog}', [\App\Http\Controllers\Admin\ApiRequestLogController::class, 'show'])
+    Route::get('/api-logs/{apiRequestLog}', [ApiRequestLogController::class, 'show'])
         ->name('api-logs.show');
 
     Route::name('data-management.')->prefix('data-management')->group(function () {

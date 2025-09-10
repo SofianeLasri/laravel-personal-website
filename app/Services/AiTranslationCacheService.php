@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AiTranslationCache;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -58,7 +59,7 @@ class AiTranslationCacheService
             ]);
 
             return $cache->response;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error retrieving AI translation cache', [
                 'cache_key' => $cacheKey,
                 'error' => $e->getMessage(),
@@ -99,7 +100,7 @@ class AiTranslationCacheService
             ]);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error storing AI translation cache', [
                 'provider' => $provider,
                 'error' => $e->getMessage(),
@@ -130,7 +131,7 @@ class AiTranslationCacheService
             ]);
 
             return $count;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error clearing expired AI translation cache', [
                 'error' => $e->getMessage(),
             ]);
@@ -155,7 +156,7 @@ class AiTranslationCacheService
             ]);
 
             return $count;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error clearing all AI translation cache', [
                 'error' => $e->getMessage(),
             ]);
@@ -187,7 +188,7 @@ class AiTranslationCacheService
                 'oldest_entry' => AiTranslationCache::min('created_at'),
                 'newest_entry' => AiTranslationCache::max('created_at'),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error getting AI translation cache statistics', [
                 'error' => $e->getMessage(),
             ]);
@@ -234,7 +235,7 @@ class AiTranslationCacheService
             }
 
             return $deleted > 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error deleting AI translation cache entry', [
                 'cache_key' => $cacheKey,
                 'error' => $e->getMessage(),

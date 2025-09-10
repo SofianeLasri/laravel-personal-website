@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\AiProviders\AiProviderFactory;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
@@ -93,7 +94,7 @@ class AiProvidersCheckCommand extends Command
                     $allHealthy = false;
                 }
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $results[] = [
                     'Provider' => ucfirst($providerName),
                     'Status' => '❌ Error',
@@ -188,7 +189,7 @@ class AiProvidersCheckCommand extends Command
                     $this->info('   Response: '.substr($response['content'], 0, 100));
                 }
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->error("❌ {$providerName} test failed: ".$e->getMessage());
             }
 

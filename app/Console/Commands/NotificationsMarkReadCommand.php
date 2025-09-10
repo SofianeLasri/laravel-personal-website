@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Notification;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Console\Command;
 
 class NotificationsMarkReadCommand extends Command
@@ -177,7 +178,7 @@ class NotificationsMarkReadCommand extends Command
         // Try to parse as a date
         try {
             return Carbon::parse($period);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Default to 7 days
             $this->warn("Could not parse period '{$period}', defaulting to 7 days");
 

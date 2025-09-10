@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\ApiRequestLog;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -219,7 +220,7 @@ class AiLogsAnalyzeCommand extends Command
         // Try to parse as a date
         try {
             return Carbon::parse($period);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Default to 7 days
             $this->warn("Could not parse period '{$period}', defaulting to 7 days");
 

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Jobs;
 
 use App\Jobs\TranslateToEnglishJob;
-use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\User;
 use App\Services\AiProviderService;

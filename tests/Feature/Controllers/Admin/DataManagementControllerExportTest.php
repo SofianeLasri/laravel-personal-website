@@ -387,7 +387,7 @@ class DataManagementControllerExportTest extends TestCase
         $cacheKey = "data_export_status_{$requestId}";
         
         // Set cache to indicate completed export but without file
-        \Illuminate\Support\Facades\Cache::put($cacheKey, [
+        Cache::put($cacheKey, [
             'status' => 'completed',
             'request_id' => $requestId,
             'file_path' => 'exports/missing-file.zip',

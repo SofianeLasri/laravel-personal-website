@@ -3,6 +3,7 @@
 namespace App\Services\AiProviders;
 
 use App\Contracts\AiProviderInterface;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +42,7 @@ class AnthropicProvider implements AiProviderInterface
         ]);
 
         if (! $response->successful()) {
-            throw new \Exception('Anthropic API error: '.$response->body());
+            throw new Exception('Anthropic API error: '.$response->body());
         }
 
         $data = $response->json();
@@ -90,7 +91,7 @@ class AnthropicProvider implements AiProviderInterface
         ]);
 
         if (! $response->successful()) {
-            throw new \Exception('Anthropic API error: '.$response->body());
+            throw new Exception('Anthropic API error: '.$response->body());
         }
 
         $data = $response->json();
@@ -137,7 +138,7 @@ class AnthropicProvider implements AiProviderInterface
                 }
 
                 return true;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::warning('Anthropic health check exception', [
                     'error' => $e->getMessage(),
                 ]);

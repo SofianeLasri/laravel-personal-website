@@ -3,6 +3,7 @@
 namespace App\Services\AiProviders;
 
 use App\Contracts\AiProviderInterface;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -40,7 +41,7 @@ class OpenAiProvider implements AiProviderInterface
         ]);
 
         if (! $response->successful()) {
-            throw new \Exception('OpenAI API error: '.$response->body());
+            throw new Exception('OpenAI API error: '.$response->body());
         }
 
         $data = $response->json();
@@ -86,7 +87,7 @@ class OpenAiProvider implements AiProviderInterface
         ]);
 
         if (! $response->successful()) {
-            throw new \Exception('OpenAI API error: '.$response->body());
+            throw new Exception('OpenAI API error: '.$response->body());
         }
 
         $data = $response->json();
@@ -126,7 +127,7 @@ class OpenAiProvider implements AiProviderInterface
                 $models = $response->json('data', []);
 
                 return count($models) > 0;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::warning('OpenAI health check exception', [
                     'error' => $e->getMessage(),
                 ]);

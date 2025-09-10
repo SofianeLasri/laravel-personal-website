@@ -11,7 +11,7 @@ use SlProjects\LaravelRequestLogger\app\Models\UserAgent;
 use SlProjects\LaravelRequestLogger\Enums\HttpMethod;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<ExtendedLoggedRequest>
+ * @extends Factory<ExtendedLoggedRequest>
  */
 class ExtendedLoggedRequestFactory extends Factory
 {

@@ -79,8 +79,8 @@ class AiLogsAnalyzeCommand extends Command
             DB::raw('AVG(response_time) as avg_response_time'),
             DB::raw('MIN(response_time) as min_response_time'),
             DB::raw('MAX(response_time) as max_response_time'),
-            DB::raw('SUM(input_tokens) as total_input_tokens'),
-            DB::raw('SUM(output_tokens) as total_output_tokens'),
+            DB::raw('SUM(prompt_tokens) as total_input_tokens'),
+            DB::raw('SUM(completion_tokens) as total_output_tokens'),
             DB::raw('SUM(estimated_cost) as total_cost')
         )->first();
 

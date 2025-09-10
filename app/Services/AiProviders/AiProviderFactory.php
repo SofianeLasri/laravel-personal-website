@@ -10,19 +10,19 @@ class AiProviderFactory
     /**
      * Create an AI provider instance
      *
-     * @param string $provider The provider name
-     * @return AiProviderInterface
+     * @param  string  $provider  The provider name
+     *
      * @throws InvalidArgumentException
      */
     public static function create(string $provider): AiProviderInterface
     {
         $config = config("ai-provider.providers.{$provider}");
 
-        if (!$config) {
+        if (! $config) {
             throw new InvalidArgumentException("Configuration not found for provider: {$provider}");
         }
 
-        return match($provider) {
+        return match ($provider) {
             'openai' => new OpenAiProvider($config),
             'anthropic' => new AnthropicProvider($config),
             default => throw new InvalidArgumentException("Unknown provider: {$provider}")
@@ -41,13 +41,11 @@ class AiProviderFactory
 
     /**
      * Check if a provider is configured
-     *
-     * @param string $provider
-     * @return bool
      */
     public static function isProviderConfigured(string $provider): bool
     {
         $config = config("ai-provider.providers.{$provider}");
-        return $config && !empty($config['api-key']);
+
+        return $config && ! empty($config['api-key']);
     }
 }

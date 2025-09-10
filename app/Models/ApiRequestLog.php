@@ -58,33 +58,29 @@ class ApiRequestLog extends Model
     /**
      * Get truncated system prompt for display
      *
-     * @param int $length Maximum length
-     * @return string
+     * @param  int  $length  Maximum length
      */
     public function getTruncatedSystemPrompt(int $length = 100): string
     {
         return strlen($this->system_prompt) > $length
-            ? substr($this->system_prompt, 0, $length) . '...'
+            ? substr($this->system_prompt, 0, $length).'...'
             : $this->system_prompt;
     }
 
     /**
      * Get truncated user prompt for display
      *
-     * @param int $length Maximum length
-     * @return string
+     * @param  int  $length  Maximum length
      */
     public function getTruncatedUserPrompt(int $length = 100): string
     {
         return strlen($this->user_prompt) > $length
-            ? substr($this->user_prompt, 0, $length) . '...'
+            ? substr($this->user_prompt, 0, $length).'...'
             : $this->user_prompt;
     }
 
     /**
      * Get status badge color for UI
-     *
-     * @return string
      */
     public function getStatusColor(): string
     {
@@ -99,8 +95,6 @@ class ApiRequestLog extends Model
 
     /**
      * Check if request was successful
-     *
-     * @return bool
      */
     public function isSuccessful(): bool
     {

@@ -15,13 +15,14 @@ class AiProviderServiceCacheTest extends TestCase
     use RefreshDatabase;
 
     private AiProviderService $service;
+
     private AiTranslationCacheService $cacheService;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new AiProviderService();
-        $this->cacheService = new AiTranslationCacheService();
+        $this->service = new AiProviderService;
+        $this->cacheService = new AiTranslationCacheService;
     }
 
     public function test_prompt_uses_cache_when_enabled(): void
@@ -40,10 +41,10 @@ class AiProviderServiceCacheTest extends TestCase
                 'choices' => [
                     [
                         'message' => [
-                            'content' => json_encode($response)
-                        ]
-                    ]
-                ]
+                            'content' => json_encode($response),
+                        ],
+                    ],
+                ],
             ], 200),
         ]);
 
@@ -86,14 +87,15 @@ class AiProviderServiceCacheTest extends TestCase
         Http::fake(function ($request) use (&$callCount, $response1, $response2) {
             $callCount++;
             $response = $callCount === 1 ? $response1 : $response2;
+
             return Http::response([
                 'choices' => [
                     [
                         'message' => [
-                            'content' => json_encode($response)
-                        ]
-                    ]
-                ]
+                            'content' => json_encode($response),
+                        ],
+                    ],
+                ],
             ], 200);
         });
 
@@ -126,9 +128,9 @@ class AiProviderServiceCacheTest extends TestCase
             'api.anthropic.com/*' => Http::response([
                 'content' => [
                     [
-                        'text' => json_encode($response)
-                    ]
-                ]
+                        'text' => json_encode($response),
+                    ],
+                ],
             ], 200),
         ]);
 
@@ -163,7 +165,7 @@ class AiProviderServiceCacheTest extends TestCase
         $response1 = ['translation' => 'Bonjour'];
         $response2 = ['translation' => 'Au revoir'];
 
-        Http::fake(function ($request) use ($prompt1, $response1, $response2) {
+        Http::fake(function ($request) use ($response1, $response2) {
             $body = json_decode($request->body(), true);
             $userPrompt = $body['messages'][1]['content'][0]['text'] ?? '';
 
@@ -173,10 +175,10 @@ class AiProviderServiceCacheTest extends TestCase
                         'message' => [
                             'content' => json_encode(
                                 str_contains($userPrompt, 'hello') ? $response1 : $response2
-                            )
-                        ]
-                    ]
-                ]
+                            ),
+                        ],
+                    ],
+                ],
             ], 200);
         });
 
@@ -230,10 +232,10 @@ class AiProviderServiceCacheTest extends TestCase
                 'choices' => [
                     [
                         'message' => [
-                            'content' => json_encode($response2)
-                        ]
-                    ]
-                ]
+                            'content' => json_encode($response2),
+                        ],
+                    ],
+                ],
             ], 200),
         ]);
 

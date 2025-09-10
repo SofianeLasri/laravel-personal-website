@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Notification;
 use App\Models\OptimizedPicture;
 use App\Models\Picture;
 use Exception;
@@ -12,23 +13,13 @@ use Illuminate\Support\Facades\Storage;
 use JsonMachine\Items;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use RuntimeException;
-use App\Models\Notification;
 
 class AiProviderService
 {
-    /**
-     * @var AiTranslationCacheService
-     */
     private AiTranslationCacheService $cacheService;
 
-    /**
-     * @var ApiRequestLogger
-     */
     private ApiRequestLogger $logger;
 
-    /**
-     * @var NotificationService
-     */
     private NotificationService $notificationService;
 
     /**
@@ -77,7 +68,7 @@ class AiProviderService
 
                 $transcodedPicture = $transcodingService->transcode($picturePath, OptimizedPicture::MEDIUM_SIZE, 'jpeg');
 
-                if (!$transcodedPicture) {
+                if (! $transcodedPicture) {
                     Log::error('Failed to transcode picture', [
                         'picture' => $picture,
                     ]);
@@ -88,7 +79,7 @@ class AiProviderService
             }
 
             $selectedProvider = config('ai-provider.selected-provider');
-            $providerConfig = config('ai-provider.providers.' . $selectedProvider);
+            $providerConfig = config('ai-provider.providers.'.$selectedProvider);
 
             if ($selectedProvider === 'anthropic') {
                 return $this->callAnthropicApi($providerConfig, $systemRole, $prompt, $transcodedPictures);
@@ -100,7 +91,7 @@ class AiProviderService
             $this->notificationService->createAiProviderNotification(
                 Notification::TYPE_ERROR,
                 'AI Provider Error',
-                'Failed to process image request: ' . $e->getMessage(),
+                'Failed to process image request: '.$e->getMessage(),
                 [
                     'provider' => config('ai-provider.selected-provider'),
                     'error' => $e->getMessage(),
@@ -148,7 +139,7 @@ class AiProviderService
                     true, // Mark as cached
                     null
                 );
-                
+
                 return $cached;
             }
         }
@@ -248,14 +239,14 @@ class AiProviderService
             $this->notificationService->createAiProviderNotification(
                 Notification::TYPE_ERROR,
                 'OpenAI Connection Error',
-                'Failed to connect to OpenAI API: ' . $e->getMessage(),
+                'Failed to connect to OpenAI API: '.$e->getMessage(),
                 [
                     'provider' => 'openai',
                     'model' => $providerConfig['model'],
                     'error' => $e->getMessage(),
                 ]
             );
-            
+
             Log::error('Failed to call OpenAI API', [
                 'exception' => $e,
             ]);
@@ -290,7 +281,7 @@ class AiProviderService
                     'status' => $response->status(),
                 ]
             );
-            
+
             Log::error('Failed to get response from OpenAI', [
                 'response' => $result,
             ]);
@@ -320,7 +311,7 @@ class AiProviderService
             false,
             ['pictures_count' => count($transcodedPictures)]
         );
-        
+
         return $decodedContent;
     }
 
@@ -396,14 +387,14 @@ class AiProviderService
             $this->notificationService->createAiProviderNotification(
                 Notification::TYPE_ERROR,
                 'Anthropic Connection Error',
-                'Failed to connect to Anthropic API: ' . $e->getMessage(),
+                'Failed to connect to Anthropic API: '.$e->getMessage(),
                 [
                     'provider' => 'anthropic',
                     'model' => $providerConfig['model'],
                     'error' => $e->getMessage(),
                 ]
             );
-            
+
             Log::error('Failed to call Anthropic API', [
                 'exception' => $e,
             ]);
@@ -438,7 +429,7 @@ class AiProviderService
                     'status' => $response->status(),
                 ]
             );
-            
+
             Log::error('Failed to get response from Anthropic', [
                 'response' => $result,
             ]);
@@ -480,7 +471,7 @@ class AiProviderService
             false,
             ['pictures_count' => count($transcodedPictures)]
         );
-        
+
         return $decodedContent;
     }
 

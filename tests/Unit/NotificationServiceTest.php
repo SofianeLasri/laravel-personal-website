@@ -13,12 +13,13 @@ class NotificationServiceTest extends TestCase
     use RefreshDatabase;
 
     private NotificationService $service;
+
     private User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new NotificationService();
+        $this->service = new NotificationService;
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
     }
@@ -74,14 +75,14 @@ class NotificationServiceTest extends TestCase
     {
         $notification = $this->service->success('Success', 'Message');
 
-        $this->assertFalse((bool)$notification->is_read);
+        $this->assertFalse((bool) $notification->is_read);
         $this->assertNull($notification->read_at);
 
         $result = $this->service->markAsRead($notification->id);
 
         $this->assertTrue($result);
         $notification->refresh();
-        $this->assertTrue((bool)$notification->is_read);
+        $this->assertTrue((bool) $notification->is_read);
         $this->assertNotNull($notification->read_at);
     }
 

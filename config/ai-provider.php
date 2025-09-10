@@ -24,7 +24,7 @@ return [
             'response_time_seconds' => env('AI_RESPONSE_TIME_THRESHOLD', 30),
         ],
     ],
-    
+
     'providers' => [
         'openai' => [
             'url' => env('OPENAI_URL', 'https://api.openai.com/v1/chat/completions'),

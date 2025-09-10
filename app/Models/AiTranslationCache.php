@@ -39,8 +39,6 @@ class AiTranslationCache extends Model
 
     /**
      * Increment the hit counter for this cache entry
-     *
-     * @return void
      */
     public function incrementHits(): void
     {
@@ -50,8 +48,7 @@ class AiTranslationCache extends Model
     /**
      * Check if the cache entry is expired
      *
-     * @param int $ttlInSeconds The TTL in seconds
-     * @return bool
+     * @param  int  $ttlInSeconds  The TTL in seconds
      */
     public function isExpired(int $ttlInSeconds): bool
     {

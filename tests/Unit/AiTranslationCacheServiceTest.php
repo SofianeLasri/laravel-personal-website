@@ -17,7 +17,7 @@ class AiTranslationCacheServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new AiTranslationCacheService();
+        $this->service = new AiTranslationCacheService;
     }
 
     public function test_generate_cache_key_creates_consistent_hash(): void

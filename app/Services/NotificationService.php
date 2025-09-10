@@ -53,7 +53,7 @@ class NotificationService
     /**
      * Create a success notification
      *
-     * @param array<string, mixed>|null $data
+     * @param  array<string, mixed>|null  $data
      */
     public function success(string $title, string $message, ?array $data = null): Notification
     {
@@ -68,7 +68,7 @@ class NotificationService
     /**
      * Create an error notification
      *
-     * @param array<string, mixed>|null $data
+     * @param  array<string, mixed>|null  $data
      */
     public function error(string $title, string $message, ?array $data = null): Notification
     {
@@ -83,7 +83,7 @@ class NotificationService
     /**
      * Create a warning notification
      *
-     * @param array<string, mixed>|null $data
+     * @param  array<string, mixed>|null  $data
      */
     public function warning(string $title, string $message, ?array $data = null): Notification
     {
@@ -98,7 +98,7 @@ class NotificationService
     /**
      * Create an info notification
      *
-     * @param array<string, mixed>|null $data
+     * @param  array<string, mixed>|null  $data
      */
     public function info(string $title, string $message, ?array $data = null): Notification
     {
@@ -123,7 +123,7 @@ class NotificationService
             ->notExpired()
             ->orderBy('created_at', 'desc');
 
-        if (!$includeRead) {
+        if (! $includeRead) {
             $query->unread();
         }
 
@@ -150,7 +150,7 @@ class NotificationService
     {
         $notification = Notification::find($notificationId);
 
-        if (!$notification) {
+        if (! $notification) {
             Log::warning('Notification not found for marking as read', ['id' => $notificationId]);
 
             return false;
@@ -181,13 +181,13 @@ class NotificationService
     {
         $notification = Notification::find($notificationId);
 
-        if (!$notification) {
+        if (! $notification) {
             Log::warning('Notification not found for deletion', ['id' => $notificationId]);
 
             return false;
         }
 
-        return (bool)$notification->delete();
+        return (bool) $notification->delete();
     }
 
     /**
@@ -220,7 +220,7 @@ class NotificationService
     /**
      * Create a notification for AI provider events
      *
-     * @param array<string, mixed>|null $data
+     * @param  array<string, mixed>|null  $data
      */
     public function createAiProviderNotification(string $type, string $title, string $message, ?array $data = null): Notification
     {
@@ -236,7 +236,7 @@ class NotificationService
     /**
      * Create a notification with action
      *
-     * @param array<string, mixed>|null $data
+     * @param  array<string, mixed>|null  $data
      */
     public function createWithAction(
         string $type,
@@ -245,8 +245,7 @@ class NotificationService
         string $actionUrl,
         string $actionLabel,
         ?array $data = null
-    ): Notification
-    {
+    ): Notification {
         return $this->create([
             'type' => $type,
             'title' => $title,
@@ -260,7 +259,7 @@ class NotificationService
     /**
      * Broadcast a notification to all users
      *
-     * @param array<string, mixed>|null $data
+     * @param  array<string, mixed>|null  $data
      */
     public function broadcast(string $type, string $title, string $message, ?array $data = null): int
     {

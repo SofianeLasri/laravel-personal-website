@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -87,7 +86,7 @@ return new class extends Migration
             'idx_bot_flags_created',
             'idx_created_at',
             'idx_method_status',
-            'idx_created_status'
+            'idx_created_status',
         ];
 
         foreach ($indexes as $index) {

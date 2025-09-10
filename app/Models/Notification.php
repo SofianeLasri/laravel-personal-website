@@ -87,7 +87,7 @@ class Notification extends Model
     /**
      * Scope a query to only include unread notifications.
      *
-     * @param Builder<Notification> $query
+     * @param  Builder<Notification>  $query
      * @return Builder<Notification>
      */
     public function scopeUnread(Builder $query): Builder
@@ -98,7 +98,7 @@ class Notification extends Model
     /**
      * Scope a query to only include read notifications.
      *
-     * @param Builder<Notification> $query
+     * @param  Builder<Notification>  $query
      * @return Builder<Notification>
      */
     public function scopeRead(Builder $query): Builder
@@ -109,7 +109,7 @@ class Notification extends Model
     /**
      * Scope a query to only include notifications for a specific user.
      *
-     * @param Builder<Notification> $query
+     * @param  Builder<Notification>  $query
      * @return Builder<Notification>
      */
     public function scopeForUser(Builder $query, int $userId): Builder
@@ -120,7 +120,7 @@ class Notification extends Model
     /**
      * Scope a query to only include non-expired notifications.
      *
-     * @param Builder<Notification> $query
+     * @param  Builder<Notification>  $query
      * @return Builder<Notification>
      */
     public function scopeNotExpired(Builder $query): Builder

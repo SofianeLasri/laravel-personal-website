@@ -11,17 +11,8 @@ class ApiRequestLogger
     /**
      * Log a successful API request
      *
-     * @param string $provider
-     * @param string $model
-     * @param string $endpoint
-     * @param string $systemPrompt
-     * @param string $userPrompt
-     * @param array<string, mixed> $response
-     * @param float $responseTime
-     * @param int|null $httpStatusCode
-     * @param bool $cached
-     * @param array<string, mixed>|null $metadata
-     * @return ApiRequestLog|null
+     * @param  array<string, mixed>  $response
+     * @param  array<string, mixed>|null  $metadata
      */
     public function logSuccess(
         string $provider,
@@ -29,13 +20,12 @@ class ApiRequestLogger
         string $endpoint,
         string $systemPrompt,
         string $userPrompt,
-        array  $response,
-        float  $responseTime,
-        ?int   $httpStatusCode = 200,
-        bool   $cached = false,
+        array $response,
+        float $responseTime,
+        ?int $httpStatusCode = 200,
+        bool $cached = false,
         ?array $metadata = null
-    ): ?ApiRequestLog
-    {
+    ): ?ApiRequestLog {
         try {
             $tokens = $this->extractTokenCounts($response, $provider);
             $cost = $this->estimateCost($provider, $model, $tokens['prompt_tokens'], $tokens['completion_tokens']);
@@ -62,6 +52,7 @@ class ApiRequestLogger
                 'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -69,16 +60,7 @@ class ApiRequestLogger
     /**
      * Log an error API request
      *
-     * @param string $provider
-     * @param string $model
-     * @param string $endpoint
-     * @param string $systemPrompt
-     * @param string $userPrompt
-     * @param string $errorMessage
-     * @param float $responseTime
-     * @param int|null $httpStatusCode
-     * @param array<string, mixed>|null $metadata
-     * @return ApiRequestLog|null
+     * @param  array<string, mixed>|null  $metadata
      */
     public function logError(
         string $provider,
@@ -87,11 +69,10 @@ class ApiRequestLogger
         string $systemPrompt,
         string $userPrompt,
         string $errorMessage,
-        float  $responseTime,
-        ?int   $httpStatusCode = null,
+        float $responseTime,
+        ?int $httpStatusCode = null,
         ?array $metadata = null
-    ): ?ApiRequestLog
-    {
+    ): ?ApiRequestLog {
         try {
             return ApiRequestLog::create([
                 'provider' => $provider,
@@ -110,6 +91,7 @@ class ApiRequestLogger
                 'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -117,14 +99,7 @@ class ApiRequestLogger
     /**
      * Log a timeout API request
      *
-     * @param string $provider
-     * @param string $model
-     * @param string $endpoint
-     * @param string $systemPrompt
-     * @param string $userPrompt
-     * @param float $responseTime
-     * @param array<string, mixed>|null $metadata
-     * @return ApiRequestLog|null
+     * @param  array<string, mixed>|null  $metadata
      */
     public function logTimeout(
         string $provider,
@@ -132,10 +107,9 @@ class ApiRequestLogger
         string $endpoint,
         string $systemPrompt,
         string $userPrompt,
-        float  $responseTime,
+        float $responseTime,
         ?array $metadata = null
-    ): ?ApiRequestLog
-    {
+    ): ?ApiRequestLog {
         try {
             return ApiRequestLog::create([
                 'provider' => $provider,
@@ -153,6 +127,7 @@ class ApiRequestLogger
                 'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -160,8 +135,7 @@ class ApiRequestLogger
     /**
      * Extract token counts from response based on provider
      *
-     * @param array<string, mixed> $response
-     * @param string $provider
+     * @param  array<string, mixed>  $response
      * @return array{prompt_tokens: int|null, completion_tokens: int|null, total_tokens: int|null}
      */
     private function extractTokenCounts(array $response, string $provider): array
@@ -193,23 +167,17 @@ class ApiRequestLogger
 
     /**
      * Estimate cost based on provider, model and token counts
-     *
-     * @param string $provider
-     * @param string $model
-     * @param int|null $promptTokens
-     * @param int|null $completionTokens
-     * @return float|null
      */
     private function estimateCost(string $provider, string $model, ?int $promptTokens, ?int $completionTokens): ?float
     {
-        if (!$promptTokens || !$completionTokens) {
+        if (! $promptTokens || ! $completionTokens) {
             return null;
         }
 
         // Get pricing from config or use defaults
         $pricing = $this->getPricing($provider, $model);
 
-        if (!$pricing) {
+        if (! $pricing) {
             return null;
         }
 
@@ -222,8 +190,6 @@ class ApiRequestLogger
     /**
      * Get pricing for provider and model
      *
-     * @param string $provider
-     * @param string $model
      * @return array{input: float, output: float}|null
      */
     private function getPricing(string $provider, string $model): ?array
@@ -250,7 +216,7 @@ class ApiRequestLogger
     /**
      * Get statistics for dashboard
      *
-     * @param int $days Number of days to look back
+     * @param  int  $days  Number of days to look back
      * @return array<string, mixed>
      */
     public function getStatistics(int $days = 7): array
@@ -283,6 +249,7 @@ class ApiRequestLogger
             Log::error('Failed to get API statistics', [
                 'error' => $e->getMessage(),
             ]);
+
             return [];
         }
     }

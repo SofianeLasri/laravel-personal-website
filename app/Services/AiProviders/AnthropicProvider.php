@@ -15,7 +15,7 @@ class AnthropicProvider implements AiProviderInterface
     private array $config;
 
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     public function __construct(array $config)
     {
@@ -23,7 +23,7 @@ class AnthropicProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function prompt(string $systemRole, string $userPrompt): array
     {
@@ -40,8 +40,8 @@ class AnthropicProvider implements AiProviderInterface
             'max_tokens' => $this->config['max-tokens'],
         ]);
 
-        if (!$response->successful()) {
-            throw new \Exception('Anthropic API error: ' . $response->body());
+        if (! $response->successful()) {
+            throw new \Exception('Anthropic API error: '.$response->body());
         }
 
         $data = $response->json();
@@ -57,7 +57,7 @@ class AnthropicProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function promptWithImages(string $systemRole, string $userPrompt, array $images): array
     {
@@ -89,8 +89,8 @@ class AnthropicProvider implements AiProviderInterface
             'max_tokens' => $this->config['max-tokens'],
         ]);
 
-        if (!$response->successful()) {
-            throw new \Exception('Anthropic API error: ' . $response->body());
+        if (! $response->successful()) {
+            throw new \Exception('Anthropic API error: '.$response->body());
         }
 
         $data = $response->json();
@@ -106,7 +106,7 @@ class AnthropicProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function isAvailable(): bool
     {
@@ -127,11 +127,12 @@ class AnthropicProvider implements AiProviderInterface
                     'max_tokens' => 1,
                 ]);
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     Log::warning('Anthropic health check failed', [
                         'status' => $response->status(),
                         'body' => $response->body(),
                     ]);
+
                     return false;
                 }
 
@@ -140,13 +141,14 @@ class AnthropicProvider implements AiProviderInterface
                 Log::warning('Anthropic health check exception', [
                     'error' => $e->getMessage(),
                 ]);
+
                 return false;
             }
         });
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getName(): string
     {
@@ -154,7 +156,7 @@ class AnthropicProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getModel(): string
     {
@@ -162,7 +164,7 @@ class AnthropicProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function estimateCost(int $inputTokens, int $outputTokens): float
     {
@@ -178,7 +180,7 @@ class AnthropicProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getEndpoint(): string
     {
@@ -186,7 +188,7 @@ class AnthropicProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMaxTokens(): int
     {
@@ -194,7 +196,7 @@ class AnthropicProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getConfig(): array
     {

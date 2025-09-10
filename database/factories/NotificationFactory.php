@@ -101,7 +101,7 @@ class NotificationFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'source' => Notification::SOURCE_AI_PROVIDER,
-                'title' => 'AI Provider: ' . $this->faker->sentence(3),
+                'title' => 'AI Provider: '.$this->faker->sentence(3),
                 'data' => [
                     'provider' => $this->faker->randomElement(['openai', 'anthropic']),
                     'model' => $this->faker->randomElement(['gpt-4', 'gpt-3.5-turbo', 'claude-3-opus', 'claude-3-sonnet']),
@@ -156,7 +156,7 @@ class NotificationFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'type' => Notification::TYPE_SUCCESS,
-                'title' => 'Success: ' . $this->faker->sentence(3),
+                'title' => 'Success: '.$this->faker->sentence(3),
             ];
         });
     }
@@ -169,7 +169,7 @@ class NotificationFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'type' => Notification::TYPE_ERROR,
-                'title' => 'Error: ' . $this->faker->sentence(3),
+                'title' => 'Error: '.$this->faker->sentence(3),
             ];
         });
     }
@@ -182,7 +182,7 @@ class NotificationFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'type' => Notification::TYPE_WARNING,
-                'title' => 'Warning: ' . $this->faker->sentence(3),
+                'title' => 'Warning: '.$this->faker->sentence(3),
             ];
         });
     }
@@ -195,7 +195,7 @@ class NotificationFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'type' => Notification::TYPE_INFO,
-                'title' => 'Info: ' . $this->faker->sentence(3),
+                'title' => 'Info: '.$this->faker->sentence(3),
             ];
         });
     }

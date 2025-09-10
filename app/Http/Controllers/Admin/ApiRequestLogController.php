@@ -13,9 +13,6 @@ class ApiRequestLogController extends Controller
 {
     /**
      * Display a listing of the API request logs.
-     *
-     * @param Request $request
-     * @return Response
      */
     public function index(Request $request): Response
     {
@@ -70,7 +67,7 @@ class ApiRequestLogController extends Controller
             $query->where('created_at', '>=', $dateFrom);
         }
         if ($dateTo) {
-            $query->where('created_at', '<=', $dateTo . ' 23:59:59');
+            $query->where('created_at', '<=', $dateTo.' 23:59:59');
         }
 
         $logs = $query->paginate($perPage);
@@ -121,9 +118,6 @@ class ApiRequestLogController extends Controller
 
     /**
      * Display the specified API request log.
-     *
-     * @param ApiRequestLog $apiRequestLog
-     * @return Response
      */
     public function show(ApiRequestLog $apiRequestLog): Response
     {

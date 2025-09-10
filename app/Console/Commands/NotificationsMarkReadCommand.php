@@ -38,40 +38,41 @@ class NotificationsMarkReadCommand extends Command
 
         // Parse the older-than period
         $cutoffDate = $this->parsePeriod($olderThan);
-        
+
         $this->info("Processing notifications older than {$cutoffDate->format('Y-m-d H:i:s')}");
-        
+
         // Build query
         $query = Notification::query()
             ->where('is_read', false)
             ->where('created_at', '<=', $cutoffDate);
-        
+
         if ($type) {
             $query->where('type', $type);
             $this->info("Filtering by type: {$type}");
         }
-        
+
         if ($severity) {
             $query->where('severity', $severity);
             $this->info("Filtering by severity: {$severity}");
         }
-        
+
         // Get count before update
         $count = $query->count();
-        
+
         if ($count === 0) {
             $this->info('No unread notifications found matching the criteria.');
+
             return Command::SUCCESS;
         }
-        
+
         $this->info("Found {$count} unread notification(s) to mark as read.");
-        
+
         // Show breakdown by type and severity
         $breakdown = clone $query;
         $typeBreakdown = $breakdown->selectRaw('type, severity, count(*) as count')
             ->groupBy('type', 'severity')
             ->get();
-        
+
         if ($typeBreakdown->isNotEmpty()) {
             $this->newLine();
             $this->info('Breakdown by Type and Severity:');
@@ -86,12 +87,12 @@ class NotificationsMarkReadCommand extends Command
                 })
             );
         }
-        
+
         if ($dryRun) {
             $this->newLine();
             $this->warn('DRY RUN: No changes were made.');
             $this->info("Would have marked {$count} notification(s) as read.");
-            
+
             // Show sample of notifications that would be marked
             $samples = $query->limit(5)->get();
             if ($samples->isNotEmpty()) {
@@ -104,42 +105,43 @@ class NotificationsMarkReadCommand extends Command
                             $notification->id,
                             $notification->type,
                             ucfirst($notification->severity),
-                            substr($notification->title, 0, 40) . (strlen($notification->title) > 40 ? '...' : ''),
+                            substr($notification->title, 0, 40).(strlen($notification->title) > 40 ? '...' : ''),
                             $notification->created_at->format('Y-m-d H:i:s'),
                         ];
                     })
                 );
             }
-            
+
             return Command::SUCCESS;
         }
-        
+
         // Confirm before marking
-        if (!$this->confirm("Are you sure you want to mark {$count} notification(s) as read?")) {
+        if (! $this->confirm("Are you sure you want to mark {$count} notification(s) as read?")) {
             $this->info('Operation cancelled.');
+
             return Command::SUCCESS;
         }
-        
+
         // Mark as read
         $updated = $query->update([
             'is_read' => true,
             'read_at' => Carbon::now(),
         ]);
-        
+
         $this->success("Successfully marked {$updated} notification(s) as read.");
-        
+
         // Show summary of remaining unread notifications
         $remainingUnread = Notification::where('is_read', false)->count();
         if ($remainingUnread > 0) {
             $this->newLine();
             $this->info("Remaining unread notifications: {$remainingUnread}");
-            
+
             // Show breakdown of remaining
             $remainingBreakdown = Notification::where('is_read', false)
                 ->selectRaw('severity, count(*) as count')
                 ->groupBy('severity')
                 ->get();
-            
+
             if ($remainingBreakdown->isNotEmpty()) {
                 $this->table(
                     ['Severity', 'Count'],
@@ -155,15 +157,12 @@ class NotificationsMarkReadCommand extends Command
             $this->newLine();
             $this->success('All notifications have been marked as read!');
         }
-        
+
         return Command::SUCCESS;
     }
 
     /**
      * Parse the period option into a Carbon date
-     *
-     * @param string $period
-     * @return Carbon
      */
     private function parsePeriod(string $period): Carbon
     {
@@ -171,25 +170,23 @@ class NotificationsMarkReadCommand extends Command
         if (preg_match('/^(\d+)(hours?|days?|weeks?|months?)$/', $period, $matches)) {
             $value = (int) $matches[1];
             $unit = rtrim($matches[2], 's'); // Remove plural 's'
-            
+
             return Carbon::now()->sub($unit, $value);
         }
-        
+
         // Try to parse as a date
         try {
             return Carbon::parse($period);
         } catch (\Exception $e) {
             // Default to 7 days
             $this->warn("Could not parse period '{$period}', defaulting to 7 days");
+
             return Carbon::now()->subDays(7);
         }
     }
 
     /**
      * Write a success message to the console.
-     *
-     * @param string $message
-     * @return void
      */
     private function success(string $message): void
     {

@@ -37,8 +37,8 @@ class AiProvidersCheckCommand extends Command
         }
 
         $specificProvider = $this->option('provider');
-        $providers = $specificProvider 
-            ? [$specificProvider] 
+        $providers = $specificProvider
+            ? [$specificProvider]
             : AiProviderFactory::getAvailableProviders();
 
         $this->info('🔍 Checking AI Provider Health');
@@ -50,10 +50,10 @@ class AiProvidersCheckCommand extends Command
 
         foreach ($providers as $providerName) {
             $this->info("Checking {$providerName}...");
-            
+
             try {
                 // Check if provider is configured
-                if (!AiProviderFactory::isProviderConfigured($providerName)) {
+                if (! AiProviderFactory::isProviderConfigured($providerName)) {
                     $results[] = [
                         'Provider' => ucfirst($providerName),
                         'Status' => '❌ Not Configured',
@@ -62,17 +62,18 @@ class AiProvidersCheckCommand extends Command
                         'Notes' => 'Missing API key or configuration',
                     ];
                     $allHealthy = false;
+
                     continue;
                 }
 
                 // Create provider instance
                 $provider = AiProviderFactory::create($providerName);
-                
+
                 // Measure response time
                 $startTime = microtime(true);
                 $isAvailable = $provider->isAvailable();
                 $responseTime = round((microtime(true) - $startTime) * 1000, 2);
-                
+
                 if ($isAvailable) {
                     $results[] = [
                         'Provider' => ucfirst($providerName),
@@ -91,7 +92,7 @@ class AiProvidersCheckCommand extends Command
                     ];
                     $allHealthy = false;
                 }
-                
+
             } catch (\Exception $e) {
                 $results[] = [
                     'Provider' => ucfirst($providerName),
@@ -114,12 +115,12 @@ class AiProvidersCheckCommand extends Command
         $this->newLine();
         $this->info('⚙️ Configuration Summary');
         $this->info('─────────────────────────');
-        
+
         $fallbackEnabled = config('ai-provider.fallback.enabled');
         $fallbackPriority = config('ai-provider.fallback.priority', []);
         $cacheEnabled = config('ai-provider.cache.enabled');
         $cacheTtl = config('ai-provider.cache.ttl');
-        
+
         $this->table(
             ['Setting', 'Value'],
             [
@@ -127,8 +128,8 @@ class AiProvidersCheckCommand extends Command
                 ['Fallback Enabled', $fallbackEnabled ? 'Yes' : 'No'],
                 ['Fallback Priority', implode(' → ', $fallbackPriority)],
                 ['Cache Enabled', $cacheEnabled ? 'Yes' : 'No'],
-                ['Cache TTL', $cacheEnabled ? ($cacheTtl / 86400) . ' days' : 'N/A'],
-                ['Health Check TTL', config('ai-provider.fallback.health_check_ttl', 300) . ' seconds'],
+                ['Cache TTL', $cacheEnabled ? ($cacheTtl / 86400).' days' : 'N/A'],
+                ['Health Check TTL', config('ai-provider.fallback.health_check_ttl', 300).' seconds'],
             ]
         );
 
@@ -143,8 +144,7 @@ class AiProvidersCheckCommand extends Command
     /**
      * Test providers with a sample prompt
      *
-     * @param array<string> $providers
-     * @return void
+     * @param  array<string>  $providers
      */
     private function testProviders(array $providers): void
     {
@@ -158,40 +158,40 @@ class AiProvidersCheckCommand extends Command
 
         foreach ($providers as $providerName) {
             try {
-                if (!AiProviderFactory::isProviderConfigured($providerName)) {
+                if (! AiProviderFactory::isProviderConfigured($providerName)) {
                     continue;
                 }
 
                 $this->info("Testing {$providerName}...");
-                
+
                 $provider = AiProviderFactory::create($providerName);
                 $startTime = microtime(true);
-                
+
                 $response = $provider->prompt($systemRole, $prompt);
-                
+
                 $responseTime = round((microtime(true) - $startTime) * 1000, 2);
-                
+
                 $this->info("✅ {$providerName} responded in {$responseTime}ms");
-                
+
                 if (isset($response['usage'])) {
                     $usage = $response['usage'];
                     $cost = $provider->estimateCost(
                         $usage['prompt_tokens'] ?? 0,
                         $usage['completion_tokens'] ?? 0
                     );
-                    
+
                     $this->info("   Tokens: {$usage['prompt_tokens']} input, {$usage['completion_tokens']} output");
-                    $this->info("   Estimated cost: $" . number_format($cost, 6));
+                    $this->info('   Estimated cost: $'.number_format($cost, 6));
                 }
-                
+
                 if (isset($response['content'])) {
-                    $this->info("   Response: " . substr($response['content'], 0, 100));
+                    $this->info('   Response: '.substr($response['content'], 0, 100));
                 }
-                
+
             } catch (\Exception $e) {
-                $this->error("❌ {$providerName} test failed: " . $e->getMessage());
+                $this->error("❌ {$providerName} test failed: ".$e->getMessage());
             }
-            
+
             $this->newLine();
         }
     }

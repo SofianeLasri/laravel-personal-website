@@ -16,7 +16,7 @@ class ApiRequestLoggerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->logger = new ApiRequestLogger();
+        $this->logger = new ApiRequestLogger;
     }
 
     public function test_log_success_creates_log_entry(): void
@@ -116,7 +116,7 @@ class ApiRequestLoggerTest extends TestCase
 
         // gpt-4o-mini: $0.00015 per 1k input, $0.0006 per 1k output
         $expectedCost = 0.00075; // (1000/1000 * 0.00015) + (1000/1000 * 0.0006)
-        $this->assertEquals($expectedCost, (float)$log->estimated_cost);
+        $this->assertEquals($expectedCost, (float) $log->estimated_cost);
     }
 
     public function test_cost_estimation_for_anthropic(): void
@@ -140,7 +140,7 @@ class ApiRequestLoggerTest extends TestCase
 
         // claude-3-5-sonnet: $0.003 per 1k input, $0.015 per 1k output
         $expectedCost = 0.018; // (1000/1000 * 0.003) + (1000/1000 * 0.015)
-        $this->assertEquals($expectedCost, (float)$log->estimated_cost);
+        $this->assertEquals($expectedCost, (float) $log->estimated_cost);
     }
 
     public function test_cached_response_logged_correctly(): void

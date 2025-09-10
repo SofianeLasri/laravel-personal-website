@@ -15,7 +15,7 @@ class OpenAiProvider implements AiProviderInterface
     private array $config;
 
     /**
-     * @param array<string, mixed> $config
+     * @param  array<string, mixed>  $config
      */
     public function __construct(array $config)
     {
@@ -23,12 +23,12 @@ class OpenAiProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function prompt(string $systemRole, string $userPrompt): array
     {
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->config['api-key'],
+            'Authorization' => 'Bearer '.$this->config['api-key'],
             'Content-Type' => 'application/json',
         ])->timeout(60)->post($this->config['url'], [
             'model' => $this->config['model'],
@@ -39,8 +39,8 @@ class OpenAiProvider implements AiProviderInterface
             'max_tokens' => $this->config['max-tokens'],
         ]);
 
-        if (!$response->successful()) {
-            throw new \Exception('OpenAI API error: ' . $response->body());
+        if (! $response->successful()) {
+            throw new \Exception('OpenAI API error: '.$response->body());
         }
 
         $data = $response->json();
@@ -56,7 +56,7 @@ class OpenAiProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function promptWithImages(string $systemRole, string $userPrompt, array $images): array
     {
@@ -68,13 +68,13 @@ class OpenAiProvider implements AiProviderInterface
             $userContent[] = [
                 'type' => 'image_url',
                 'image_url' => [
-                    'url' => 'data:' . $image['mime_type'] . ';base64,' . $image['base64'],
+                    'url' => 'data:'.$image['mime_type'].';base64,'.$image['base64'],
                 ],
             ];
         }
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->config['api-key'],
+            'Authorization' => 'Bearer '.$this->config['api-key'],
             'Content-Type' => 'application/json',
         ])->timeout(60)->post($this->config['url'], [
             'model' => $this->config['model'],
@@ -85,8 +85,8 @@ class OpenAiProvider implements AiProviderInterface
             'max_tokens' => $this->config['max-tokens'],
         ]);
 
-        if (!$response->successful()) {
-            throw new \Exception('OpenAI API error: ' . $response->body());
+        if (! $response->successful()) {
+            throw new \Exception('OpenAI API error: '.$response->body());
         }
 
         $data = $response->json();
@@ -102,7 +102,7 @@ class OpenAiProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function isAvailable(): bool
     {
@@ -111,30 +111,33 @@ class OpenAiProvider implements AiProviderInterface
         return Cache::remember($cacheKey, 300, function () {
             try {
                 $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $this->config['api-key'],
+                    'Authorization' => 'Bearer '.$this->config['api-key'],
                 ])->timeout(5)->get('https://api.openai.com/v1/models');
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     Log::warning('OpenAI health check failed', [
                         'status' => $response->status(),
                         'body' => $response->body(),
                     ]);
+
                     return false;
                 }
 
                 $models = $response->json('data', []);
+
                 return count($models) > 0;
             } catch (\Exception $e) {
                 Log::warning('OpenAI health check exception', [
                     'error' => $e->getMessage(),
                 ]);
+
                 return false;
             }
         });
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getName(): string
     {
@@ -142,7 +145,7 @@ class OpenAiProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getModel(): string
     {
@@ -150,7 +153,7 @@ class OpenAiProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function estimateCost(int $inputTokens, int $outputTokens): float
     {
@@ -166,7 +169,7 @@ class OpenAiProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getEndpoint(): string
     {
@@ -174,7 +177,7 @@ class OpenAiProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMaxTokens(): int
     {
@@ -182,7 +185,7 @@ class OpenAiProvider implements AiProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getConfig(): array
     {

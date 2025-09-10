@@ -30,7 +30,7 @@ class NotificationController extends Controller
             ->notExpired()
             ->orderBy('created_at', 'desc');
 
-        if (!$includeRead) {
+        if (! $includeRead) {
             $query->unread();
         }
 
@@ -64,7 +64,7 @@ class NotificationController extends Controller
     {
         $notification = Notification::forUser(Auth::id())->find($id);
 
-        if (!$notification) {
+        if (! $notification) {
             return response()->json([
                 'message' => 'Notification not found',
             ], 404);
@@ -98,7 +98,7 @@ class NotificationController extends Controller
     {
         $notification = Notification::forUser(Auth::id())->find($id);
 
-        if (!$notification) {
+        if (! $notification) {
             return response()->json([
                 'message' => 'Notification not found',
             ], 404);
@@ -164,7 +164,7 @@ class NotificationController extends Controller
                 $notifications = $this->notificationService->getUserNotifications(Auth::id());
 
                 foreach ($notifications as $notification) {
-                    echo "data: " . json_encode($notification) . "\n\n";
+                    echo 'data: '.json_encode($notification)."\n\n";
                 }
 
                 ob_flush();

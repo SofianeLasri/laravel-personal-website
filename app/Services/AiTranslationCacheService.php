@@ -11,22 +11,23 @@ class AiTranslationCacheService
     /**
      * Generate a cache key from provider, system prompt and user prompt
      *
-     * @param string $provider The AI provider name
-     * @param string $systemPrompt The system prompt
-     * @param string $userPrompt The user prompt
+     * @param  string  $provider  The AI provider name
+     * @param  string  $systemPrompt  The system prompt
+     * @param  string  $userPrompt  The user prompt
      * @return string The cache key
      */
     public function generateCacheKey(string $provider, string $systemPrompt, string $userPrompt): string
     {
-        $content = $provider . '|' . $systemPrompt . '|' . $userPrompt;
+        $content = $provider.'|'.$systemPrompt.'|'.$userPrompt;
+
         return hash('sha256', $content);
     }
 
     /**
      * Get cached response if available and not expired
      *
-     * @param string $cacheKey The cache key
-     * @param int $ttlInSeconds The TTL in seconds
+     * @param  string  $cacheKey  The cache key
+     * @param  int  $ttlInSeconds  The TTL in seconds
      * @return array<string, mixed>|null The cached response or null
      */
     public function get(string $cacheKey, int $ttlInSeconds): ?array
@@ -35,7 +36,7 @@ class AiTranslationCacheService
             /** @var AiTranslationCache|null $cache */
             $cache = AiTranslationCache::where('cache_key', $cacheKey)->first();
 
-            if (!$cache) {
+            if (! $cache) {
                 return null;
             }
 
@@ -45,6 +46,7 @@ class AiTranslationCacheService
                     'created_at' => $cache->created_at,
                     'ttl' => $ttlInSeconds,
                 ]);
+
                 return null;
             }
 
@@ -61,6 +63,7 @@ class AiTranslationCacheService
                 'cache_key' => $cacheKey,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -68,10 +71,10 @@ class AiTranslationCacheService
     /**
      * Store a response in cache
      *
-     * @param string $provider The AI provider name
-     * @param string $systemPrompt The system prompt
-     * @param string $userPrompt The user prompt
-     * @param array<string, mixed> $response The response to cache
+     * @param  string  $provider  The AI provider name
+     * @param  string  $systemPrompt  The system prompt
+     * @param  string  $userPrompt  The user prompt
+     * @param  array<string, mixed>  $response  The response to cache
      * @return bool Success status
      */
     public function put(string $provider, string $systemPrompt, string $userPrompt, array $response): bool
@@ -101,6 +104,7 @@ class AiTranslationCacheService
                 'provider' => $provider,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -108,7 +112,7 @@ class AiTranslationCacheService
     /**
      * Clear expired cache entries
      *
-     * @param int $ttlInSeconds The TTL in seconds
+     * @param  int  $ttlInSeconds  The TTL in seconds
      * @return int Number of deleted entries
      */
     public function clearExpired(int $ttlInSeconds): int
@@ -130,6 +134,7 @@ class AiTranslationCacheService
             Log::error('Error clearing expired AI translation cache', [
                 'error' => $e->getMessage(),
             ]);
+
             return 0;
         }
     }
@@ -154,6 +159,7 @@ class AiTranslationCacheService
             Log::error('Error clearing all AI translation cache', [
                 'error' => $e->getMessage(),
             ]);
+
             return 0;
         }
     }
@@ -185,14 +191,13 @@ class AiTranslationCacheService
             Log::error('Error getting AI translation cache statistics', [
                 'error' => $e->getMessage(),
             ]);
+
             return [];
         }
     }
 
     /**
      * Check if caching is enabled
-     *
-     * @return bool
      */
     public function isEnabled(): bool
     {
@@ -207,13 +212,14 @@ class AiTranslationCacheService
     public function getTtl(): int
     {
         $ttl = config('ai-provider.cache.ttl');
-        return $ttl !== null ? (int)$ttl : 2592000; // 30 days default
+
+        return $ttl !== null ? (int) $ttl : 2592000; // 30 days default
     }
 
     /**
      * Remove a specific cache entry
      *
-     * @param string $cacheKey The cache key
+     * @param  string  $cacheKey  The cache key
      * @return bool Success status
      */
     public function forget(string $cacheKey): bool
@@ -233,6 +239,7 @@ class AiTranslationCacheService
                 'cache_key' => $cacheKey,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }

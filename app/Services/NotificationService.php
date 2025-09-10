@@ -30,6 +30,7 @@ class NotificationService
         $notification = Notification::create([
             'user_id' => $data['user_id'] ?? auth()->id(),
             'type' => $data['type'],
+            'severity' => $data['type'], // Use type as severity for backward compatibility
             'title' => $data['title'],
             'message' => $data['message'],
             'data' => $data['data'] ?? null,

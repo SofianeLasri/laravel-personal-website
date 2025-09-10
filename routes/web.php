@@ -153,14 +153,14 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('notifications.index');
         Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])
             ->name('notifications.unread-count');
-        Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])
-            ->name('notifications.mark-as-read');
         Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])
             ->name('notifications.mark-all-as-read');
-        Route::delete('notifications/{id}', [NotificationController::class, 'destroy'])
-            ->name('notifications.destroy');
+        Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])
+            ->name('notifications.mark-as-read');
         Route::delete('notifications/clear', [NotificationController::class, 'clearAll'])
             ->name('notifications.clear');
+        Route::delete('notifications/{id}', [NotificationController::class, 'destroy'])
+            ->name('notifications.destroy');
         Route::post('notifications', [NotificationController::class, 'store'])
             ->name('notifications.store');
         Route::get('notifications/stream', [NotificationController::class, 'stream'])

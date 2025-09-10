@@ -141,6 +141,10 @@ class Notification extends Model
      */
     public function markAsRead(): bool
     {
+        if ($this->is_read) {
+            return true;
+        }
+        
         return $this->update([
             'is_read' => true,
             'read_at' => now(),

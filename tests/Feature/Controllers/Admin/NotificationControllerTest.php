@@ -1,13 +1,16 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Controllers\Admin;
 
+use App\Http\Controllers\Admin\NotificationController;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
-class NotificationApiTest extends TestCase
+#[CoversClass(NotificationController::class)]
+class NotificationControllerTest extends TestCase
 {
     use RefreshDatabase;
 

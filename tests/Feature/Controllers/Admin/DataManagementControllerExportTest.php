@@ -245,7 +245,7 @@ class DataManagementControllerExportTest extends TestCase
     {
         // Mock the job to prevent actual file operations
         Queue::fake();
-        
+
         $response = $this->postJson('/dashboard/data-management/export');
 
         $response->assertStatus(ResponseAlias::HTTP_ACCEPTED);
@@ -266,7 +266,7 @@ class DataManagementControllerExportTest extends TestCase
             '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i',
             $requestId
         );
-        
+
         // Verify job was dispatched
         Queue::assertPushed(ExportWebsiteJob::class);
     }
@@ -276,7 +276,7 @@ class DataManagementControllerExportTest extends TestCase
     {
         // Mock the job to prevent actual file operations
         Queue::fake();
-        
+
         // First export request
         $response1 = $this->postJson('/dashboard/data-management/export');
         $response1->assertStatus(ResponseAlias::HTTP_ACCEPTED);
@@ -302,9 +302,9 @@ class DataManagementControllerExportTest extends TestCase
     public function test_export_status_returns_not_found_for_invalid_request(): void
     {
         $invalidRequestId = 'invalid-request-id';
-        
+
         $response = $this->getJson("/dashboard/data-management/export/{$invalidRequestId}/status");
-        
+
         $response->assertStatus(ResponseAlias::HTTP_NOT_FOUND);
         $response->assertJson([
             'status' => 'not_found',
@@ -317,14 +317,14 @@ class DataManagementControllerExportTest extends TestCase
     {
         // Mock the job to prevent actual file operations
         Queue::fake();
-        
+
         // Initiate export
         $exportResponse = $this->postJson('/dashboard/data-management/export');
         $requestId = $exportResponse->json('request_id');
-        
+
         // Check status
         $response = $this->getJson("/dashboard/data-management/export/{$requestId}/status");
-        
+
         $response->assertSuccessful();
         $response->assertJsonStructure([
             'status',
@@ -340,14 +340,14 @@ class DataManagementControllerExportTest extends TestCase
     {
         // Mock the job to prevent actual file operations
         Queue::fake();
-        
+
         // Initiate export
         $exportResponse = $this->postJson('/dashboard/data-management/export');
         $requestId = $exportResponse->json('request_id');
-        
+
         // Try to download immediately
         $response = $this->get("/dashboard/data-management/export/{$requestId}/download");
-        
+
         $response->assertStatus(ResponseAlias::HTTP_NOT_FOUND);
         $response->assertJson([
             'status' => 'not_ready',
@@ -361,10 +361,10 @@ class DataManagementControllerExportTest extends TestCase
         $requestId = 'test-request-id';
         $cacheKey = "data_export_status_{$requestId}";
         $filePath = 'exports/test-export.zip';
-        
+
         // Create a test file
         Storage::put($filePath, 'test zip content');
-        
+
         // Set cache to indicate completed export
         Cache::put($cacheKey, [
             'status' => 'completed',
@@ -372,9 +372,9 @@ class DataManagementControllerExportTest extends TestCase
             'file_path' => $filePath,
             'completed_at' => now()->toISOString(),
         ], now()->addMinutes(20));
-        
+
         $response = $this->get("/dashboard/data-management/export/{$requestId}/download");
-        
+
         $response->assertSuccessful();
         $response->assertHeader('content-type', 'application/zip');
         $response->assertDownload("website-export-{$requestId}-".now()->format('Y-m-d_H-i-s').'.zip');
@@ -385,7 +385,7 @@ class DataManagementControllerExportTest extends TestCase
     {
         $requestId = 'test-request-id';
         $cacheKey = "data_export_status_{$requestId}";
-        
+
         // Set cache to indicate completed export but without file
         Cache::put($cacheKey, [
             'status' => 'completed',
@@ -393,9 +393,9 @@ class DataManagementControllerExportTest extends TestCase
             'file_path' => 'exports/missing-file.zip',
             'completed_at' => now()->toISOString(),
         ], now()->addMinutes(20));
-        
+
         $response = $this->get("/dashboard/data-management/export/{$requestId}/download");
-        
+
         $response->assertStatus(ResponseAlias::HTTP_NOT_FOUND);
         $response->assertJson([
             'status' => 'file_not_found',
@@ -409,13 +409,13 @@ class DataManagementControllerExportTest extends TestCase
         $requestId = 'test-request-id';
         $cacheKey = "data_export_status_{$requestId}";
         $lockKey = 'data_export_lock';
-        
+
         // Set lock
         Cache::put($lockKey, [
             'request_id' => $requestId,
             'started_at' => now()->toISOString(),
         ], now()->addMinutes(20));
-        
+
         // Set status as completed
         Cache::put($cacheKey, [
             'status' => 'completed',
@@ -423,11 +423,11 @@ class DataManagementControllerExportTest extends TestCase
             'file_path' => 'exports/test.zip',
             'completed_at' => now()->toISOString(),
         ], now()->addMinutes(20));
-        
+
         // Check status (should clear lock)
         $response = $this->getJson("/dashboard/data-management/export/{$requestId}/status");
         $response->assertSuccessful();
-        
+
         // Verify lock is cleared
         $this->assertFalse(Cache::has($lockKey));
     }
@@ -438,13 +438,13 @@ class DataManagementControllerExportTest extends TestCase
         $requestId = 'test-request-id';
         $cacheKey = "data_export_status_{$requestId}";
         $lockKey = 'data_export_lock';
-        
+
         // Set lock
         Cache::put($lockKey, [
             'request_id' => $requestId,
             'started_at' => now()->toISOString(),
         ], now()->addMinutes(20));
-        
+
         // Set status as failed
         Cache::put($cacheKey, [
             'status' => 'failed',
@@ -452,11 +452,11 @@ class DataManagementControllerExportTest extends TestCase
             'error' => 'Export failed due to error',
             'failed_at' => now()->toISOString(),
         ], now()->addMinutes(20));
-        
+
         // Check status (should clear lock)
         $response = $this->getJson("/dashboard/data-management/export/{$requestId}/status");
         $response->assertSuccessful();
-        
+
         // Verify lock is cleared
         $this->assertFalse(Cache::has($lockKey));
     }

@@ -312,7 +312,7 @@ class DataManagementControllerImportTest extends TestCase
     public function test_get_import_metadata_handles_invalid_file(): void
     {
         Storage::put('temp/invalid.zip', 'invalid content');
-        
+
         $mockImportService = $this->mock(WebsiteImportService::class);
         $mockImportService->shouldReceive('getImportMetadata')
             ->once()

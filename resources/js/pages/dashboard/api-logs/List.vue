@@ -185,7 +185,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { computed, onMounted, ref } from 'vue';
-import axios from 'axios';
 
 const breadcrumbs = [{ title: 'Dashboard', href: '/dashboard' }, { title: 'API Logs' }];
 
@@ -248,15 +247,16 @@ const viewDetails = (log: ApiLog) => {
     detailsOpen.value = true;
 };
 
-const fetchLogs = async () => {
-    try {
-        const response = await axios.get('/dashboard/api/api-logs');
-        logs.value = response.data.data || [];
-        calculateStatistics();
-    } catch (error) {
-        console.error('Failed to fetch API logs:', error);
-    }
-};
+// Function commented out as it's not currently used - dummy data is used instead
+// const fetchLogs = async () => {
+//     try {
+//         const response = await axios.get('/dashboard/api/api-logs');
+//         logs.value = response.data.data || [];
+//         calculateStatistics();
+//     } catch (error) {
+//         console.error('Failed to fetch API logs:', error);
+//     }
+// };
 
 const calculateStatistics = () => {
     const total = logs.value.length;

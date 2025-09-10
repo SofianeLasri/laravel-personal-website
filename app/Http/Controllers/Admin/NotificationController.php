@@ -147,7 +147,7 @@ class NotificationController extends Controller
 
         /** @var array{user_id: int, type: string, title: string, message: string, data?: array<string, mixed>|null, source?: string|null, action_url?: string|null, action_label?: string|null, is_persistent?: bool, expires_at?: string|null} $notificationData */
         $notificationData = array_merge($validated, ['user_id' => (int) Auth::id()]);
-        
+
         $notification = $this->notificationService->create($notificationData);
 
         return response()->json([
@@ -164,7 +164,7 @@ class NotificationController extends Controller
         return response()->stream(function () {
             $maxIterations = 100; // Prevent infinite loop for static analysis
             $iteration = 0;
-            
+
             while ($iteration < $maxIterations) {
                 $notifications = $this->notificationService->getUserNotifications((int) Auth::id());
 
@@ -178,7 +178,7 @@ class NotificationController extends Controller
                 // Sleep for 30 seconds before next check
                 sleep(30);
                 $iteration++;
-                
+
                 // In production, this would continue indefinitely
                 // but we limit it for static analysis
             }

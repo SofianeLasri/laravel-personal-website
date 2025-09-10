@@ -207,7 +207,7 @@ class NotificationControllerTest extends TestCase
 
         $response->assertOk();
         $data = $response->json('data');
-        
+
         // Check pagination structure
         $this->assertArrayHasKey('data', $data);
         $this->assertArrayHasKey('current_page', $data);
@@ -249,7 +249,7 @@ class NotificationControllerTest extends TestCase
 
         $response->assertOk();
         $data = $response->json('data');
-        
+
         // Should return all notifications as array
         $this->assertIsArray($data);
         $this->assertCount(30, $data);
@@ -292,7 +292,7 @@ class NotificationControllerTest extends TestCase
 
         $response->assertOk();
         $notifications = $response->json('data');
-        
+
         $this->assertCount(3, $notifications);
         foreach ($notifications as $notification) {
             $this->assertFalse($notification['is_read']);
@@ -641,7 +641,7 @@ class NotificationControllerTest extends TestCase
 
         $response->assertOk();
         $notifications = $response->json('data');
-        
+
         // Should only return non-expired notifications
         $this->assertCount(2, $notifications);
         $titles = collect($notifications)->pluck('title')->toArray();
@@ -696,7 +696,7 @@ class NotificationControllerTest extends TestCase
 
         $response->assertOk();
         $notifications = $response->json('data');
-        
+
         $this->assertCount(3, $notifications);
         // Check order: newest first
         $this->assertEquals($notification2->id, $notifications[0]['id']);

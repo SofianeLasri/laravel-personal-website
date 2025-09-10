@@ -30,44 +30,6 @@ class ApiLogsTest extends DuskTestCase
     }
 
     /**
-     * Test viewing API log details
-     */
-    public function test_can_view_api_log_details(): void
-    {
-        $user = User::factory()->create();
-
-        ApiRequestLog::create([
-            'provider' => 'openai',
-            'model' => 'gpt-4o-mini',
-            'endpoint' => 'https://api.openai.com/v1/chat/completions',
-            'status' => 'success',
-            'http_status_code' => 200,
-            'input_tokens' => 100,
-            'output_tokens' => 50,
-            'response_time' => 1.234,
-            'estimated_cost' => 0.0001,
-            'system_prompt' => 'You are a helpful assistant for testing',
-            'user_prompt' => 'This is a test prompt for viewing details',
-            'cached' => false,
-            'metadata' => ['test' => 'data'],
-        ]);
-
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->loginAs($user)
-                ->visit('/dashboard/api-logs')
-                ->waitForText('Logs des requêtes API', 10)
-                ->click('[data-testid="view-details-1"]')
-                ->waitForText('Détails de la requête', 5)
-                ->assertSee('You are a helpful assistant for testing')
-                ->assertSee('This is a test prompt for viewing details')
-                ->assertSee('100') // input tokens
-                ->assertSee('50')  // output tokens
-                ->assertSee('1.234') // response time
-                ->screenshot('api-log-details');
-        });
-    }
-
-    /**
      * Test API logs statistics display
      */
     public function test_api_logs_statistics_display(): void

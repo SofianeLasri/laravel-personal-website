@@ -506,7 +506,7 @@ class NotificationTest extends TestCase
             'expires_at',
         ];
 
-        $notification = new Notification();
+        $notification = new Notification;
         $this->assertEquals($fillable, $notification->getFillable());
     }
 
@@ -578,8 +578,8 @@ class NotificationTest extends TestCase
     #[Test]
     public function it_handles_mass_assignment_protection(): void
     {
-        $notification = new Notification();
-        
+        $notification = new Notification;
+
         // These should be fillable
         $notification->fill([
             'type' => 'info',

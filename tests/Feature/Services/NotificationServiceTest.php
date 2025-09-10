@@ -23,14 +23,14 @@ class NotificationServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new NotificationService();
+        $this->service = new NotificationService;
     }
 
     #[Test]
     public function it_creates_notification_with_all_parameters(): void
     {
         $user = User::factory()->create();
-        
+
         $data = [
             'user_id' => $user->id,
             'type' => 'info',
@@ -577,7 +577,7 @@ class NotificationServiceTest extends TestCase
         foreach ($users as $user) {
             $notifications = Notification::where('user_id', $user->id)->get();
             $this->assertCount(1, $notifications);
-            
+
             $notification = $notifications->first();
             $this->assertEquals('info', $notification->type);
             $this->assertEquals('System Maintenance', $notification->title);

@@ -144,7 +144,7 @@ class Notification extends Model
         if ($this->is_read) {
             return true;
         }
-        
+
         return $this->update([
             'is_read' => true,
             'read_at' => now(),

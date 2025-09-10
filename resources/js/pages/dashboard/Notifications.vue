@@ -83,7 +83,7 @@ const testNotification = async (type: string) => {
 
         // Show toast
         notificationStore.showToast('success', 'Notification Created', `A test ${type} notification has been created`);
-    } catch (error) {
+    } catch {
         notificationStore.showToast('error', 'Error', 'Failed to create test notification');
     }
 };

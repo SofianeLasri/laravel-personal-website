@@ -1,15 +1,17 @@
 export interface Notification {
     id: number;
     user_id?: number;
-    type: 'success' | 'error' | 'warning' | 'info';
+    type: 'ai_provider_error' | 'ai_provider_fallback' | 'system' | 'ai_provider' | string;
+    severity: 'info' | 'warning' | 'error' | 'critical';
     title: string;
     message: string;
     data?: Record<string, any>;
+    context?: Record<string, any>;
     source?: string;
     action_url?: string;
     action_label?: string;
     is_read: boolean;
-    is_persistent: boolean;
+    is_persistent?: boolean;
     read_at?: string;
     expires_at?: string;
     created_at: string;

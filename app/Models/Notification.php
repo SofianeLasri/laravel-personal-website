@@ -13,9 +13,11 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int|null $user_id
  * @property string $type
+ * @property string $severity
  * @property string $title
  * @property string $message
  * @property array<string, mixed>|null $data
+ * @property array<string, mixed>|null $context
  * @property string|null $source
  * @property string|null $action_url
  * @property string|null $action_label
@@ -34,9 +36,11 @@ class Notification extends Model
     protected $fillable = [
         'user_id',
         'type',
+        'severity',
         'title',
         'message',
         'data',
+        'context',
         'source',
         'action_url',
         'action_label',
@@ -48,6 +52,7 @@ class Notification extends Model
 
     protected $casts = [
         'data' => 'array',
+        'context' => 'array',
         'is_read' => 'boolean',
         'is_persistent' => 'boolean',
         'read_at' => 'datetime',

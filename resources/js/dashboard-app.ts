@@ -7,6 +7,7 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
+import { useNotificationStore } from './stores/notification';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -16,11 +17,17 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const pinia = createPinia();
 
-        createApp({ render: () => h(App, props) })
+        const app = createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(pinia)
-            .use(ZiggyVue)
-            .mount(el);
+            .use(ZiggyVue);
+
+        app.mount(el);
+
+        // Initialize notification store after mounting
+        const notificationStore = useNotificationStore();
+        notificationStore.fetchNotifications();
+        notificationStore.startPolling();
     },
     progress: {
         color: '#4B5563',

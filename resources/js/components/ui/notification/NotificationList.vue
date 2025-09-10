@@ -18,6 +18,7 @@
         :loading="loadingIds.includes(notification.id)"
         @mark-as-read="handleMarkAsRead"
         @dismiss="handleDismiss"
+        @view-details="() => emit('view-details', notification)"
       />
     </TransitionGroup>
   </div>
@@ -37,6 +38,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'mark-as-read': [id: number]
   'dismiss': [id: number]
+  'view-details': [notification: Notification]
 }>()
 
 const loadingIds = ref<number[]>([])

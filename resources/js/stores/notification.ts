@@ -108,6 +108,7 @@ export const useNotificationStore = defineStore('notification', () => {
         const toast: Notification = {
             id: Date.now(),
             type,
+            severity: type === 'success' ? 'info' : type === 'error' ? 'error' : 'warning',
             title,
             message,
             is_read: false,

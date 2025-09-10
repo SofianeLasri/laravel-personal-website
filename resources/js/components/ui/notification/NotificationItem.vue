@@ -3,14 +3,15 @@
     :class="cn(
       'relative flex w-full items-start gap-3 rounded-lg border p-4 shadow-sm transition-all',
       'hover:shadow-md',
-      notificationVariants[notification.type],
+      notificationVariants[notification.severity || 'info'],
       { 'opacity-60': notification.is_read }
     )"
+    :data-testid="`notification-${notification.id}`"
   >
-    <div class="flex-shrink-0">
+    <div class="flex-shrink-0" :data-testid="`severity-${notification.severity || 'info'}`">
       <component
         :is="iconComponent"
-        :class="cn('h-5 w-5', iconColors[notification.type])"
+        :class="cn('h-5 w-5', iconColors[notification.severity || 'info'])"
       />
     </div>
     
@@ -28,6 +29,7 @@
             size="sm"
             @click="markAsRead"
             :disabled="loading"
+            :data-testid="`mark-read-${notification.id}`"
           >
             <Check class="h-4 w-4" />
           </Button>
@@ -44,14 +46,25 @@
         </div>
       </div>
       
-      <div v-if="notification.action_url" class="pt-2">
+      <div class="flex gap-2 pt-2">
         <Button
+          v-if="notification.action_url"
           variant="outline"
           size="sm"
           :as="Link"
           :href="notification.action_url"
         >
           {{ notification.action_label || 'View' }}
+        </Button>
+        
+        <Button
+          v-if="notification.context || notification.message.length > 100"
+          variant="ghost"
+          size="sm"
+          @click="emit('view-details')"
+          :data-testid="`view-details-${notification.id}`"
+        >
+          Details
         </Button>
       </div>
       
@@ -71,7 +84,7 @@ import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Check, CheckCircle, Info, X, XCircle } from 'lucide-vue-next';
+import { AlertTriangle, Check, Info, X, XCircle } from 'lucide-vue-next';
 import { formatRelativeTime } from '@/lib/date-utils';
 import type { Notification } from '@/types/notification';
 
@@ -84,26 +97,27 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'mark-as-read': [id: number]
   'dismiss': [id: number]
+  'view-details': []
 }>()
 
 const notificationVariants = {
-  success: 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950',
+  critical: 'border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-950',
   error: 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950',
   warning: 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950',
   info: 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950',
 }
 
 const iconColors = {
-  success: 'text-green-600 dark:text-green-400',
+  critical: 'text-red-700 dark:text-red-300',
   error: 'text-red-600 dark:text-red-400',
   warning: 'text-yellow-600 dark:text-yellow-400',
   info: 'text-blue-600 dark:text-blue-400',
 }
 
 const iconComponent = computed(() => {
-  switch (props.notification.type) {
-    case 'success':
-      return CheckCircle
+  const severity = props.notification.severity || 'info'
+  switch (severity) {
+    case 'critical':
     case 'error':
       return XCircle
     case 'warning':

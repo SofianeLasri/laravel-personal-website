@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Controllers\Admin;
+namespace Tests\Feature\Models\Notification;
 
 use App\Http\Controllers\Admin\NotificationController;
 use App\Models\Notification;

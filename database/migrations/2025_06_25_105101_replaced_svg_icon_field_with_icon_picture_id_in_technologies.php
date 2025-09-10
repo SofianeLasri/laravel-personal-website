@@ -36,7 +36,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('technologies', function (Blueprint $table) {
-            $table->string('svg_icon');
+            $table->string('svg_icon')->nullable();
         });
 
         Schema::table('technologies', function (Blueprint $table) {

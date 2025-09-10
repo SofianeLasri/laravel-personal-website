@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DotMatrixMask from '@/components/public/DotMatrixMask.vue';
 import LanguagePopup from '@/components/public/LanguagePopup.vue';
 import Navbar from '@/components/public/Navbar/Navbar.vue';
 import Footer from '@/components/public/Ui/Footer.vue';
@@ -15,6 +16,7 @@ withDefaults(defineProps<Props>(), {
 
 <template>
     <div class="dots-background dark:bg-gray-990 relative flex min-h-screen flex-col items-center">
+        <DotMatrixMask />
         <Navbar />
         <slot />
         <LanguagePopup />
@@ -24,22 +26,6 @@ withDefaults(defineProps<Props>(), {
 
 <style>
 .dots-background {
-    background-image: url('/images/dots-light.svg');
-    background-repeat: repeat;
     position: relative;
-}
-
-@media (prefers-color-scheme: dark) {
-    html:not(.light) .dots-background {
-        background-image: url('/images/dots-dark.svg');
-    }
-}
-
-html.dark .dots-background {
-    background-image: url('/images/dots-dark.svg');
-}
-
-html.light .dots-background {
-    background-image: url('/images/dots-light.svg');
 }
 </style>

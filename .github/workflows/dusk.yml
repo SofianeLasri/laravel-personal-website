@@ -1,4 +1,4 @@
-name: tests
+name: dusk
 
 on:
   push:
@@ -9,66 +9,11 @@ on:
     branches:
       - develop
       - master
+  workflow_dispatch:
 
 jobs:
-  phpunit:
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.4
-          extensions: imagick
-          tools: composer:v2
-          coverage: xdebug
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install Node Dependencies
-        run: npm ci
-
-      - name: Create SQLite Database
-        run: touch database/database.sqlite
-
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Copy Environment File
-        run: cp .env.example .env
-
-      - name: Generate Application Key
-        run: php artisan key:generate
-
-      - name: Publish Ziggy Configuration
-        run: php artisan ziggy:generate
-
-      - name: Build Assets
-        run: npm run build
-
-      - name: Tests
-        run: php artisan test --parallel --coverage --coverage-clover coverage.xml --log-junit junit.xml --exclude-group=real-api
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN  }}
-
-      - name: Upload test results to Codecov
-        uses: codecov/test-results-action@v1
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN  }}
-
   dusk:
     runs-on: ubuntu-22.04
-    needs: phpunit
 
     services:
       mariadb:
@@ -123,11 +68,23 @@ jobs:
       - name: Publish Ziggy Configuration
         run: php artisan ziggy:generate
 
-      - name: Build Assets
-        run: npm run build
+      - name: Build SSR Assets
+        run: npm run build:ssr
+
+      - name: Run Database Migrations
+        run: php artisan migrate --force
+
+      - name: Seed Database with Test Data
+        run: php artisan db:seed --class=DuskTestSeeder --force
 
       - name: Run Laravel Server
         run: php artisan serve --no-reload &
+
+      - name: Run Inertia SSR Server
+        run: php artisan inertia:start-ssr &
+
+      - name: Wait for servers to be ready
+        run: sleep 5
 
       - name: Run Laravel Dusk
         run: php artisan dusk

@@ -1,7 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build:*)",
       "Bash(docker-compose exec:*)",
       "Bash(php artisan test:*)",
       "Bash(docker exec:*)",

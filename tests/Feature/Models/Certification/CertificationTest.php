@@ -4,6 +4,7 @@ namespace Tests\Feature\Models\Certification;
 
 use App\Models\Certification;
 use App\Models\Picture;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -56,7 +57,7 @@ class CertificationTest extends TestCase
             'date' => '2024-05-15',
         ]);
 
-        $this->assertInstanceOf(\Carbon\Carbon::class, $certification->date);
+        $this->assertInstanceOf(Carbon::class, $certification->date);
         $this->assertEquals('2024-05-15', $certification->date->format('Y-m-d'));
     }
 

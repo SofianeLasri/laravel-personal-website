@@ -82,7 +82,10 @@ const toggleFilter = (techId: number) => {
 </script>
 
 <template>
-    <div class="flex max-h-96 w-full flex-col items-start overflow-hidden rounded-2xl border bg-gray-100 dark:border-gray-800 dark:bg-gray-900">
+    <div
+        class="flex max-h-96 w-full flex-col items-start overflow-hidden rounded-2xl border bg-gray-100 dark:border-gray-800 dark:bg-gray-900"
+        data-testid="project-filter"
+    >
         <div
             class="flex w-full cursor-pointer items-center justify-between gap-2.5 px-4 py-3 transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
             @click="toggleCollapse"
@@ -111,6 +114,9 @@ const toggleFilter = (techId: number) => {
                         variant="active"
                         class="w-full rounded-lg !px-3 py-2"
                         @click="toggleFilter(tech.id)"
+                        :data-filter-type="props.name.toLowerCase()"
+                        :data-filter-value="tech.name.toLowerCase().replace(/[^a-z0-9]/gi, '')"
+                        data-selected="true"
                     >
                         <div class="flex grow items-center gap-2">
                             <div
@@ -128,7 +134,15 @@ const toggleFilter = (techId: number) => {
                         <div class="text-design-system-paragraph shrink-0">{{ tech.creationCount }}</div>
                     </BaseButton>
 
-                    <BaseButton v-else variant="white" class="w-full rounded-lg border-none !px-3 py-2" @click="toggleFilter(tech.id)">
+                    <BaseButton
+                        v-else
+                        variant="white"
+                        class="w-full rounded-lg border-none !px-3 py-2"
+                        @click="toggleFilter(tech.id)"
+                        :data-filter-type="props.name.toLowerCase()"
+                        :data-filter-value="tech.name.toLowerCase().replace(/[^a-z0-9]/gi, '')"
+                        data-selected="false"
+                    >
                         <div class="flex grow items-center gap-2">
                             <div
                                 class="flex aspect-square size-8 items-center justify-center rounded-lg border bg-white p-2 dark:border-gray-700 dark:bg-gray-900"

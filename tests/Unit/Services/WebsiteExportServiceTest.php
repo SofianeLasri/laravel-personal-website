@@ -2,9 +2,11 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Creation;
 use App\Models\Picture;
 use App\Models\Technology;
 use App\Services\WebsiteExportService;
+use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -250,7 +252,7 @@ class WebsiteExportServiceTest extends TestCase
         $picture = Picture::factory()->create(['filename' => 'test.jpg']);
 
         // Create a creation that uses both
-        $creation = \App\Models\Creation::factory()->create(['name' => 'Test Project']);
+        $creation = Creation::factory()->create(['name' => 'Test Project']);
         $creation->technologies()->attach($tech);
 
         $zipPath = $this->exportService->exportWebsite();
@@ -288,7 +290,7 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertIsInt($metadata['files_count']);
 
         // Verify timestamp format (ISO 8601)
-        $this->assertNotFalse(\DateTime::createFromFormat('Y-m-d\TH:i:s.u\Z', $metadata['export_date']) ?: \DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $metadata['export_date']));
+        $this->assertNotFalse(DateTime::createFromFormat('Y-m-d\TH:i:s.u\Z', $metadata['export_date']) ?: DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $metadata['export_date']));
 
         $zip->close();
         Storage::delete($zipPath);

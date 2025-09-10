@@ -6,6 +6,7 @@ use App\Jobs\AnalyzeBotRequestsJob;
 use App\Services\BotDetection\BotDetectionService;
 use Exception;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class AnalyzeBotRequestsCommand extends Command
 {
@@ -59,10 +60,10 @@ class AnalyzeBotRequestsCommand extends Command
             } catch (Exception $e) {
                 $this->error('Analysis failed: '.$e->getMessage());
 
-                return Command::FAILURE;
+                return CommandAlias::FAILURE;
             }
         }
 
-        return Command::SUCCESS;
+        return CommandAlias::SUCCESS;
     }
 }

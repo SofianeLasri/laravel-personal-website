@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'highlight.js/styles/atom-one-light.css';
 
 @plugin "tailwindcss-motion";
 
@@ -166,6 +167,124 @@
 
     /* SVG dot matrix background */
     --dot-matrix-color: rgba(107, 113, 117, 0.3);
+
+    /* Override highlight.js theme to Atom One Dark in dark mode */
+
+    & .hljs {
+        background: #282c34;
+        color: #abb2bf;
+    }
+
+    & .hljs-comment,
+    & .hljs-quote {
+        @apply text-gray-500;
+        font-style: italic;
+    }
+
+    & .hljs-doctag,
+    & .hljs-keyword,
+    & .hljs-formula {
+        color: #c678dd;
+    }
+
+    & .hljs-section,
+    & .hljs-name,
+    & .hljs-selector-tag,
+    & .hljs-deletion,
+    & .hljs-subst {
+        color: #e06c75;
+    }
+
+    & .hljs-literal {
+        color: #56b6c2;
+    }
+
+    & .hljs-string,
+    & .hljs-regexp,
+    & .hljs-addition,
+    & .hljs-attribute,
+    & .hljs-meta .hljs-string {
+        color: #98c379;
+    }
+
+    & .hljs-attr,
+    & .hljs-variable,
+    & .hljs-template-variable,
+    & .hljs-type,
+    & .hljs-selector-class,
+    & .hljs-selector-attr,
+    & .hljs-selector-pseudo,
+    & .hljs-number {
+        color: #d19a66;
+    }
+
+    & .hljs-symbol,
+    & .hljs-bullet,
+    & .hljs-link,
+    & .hljs-meta,
+    & .hljs-selector-id,
+    & .hljs-title {
+        color: #61aeee;
+    }
+
+    & .hljs-built_in,
+    & .hljs-title.class_,
+    & .hljs-class .hljs-title {
+        color: #e6c07b;
+    }
+
+    & .hljs-emphasis {
+        font-style: italic;
+    }
+
+    & .hljs-strong {
+        font-weight: bold;
+    }
+
+    & .hljs-link {
+        text-decoration: underline;
+    }
+
+    /* Dark mode markdown elements */
+
+    & .markdown-view {
+        & pre {
+            @apply border-gray-600 bg-gray-950;
+        }
+
+        & code:not(pre code) {
+            @apply bg-gray-700 text-gray-200;
+        }
+
+        & blockquote {
+            @apply border-gray-600 text-gray-400;
+        }
+
+        & th,
+        & td {
+            @apply border-gray-600;
+        }
+
+        & th {
+            @apply bg-gray-800;
+        }
+
+        & hr {
+            @apply border-gray-600;
+        }
+
+        & pre::-webkit-scrollbar-track {
+            @apply bg-gray-800;
+        }
+
+        & pre::-webkit-scrollbar-thumb {
+            @apply bg-gray-600;
+        }
+
+        & pre::-webkit-scrollbar-thumb:hover {
+            @apply bg-gray-500;
+        }
+    }
 }
 
 /* Ensure smooth transitions for theme changes */
@@ -195,45 +314,160 @@ body * {
 }
 
 @utility markdown-view {
-    @apply text-design-system-paragraph;
+    @apply text-gray-800 dark:text-gray-300;
 
-    /* Markdown view shouldn't have h1 title !*/
-    h1,
-    h2 {
-        @apply text-design-system-title mb-8 text-2xl font-bold;
+    /* Headings */
+    & h1,
+    & h2 {
+        @apply text-gray-990 mb-6 text-2xl font-bold dark:text-gray-100;
     }
 
-    h3 {
-        @apply text-design-system-paragraph mb-6 text-xl font-bold;
+    & h3 {
+        @apply text-gray-990 mb-4 text-xl font-bold dark:text-gray-100;
     }
 
-    h4 {
-        @apply text-design-system-paragraph mb-3 text-lg font-bold;
+    & h4 {
+        @apply text-gray-990 relative mb-3 ml-6 text-lg font-bold dark:text-gray-200;
+
+        /* Tangerine bullet point */
+
+        &::before {
+            content: '';
+            @apply bg-atomic-tangerine-400 absolute top-1/2 -left-5 h-2 w-2 -translate-y-1/2 rounded-full;
+        }
     }
 
-    h1:not(:first-child),
-    h2:not(:first-child) {
+    & h5 {
+        @apply text-gray-990 relative mb-2 ml-4 inline-block text-base font-semibold dark:text-gray-200;
+
+        /* Tangerine underline */
+
+        &::after {
+            content: '';
+            @apply bg-atomic-tangerine-400 absolute bottom-0 left-0 h-[0.1825rem] w-full;
+        }
+    }
+
+    & h1:not(:first-child),
+    & h2:not(:first-child) {
         @apply mt-8;
     }
 
-    h3:not(:first-child),
-    h4:not(:first-child) {
+    & h3:not(:first-child),
+    & h4:not(:first-child),
+    & h5:not(:first-child) {
         @apply mt-6;
     }
 
-    a {
-        @apply text-design-system-primary underline;
+    /* Reduced spacing when h4 directly follows h3 */
+    & h3 + h4 {
+        @apply mt-2!;
     }
 
-    p:not(:last-child) {
+    /* Reduced spacing when h5 directly follows h4 */
+    & h4 + h5 {
+        @apply mt-2!;
+    }
+
+    /* Links */
+    & a {
+        color: var(--color-design-system-primary);
+        @apply underline;
+    }
+
+    /* Paragraphs */
+    & p:not(:last-child) {
         @apply mb-4;
     }
 
-    ul {
-        @apply mb-4 list-inside list-disc pt-2 pl-4;
+    /* Reduced spacing when paragraph in li is followed by ul */
+    & li p:has(+ ul) {
+        @apply mb-1!;
     }
 
-    ul li {
+    /* Lists */
+    & ul {
+        @apply mb-4 list-outside list-disc pt-2 pl-8;
+    }
+
+    & ul li {
         @apply mb-2;
+    }
+
+    & ol {
+        @apply mb-4 list-outside list-decimal pt-2 pl-8;
+    }
+
+    & ol li {
+        @apply mb-2;
+    }
+
+    /* Blockquotes */
+    & blockquote {
+        @apply my-4 border-l-4 border-gray-300 pl-4 text-gray-600 italic;
+    }
+
+    /* Tables */
+    & table {
+        @apply my-4 w-full border-collapse;
+    }
+
+    & th,
+    & td {
+        @apply border border-gray-300 px-4 py-2;
+    }
+
+    & th {
+        @apply bg-gray-100 font-semibold;
+    }
+
+    /* Horizontal rules */
+    & hr {
+        @apply my-8 border-t border-none border-gray-300;
+    }
+
+    /* Images */
+    & img {
+        @apply my-4 h-auto max-w-full rounded-lg;
+    }
+
+    /* Code blocks */
+    & pre {
+        @apply relative my-4 max-w-full overflow-x-auto rounded-lg border border-gray-200 bg-gray-50;
+    }
+
+    & pre code {
+        @apply block bg-transparent p-4 font-mono text-sm;
+    }
+
+    /* Ensure hljs code blocks are visible */
+    & pre.hljs {
+        @apply p-0;
+    }
+
+    & pre.hljs code {
+        @apply bg-transparent;
+    }
+
+    /* Inline code */
+    & code:not(pre code) {
+        @apply rounded bg-gray-200 px-1.5 py-0.5 font-mono text-sm text-gray-900;
+    }
+
+    /* Scrollbar styling for code blocks */
+    & pre::-webkit-scrollbar {
+        @apply h-2;
+    }
+
+    & pre::-webkit-scrollbar-track {
+        @apply rounded bg-gray-100;
+    }
+
+    & pre::-webkit-scrollbar-thumb {
+        @apply rounded bg-gray-400;
+    }
+
+    & pre::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-500;
     }
 }

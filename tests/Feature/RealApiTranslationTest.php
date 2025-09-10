@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\AiProviderService;
+use Exception;
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
@@ -34,7 +35,7 @@ class RealApiTranslationTest extends TestCase
         $aiService = app(AiProviderService::class);
 
         $systemPrompt = 'You are a helpful assistant that translates french markdown text to english and outputs JSON in the format {message:string}. Markdown formatting must be preserved.';
-        $userPrompt = "Translate this French text to English:\n\n" . $this->sampleText;
+        $userPrompt = "Translate this French text to English:\n\n".$this->sampleText;
 
         // Log the request details
         $this->logTestDetails('OpenAI', strlen($this->sampleText), strlen($userPrompt));
@@ -57,24 +58,24 @@ class RealApiTranslationTest extends TestCase
 
             // Log success
             echo "\n✅ OpenAI Translation Success:\n";
-            echo "- Original length: " . strlen($this->sampleText) . " chars\n";
-            echo "- Translation length: " . strlen($response['message']) . " chars\n";
+            echo '- Original length: '.strlen($this->sampleText)." chars\n";
+            echo '- Translation length: '.strlen($response['message'])." chars\n";
             echo "- Response time: {$duration}s\n";
-            echo "- First 200 chars: " . substr($response['message'], 0, 200) . "...\n";
+            echo '- First 200 chars: '.substr($response['message'], 0, 200)."...\n";
 
             // Save the translation for inspection
             File::put(base_path('tests/output_openai_translation.md'), $response['message']);
             echo "- Full translation saved to: tests/output_openai_translation.md\n";
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "\n❌ OpenAI Translation Failed:\n";
-            echo "- Error: " . $e->getMessage() . "\n";
-            echo "- Error class: " . get_class($e) . "\n";
+            echo '- Error: '.$e->getMessage()."\n";
+            echo '- Error class: '.get_class($e)."\n";
 
             // Save error details
             File::put(base_path('tests/output_openai_error.txt'),
-                "Error: " . $e->getMessage() . "\n\n" .
-                "Stack trace:\n" . $e->getTraceAsString()
+                'Error: '.$e->getMessage()."\n\n".
+                "Stack trace:\n".$e->getTraceAsString()
             );
 
             throw $e;
@@ -96,7 +97,7 @@ class RealApiTranslationTest extends TestCase
         $aiService = app(AiProviderService::class);
 
         $systemPrompt = 'You are a helpful assistant that translates french markdown text to english and outputs JSON in the format {message:string}. Markdown formatting must be preserved.';
-        $userPrompt = "Translate this French text to English:\n\n" . $this->sampleText;
+        $userPrompt = "Translate this French text to English:\n\n".$this->sampleText;
 
         // Log the request details
         $this->logTestDetails('Anthropic', strlen($this->sampleText), strlen($userPrompt));
@@ -119,24 +120,24 @@ class RealApiTranslationTest extends TestCase
 
             // Log success
             echo "\n✅ Anthropic Translation Success:\n";
-            echo "- Original length: " . strlen($this->sampleText) . " chars\n";
-            echo "- Translation length: " . strlen($response['message']) . " chars\n";
+            echo '- Original length: '.strlen($this->sampleText)." chars\n";
+            echo '- Translation length: '.strlen($response['message'])." chars\n";
             echo "- Response time: {$duration}s\n";
-            echo "- First 200 chars: " . substr($response['message'], 0, 200) . "...\n";
+            echo '- First 200 chars: '.substr($response['message'], 0, 200)."...\n";
 
             // Save the translation for inspection
             File::put(base_path('tests/output_anthropic_translation.md'), $response['message']);
             echo "- Full translation saved to: tests/output_anthropic_translation.md\n";
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "\n❌ Anthropic Translation Failed:\n";
-            echo "- Error: " . $e->getMessage() . "\n";
-            echo "- Error class: " . get_class($e) . "\n";
+            echo '- Error: '.$e->getMessage()."\n";
+            echo '- Error class: '.get_class($e)."\n";
 
             // Save error details
             File::put(base_path('tests/output_anthropic_error.txt'),
-                "Error: " . $e->getMessage() . "\n\n" .
-                "Stack trace:\n" . $e->getTraceAsString()
+                'Error: '.$e->getMessage()."\n\n".
+                "Stack trace:\n".$e->getTraceAsString()
             );
 
             throw $e;
@@ -152,8 +153,8 @@ class RealApiTranslationTest extends TestCase
         echo "- Original text length: {$originalLength} chars\n";
         echo "- Full prompt length: {$promptLength} chars\n";
         echo "- Provider config:\n";
-        echo "  - URL: " . config("ai-provider.providers." . strtolower($provider) . ".url") . "\n";
-        echo "  - Model: " . config("ai-provider.providers." . strtolower($provider) . ".model") . "\n";
-        echo "  - Max tokens: " . config("ai-provider.providers." . strtolower($provider) . ".max-tokens") . "\n";
+        echo '  - URL: '.config('ai-provider.providers.'.strtolower($provider).'.url')."\n";
+        echo '  - Model: '.config('ai-provider.providers.'.strtolower($provider).'.model')."\n";
+        echo '  - Max tokens: '.config('ai-provider.providers.'.strtolower($provider).'.max-tokens')."\n";
     }
 }

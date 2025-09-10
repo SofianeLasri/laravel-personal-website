@@ -12,6 +12,7 @@ RUN install-php-extensions \
     redis \
     pcntl \
     bcmath \
+    intl \
     excimer
 
 RUN apt-get update

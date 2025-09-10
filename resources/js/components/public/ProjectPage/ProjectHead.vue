@@ -32,7 +32,10 @@ const formattedPeriod = computed(() => {
         <div class="flex grow flex-col gap-16">
             <div class="flex flex-col gap-6 self-stretch">
                 <div class="inline-flex justify-between self-stretch">
-                    <div class="bg-gray-0 flex size-24 items-center justify-center gap-2.5 overflow-hidden rounded-lg border p-4">
+                    <div
+                        class="bg-gray-0 flex size-24 items-center justify-center gap-2.5 overflow-hidden rounded-lg border p-4"
+                        data-testid="project-status"
+                    >
                         <img
                             :src="creation.logo.webp.small"
                             :alt="t('project.project_logo_alt')"
@@ -52,7 +55,7 @@ const formattedPeriod = computed(() => {
                     </div>
                 </div>
                 <div class="flex flex-col gap-2 self-stretch">
-                    <div class="text-design-system-title justify-center self-stretch text-5xl font-bold">
+                    <div class="text-design-system-title justify-center self-stretch text-5xl font-bold" data-testid="project-name">
                         {{ creation.name }}
                     </div>
                     <div class="text-design-system-paragraph justify-center self-stretch text-xl font-bold">
@@ -69,11 +72,27 @@ const formattedPeriod = computed(() => {
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <BaseButton variant="black" as="link" v-if="creation.externalUrl" :href="creation.externalUrl">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center" data-testid="project-links">
+                <BaseButton
+                    variant="black"
+                    as="link"
+                    v-if="creation.externalUrl"
+                    :href="creation.externalUrl"
+                    data-testid="demo-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     {{ t('project.visit_website') }}
                 </BaseButton>
-                <BaseButton variant="white" as="link" v-if="creation.sourceCodeUrl" :href="creation.sourceCodeUrl">
+                <BaseButton
+                    variant="white"
+                    as="link"
+                    v-if="creation.sourceCodeUrl"
+                    :href="creation.sourceCodeUrl"
+                    data-testid="github-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     {{ t('project.source_code') }}
                 </BaseButton>
             </div>

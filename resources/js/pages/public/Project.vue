@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LightShape from '@/components/public/LightShape.vue';
+import MarkdownViewer from '@/components/public/MarkdownViewer.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
 import ProjectScreenshotsContainer from '@/components/public/ProjectPage/ProjectScreenshotsContainer.vue';
 import ProjectVideoGallery from '@/components/public/ProjectPage/ProjectVideoGallery.vue';
@@ -12,7 +13,6 @@ import { SocialMediaLink, SSRFullCreation } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import { User } from 'lucide-vue-next';
 import { ref } from 'vue';
-import VueMarkdown from 'vue-markdown-render';
 
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
@@ -76,10 +76,14 @@ if (props.creation.screenshots.length > 0) {
     <PublicAppLayout :socialMediaLinks="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
+            <LightShape class="absolute top-[40rem] right-[-27rem] xl:right-[-15rem]" />
+            <LightShape class="absolute top-[80rem] left-[-27rem] xl:left-[-15rem]" />
+            <LightShape class="absolute top-[140rem] right-[-27rem] xl:right-[-15rem]" />
+            <LightShape class="absolute bottom-[40rem] left-[-27rem] xl:left-[-15rem]" />
         </div>
 
         <div class="z-10 container mb-16 flex flex-col gap-16 px-4">
-            <ProjectHead :creation="creation" />
+            <ProjectHead :creation="creation" data-testid="project-head" />
 
             <div ref="contentContainer" class="flex flex-col">
                 <HorizontalNavbar
@@ -91,29 +95,30 @@ if (props.creation.screenshots.length > 0) {
                     :containerRef="contentContainer"
                 />
 
-                <div class="content-sections mt-8">
-                    <section id="description" class="flex flex-col gap-8">
+                <div class="content-sections mt-8" data-testid="project-content">
+                    <section id="description" class="flex flex-col" data-testid="description-section">
                         <ContentSectionTitle>{{ t('project.description') }}</ContentSectionTitle>
-                        <vue-markdown class="markdown-view" :source="creation.fullDescription" />
+                        <MarkdownViewer :source="creation.fullDescription" data-testid="project-description" />
                     </section>
 
-                    <section id="features" class="mt-16 flex flex-col gap-8" v-if="creation.features.length > 0">
+                    <section id="features" class="mt-16 flex flex-col gap-8" v-if="creation.features.length > 0" data-testid="features-section">
                         <ContentSectionTitle>{{ t('project.key_features') }}</ContentSectionTitle>
                         <div class="grid gap-16 md:grid-cols-2 lg:grid-cols-3">
-                            <div v-for="feature in creation.features" :key="feature.id" class="flex flex-col gap-6">
+                            <div v-for="feature in creation.features" :key="feature.id" class="flex flex-col gap-6" data-testid="feature-card">
                                 <h3 class="text-design-system-paragraph text-xl font-bold">{{ feature.title }}</h3>
                                 <div class="text-design-system-paragraph text-lg font-normal">{{ feature.description }}</div>
                             </div>
                         </div>
                     </section>
 
-                    <section id="people" class="mt-16 flex flex-col gap-8" v-if="creation.people.length > 0">
+                    <section id="people" class="mt-16 flex flex-col gap-8" v-if="creation.people.length > 0" data-testid="people-section">
                         <ContentSectionTitle>{{ t('project.people_involved') }}</ContentSectionTitle>
                         <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                             <div
                                 class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 p-2 outline-1 outline-gray-200 dark:bg-gray-900 dark:outline-gray-700"
                                 v-for="person in creation.people"
                                 :key="person.id"
+                                data-testid="person-card"
                             >
                                 <div class="flex size-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full lg:size-16">
                                     <img
@@ -135,7 +140,7 @@ if (props.creation.screenshots.length > 0) {
                         </div>
                     </section>
 
-                    <section id="technologies" class="mt-16 flex flex-col gap-8" v-if="creation.technologies.length > 0">
+                    <section id="technologies" class="mt-16 flex flex-col" v-if="creation.technologies.length > 0" data-testid="technologies-section">
                         <ContentSectionTitle>{{ t('project.technologies_used') }}</ContentSectionTitle>
                         <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                             <TechnologyCard
@@ -145,16 +150,17 @@ if (props.creation.screenshots.length > 0) {
                                 :description="tech.description"
                                 :iconPicture="tech.iconPicture"
                                 class="bg-gray-100 dark:bg-gray-900"
+                                data-testid="technology-card"
                             />
                         </div>
                     </section>
 
-                    <section id="videos" class="mt-16 flex flex-col gap-8" v-if="creation.videos.length > 0">
+                    <section id="videos" class="mt-16 flex flex-col" v-if="creation.videos.length > 0" data-testid="videos-section">
                         <ContentSectionTitle>{{ t('project.videos') }}</ContentSectionTitle>
                         <ProjectVideoGallery :videos="creation.videos" />
                     </section>
 
-                    <section id="screenshots" class="mt-16 flex flex-col gap-8" v-if="creation.screenshots.length > 0">
+                    <section id="screenshots" class="mt-16 flex flex-col" v-if="creation.screenshots.length > 0" data-testid="screenshots-section">
                         <ContentSectionTitle>{{ t('project.screenshots') }}</ContentSectionTitle>
                         <ProjectScreenshotsContainer :screenshots="creation.screenshots" />
                     </section>

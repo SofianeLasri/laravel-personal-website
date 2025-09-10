@@ -23,15 +23,22 @@ use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Admin\TranslationPageController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CertificationsCareerController;
 use App\Http\Controllers\Public\ExperienceController as PublicExperienceController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\LanguageController;
 use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ProjectsController;
 use App\Http\Controllers\Public\SearchController;
 use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
+
+// Debug route (only in non-production)
+if (config('app.env') !== 'production') {
+    Route::get('/debug', [DebugController::class, 'index'])->name('debug');
+}
 
 Route::name('public.')->group(function () {
     Route::get('/cv-pdf', function () {
@@ -58,7 +65,7 @@ Route::name('public.')->group(function () {
     Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
     // Language preference
-    Route::post('/set-language', [\App\Http\Controllers\Public\LanguageController::class, 'setLanguage'])->name('set-language');
+    Route::post('/set-language', [LanguageController::class, 'setLanguage'])->name('set-language');
 });
 
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {
@@ -158,7 +165,7 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('notifications.store');
         Route::get('notifications/stream', [NotificationController::class, 'stream'])
             ->name('notifications.stream');
-        
+
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
         Route::apiResource('pictures', PictureController::class)->except('update');

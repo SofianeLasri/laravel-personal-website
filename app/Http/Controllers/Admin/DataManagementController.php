@@ -198,7 +198,7 @@ class DataManagementController extends Controller
         if (! Storage::exists($filePath)) {
             return response()->json([
                 'message' => 'Import file not found',
-            ], Response::HTTP_NOT_FOUND);
+            ], ResponseAlias::HTTP_NOT_FOUND);
         }
 
         try {
@@ -213,7 +213,7 @@ class DataManagementController extends Controller
         } catch (RuntimeException $e) {
             return response()->json([
                 'message' => 'Import failed: '.$e->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -232,7 +232,7 @@ class DataManagementController extends Controller
         if (! Storage::exists($filePath)) {
             return response()->json([
                 'message' => 'File not found',
-            ], Response::HTTP_NOT_FOUND);
+            ], ResponseAlias::HTTP_NOT_FOUND);
         }
 
         $metadata = $this->importService->getImportMetadata($fullPath);
@@ -240,7 +240,7 @@ class DataManagementController extends Controller
         if ($metadata === null) {
             return response()->json([
                 'message' => 'Cannot read metadata from file',
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return response()->json($metadata);

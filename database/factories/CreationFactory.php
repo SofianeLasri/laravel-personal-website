@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\CreationType;
 use App\Models\Creation;
 use App\Models\Feature;
+use App\Models\OptimizedPicture;
 use App\Models\Person;
 use App\Models\Picture;
 use App\Models\Screenshot;
@@ -63,6 +64,79 @@ class CreationFactory extends Factory
             $technologies = Technology::factory()->count($count)->create();
             $creation->technologies()->attach($technologies);
         });
+    }
+
+    public function withExistingTechnologies(array $technologies): static
+    {
+        return $this->afterCreating(function (Creation $creation) use ($technologies) {
+            $creation->technologies()->attach($technologies);
+        });
+    }
+
+    /**
+     * Complete the creation with a realistic set of related models:
+     * - 3 to 5 technologies (existing or new)
+     * - 2 to 4 features
+     * - 2 to 4 screenshots (with optimized pictures)
+     * - 0 to 3 people
+     * - 2 to 4 tags
+     *
+     * @return $this
+     */
+    public function complete(): static
+    {
+        return $this->afterCreating(function (Creation $creation) {
+            $technologies = Technology::count() >= 5
+                ? Technology::inRandomOrder()->take(rand(3, 5))->get()
+                : Technology::factory()->count(5)->create();
+
+            $creation->technologies()->attach($technologies);
+
+            Feature::factory()->count(rand(2, 4))->create([
+                'creation_id' => $creation->id,
+            ]);
+
+            $screenshots = Screenshot::factory()->count(rand(2, 4))->create([
+                'creation_id' => $creation->id,
+            ]);
+
+            foreach ([$creation->logo, $creation->coverImage] as $picture) {
+                if ($picture) {
+                    $this->createOptimizedPicturesFor($picture);
+                }
+            }
+
+            foreach ($screenshots as $screenshot) {
+                if ($screenshot->picture) {
+                    $this->createOptimizedPicturesFor($screenshot->picture);
+                }
+            }
+
+            if (rand(0, 1)) {
+                $people = Person::factory()->count(rand(1, 3))->create();
+                $creation->people()->attach($people);
+            }
+
+            $tags = Tag::factory()->count(rand(2, 4))->create();
+            $creation->tags()->attach($tags);
+        });
+    }
+
+    protected function createOptimizedPicturesFor(Picture $picture): void
+    {
+        $formats = ['avif', 'webp', 'jpg'];
+        $variants = ['thumbnail', 'small', 'medium', 'large', 'full'];
+
+        foreach ($formats as $format) {
+            foreach ($variants as $variant) {
+                OptimizedPicture::create([
+                    'picture_id' => $picture->id,
+                    'format' => $format,
+                    'variant' => $variant,
+                    'path' => "uploads/optimized/{$picture->filename}_{$variant}.{$format}",
+                ]);
+            }
+        }
     }
 
     public function withPeople(int $count = 2): static

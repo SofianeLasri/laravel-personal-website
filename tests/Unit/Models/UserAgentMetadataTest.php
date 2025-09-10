@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\UserAgentMetadata;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use SlProjects\LaravelRequestLogger\app\Models\UserAgent;
@@ -102,7 +103,7 @@ class UserAgentMetadataTest extends TestCase
 
     public function test_user_agent_id_is_required()
     {
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
 
         UserAgentMetadata::create([
             'is_bot' => true,

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\IpAddressMetadata;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use SlProjects\LaravelRequestLogger\app\Models\IpAddress;
@@ -124,7 +125,7 @@ class IpAddressMetadataTest extends TestCase
 
     public function test_ip_address_id_is_required()
     {
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
 
         IpAddressMetadata::create([
             'country_code' => 'US',

@@ -202,11 +202,14 @@ onBeforeUnmount(() => {
                 <ArrowLeftRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
             </BaseButton>
 
-            <div ref="navScrollContainer" class="no-scrollbar flex space-x-8 overflow-x-auto">
+            <div ref="navScrollContainer" class="no-scrollbar flex space-x-8 overflow-x-auto" data-testid="section-nav">
                 <button
                     v-for="item in items"
                     :key="item.id"
                     :data-item="item.id"
+                    :data-tab="item.id"
+                    :data-section="item.id"
+                    :data-active="currentActiveItem === item.id"
                     class="flex-shrink-0 cursor-pointer border-b-2 py-4 text-xl whitespace-nowrap transition-colors"
                     :class="
                         currentActiveItem === item.id

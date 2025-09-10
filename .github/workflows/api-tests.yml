@@ -3,6 +3,14 @@ name: API Integration Tests
 on:
   workflow_dispatch:
     inputs:
+      run_tests:
+        description: 'Run API tests'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
       provider:
         description: 'AI Provider to test'
         required: true
@@ -16,12 +24,7 @@ on:
 jobs:
   api-tests:
     runs-on: ubuntu-22.04
-    
-    # Only run if secrets are available
-    if: |
-      (github.event.inputs.provider == 'all' && secrets.OPENAI_API_KEY && secrets.ANTHROPIC_API_KEY) ||
-      (github.event.inputs.provider == 'openai' && secrets.OPENAI_API_KEY) ||
-      (github.event.inputs.provider == 'anthropic' && secrets.ANTHROPIC_API_KEY)
+    if: github.event.inputs.run_tests == 'true'
 
     steps:
       - name: Checkout

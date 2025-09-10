@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Http\Controllers\Admin;
+namespace Tests\Feature\Controllers\Admin;
 
 use App\Models\User;
 use DB;

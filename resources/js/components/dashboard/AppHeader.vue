@@ -13,6 +13,7 @@ import {
     NavigationMenuList,
     navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import NotificationPopover from '@/components/ui/notification/NotificationPopover.vue';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getInitials } from '@/composables/useInitials';
@@ -142,6 +143,8 @@ const rightNavItems: NavItem[] = [
                             <Search class="size-5 opacity-80 group-hover:opacity-100" />
                         </Button>
 
+                        <NotificationPopover />
+
                         <div class="hidden space-x-1 lg:flex">
                             <template v-for="item in rightNavItems" :key="item.title">
                                 <TooltipProvider :delay-duration="0">
@@ -187,7 +190,7 @@ const rightNavItems: NavItem[] = [
         </div>
 
         <div v-if="props.breadcrumbs.length > 1" class="border-sidebar-border/70 flex w-full border-b">
-            <div class="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
+            <div class="mx-auto flex h-12 w-full items-center justify-between px-4 text-neutral-500 md:max-w-7xl">
                 <Breadcrumbs :breadcrumbs="breadcrumbs" />
             </div>
         </div>

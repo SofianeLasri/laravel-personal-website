@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Notification;
 use App\Models\OptimizedPicture;
 use App\Models\Picture;
 use Exception;
@@ -15,6 +16,22 @@ use RuntimeException;
 
 class AiProviderService
 {
+    private AiTranslationCacheService $cacheService;
+
+    private ApiRequestLogger $logger;
+
+    private NotificationService $notificationService;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->cacheService = app(AiTranslationCacheService::class);
+        $this->logger = app(ApiRequestLogger::class);
+        $this->notificationService = app(NotificationService::class);
+    }
+
     /**
      * Prompt the AI provider with a text and pictures
      *
@@ -25,47 +42,65 @@ class AiProviderService
      */
     public function promptWithPictures(string $systemRole, string $prompt, Picture ...$pictures): array
     {
-        $transcodingService = app(ImageTranscodingService::class);
+        // Note: Currently not caching image-based prompts due to complexity
+        // This could be added in the future by including image hashes in the cache key
+        try {
+            $transcodingService = app(ImageTranscodingService::class);
 
-        $transcodedPictures = [];
-        foreach ($pictures as $picture) {
-            if ($picture->path_original === null) {
-                Log::error('Picture has no original path', [
-                    'picture' => $picture,
-                ]);
-                throw new RuntimeException('Picture has no original path');
+            $transcodedPictures = [];
+            foreach ($pictures as $picture) {
+                if ($picture->path_original === null) {
+                    Log::error('Picture has no original path', [
+                        'picture' => $picture,
+                    ]);
+                    throw new RuntimeException('Picture has no original path');
+                }
+
+                $picturePath = Storage::disk('public')->get($picture->path_original);
+
+                if ($picturePath === null) {
+                    Log::error('Failed to get picture content from storage', [
+                        'picture' => $picture,
+                        'path' => $picture->path_original,
+                    ]);
+                    throw new RuntimeException('Failed to get picture content from storage');
+                }
+
+                $transcodedPicture = $transcodingService->transcode($picturePath, OptimizedPicture::MEDIUM_SIZE, 'jpeg');
+
+                if (! $transcodedPicture) {
+                    Log::error('Failed to transcode picture', [
+                        'picture' => $picture,
+                    ]);
+                    throw new RuntimeException('Failed to transcode picture');
+                }
+
+                $transcodedPictures[] = $transcodedPicture;
             }
 
-            $picturePath = Storage::disk('public')->get($picture->path_original);
+            $selectedProvider = config('ai-provider.selected-provider');
+            $providerConfig = config('ai-provider.providers.'.$selectedProvider);
 
-            if ($picturePath === null) {
-                Log::error('Failed to get picture content from storage', [
-                    'picture' => $picture,
-                    'path' => $picture->path_original,
-                ]);
-                throw new RuntimeException('Failed to get picture content from storage');
+            if ($selectedProvider === 'anthropic') {
+                return $this->callAnthropicApi($providerConfig, $systemRole, $prompt, $transcodedPictures);
             }
 
-            $transcodedPicture = $transcodingService->transcode($picturePath, OptimizedPicture::MEDIUM_SIZE, 'jpeg');
+            return $this->callOpenAiApi($providerConfig, $systemRole, $prompt, $transcodedPictures);
+        } catch (Exception $e) {
+            // Send error notification
+            $this->notificationService->createAiProviderNotification(
+                Notification::TYPE_ERROR,
+                'AI Provider Error',
+                'Failed to process image request: '.$e->getMessage(),
+                [
+                    'provider' => config('ai-provider.selected-provider'),
+                    'error' => $e->getMessage(),
+                    'pictures_count' => count($pictures),
+                ]
+            );
 
-            if (! $transcodedPicture) {
-                Log::error('Failed to transcode picture', [
-                    'picture' => $picture,
-                ]);
-                throw new RuntimeException('Failed to transcode picture');
-            }
-
-            $transcodedPictures[] = $transcodedPicture;
+            throw $e;
         }
-
-        $selectedProvider = config('ai-provider.selected-provider');
-        $providerConfig = config('ai-provider.providers.'.$selectedProvider);
-
-        if ($selectedProvider === 'anthropic') {
-            return $this->callAnthropicApi($providerConfig, $systemRole, $prompt, $transcodedPictures);
-        }
-
-        return $this->callOpenAiApi($providerConfig, $systemRole, $prompt, $transcodedPictures);
     }
 
     /**
@@ -80,11 +115,48 @@ class AiProviderService
         $selectedProvider = config('ai-provider.selected-provider');
         $providerConfig = config('ai-provider.providers.'.$selectedProvider);
 
-        if ($selectedProvider === 'anthropic') {
-            return $this->callAnthropicApi($providerConfig, $systemRole, $prompt);
+        // Check cache if enabled
+        if ($this->cacheService->isEnabled()) {
+            $cacheKey = $this->cacheService->generateCacheKey($selectedProvider, $systemRole, $prompt);
+            $cached = $this->cacheService->get($cacheKey, $this->cacheService->getTtl());
+
+            if ($cached !== null) {
+                Log::info('Using cached AI response', [
+                    'provider' => $selectedProvider,
+                    'cache_key' => $cacheKey,
+                ]);
+
+                // Log cached response
+                $this->logger->logSuccess(
+                    $selectedProvider,
+                    $providerConfig['model'],
+                    $providerConfig['url'],
+                    $systemRole,
+                    $prompt,
+                    $cached,
+                    0.001, // Minimal response time for cache hit
+                    200,
+                    true, // Mark as cached
+                    null
+                );
+
+                return $cached;
+            }
         }
 
-        return $this->callOpenAiApi($providerConfig, $systemRole, $prompt);
+        // Call the API
+        if ($selectedProvider === 'anthropic') {
+            $response = $this->callAnthropicApi($providerConfig, $systemRole, $prompt);
+        } else {
+            $response = $this->callOpenAiApi($providerConfig, $systemRole, $prompt);
+        }
+
+        // Store in cache if enabled
+        if ($this->cacheService->isEnabled()) {
+            $this->cacheService->put($selectedProvider, $systemRole, $prompt, $response);
+        }
+
+        return $response;
     }
 
     /**
@@ -98,6 +170,7 @@ class AiProviderService
      */
     private function callOpenAiApi(array $providerConfig, string $systemRole, string $prompt, array $transcodedPictures = []): array
     {
+        $startTime = microtime(true);
         $userContent = [
             [
                 'type' => 'text',
@@ -147,15 +220,68 @@ class AiProviderService
                 ->timeout(120)
                 ->post($providerConfig['url'], $requestBody);
         } catch (ConnectionException $e) {
+            $responseTime = microtime(true) - $startTime;
+
+            // Log the error
+            $this->logger->logError(
+                'openai',
+                $providerConfig['model'],
+                $providerConfig['url'],
+                $systemRole,
+                $prompt,
+                $e->getMessage(),
+                $responseTime,
+                null,
+                ['pictures_count' => count($transcodedPictures)]
+            );
+
+            // Send error notification
+            $this->notificationService->createAiProviderNotification(
+                Notification::TYPE_ERROR,
+                'OpenAI Connection Error',
+                'Failed to connect to OpenAI API: '.$e->getMessage(),
+                [
+                    'provider' => 'openai',
+                    'model' => $providerConfig['model'],
+                    'error' => $e->getMessage(),
+                ]
+            );
+
             Log::error('Failed to call OpenAI API', [
                 'exception' => $e,
             ]);
             throw new RuntimeException('Failed to call AI provider API');
         }
 
+        $responseTime = microtime(true) - $startTime;
         $result = $response->json();
 
         if (! isset($result['choices'][0]['message']['content'])) {
+            // Log the error
+            $this->logger->logError(
+                'openai',
+                $providerConfig['model'],
+                $providerConfig['url'],
+                $systemRole,
+                $prompt,
+                'Invalid response structure',
+                $responseTime,
+                $response->status(),
+                ['response' => $result]
+            );
+
+            // Send error notification
+            $this->notificationService->createAiProviderNotification(
+                Notification::TYPE_ERROR,
+                'OpenAI Response Error',
+                'Invalid response structure from OpenAI API',
+                [
+                    'provider' => 'openai',
+                    'model' => $providerConfig['model'],
+                    'status' => $response->status(),
+                ]
+            );
+
             Log::error('Failed to get response from OpenAI', [
                 'response' => $result,
             ]);
@@ -172,6 +298,20 @@ class AiProviderService
             throw new RuntimeException('AI provider returned invalid JSON content');
         }
 
+        // Log successful request
+        $this->logger->logSuccess(
+            'openai',
+            $providerConfig['model'],
+            $providerConfig['url'],
+            $systemRole,
+            $prompt,
+            $result,
+            $responseTime,
+            $response->status(),
+            false,
+            ['pictures_count' => count($transcodedPictures)]
+        );
+
         return $decodedContent;
     }
 
@@ -186,6 +326,7 @@ class AiProviderService
      */
     private function callAnthropicApi(array $providerConfig, string $systemRole, string $prompt, array $transcodedPictures = []): array
     {
+        $startTime = microtime(true);
         $userContent = [
             [
                 'type' => 'text',
@@ -227,15 +368,68 @@ class AiProviderService
                 ->timeout(120) // Increase timeout for long responses
                 ->post($providerConfig['url'], $requestBody);
         } catch (ConnectionException $e) {
+            $responseTime = microtime(true) - $startTime;
+
+            // Log the error
+            $this->logger->logError(
+                'anthropic',
+                $providerConfig['model'],
+                $providerConfig['url'],
+                $systemRole,
+                $prompt,
+                $e->getMessage(),
+                $responseTime,
+                null,
+                ['pictures_count' => count($transcodedPictures)]
+            );
+
+            // Send error notification
+            $this->notificationService->createAiProviderNotification(
+                Notification::TYPE_ERROR,
+                'Anthropic Connection Error',
+                'Failed to connect to Anthropic API: '.$e->getMessage(),
+                [
+                    'provider' => 'anthropic',
+                    'model' => $providerConfig['model'],
+                    'error' => $e->getMessage(),
+                ]
+            );
+
             Log::error('Failed to call Anthropic API', [
                 'exception' => $e,
             ]);
             throw new RuntimeException('Failed to call AI provider API');
         }
 
+        $responseTime = microtime(true) - $startTime;
         $result = $response->json();
 
         if (! isset($result['content'][0]['text'])) {
+            // Log the error
+            $this->logger->logError(
+                'anthropic',
+                $providerConfig['model'],
+                $providerConfig['url'],
+                $systemRole,
+                $prompt,
+                'Invalid response structure',
+                $responseTime,
+                $response->status(),
+                ['response' => $result]
+            );
+
+            // Send error notification
+            $this->notificationService->createAiProviderNotification(
+                Notification::TYPE_ERROR,
+                'Anthropic Response Error',
+                'Invalid response structure from Anthropic API',
+                [
+                    'provider' => 'anthropic',
+                    'model' => $providerConfig['model'],
+                    'status' => $response->status(),
+                ]
+            );
+
             Log::error('Failed to get response from Anthropic', [
                 'response' => $result,
             ]);
@@ -264,6 +458,20 @@ class AiProviderService
             throw new RuntimeException('AI provider returned invalid JSON content');
         }
 
+        // Log successful request
+        $this->logger->logSuccess(
+            'anthropic',
+            $providerConfig['model'],
+            $providerConfig['url'],
+            $systemRole,
+            $prompt,
+            $result,
+            $responseTime,
+            $response->status(),
+            false,
+            ['pictures_count' => count($transcodedPictures)]
+        );
+
         return $decodedContent;
     }
 
@@ -290,7 +498,7 @@ class AiProviderService
 
         // Check if this is a JSON with unescaped newlines (common with AI responses)
         // Try to fix it by extracting and properly escaping the message content
-        if (preg_match('/^\s*\{\s*"message"\s*:\s*"(.*)"\s*\}\s*$/s', $jsonString, $matches)) {
+        if (preg_match('/^\s*\{\s*"message"\s*:\s*"(.*)"\s*}\s*$/s', $jsonString, $matches)) {
             $messageContent = $matches[1];
 
             // Properly escape the message content for JSON

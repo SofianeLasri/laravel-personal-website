@@ -4,7 +4,6 @@ namespace Tests\Feature\Pages;
 
 use App\Http\Controllers\Admin\TranslationPageController;
 use App\Jobs\TranslateToEnglishJob;
-use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

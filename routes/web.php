@@ -13,10 +13,12 @@ use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
+use App\Http\Controllers\Admin\ApiRequestLogController;
 use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\DataManagementController;
 use App\Http\Controllers\Admin\ExperiencePageController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PicturePageController;
 use App\Http\Controllers\Admin\RequestLogController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
@@ -71,6 +73,11 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     Route::get('/', [\App\Http\Controllers\Admin\HomeController::class, 'index'])->name('index');
     Route::get('/stats', [\App\Http\Controllers\Admin\HomeController::class, 'stats'])->name('stats');
 
+    // Notifications page
+    Route::get('/notifications', function () {
+        return inertia('dashboard/Notifications');
+    })->name('notifications');
+
     Route::name('creations.')->prefix('creations')->group(function () {
         Route::get('/', [CreationPageController::class, 'listPage'])
             ->name('index');
@@ -117,6 +124,11 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     Route::post('/request-logs/mark-as-bot', [RequestLogController::class, 'markAsBot'])
         ->name('request-logs.mark-as-bot');
 
+    Route::get('/api-logs', [ApiRequestLogController::class, 'index'])
+        ->name('api-logs.index');
+    Route::get('/api-logs/{apiRequestLog}', [ApiRequestLogController::class, 'show'])
+        ->name('api-logs.show');
+
     Route::name('data-management.')->prefix('data-management')->group(function () {
         Route::get('/', [DataManagementController::class, 'index'])
             ->name('index');
@@ -137,6 +149,24 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     });
 
     Route::name('api.')->prefix('api')->group(function () {
+        // Notifications routes
+        Route::get('notifications', [NotificationController::class, 'index'])
+            ->name('notifications.index');
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])
+            ->name('notifications.unread-count');
+        Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+            ->name('notifications.mark-all-as-read');
+        Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])
+            ->name('notifications.mark-as-read');
+        Route::delete('notifications/clear', [NotificationController::class, 'clearAll'])
+            ->name('notifications.clear');
+        Route::delete('notifications/{id}', [NotificationController::class, 'destroy'])
+            ->name('notifications.destroy');
+        Route::post('notifications', [NotificationController::class, 'store'])
+            ->name('notifications.store');
+        Route::get('notifications/stream', [NotificationController::class, 'stream'])
+            ->name('notifications.stream');
+
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
         Route::apiResource('pictures', PictureController::class)->except('update');

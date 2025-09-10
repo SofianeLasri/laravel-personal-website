@@ -65,7 +65,7 @@ return new class extends Migration
         } else {
             // First, delete any jpg format entries that might exist
             DB::table('optimized_pictures')->where('format', 'jpg')->delete();
-            
+
             // Then change the enum
             Schema::table('optimized_pictures', function (Blueprint $table) {
                 $table->enum('format', ['avif', 'webp'])->change();

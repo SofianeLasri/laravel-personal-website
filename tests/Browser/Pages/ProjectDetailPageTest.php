@@ -1,8 +1,10 @@
 <?php
 
-namespace Tests\Browser;
+namespace Tests\Browser\Pages;
 
 use App\Enums\CreationType;
+use App\Enums\VideoStatus;
+use App\Enums\VideoVisibility;
 use App\Models\Creation;
 use App\Models\Feature;
 use App\Models\OptimizedPicture;
@@ -229,7 +231,7 @@ class ProjectDetailPageTest extends DuskTestCase
                     // Verify technology categories if they exist
                     $techCategories = $browser->script('return Array.from(document.querySelectorAll(\'[data-testid="technology-category"]\'))
                         .map(el => el.textContent.trim());');
-                    if (!empty($techCategories[0])) {
+                    if (! empty($techCategories[0])) {
                         $this->assertNotEmpty($techCategories[0], 'Technology categories should have content if displayed');
                     }
 
@@ -258,7 +260,7 @@ class ProjectDetailPageTest extends DuskTestCase
                     // Check that people are displayed (count may vary due to seeding)
                     $peopleElements = $browser->script('return document.querySelectorAll(\'[data-testid="people-section"] [data-testid^="person-"], [data-testid="people-section"] .person-item, [data-testid="people-section"] [class*="person"]\').length;');
                     $this->assertGreaterThan(0, $peopleElements[0] ?? 0, 'Team members should be displayed');
-                    
+
                     // Verify our specific test people are shown
                     $peopleContent = $browser->text('[data-testid="people-section"]');
                     $this->assertStringContainsString('John Doe', $peopleContent);
@@ -328,17 +330,17 @@ class ProjectDetailPageTest extends DuskTestCase
             // 16. Test that all sections are accessible via navigation
             $navSections = $browser->script('return Array.from(document.querySelectorAll(\'[data-testid="section-nav"] [data-section]\'))
                 .map(el => el.getAttribute("data-section"));');
-            
+
             foreach ($navSections[0] ?? [] as $section) {
                 $browser->click("[data-section=\"$section\"]")
                     ->pause(300);
-                
+
                 // Verify section is active
                 $isActive = $browser->script("return document.querySelector('[data-section=\"$section\"][data-active=\"true\"]') !== null;");
                 $this->assertTrue($isActive[0] ?? false, "Section $section should be active after clicking");
-                
+
                 // Verify corresponding content is visible
-                $sectionTestId = str_replace('_', '-', $section) . '-section';
+                $sectionTestId = str_replace('_', '-', $section).'-section';
                 $isVisible = $browser->script("return document.querySelector('[data-testid=\"$sectionTestId\"]') !== null;");
                 if ($isVisible[0] ?? false) {
                     $browser->assertVisible("[data-testid=\"$sectionTestId\"]");
@@ -353,7 +355,7 @@ class ProjectDetailPageTest extends DuskTestCase
             $externalLinks = $browser->script('return Array.from(document.querySelectorAll(\'a[href^="http"]\'))
                 .filter(a => !a.href.includes(window.location.hostname))
                 .map(a => ({href: a.href, target: a.target, rel: a.rel}));');
-            
+
             foreach ($externalLinks[0] ?? [] as $link) {
                 $this->assertEquals('_blank', $link['target'] ?? '', 'External links should open in new tab');
                 $this->assertStringContainsString('noopener', $link['rel'] ?? '', 'External links should have noopener rel');
@@ -564,8 +566,8 @@ class ProjectDetailPageTest extends DuskTestCase
         $this->assertCount(2, $this->videos);
         foreach ($this->videos as $video) {
             $this->assertNotNull($video->bunny_video_id);
-            $this->assertEquals(\App\Enums\VideoStatus::READY, $video->status);
-            $this->assertEquals(\App\Enums\VideoVisibility::PUBLIC, $video->visibility);
+            $this->assertEquals(VideoStatus::READY, $video->status);
+            $this->assertEquals(VideoVisibility::PUBLIC, $video->visibility);
         }
 
         // Validate relationships

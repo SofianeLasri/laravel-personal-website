@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Http\Controllers\Public;
+namespace Tests\Feature\Controllers\Public;
 
 use App\Enums\ExperienceType;
 use App\Models\Experience;

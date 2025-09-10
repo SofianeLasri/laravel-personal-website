@@ -28,7 +28,8 @@
     "spatie/laravel-backup": "^9.3",
     "spatie/laravel-sitemap": "^7.3",
     "tightenco/ziggy": "^2.4",
-    "verschuur/laravel-robotstxt": "^5.2"
+    "verschuur/laravel-robotstxt": "^5.2",
+    "ext-pdo": "*"
   },
   "require-dev": {
     "brianium/paratest": "^7.8",

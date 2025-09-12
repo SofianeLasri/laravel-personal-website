@@ -27,6 +27,8 @@ class PublicControllersService
     private string $locale;
 
     private string $fallbackLocale;
+    
+    private GitHubService $gitHubService;
 
     private const DEVELOPMENT_TYPES = [
         CreationType::PORTFOLIO,
@@ -46,6 +48,7 @@ class PublicControllersService
         $this->locale = app()->getLocale();
         $this->fallbackLocale = config('app.fallback_locale');
         $this->creationCountByTechnology = $this->calcCreationCountByTechnology();
+        $this->gitHubService = new GitHubService();
     }
 
     /**
@@ -297,6 +300,17 @@ class PublicControllersService
             ->map(function (Video $video) {
                 return $this->formatVideoForSSR($video);
             })->toArray();
+
+        // Add GitHub repository data if source code URL exists
+        $response['githubData'] = null;
+        $response['githubLanguages'] = null;
+        
+        if ($creation->source_code_url && str_contains($creation->source_code_url, 'github.com')) {
+            $response['githubData'] = $this->gitHubService->getRepositoryData($creation->source_code_url);
+            if ($response['githubData']) {
+                $response['githubLanguages'] = $this->gitHubService->getRepositoryLanguages($creation->source_code_url);
+            }
+        }
 
         return $response;
     }

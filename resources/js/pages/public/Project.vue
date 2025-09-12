@@ -7,6 +7,7 @@ import ProjectVideoGallery from '@/components/public/ProjectPage/ProjectVideoGal
 import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import HorizontalNavbar from '@/components/public/Ui/HorizontalNavbar.vue';
+import GitHubStats from '@/components/public/GitHubStats.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';
@@ -34,6 +35,9 @@ const contentContainer = ref<HTMLElement | null>(null);
 
 const sections = [{ id: 'description', label: t('project.description') }];
 
+if (props.creation.githubData) {
+    sections.push({ id: 'github', label: 'GitHub' });
+}
 if (props.creation.features.length > 0) {
     sections.push({ id: 'features', label: t('project.key_features') });
 }
@@ -99,6 +103,10 @@ if (props.creation.screenshots.length > 0) {
                     <section id="description" class="flex flex-col" data-testid="description-section">
                         <ContentSectionTitle>{{ t('project.description') }}</ContentSectionTitle>
                         <MarkdownViewer :source="creation.fullDescription" data-testid="project-description" />
+                    </section>
+
+                    <section id="github" class="mt-16" v-if="creation.githubData" data-testid="github-section">
+                        <GitHubStats :github-data="creation.githubData" :github-languages="creation.githubLanguages" />
                     </section>
 
                     <section id="features" class="mt-16 flex flex-col gap-8" v-if="creation.features.length > 0" data-testid="features-section">

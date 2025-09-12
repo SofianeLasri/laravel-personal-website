@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { AlertCircle, Calendar, Code, Eye, GitBranch, GitFork, RefreshCw, Scale, Star } from 'lucide-vue-next';
+import { useTranslation } from '@/composables/useTranslation';
 
 interface GitHubData {
     name: string;
@@ -30,6 +31,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useTranslation();
 
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -82,9 +84,9 @@ const getLanguageColor = (language: string): string => {
         <div class="github-header">
             <h3 class="github-title">
                 <Code class="icon" />
-                GitHub Repository
+                {{ t('project.github_repository') }}
             </h3>
-            <a :href="githubData.url" target="_blank" rel="noopener noreferrer" class="github-link"> View on GitHub → </a>
+            <a :href="githubData.url" target="_blank" rel="noopener noreferrer" class="github-link"> {{ t('project.view_on_github') }} → </a>
         </div>
 
         <div v-if="githubData.description" class="github-description">
@@ -96,7 +98,7 @@ const getLanguageColor = (language: string): string => {
                 <Star class="stat-icon" />
                 <div class="stat-content">
                     <div class="stat-value">{{ githubData.stars }}</div>
-                    <div class="stat-label">Stars</div>
+                    <div class="stat-label">{{ t('project.stars') }}</div>
                 </div>
             </div>
 
@@ -104,7 +106,7 @@ const getLanguageColor = (language: string): string => {
                 <GitFork class="stat-icon" />
                 <div class="stat-content">
                     <div class="stat-value">{{ githubData.forks }}</div>
-                    <div class="stat-label">Forks</div>
+                    <div class="stat-label">{{ t('project.forks') }}</div>
                 </div>
             </div>
 
@@ -112,7 +114,7 @@ const getLanguageColor = (language: string): string => {
                 <Eye class="stat-icon" />
                 <div class="stat-content">
                     <div class="stat-value">{{ githubData.watchers }}</div>
-                    <div class="stat-label">Watchers</div>
+                    <div class="stat-label">{{ t('project.watchers') }}</div>
                 </div>
             </div>
 
@@ -120,13 +122,13 @@ const getLanguageColor = (language: string): string => {
                 <AlertCircle class="stat-icon" />
                 <div class="stat-content">
                     <div class="stat-value">{{ githubData.open_issues }}</div>
-                    <div class="stat-label">Issues</div>
+                    <div class="stat-label">{{ t('project.issues') }}</div>
                 </div>
             </div>
         </div>
 
         <div v-if="githubLanguages && topLanguages.length > 0" class="languages-section">
-            <h4 class="languages-title">Languages</h4>
+            <h4 class="languages-title">{{ t('project.languages') }}</h4>
             <div class="languages-bar">
                 <div
                     v-for="{ lang, percentage } in topLanguages"
@@ -161,12 +163,12 @@ const getLanguageColor = (language: string): string => {
 
             <div class="meta-item">
                 <Calendar class="meta-icon" />
-                <span>Created {{ formatDate(githubData.created_at) }}</span>
+                <span>{{ t('project.created') }} {{ formatDate(githubData.created_at) }}</span>
             </div>
 
             <div class="meta-item">
                 <RefreshCw class="meta-icon" />
-                <span>Updated {{ formatDate(githubData.updated_at) }}</span>
+                <span>{{ t('project.updated') }} {{ formatDate(githubData.updated_at) }}</span>
             </div>
         </div>
 
@@ -182,15 +184,15 @@ const getLanguageColor = (language: string): string => {
 
 <style scoped>
 .github-stats {
-    background-color: #f3f4f6;
+    background-color: #fff7ed;
     border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #fed7aa;
     padding: 1.5rem;
 }
 
 .dark .github-stats {
-    background-color: #1f2937;
-    border-color: #374151;
+    background-color: #1a0f08;
+    border-color: #431407;
 }
 
 .github-header {
@@ -211,34 +213,40 @@ const getLanguageColor = (language: string): string => {
 .github-title .icon {
     width: 1.25rem;
     height: 1.25rem;
-    color: #6b7280;
+    color: #ea580c;
 }
 
 .dark .github-title .icon {
-    color: #9ca3af;
+    color: #fb923c;
 }
 
 .github-link {
     font-size: 0.875rem;
-    color: #2563eb;
+    color: #ea580c;
     text-decoration: none;
+    transition: color 0.2s;
 }
 
 .github-link:hover {
     text-decoration: underline;
+    color: #dc2626;
 }
 
 .dark .github-link {
-    color: #60a5fa;
+    color: #fb923c;
+}
+
+.dark .github-link:hover {
+    color: #fed7aa;
 }
 
 .github-description {
-    color: #4b5563;
+    color: #57534e;
     margin-bottom: 1rem;
 }
 
 .dark .github-description {
-    color: #9ca3af;
+    color: #d6d3d1;
 }
 
 .github-stats-grid {
@@ -263,11 +271,11 @@ const getLanguageColor = (language: string): string => {
 .stat-icon {
     width: 1.25rem;
     height: 1.25rem;
-    color: #6b7280;
+    color: #f97316;
 }
 
 .dark .stat-icon {
-    color: #9ca3af;
+    color: #fdba74;
 }
 
 .stat-content {
@@ -282,11 +290,11 @@ const getLanguageColor = (language: string): string => {
 
 .stat-label {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: #78716c;
 }
 
 .dark .stat-label {
-    color: #9ca3af;
+    color: #a8a29e;
 }
 
 .languages-section {
@@ -296,12 +304,12 @@ const getLanguageColor = (language: string): string => {
 .languages-title {
     font-size: 0.875rem;
     font-weight: 500;
-    color: #6b7280;
+    color: #78716c;
     margin-bottom: 0.75rem;
 }
 
 .dark .languages-title {
-    color: #9ca3af;
+    color: #a8a29e;
 }
 
 .languages-bar {
@@ -309,12 +317,12 @@ const getLanguageColor = (language: string): string => {
     height: 0.5rem;
     border-radius: 9999px;
     overflow: hidden;
-    background-color: #e5e7eb;
+    background-color: #fed7aa;
     margin-bottom: 0.75rem;
 }
 
 .dark .languages-bar {
-    background-color: #374151;
+    background-color: #431407;
 }
 
 .language-segment {
@@ -349,11 +357,11 @@ const getLanguageColor = (language: string): string => {
 }
 
 .language-percentage {
-    color: #6b7280;
+    color: #78716c;
 }
 
 .dark .language-percentage {
-    color: #9ca3af;
+    color: #a8a29e;
 }
 
 .github-meta {
@@ -361,12 +369,12 @@ const getLanguageColor = (language: string): string => {
     flex-wrap: wrap;
     gap: 1rem;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: #78716c;
     margin-top: 1rem;
 }
 
 .dark .github-meta {
-    color: #9ca3af;
+    color: #a8a29e;
 }
 
 .meta-item {
@@ -394,14 +402,14 @@ const getLanguageColor = (language: string): string => {
     padding: 0.25rem 0.625rem;
     font-size: 0.75rem;
     font-weight: 500;
-    background-color: #dbeafe;
-    color: #1d4ed8;
+    background-color: #ffedd5;
+    color: #c2410c;
     border-radius: 9999px;
 }
 
 .dark .topic-badge {
-    background-color: #1e3a8a;
-    color: #93bbfc;
+    background-color: #431407;
+    color: #fdba74;
 }
 
 @media (max-width: 640px) {

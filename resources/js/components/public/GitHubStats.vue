@@ -37,14 +37,6 @@ const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 };
-
-const formatSize = (sizeInKb: number): string => {
-    if (sizeInKb < 1024) {
-        return `${sizeInKb} KB`;
-    }
-    return `${(sizeInKb / 1024).toFixed(1)} MB`;
-};
-
 const topLanguages = computed(() => {
     if (!props.githubLanguages) return [];
     return Object.entries(props.githubLanguages)

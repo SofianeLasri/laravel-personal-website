@@ -6,6 +6,7 @@ return [
     // Project sections
     'description' => 'Description',
     'key_features' => 'Key Features',
+    'statistics' => 'Statistics',
     'people_involved' => 'People Involved',
     'technologies_used' => 'Technologies Used',
     'videos' => 'Videos',
@@ -33,4 +34,17 @@ return [
     'languages' => 'Languages',
     'created' => 'Created',
     'updated' => 'Updated',
+
+    // Packagist Stats
+    'packagist_package' => 'Composer Package',
+    'view_on_packagist' => 'View on Packagist',
+    'total_downloads' => 'Downloads',
+    'monthly_downloads' => 'Monthly',
+    'daily_downloads' => 'Daily',
+    'favorites' => 'Favorites',
+    'dependents' => 'Dependents',
+    'suggesters' => 'Suggesters',
+    'maintainers' => 'Maintainers',
+    'php_required' => 'PHP Required',
+    'version_required' => 'Required',
 ];

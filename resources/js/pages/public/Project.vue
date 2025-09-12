@@ -2,6 +2,7 @@
 import GitHubStats from '@/components/public/GitHubStats.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import MarkdownViewer from '@/components/public/MarkdownViewer.vue';
+import PackagistStats from '@/components/public/PackagistStats.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
 import ProjectScreenshotsContainer from '@/components/public/ProjectPage/ProjectScreenshotsContainer.vue';
 import ProjectVideoGallery from '@/components/public/ProjectPage/ProjectVideoGallery.vue';
@@ -35,11 +36,11 @@ const contentContainer = ref<HTMLElement | null>(null);
 
 const sections = [{ id: 'description', label: t('project.description') }];
 
-if (props.creation.githubData) {
-    sections.push({ id: 'github', label: 'GitHub' });
-}
 if (props.creation.features.length > 0) {
     sections.push({ id: 'features', label: t('project.key_features') });
+}
+if (props.creation.githubData || props.creation.packagistData) {
+    sections.push({ id: 'statistics', label: t('project.statistics') });
 }
 if (props.creation.people.length > 0) {
     sections.push({ id: 'people', label: t('project.people_involved') });
@@ -105,10 +106,6 @@ if (props.creation.screenshots.length > 0) {
                         <MarkdownViewer :source="creation.fullDescription" data-testid="project-description" />
                     </section>
 
-                    <section id="github" class="mt-16" v-if="creation.githubData" data-testid="github-section">
-                        <GitHubStats :github-data="creation.githubData" :github-languages="creation.githubLanguages" />
-                    </section>
-
                     <section id="features" class="mt-16 flex flex-col gap-8" v-if="creation.features.length > 0" data-testid="features-section">
                         <ContentSectionTitle>{{ t('project.key_features') }}</ContentSectionTitle>
                         <div class="grid gap-16 md:grid-cols-2 lg:grid-cols-3">
@@ -116,6 +113,19 @@ if (props.creation.screenshots.length > 0) {
                                 <h3 class="text-design-system-paragraph text-xl font-bold">{{ feature.title }}</h3>
                                 <div class="text-design-system-paragraph text-lg font-normal">{{ feature.description }}</div>
                             </div>
+                        </div>
+                    </section>
+
+                    <section
+                        id="statistics"
+                        class="mt-16 flex flex-col"
+                        v-if="creation.githubData || creation.packagistData"
+                        data-testid="statistics-section"
+                    >
+                        <ContentSectionTitle>{{ t('project.statistics') }}</ContentSectionTitle>
+                        <div class="flex flex-col gap-8">
+                            <GitHubStats v-if="creation.githubData" :github-data="creation.githubData" :github-languages="creation.githubLanguages" />
+                            <PackagistStats v-if="creation.packagistData" :packagist-data="creation.packagistData" />
                         </div>
                     </section>
 

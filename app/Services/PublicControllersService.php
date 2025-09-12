@@ -30,6 +30,8 @@ class PublicControllersService
 
     private GitHubService $gitHubService;
 
+    private PackagistService $packagistService;
+
     private const DEVELOPMENT_TYPES = [
         CreationType::PORTFOLIO,
         CreationType::LIBRARY,
@@ -49,6 +51,7 @@ class PublicControllersService
         $this->fallbackLocale = config('app.fallback_locale');
         $this->creationCountByTechnology = $this->calcCreationCountByTechnology();
         $this->gitHubService = new GitHubService;
+        $this->packagistService = new PackagistService;
     }
 
     /**
@@ -310,6 +313,13 @@ class PublicControllersService
             if ($response['githubData']) {
                 $response['githubLanguages'] = $this->gitHubService->getRepositoryLanguages($creation->source_code_url);
             }
+        }
+
+        // Add Packagist package data if external URL is a Packagist URL
+        $response['packagistData'] = null;
+
+        if ($creation->external_url && str_contains($creation->external_url, 'packagist.org')) {
+            $response['packagistData'] = $this->packagistService->getPackageData($creation->external_url);
         }
 
         return $response;

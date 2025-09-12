@@ -244,6 +244,35 @@ interface SSRFullCreation extends SSRSimplifiedCreation {
         homepage: string | null;
     } | null;
     githubLanguages: Record<string, number> | null;
+    packagistData: {
+        name: string;
+        description: string | null;
+        downloads: number;
+        daily_downloads: number;
+        monthly_downloads: number;
+        stars: number;
+        dependents: number;
+        suggesters: number;
+        type: string | null;
+        repository: string | null;
+        github_stars: number | null;
+        github_watchers: number | null;
+        github_forks: number | null;
+        github_open_issues: number | null;
+        language: string | null;
+        license: string[] | null;
+        latest_version: string | null;
+        latest_stable_version: string | null;
+        created_at: string | null;
+        updated_at: string | null;
+        url: string;
+        maintainers: Array<{
+            name: string;
+            avatar_url: string | null;
+        }>;
+        php_version: string | null;
+        laravel_version: string | null;
+    } | null;
 }
 
 interface SSRTechnology {

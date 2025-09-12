@@ -5,29 +5,27 @@
 }
 
 /* Elements that can have the glow effect */
-.glow-border,
-.card,
-button,
-.btn,
-a.inline-flex,
-.group,
-[role='button'],
-.border:not(.border-transparent),
-[class*='border-']:not([class*='border-transparent']) {
+.glow-border:not(.no-glow),
+.card:not(.no-glow),
+button:not(.no-glow),
+.btn:not(.no-glow),
+a.inline-flex:not(.no-glow),
+.group:not(.no-glow),
+[role='button']:not(.no-glow),
+.border:not(.no-glow) {
     position: relative;
     isolation: isolate;
 }
 
 /* Create the glow effect with pseudo-element */
-.glow-border::before,
-.card::before,
-button::before,
-.btn::before,
-a.inline-flex::before,
-.group::before,
-[role='button']::before,
-.border:not(.border-transparent)::before,
-[class*='border-']:not([class*='border-transparent'])::before {
+.glow-border:not(.no-glow)::before,
+.card:not(.no-glow)::before,
+button:not(.no-glow)::before,
+.btn:not(.no-glow)::before,
+a.inline-flex:not(.no-glow)::before,
+.group:not(.no-glow)::before,
+[role='button']:not(.no-glow)::before,
+.border:not(.no-glow)::before {
     content: '';
     position: absolute;
     inset: -2px;
@@ -76,13 +74,13 @@ a.inline-flex:hover,
 }
 
 /* Prevent overflow issues on certain elements */
-.overflow-hidden .glow-border::before,
-.overflow-hidden .card::before,
-.overflow-hidden button::before,
-.overflow-hidden .btn::before,
-.overflow-hidden a.inline-flex::before,
-.overflow-hidden .group::before,
-.overflow-hidden [role='button']::before {
+.overflow-hidden .glow-border:not(.no-glow)::before,
+.overflow-hidden .card:not(.no-glow)::before,
+.overflow-hidden button:not(.no-glow)::before,
+.overflow-hidden .btn:not(.no-glow)::before,
+.overflow-hidden a.inline-flex:not(.no-glow)::before,
+.overflow-hidden .group:not(.no-glow)::before,
+.overflow-hidden [role='button']:not(.no-glow)::before {
     inset: 0;
     padding: 0;
 }
@@ -96,8 +94,7 @@ a.inline-flex:hover,
     a.inline-flex::before,
     .group::before,
     [role='button']::before,
-    .border:not(.border-transparent)::before,
-    [class*='border-']:not([class*='border-transparent'])::before {
+    .border::before {
         display: none;
     }
 }

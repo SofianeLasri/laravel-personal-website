@@ -80,18 +80,38 @@ const updateGradients = () => {
 
     // Select all potential elements with borders
     const elements = document.querySelectorAll<HTMLElement>(`
-        .glow-border,
-        .card,
-        button,
-        .btn,
-        a.inline-flex,
-        .group,
-        [role="button"],
-        .border:not(.border-transparent),
-        [class*="border-"]:not([class*="border-transparent"])
+        .glow-border:not(.no-glow),
+        .card:not(.no-glow),
+        button:not(.no-glow),
+        .btn:not(.no-glow),
+        a.inline-flex:not(.no-glow),
+        .group:not(.no-glow),
+        [role="button"]:not(.no-glow),
+        .border:not(.no-glow)
     `);
 
     elements.forEach((element) => {
+        // Skip elements explicitly marked with no-glow
+        if (element.classList.contains('no-glow')) {
+            return;
+        }
+
+        // Check if element has any transparent or no-border classes
+        const classes = Array.from(element.classList);
+        const hasBorderTransparent = classes.some(
+            (cls) =>
+                cls === 'border-transparent' ||
+                cls === 'border-none' ||
+                cls === 'border-0' ||
+                cls.endsWith(':border-transparent') ||
+                cls.endsWith(':border-none') ||
+                cls.endsWith(':border-0'),
+        );
+
+        if (hasBorderTransparent) {
+            return;
+        }
+
         const rect = element.getBoundingClientRect();
 
         if (doesBorderIntersectGlow(rect)) {

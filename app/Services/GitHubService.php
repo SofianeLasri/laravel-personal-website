@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Log;
 class GitHubService
 {
     private const CACHE_TTL = 3600; // 1 hour
+
     private const API_BASE_URL = 'https://api.github.com';
 
     /**
      * Extract owner and repo from GitHub URL
      *
-     * @param string $url
      * @return array{owner: string, repo: string}|null
      */
     private function parseGitHubUrl(string $url): ?array
@@ -24,7 +24,7 @@ class GitHubService
         if ($cleanUrl === null) {
             return null;
         }
-        
+
         // Match GitHub URLs (both HTTPS and SSH format)
         $pattern = '/github\.com[\/:]([^\/]+)\/([^\/\?#]+)/';
         if (preg_match($pattern, $cleanUrl, $matches)) {
@@ -33,13 +33,13 @@ class GitHubService
                 'repo' => $matches[2],
             ];
         }
+
         return null;
     }
 
     /**
      * Get repository data from GitHub API
      *
-     * @param string $githubUrl
      * @return array{
      *     name: string,
      *     description: string|null,
@@ -61,24 +61,25 @@ class GitHubService
     public function getRepositoryData(string $githubUrl): ?array
     {
         $parsed = $this->parseGitHubUrl($githubUrl);
-        if (!$parsed) {
+        if (! $parsed) {
             return null;
         }
 
         $cacheKey = "github_repo_{$parsed['owner']}_{$parsed['repo']}";
-        
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($parsed) {
             try {
                 $response = Http::withHeaders([
                     'Accept' => 'application/vnd.github.v3+json',
-                ])->get(self::API_BASE_URL . "/repos/{$parsed['owner']}/{$parsed['repo']}");
+                ])->get(self::API_BASE_URL."/repos/{$parsed['owner']}/{$parsed['repo']}");
 
-                if (!$response->successful()) {
-                    Log::warning("GitHub API request failed", [
+                if (! $response->successful()) {
+                    Log::warning('GitHub API request failed', [
                         'status' => $response->status(),
                         'owner' => $parsed['owner'],
                         'repo' => $parsed['repo'],
                     ]);
+
                     return null;
                 }
 
@@ -102,11 +103,12 @@ class GitHubService
                     'homepage' => $data['homepage'],
                 ];
             } catch (\Exception $e) {
-                Log::error("Failed to fetch GitHub repository data", [
+                Log::error('Failed to fetch GitHub repository data', [
                     'error' => $e->getMessage(),
                     'owner' => $parsed['owner'],
                     'repo' => $parsed['repo'],
                 ]);
+
                 return null;
             }
         });
@@ -115,25 +117,24 @@ class GitHubService
     /**
      * Get repository languages with percentages
      *
-     * @param string $githubUrl
      * @return array<string, float>|null
      */
     public function getRepositoryLanguages(string $githubUrl): ?array
     {
         $parsed = $this->parseGitHubUrl($githubUrl);
-        if (!$parsed) {
+        if (! $parsed) {
             return null;
         }
 
         $cacheKey = "github_languages_{$parsed['owner']}_{$parsed['repo']}";
-        
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($parsed) {
             try {
                 $response = Http::withHeaders([
                     'Accept' => 'application/vnd.github.v3+json',
-                ])->get(self::API_BASE_URL . "/repos/{$parsed['owner']}/{$parsed['repo']}/languages");
+                ])->get(self::API_BASE_URL."/repos/{$parsed['owner']}/{$parsed['repo']}/languages");
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     return null;
                 }
 
@@ -150,13 +151,15 @@ class GitHubService
                 }
 
                 arsort($percentages);
+
                 return $percentages;
             } catch (\Exception $e) {
-                Log::error("Failed to fetch GitHub repository languages", [
+                Log::error('Failed to fetch GitHub repository languages', [
                     'error' => $e->getMessage(),
                     'owner' => $parsed['owner'],
                     'repo' => $parsed['repo'],
                 ]);
+
                 return null;
             }
         });
@@ -164,14 +167,11 @@ class GitHubService
 
     /**
      * Clear cache for a specific repository
-     *
-     * @param string $githubUrl
-     * @return void
      */
     public function clearCache(string $githubUrl): void
     {
         $parsed = $this->parseGitHubUrl($githubUrl);
-        if (!$parsed) {
+        if (! $parsed) {
             return;
         }
 

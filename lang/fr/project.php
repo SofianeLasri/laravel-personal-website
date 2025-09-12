@@ -22,7 +22,7 @@ return [
     // Alt text
     'project_logo_alt' => 'Logo of the project',
     'project_cover_alt' => 'Project cover',
-    
+
     // GitHub Stats
     'github_repository' => 'Dépôt GitHub',
     'view_on_github' => 'Voir sur GitHub',

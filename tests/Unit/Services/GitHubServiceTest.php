@@ -19,7 +19,7 @@ class GitHubServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new GitHubService();
+        $this->service = new GitHubService;
         Cache::flush();
     }
 
@@ -369,7 +369,7 @@ class GitHubServiceTest extends TestCase
     public function it_clears_cache_for_repository(): void
     {
         $githubUrl = 'https://github.com/owner/repo';
-        
+
         // Set some cache values
         Cache::put('github_repo_owner_repo', ['test' => 'data'], 3600);
         Cache::put('github_languages_owner_repo', ['PHP' => 100], 3600);
@@ -419,7 +419,7 @@ class GitHubServiceTest extends TestCase
                 'html_url' => $url,
                 'homepage' => null,
             ];
-            
+
             Http::fake([
                 'api.github.com/repos/owner/repo' => Http::response($mockResponse, 200),
             ]);

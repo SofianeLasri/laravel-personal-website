@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GitHubStats from '@/components/public/GitHubStats.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import MarkdownViewer from '@/components/public/MarkdownViewer.vue';
 import ProjectHead from '@/components/public/ProjectPage/ProjectHead.vue';
@@ -7,7 +8,6 @@ import ProjectVideoGallery from '@/components/public/ProjectPage/ProjectVideoGal
 import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import HorizontalNavbar from '@/components/public/Ui/HorizontalNavbar.vue';
-import GitHubStats from '@/components/public/GitHubStats.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRFullCreation } from '@/types';

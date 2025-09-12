@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { AlertCircle, Calendar, Code, Eye, GitBranch, GitFork, RefreshCw, Scale, Star } from 'lucide-vue-next';
 import { useTranslation } from '@/composables/useTranslation';
+import { AlertCircle, Calendar, Code, Eye, GitBranch, GitFork, RefreshCw, Scale, Star } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface GitHubData {
     name: string;

@@ -4,12 +4,15 @@ namespace Tests\Feature;
 
 use App\Services\AiProviderService;
 use Exception;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
 
 class RealApiTranslationTest extends TestCase
 {
+    use RefreshDatabase;
+
     private string $sampleText;
 
     protected function setUp(): void

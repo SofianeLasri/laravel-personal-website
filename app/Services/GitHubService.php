@@ -8,9 +8,30 @@ use Illuminate\Support\Facades\Log;
 
 class GitHubService
 {
-    private const CACHE_TTL = 3600; // 1 hour
-
     private const API_BASE_URL = 'https://api.github.com';
+
+    private int $cacheTtl;
+
+    public function __construct()
+    {
+        $this->cacheTtl = config('services.github.cache_ttl', 7200); // 2 hours default
+    }
+
+    /**
+     * Get headers for GitHub API requests
+     *
+     * @return array<string, string>
+     */
+    private function getHeaders(): array
+    {
+        $headers = ['Accept' => 'application/vnd.github.v3+json'];
+
+        if ($token = config('services.github.token')) {
+            $headers['Authorization'] = "Bearer {$token}";
+        }
+
+        return $headers;
+    }
 
     /**
      * Extract owner and repo from GitHub URL
@@ -67,18 +88,13 @@ class GitHubService
 
         $cacheKey = "github_repo_{$parsed['owner']}_{$parsed['repo']}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($parsed) {
+        return Cache::remember($cacheKey, $this->cacheTtl, function () use ($parsed) {
             try {
-                $response = Http::withHeaders([
-                    'Accept' => 'application/vnd.github.v3+json',
-                ])->get(self::API_BASE_URL."/repos/{$parsed['owner']}/{$parsed['repo']}");
+                $response = Http::withHeaders($this->getHeaders())
+                    ->get(self::API_BASE_URL."/repos/{$parsed['owner']}/{$parsed['repo']}");
 
                 if (! $response->successful()) {
-                    Log::warning('GitHub API request failed', [
-                        'status' => $response->status(),
-                        'owner' => $parsed['owner'],
-                        'repo' => $parsed['repo'],
-                    ]);
+                    $this->logApiError($response->status(), $parsed['owner'], $parsed['repo']);
 
                     return null;
                 }
@@ -128,13 +144,14 @@ class GitHubService
 
         $cacheKey = "github_languages_{$parsed['owner']}_{$parsed['repo']}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($parsed) {
+        return Cache::remember($cacheKey, $this->cacheTtl, function () use ($parsed) {
             try {
-                $response = Http::withHeaders([
-                    'Accept' => 'application/vnd.github.v3+json',
-                ])->get(self::API_BASE_URL."/repos/{$parsed['owner']}/{$parsed['repo']}/languages");
+                $response = Http::withHeaders($this->getHeaders())
+                    ->get(self::API_BASE_URL."/repos/{$parsed['owner']}/{$parsed['repo']}/languages");
 
                 if (! $response->successful()) {
+                    $this->logApiError($response->status(), $parsed['owner'], $parsed['repo'], 'languages');
+
                     return null;
                 }
 
@@ -166,6 +183,40 @@ class GitHubService
     }
 
     /**
+     * Log API errors with appropriate severity based on status code
+     */
+    private function logApiError(int $status, string $owner, string $repo, string $endpoint = 'repository'): void
+    {
+        $context = [
+            'status' => $status,
+            'owner' => $owner,
+            'repo' => $repo,
+            'endpoint' => $endpoint,
+        ];
+
+        switch ($status) {
+            case 403:
+                // Check if it's rate limiting
+                Log::warning('GitHub API rate limit may be exceeded', $context);
+                break;
+            case 404:
+                // Repository not found or private - this is expected sometimes
+                Log::info('GitHub repository not found or private', $context);
+                break;
+            case 401:
+                Log::error('GitHub API authentication failed - check token', $context);
+                break;
+            case 500:
+            case 502:
+            case 503:
+                Log::error('GitHub API server error', $context);
+                break;
+            default:
+                Log::warning('GitHub API request failed', $context);
+        }
+    }
+
+    /**
      * Clear cache for a specific repository
      */
     public function clearCache(string $githubUrl): void
@@ -177,5 +228,34 @@ class GitHubService
 
         Cache::forget("github_repo_{$parsed['owner']}_{$parsed['repo']}");
         Cache::forget("github_languages_{$parsed['owner']}_{$parsed['repo']}");
+    }
+
+    /**
+     * Get current rate limit status
+     *
+     * @return array{limit: int, remaining: int, reset: int}|null
+     */
+    public function getRateLimitStatus(): ?array
+    {
+        try {
+            $response = Http::withHeaders($this->getHeaders())
+                ->get(self::API_BASE_URL.'/rate_limit');
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                return [
+                    'limit' => $data['rate']['limit'],
+                    'remaining' => $data['rate']['remaining'],
+                    'reset' => $data['rate']['reset'],
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch GitHub rate limit status', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return null;
     }
 }

@@ -160,12 +160,13 @@ class GitHubServiceTest extends TestCase
             'api.github.com/repos/owner/nonexistent' => Http::response(null, 404),
         ]);
 
-        Log::shouldReceive('warning')
+        Log::shouldReceive('info')
             ->once()
-            ->with('GitHub API request failed', [
+            ->with('GitHub repository not found or private', [
                 'status' => 404,
                 'owner' => 'owner',
                 'repo' => 'nonexistent',
+                'endpoint' => 'repository',
             ])
             ->andReturnNull();
 
@@ -183,12 +184,13 @@ class GitHubServiceTest extends TestCase
             'api.github.com/repos/owner/repo' => Http::response(null, 500),
         ]);
 
-        Log::shouldReceive('warning')
+        Log::shouldReceive('error')
             ->once()
-            ->with('GitHub API request failed', [
+            ->with('GitHub API server error', [
                 'status' => 500,
                 'owner' => 'owner',
                 'repo' => 'repo',
+                'endpoint' => 'repository',
             ])
             ->andReturnNull();
 
@@ -442,5 +444,109 @@ class GitHubServiceTest extends TestCase
             'Invalid URL' => ['not-a-url', false],
             'Empty string' => ['', false],
         ];
+    }
+
+    #[Test]
+    public function it_handles_rate_limit_errors(): void
+    {
+        $githubUrl = 'https://github.com/owner/repo';
+
+        Http::fake([
+            'api.github.com/repos/owner/repo' => Http::response(['message' => 'API rate limit exceeded'], 403),
+        ]);
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('GitHub API rate limit may be exceeded', [
+                'status' => 403,
+                'owner' => 'owner',
+                'repo' => 'repo',
+                'endpoint' => 'repository',
+            ])
+            ->andReturnNull();
+
+        $result = $this->service->getRepositoryData($githubUrl);
+
+        $this->assertNull($result);
+    }
+
+    #[Test]
+    public function it_handles_authentication_errors(): void
+    {
+        $githubUrl = 'https://github.com/owner/repo';
+
+        Http::fake([
+            'api.github.com/repos/owner/repo' => Http::response(['message' => 'Bad credentials'], 401),
+        ]);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('GitHub API authentication failed - check token', [
+                'status' => 401,
+                'owner' => 'owner',
+                'repo' => 'repo',
+                'endpoint' => 'repository',
+            ])
+            ->andReturnNull();
+
+        $result = $this->service->getRepositoryData($githubUrl);
+
+        $this->assertNull($result);
+    }
+
+    #[Test]
+    public function it_fetches_rate_limit_status(): void
+    {
+        Http::fake([
+            'api.github.com/rate_limit' => Http::response([
+                'rate' => [
+                    'limit' => 5000,
+                    'remaining' => 4999,
+                    'reset' => 1640000000,
+                ],
+            ], 200),
+        ]);
+
+        $result = $this->service->getRateLimitStatus();
+
+        $this->assertNotNull($result);
+        $this->assertEquals(5000, $result['limit']);
+        $this->assertEquals(4999, $result['remaining']);
+        $this->assertEquals(1640000000, $result['reset']);
+    }
+
+    #[Test]
+    public function it_uses_authentication_token_when_configured(): void
+    {
+        config(['services.github.token' => 'test-token']);
+
+        Http::fake([
+            'api.github.com/repos/owner/repo' => Http::response([
+                'name' => 'repo',
+                'description' => 'Test',
+                'stargazers_count' => 100,
+                'forks_count' => 50,
+                'watchers_count' => 75,
+                'language' => 'PHP',
+                'topics' => [],
+                'license' => null,
+                'updated_at' => '2024-01-01T00:00:00Z',
+                'created_at' => '2023-01-01T00:00:00Z',
+                'open_issues_count' => 10,
+                'default_branch' => 'main',
+                'size' => 1024,
+                'html_url' => 'https://github.com/owner/repo',
+                'homepage' => null,
+            ], 200),
+        ]);
+
+        $result = $this->service->getRepositoryData('https://github.com/owner/repo');
+
+        $this->assertNotNull($result);
+
+        Http::assertSent(function ($request) {
+            return $request->hasHeader('Authorization', 'Bearer test-token') &&
+                   $request->hasHeader('Accept', 'application/vnd.github.v3+json');
+        });
     }
 }

@@ -46,4 +46,9 @@ return [
         'call_limit_per_minute' => env('IP_ADDRESS_RESOLVER_CALL_LIMIT_PER_MINUTE', 15),
         'max_ip_addresses_per_call' => env('IP_ADDRESS_RESOLVER_MAX_IP_ADDRESSES_PER_CALL', 100),
     ],
+
+    'github' => [
+        'token' => env('GITHUB_TOKEN'),
+        'cache_ttl' => env('GITHUB_CACHE_TTL', 7200), // 2 hours by default
+    ],
 ];

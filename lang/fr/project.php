@@ -6,6 +6,7 @@ return [
     // Project sections
     'description' => 'Description',
     'key_features' => 'Fonctionnalités clés',
+    'statistics' => 'Statistiques',
     'people_involved' => 'Personnes impliquées',
     'technologies_used' => 'Technologies utilisées',
     'videos' => 'Vidéos',
@@ -33,4 +34,17 @@ return [
     'languages' => 'Langages',
     'created' => 'Créé le',
     'updated' => 'Mis à jour le',
+
+    // Packagist Stats
+    'packagist_package' => 'Package Composer',
+    'view_on_packagist' => 'Voir sur Packagist',
+    'total_downloads' => 'Téléchargements',
+    'monthly_downloads' => 'Par mois',
+    'daily_downloads' => 'Par jour',
+    'favorites' => 'Favoris',
+    'dependents' => 'Dépendants',
+    'suggesters' => 'Suggéré par',
+    'maintainers' => 'Mainteneurs',
+    'php_required' => 'PHP requis',
+    'version_required' => 'Requis',
 ];

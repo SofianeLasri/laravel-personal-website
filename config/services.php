@@ -51,4 +51,8 @@ return [
         'token' => env('GITHUB_TOKEN'),
         'cache_ttl' => env('GITHUB_CACHE_TTL', 7200), // 2 hours by default
     ],
+
+    'packagist' => [
+        'cache_ttl' => env('PACKAGIST_CACHE_TTL', 7200), // 2 hours by default
+    ],
 ];

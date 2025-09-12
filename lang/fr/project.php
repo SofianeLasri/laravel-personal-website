@@ -22,4 +22,15 @@ return [
     // Alt text
     'project_logo_alt' => 'Logo of the project',
     'project_cover_alt' => 'Project cover',
+
+    // GitHub Stats
+    'github_repository' => 'Dépôt GitHub',
+    'view_on_github' => 'Voir sur GitHub',
+    'stars' => 'Étoiles',
+    'forks' => 'Forks',
+    'watchers' => 'Observateurs',
+    'issues' => 'Issues',
+    'languages' => 'Langages',
+    'created' => 'Créé le',
+    'updated' => 'Mis à jour le',
 ];

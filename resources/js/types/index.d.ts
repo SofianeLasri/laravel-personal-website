@@ -226,6 +226,24 @@ interface SSRFullCreation extends SSRSimplifiedCreation {
         picture: SSRPicture | null;
     }[];
     videos: SSRVideo[];
+    githubData: {
+        name: string;
+        description: string | null;
+        stars: number;
+        forks: number;
+        watchers: number;
+        language: string | null;
+        topics: string[];
+        license: string | null;
+        updated_at: string;
+        created_at: string;
+        open_issues: number;
+        default_branch: string;
+        size: number;
+        url: string;
+        homepage: string | null;
+    } | null;
+    githubLanguages: Record<string, number> | null;
 }
 
 interface SSRTechnology {

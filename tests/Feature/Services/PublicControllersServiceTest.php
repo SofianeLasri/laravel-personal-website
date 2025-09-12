@@ -12,6 +12,7 @@ use App\Models\TechnologyExperience;
 use App\Models\Translation;
 use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -513,5 +514,173 @@ class PublicControllersServiceTest extends TestCase
         $result = $service->getTechnologyExperiences();
 
         $this->assertEquals('English tech experience description', $result[0]['description']);
+    }
+
+    #[Test]
+    public function test_format_creation_with_github_data(): void
+    {
+        $creation = Creation::factory()
+            ->withFeatures(1)
+            ->withScreenshots(1)
+            ->create([
+                'name' => 'Test Creation',
+                'source_code_url' => 'https://github.com/owner/repo',
+            ]);
+
+        $mockGitHubResponse = [
+            'name' => 'repo',
+            'description' => 'Test repository description',
+            'stargazers_count' => 150,
+            'forks_count' => 25,
+            'watchers_count' => 80,
+            'language' => 'PHP',
+            'topics' => ['laravel', 'php', 'web'],
+            'license' => ['name' => 'MIT License'],
+            'updated_at' => '2024-01-15T10:30:00Z',
+            'created_at' => '2023-06-01T08:00:00Z',
+            'open_issues_count' => 5,
+            'default_branch' => 'main',
+            'size' => 2048,
+            'html_url' => 'https://github.com/owner/repo',
+            'homepage' => 'https://example.com',
+        ];
+
+        $mockLanguagesResponse = [
+            'PHP' => 60000,
+            'JavaScript' => 25000,
+            'Vue' => 10000,
+            'CSS' => 5000,
+        ];
+
+        Http::fake([
+            'api.github.com/repos/owner/repo' => Http::response($mockGitHubResponse, 200),
+            'api.github.com/repos/owner/repo/languages' => Http::response($mockLanguagesResponse, 200),
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('githubData', $result);
+        $this->assertArrayHasKey('githubLanguages', $result);
+
+        $this->assertNotNull($result['githubData']);
+        $this->assertEquals('repo', $result['githubData']['name']);
+        $this->assertEquals('Test repository description', $result['githubData']['description']);
+        $this->assertEquals(150, $result['githubData']['stars']);
+        $this->assertEquals(25, $result['githubData']['forks']);
+        $this->assertEquals(80, $result['githubData']['watchers']);
+        $this->assertEquals('PHP', $result['githubData']['language']);
+        $this->assertEquals(['laravel', 'php', 'web'], $result['githubData']['topics']);
+        $this->assertEquals('MIT License', $result['githubData']['license']);
+        $this->assertEquals(5, $result['githubData']['open_issues']);
+        $this->assertEquals('main', $result['githubData']['default_branch']);
+        $this->assertEquals(2048, $result['githubData']['size']);
+        $this->assertEquals('https://github.com/owner/repo', $result['githubData']['url']);
+        $this->assertEquals('https://example.com', $result['githubData']['homepage']);
+
+        $this->assertNotNull($result['githubLanguages']);
+        $this->assertEquals(60.0, $result['githubLanguages']['PHP']);
+        $this->assertEquals(25.0, $result['githubLanguages']['JavaScript']);
+        $this->assertEquals(10.0, $result['githubLanguages']['Vue']);
+        $this->assertEquals(5.0, $result['githubLanguages']['CSS']);
+    }
+
+    #[Test]
+    public function test_format_creation_without_github_url(): void
+    {
+        $creation = Creation::factory()->create([
+            'name' => 'Test Creation',
+            'source_code_url' => null,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('githubData', $result);
+        $this->assertArrayHasKey('githubLanguages', $result);
+        $this->assertNull($result['githubData']);
+        $this->assertNull($result['githubLanguages']);
+    }
+
+    #[Test]
+    public function test_format_creation_with_non_github_url(): void
+    {
+        $creation = Creation::factory()->create([
+            'name' => 'Test Creation',
+            'source_code_url' => 'https://gitlab.com/owner/repo',
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('githubData', $result);
+        $this->assertArrayHasKey('githubLanguages', $result);
+        $this->assertNull($result['githubData']);
+        $this->assertNull($result['githubLanguages']);
+    }
+
+    #[Test]
+    public function test_format_creation_with_github_api_error(): void
+    {
+        $creation = Creation::factory()->create([
+            'name' => 'Test Creation',
+            'source_code_url' => 'https://github.com/owner/nonexistent',
+        ]);
+
+        Http::fake([
+            'api.github.com/repos/owner/nonexistent' => Http::response(null, 404),
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('githubData', $result);
+        $this->assertArrayHasKey('githubLanguages', $result);
+        $this->assertNull($result['githubData']);
+        $this->assertNull($result['githubLanguages']);
+    }
+
+    #[Test]
+    public function test_format_creation_with_private_github_repo(): void
+    {
+        $creation = Creation::factory()->create([
+            'name' => 'Test Creation',
+            'source_code_url' => 'https://github.com/owner/private-repo',
+        ]);
+
+        Http::fake([
+            'api.github.com/repos/owner/private-repo' => Http::response(['message' => 'Not Found'], 404),
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('githubData', $result);
+        $this->assertArrayHasKey('githubLanguages', $result);
+        $this->assertNull($result['githubData']);
+        $this->assertNull($result['githubLanguages']);
+    }
+
+    #[Test]
+    public function test_format_creation_with_github_rate_limit(): void
+    {
+        $creation = Creation::factory()->create([
+            'name' => 'Test Creation',
+            'source_code_url' => 'https://github.com/owner/repo',
+        ]);
+
+        Http::fake([
+            'api.github.com/repos/owner/repo' => Http::response([
+                'message' => 'API rate limit exceeded',
+            ], 403),
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('githubData', $result);
+        $this->assertArrayHasKey('githubLanguages', $result);
+        $this->assertNull($result['githubData']);
+        $this->assertNull($result['githubLanguages']);
     }
 }

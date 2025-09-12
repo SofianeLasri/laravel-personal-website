@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BorderGlow from '@/components/public/BorderGlow.vue';
 import DotMatrixMask from '@/components/public/DotMatrixMask.vue';
 import LanguagePopup from '@/components/public/LanguagePopup.vue';
 import Navbar from '@/components/public/Navbar/Navbar.vue';
@@ -17,6 +18,7 @@ withDefaults(defineProps<Props>(), {
 <template>
     <div class="dots-background dark:bg-gray-990 relative flex min-h-screen flex-col items-center">
         <DotMatrixMask />
+        <BorderGlow />
         <Navbar />
         <slot />
         <LanguagePopup />

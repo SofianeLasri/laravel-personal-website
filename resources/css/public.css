@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'highlight.js/styles/atom-one-light.css';
+@import './border-glow.css';
 
 @plugin "tailwindcss-motion";
 

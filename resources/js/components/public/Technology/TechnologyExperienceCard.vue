@@ -56,7 +56,7 @@ const projectsUrl = computed(() => {
             <div class="flex flex-col items-start justify-start gap-4">
                 <div class="flex items-center justify-start gap-4">
                     <div
-                        class="outline-border dark:from-atomic-tangerine-600/20 dark:border-atomic-tangerine-500/20 dark:group-hover:border-atomic-tangerine-500/30 flex size-12 items-center justify-center gap-2.5 rounded-lg outline-1 dark:bg-gradient-to-br dark:to-gray-800/60 dark:shadow-[inset_0_1px_0_0_rgba(247,142,87,0.1)]"
+                        class="dark:from-atomic-tangerine-600/20 dark:border-atomic-tangerine-500/20 dark:group-hover:border-atomic-tangerine-500/30 borderdark:bg-gradient-to-br flex size-12 items-center justify-center gap-2.5 rounded-lg dark:to-gray-800/60 dark:shadow-[inset_0_1px_0_0_rgba(247,142,87,0.1)]"
                     >
                         <div class="flex size-7 items-center justify-center">
                             <img

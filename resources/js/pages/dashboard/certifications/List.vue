@@ -108,7 +108,7 @@ const deleteCertification = async () => {
                     Mes certifications
                 </h2>
 
-                <div v-if="certifications.length === 0" class="border-border mt-4 rounded-lg border p-8 text-center">
+                <div v-if="certifications.length === 0" class="mt-4 rounded-lg border p-8 text-center">
                     <p class="text-muted-foreground mb-4">Aucune certification n'a été ajoutée.</p>
                     <Button as-child variant="outline">
                         <Link :href="route('dashboard.certifications.create')">

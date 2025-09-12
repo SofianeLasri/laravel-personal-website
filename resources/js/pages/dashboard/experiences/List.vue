@@ -173,7 +173,7 @@ const deleteExperience = async () => {
                     Expériences professionnelles
                 </h2>
 
-                <div v-if="employmentExperiences.length === 0" class="border-border mt-4 rounded-lg border p-8 text-center">
+                <div v-if="employmentExperiences.length === 0" class="mt-4 rounded-lg border p-8 text-center">
                     <p class="text-muted-foreground mb-4">Aucune expérience professionnelle n'a été ajoutée.</p>
                     <Button as-child variant="outline">
                         <Link :href="route('dashboard.experiences.create')">
@@ -259,7 +259,7 @@ const deleteExperience = async () => {
                     Formations
                 </h2>
 
-                <div v-if="educationExperiences.length === 0" class="border-border mt-4 rounded-lg border p-8 text-center">
+                <div v-if="educationExperiences.length === 0" class="mt-4 rounded-lg border p-8 text-center">
                     <p class="text-muted-foreground mb-4">Aucune formation n'a été ajoutée.</p>
                     <Button as-child variant="outline">
                         <Link :href="route('dashboard.experiences.create')">

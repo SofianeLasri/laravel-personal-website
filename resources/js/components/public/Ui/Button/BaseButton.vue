@@ -40,7 +40,7 @@ const variantClasses = {
         spinner: 'border-white border-t-transparent dark:border-gray-990 dark:border-t-transparent',
     },
     white: {
-        base: 'border-border border-1 bg-white text-black dark:bg-gray-990 dark:text-gray-100',
+        base: 'border bg-white text-black dark:bg-gray-990 dark:text-gray-100',
         hover: 'hover:bg-gray-100 dark:hover:bg-gray-975',
         spinner: 'border-black border-t-transparent dark:border-gray-100 dark:border-t-transparent',
     },

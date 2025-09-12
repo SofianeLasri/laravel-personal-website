@@ -206,7 +206,7 @@ const deleteLink = async () => {
                     </TableBody>
                 </Table>
 
-                <div v-else class="border-border text-muted-foreground rounded-lg border p-8 text-center">
+                <div v-else class="text-muted-foreground rounded-lg border p-8 text-center">
                     <LinkIcon class="mx-auto mb-4 h-12 w-12" />
                     <p class="mb-4">Aucun lien social n'a été ajouté.</p>
                     <Button type="button" @click="openAddDialog">

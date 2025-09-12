@@ -107,7 +107,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
 <template>
     <div class="relative inline-flex flex-col items-center justify-start gap-8 self-stretch">
         <div
-            class="outline-border action-container-shadow action-container-outer-border action-container-background-blur flex flex-col gap-2 rounded-2xl p-2 sm:flex-row"
+            class="action-container-shadow action-container-outer-border action-container-background-blur flex flex-col gap-2 rounded-2xl border p-2 sm:flex-row"
         >
             <BaseButton
                 :variant="selectedType === 'formation' ? 'black' : 'white'"
@@ -166,7 +166,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                 class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur inline-flex grow gap-2.5 self-stretch rounded-3xl p-2"
             >
                 <div
-                    class="outline-border action-container-inner-shadow inline-flex w-full flex-col items-start justify-start rounded-2xl bg-white outline-1 dark:bg-gray-900"
+                    class="action-container-inner-shadow inline-flex w-full flex-col items-start justify-start rounded-2xl border border-1 bg-white dark:bg-gray-900"
                 >
                     <div class="relative inline-flex flex-col items-start justify-between self-stretch px-4 py-4 lg:flex-row lg:px-8 lg:py-6">
                         <div
@@ -178,7 +178,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                         </div>
                         <div class="z-10 flex grow flex-col items-start justify-start gap-4 lg:flex-row lg:items-center">
                             <div
-                                class="outline-border flex size-16 items-center justify-center gap-2.5 rounded-xl bg-white p-3 outline-1 lg:size-24 lg:p-4 dark:bg-gray-800"
+                                class="flex size-16 items-center justify-center gap-2.5 rounded-xl border border-1 bg-white p-3 lg:size-24 lg:p-4 dark:bg-gray-800"
                             >
                                 <picture class="flex h-full w-full items-center justify-center" v-if="selectedExperience.logo">
                                     <source :srcset="selectedExperience.logo.webp.thumbnail" type="image/webp" />
@@ -231,7 +231,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
 
                     <!-- Content -->
                     <div
-                        class="outline-border z-10 flex grow flex-col items-start justify-start gap-6 self-stretch rounded-2xl bg-white p-4 outline-1 lg:gap-8 lg:p-8 dark:bg-gray-900"
+                        class="z-10 flex grow flex-col items-start justify-start gap-6 self-stretch rounded-2xl border border-1 bg-white p-4 lg:gap-8 lg:p-8 dark:bg-gray-900"
                     >
                         <div class="flex flex-col gap-3 self-stretch lg:gap-4">
                             <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">{{ t('career.description') }}</h3>
@@ -260,7 +260,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                 class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur inline-flex grow gap-2.5 self-stretch rounded-3xl p-2"
             >
                 <div
-                    class="outline-border action-container-inner-shadow flex w-full items-center justify-center rounded-2xl bg-white p-4 outline-1 lg:p-8 dark:bg-gray-900"
+                    class="action-container-inner-shadow flex w-full items-center justify-center rounded-2xl border border-1 bg-white p-4 lg:p-8 dark:bg-gray-900"
                 >
                     <p class="text-design-system-paragraph text-center text-base lg:text-lg">
                         {{ t('career.select_experience') }}

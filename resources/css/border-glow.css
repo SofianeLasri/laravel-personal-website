@@ -1,0 +1,100 @@
+/* Halo-style Border Glow Effect */
+:root {
+    --glow-color: rgb(251, 146, 60); /* Orange-400 */
+    --glow-radius: 150px;
+}
+
+/* Elements that can have the glow effect */
+.glow-border:not(.no-glow),
+.card:not(.no-glow),
+button:not(.no-glow),
+.btn:not(.no-glow),
+a.inline-flex:not(.no-glow),
+.group:not(.no-glow),
+[role='button']:not(.no-glow),
+.border:not(.no-glow) {
+    position: relative;
+    isolation: isolate;
+}
+
+/* Create the glow effect with pseudo-element */
+.glow-border:not(.no-glow)::before,
+.card:not(.no-glow)::before,
+button:not(.no-glow)::before,
+.btn:not(.no-glow)::before,
+a.inline-flex:not(.no-glow)::before,
+.group:not(.no-glow)::before,
+[role='button']:not(.no-glow)::before,
+.border:not(.no-glow)::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: radial-gradient(circle var(--glow-radius) at var(--glow-x, 50%) var(--glow-y, 50%), var(--glow-color) 0%, transparent 100%);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Show glow when active class is added by JavaScript */
+.glow-active::before {
+    opacity: calc(var(--glow-opacity, 0) * 0.7);
+}
+
+/* Stronger glow in dark mode */
+.dark .glow-active::before {
+    opacity: calc(var(--glow-opacity, 0) * 1);
+    background: radial-gradient(
+        circle var(--glow-radius) at var(--glow-x, 50%) var(--glow-y, 50%),
+        rgba(251, 146, 60, 1) 0%,
+        rgba(251, 146, 60, 0.5) 50%,
+        transparent 100%
+    );
+}
+
+/* Optional: Add subtle hover effect */
+.glow-border:hover,
+.card:hover,
+button:hover,
+.btn:hover,
+a.inline-flex:hover,
+.group:hover,
+[role='button']:hover {
+    transition: transform 0.2s ease;
+}
+
+/* Prevent overflow issues on certain elements */
+.overflow-hidden .glow-border:not(.no-glow)::before,
+.overflow-hidden .card:not(.no-glow)::before,
+.overflow-hidden button:not(.no-glow)::before,
+.overflow-hidden .btn:not(.no-glow)::before,
+.overflow-hidden a.inline-flex:not(.no-glow)::before,
+.overflow-hidden .group:not(.no-glow)::before,
+.overflow-hidden [role='button']:not(.no-glow)::before {
+    inset: 0;
+    padding: 0;
+}
+
+/* Disable on mobile */
+@media (max-width: 768px) {
+    .glow-border::before,
+    .card::before,
+    button::before,
+    .btn::before,
+    a.inline-flex::before,
+    .group::before,
+    [role='button']::before,
+    .border::before {
+        display: none;
+    }
+}

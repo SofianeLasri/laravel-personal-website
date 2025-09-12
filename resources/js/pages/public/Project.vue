@@ -157,6 +157,7 @@ if (props.creation.screenshots.length > 0) {
                                 :name="tech.name"
                                 :description="tech.description"
                                 :iconPicture="tech.iconPicture"
+                                :technology="tech"
                                 class="bg-gray-100 dark:bg-gray-900"
                                 data-testid="technology-card"
                             />

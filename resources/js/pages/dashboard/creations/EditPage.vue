@@ -522,29 +522,29 @@ onMounted(() => {
             </div>
         </form>
 
-        <div v-if="currentCreationDraft?.id" class="border-border border-t">
-            <div class="border-border border-t px-5 py-6">
+        <div v-if="currentCreationDraft?.id" class="border-t">
+            <div class="border-t px-5 py-6">
                 <CreationDraftScreenshots :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
             </div>
 
-            <div class="border-border border-t px-5 py-6">
+            <div class="border-t px-5 py-6">
                 <CreationDraftVideos :creation-draft-id="currentCreationDraft.id" />
             </div>
 
-            <div class="border-border border-t px-5 py-6">
+            <div class="border-t px-5 py-6">
                 <CreationDraftFeatures :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
             </div>
 
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div class="border-border border-t px-5 py-6">
+                <div class="border-t px-5 py-6">
                     <CreationDraftPeople :creation-draft-id="currentCreationDraft.id" />
                 </div>
-                <div class="border-border border-t px-5 py-6">
+                <div class="border-t px-5 py-6">
                     <CreationDraftTags :creation-draft-id="currentCreationDraft.id" />
                 </div>
             </div>
 
-            <div class="border-border border-t px-5 py-6">
+            <div class="border-t px-5 py-6">
                 <CreationDraftTechnologies :creation-draft-id="currentCreationDraft.id" :locale="localeValue" />
             </div>
         </div>

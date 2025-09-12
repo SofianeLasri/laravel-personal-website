@@ -429,7 +429,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <div
                     v-for="technology in filteredTechnologies"
                     :key="technology.id"
-                    class="border-border bg-card flex flex-col overflow-hidden rounded-lg border shadow-sm"
+                    class="bg-card flex flex-col overflow-hidden rounded-lg border shadow-sm"
                 >
                     <div class="p-4">
                         <div class="flex items-center justify-between">
@@ -464,7 +464,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div class="text-muted-foreground mt-4 text-xs">Utilisée dans {{ technology.creations_count }} création(s)</div>
                     </div>
 
-                    <div class="border-border mt-auto border-t">
+                    <div class="mt-auto border-t">
                         <div class="bg-muted/50 p-4">
                             <div class="flex items-center justify-between">
                                 <h4 class="mb-2 text-sm font-medium">Mon expérience</h4>

@@ -133,7 +133,7 @@ if (props.creation.screenshots.length > 0) {
                         <ContentSectionTitle>{{ t('project.people_involved') }}</ContentSectionTitle>
                         <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                             <div
-                                class="flex items-center justify-center gap-2 rounded-lg border-1 border-gray-200 bg-gray-100 p-2 dark:border-gray-700 dark:bg-gray-900"
+                                class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-100 p-2 dark:border-gray-700 dark:bg-gray-900"
                                 v-for="person in creation.people"
                                 :key="person.id"
                                 data-testid="person-card"

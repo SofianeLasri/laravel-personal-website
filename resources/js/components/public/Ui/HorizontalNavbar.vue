@@ -210,7 +210,7 @@ onBeforeUnmount(() => {
                     :data-tab="item.id"
                     :data-section="item.id"
                     :data-active="currentActiveItem === item.id"
-                    class="flex-shrink-0 cursor-pointer border-b-2 py-4 text-xl whitespace-nowrap transition-colors"
+                    class="no-glow flex-shrink-0 cursor-pointer border-b-2 py-4 text-xl whitespace-nowrap transition-colors"
                     :class="
                         currentActiveItem === item.id
                             ? 'border-black text-black dark:border-gray-100 dark:text-gray-100'

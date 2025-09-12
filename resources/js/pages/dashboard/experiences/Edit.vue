@@ -438,7 +438,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     </Button>
                 </div>
 
-                <div v-if="selectedTechnologies.length === 0" class="border-border rounded-lg border p-8 text-center">
+                <div v-if="selectedTechnologies.length === 0" class="rounded-lg border p-8 text-center">
                     <p class="text-muted-foreground mb-2">Aucune technologie sélectionnée</p>
                     <Button variant="outline" type="button" @click="modalTechOpen = true">
                         <Plus class="mr-2 h-4 w-4" />
@@ -447,7 +447,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                 </div>
 
                 <div v-else class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                    <div v-for="tech in selectedTechnologies" :key="tech.id" class="border-border flex items-center rounded-md border p-2">
+                    <div v-for="tech in selectedTechnologies" :key="tech.id" class="flex items-center rounded-md border p-2">
                         <div class="mr-2 h-6 w-6" v-html="tech.svg_icon"></div>
                         <span class="text-sm">{{ tech.name }}</span>
                     </div>

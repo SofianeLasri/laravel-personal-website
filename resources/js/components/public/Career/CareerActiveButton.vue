@@ -17,7 +17,7 @@ const emit = defineEmits(['click']);
         @click="emit('click')"
     >
         <div
-            class="dark:border-atomic-tangerine-600/30 flex size-20 shrink-0 items-center justify-center rounded-xl border border-1 bg-white p-2 dark:bg-white"
+            class="dark:border-atomic-tangerine-600/30 borderbg-white flex size-20 shrink-0 items-center justify-center rounded-xl p-2 dark:bg-white"
         >
             <picture class="flex h-full w-full items-center justify-center">
                 <source :srcset="experience.logo.webp.thumbnail" type="image/webp" />

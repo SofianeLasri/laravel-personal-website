@@ -57,7 +57,7 @@ onMounted(() => {
             :value="modelValue"
             @input="handleInput"
             :placeholder="t('search.placeholder')"
-            class="flex-1 bg-transparent py-3 text-black outline-none placeholder:text-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
+            class="flex-1 border-none bg-transparent py-3 text-black placeholder:text-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
         />
         <div class="flex items-center gap-2">
             <div v-if="loading" class="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>

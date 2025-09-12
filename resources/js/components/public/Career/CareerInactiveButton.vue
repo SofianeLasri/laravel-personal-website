@@ -16,9 +16,7 @@ const emit = defineEmits(['click']);
         class="flex cursor-pointer items-start justify-start gap-4 self-stretch rounded-2xl bg-white p-2 shadow-lg transition-all hover:scale-[1.02] dark:border dark:border-gray-700/30 dark:bg-gray-800/60 dark:shadow-[0_0_10px_rgba(0,0,0,0.2)] dark:hover:bg-gray-800/80"
         @click="emit('click')"
     >
-        <div
-            class="outline-border flex size-20 shrink-0 items-center justify-center rounded-xl bg-white p-2 outline-1 dark:border-gray-700/20 dark:bg-white"
-        >
+        <div class="flex size-20 shrink-0 items-center justify-center rounded-xl border border-1 bg-white p-2 dark:border-gray-700/20 dark:bg-white">
             <picture class="flex h-full w-full items-center justify-center">
                 <source :srcset="experience.logo.webp.thumbnail" type="image/webp" />
                 <img :src="experience.logo.avif.thumbnail" :alt="experience.title" class="object-contain" loading="lazy" />

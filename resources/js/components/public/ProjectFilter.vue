@@ -104,7 +104,7 @@ const toggleFilter = (techId: number) => {
         </div>
 
         <div
-            class="outline-border flex flex-col self-stretch overflow-hidden rounded-2xl rounded-b-none outline-1 transition-all duration-300 ease-in-out"
+            class="flex flex-col self-stretch overflow-hidden rounded-2xl rounded-b-none border border-1 transition-all duration-300 ease-in-out"
             :class="isCollapsed ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100'"
         >
             <div class="custom-scrollbar flex flex-col items-start gap-2 overflow-y-auto bg-white p-2 dark:bg-gray-950">

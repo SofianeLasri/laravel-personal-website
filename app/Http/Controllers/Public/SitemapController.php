@@ -24,28 +24,28 @@ class SitemapController extends Controller
             ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
             ->setPriority(0.9));
 
-        Experience::all()->each(function (Experience $experience) use ($sitemap) {
-            $sitemap->add(Url::create(route('public.experience.show', $experience->slug))
-                ->setLastModificationDate($experience->updated_at)
+        Creation::all()->each(function (Creation $creation) use ($sitemap) {
+            $sitemap->add(Url::create(route('public.projects.show', $creation->slug))
+                ->setLastModificationDate($creation->updated_at)
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
                 ->setPriority(0.8));
         });
-
-        $sitemap->add(Url::create(route('public.certifications-career'))
-            ->setLastModificationDate(now())
-            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
-            ->setPriority(0.8));
 
         $sitemap->add(Url::create(route('public.about'))
             ->setLastModificationDate(now())
             ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
             ->setPriority(0.7));
 
-        Creation::all()->each(function (Creation $creation) use ($sitemap) {
-            $sitemap->add(Url::create(route('public.projects.show', $creation->slug))
-                ->setLastModificationDate($creation->updated_at)
+        $sitemap->add(Url::create(route('public.certifications-career'))
+            ->setLastModificationDate(now())
+            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+            ->setPriority(0.6));
+
+        Experience::all()->each(function (Experience $experience) use ($sitemap) {
+            $sitemap->add(Url::create(route('public.experience.show', $experience->slug))
+                ->setLastModificationDate($experience->updated_at)
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
-                ->setPriority(0.6));
+                ->setPriority(0.5));
         });
 
         return $sitemap->toResponse(request());

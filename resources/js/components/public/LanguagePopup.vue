@@ -67,7 +67,7 @@ onMounted(() => {
     >
         <div
             v-if="isVisible && shouldShowPopup"
-            class="fixed right-4 bottom-4 z-50 max-w-sm rounded-lg border border-gray-200 bg-white p-4 shadow-xl backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900"
+            class="fixed! right-4 bottom-4 z-50 max-w-sm rounded-lg border border-gray-200 bg-white p-4 shadow-xl backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900"
         >
             <div class="flex items-start gap-3">
                 <div class="bg-atomic-tangerine-100 dark:bg-atomic-tangerine-900 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full">
@@ -81,13 +81,13 @@ onMounted(() => {
                     <div class="flex gap-2">
                         <button
                             @click="acceptTranslation"
-                            class="bg-atomic-tangerine-400 hover:bg-atomic-tangerine-500 rounded-md px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors duration-200"
+                            class="no-glow bg-atomic-tangerine-400 hover:bg-atomic-tangerine-500 rounded-md px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors duration-200"
                         >
                             Yes, English
                         </button>
                         <button
                             @click="dismissPopup"
-                            class="px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors duration-200 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
+                            class="no-glow px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors duration-200 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
                         >
                             No, thanks
                         </button>
@@ -96,7 +96,7 @@ onMounted(() => {
 
                 <button
                     @click="dismissPopup"
-                    class="hover:text-atomic-tangerine-600 dark:hover:text-atomic-tangerine-400 h-6 w-6 flex-shrink-0 text-gray-400 transition-colors duration-200"
+                    class="no-glow hover:text-atomic-tangerine-600 dark:hover:text-atomic-tangerine-400 h-6 w-6 flex-shrink-0 text-gray-400 transition-colors duration-200"
                 >
                     <X class="h-4 w-4" />
                 </button>

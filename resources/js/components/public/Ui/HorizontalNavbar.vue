@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
 <template>
     <div
         ref="navBarRef"
-        class="w-full border-b border-gray-200 transition-all duration-200 dark:border-gray-800"
+        class="no-glow w-full border-b border-gray-200 transition-all duration-200 dark:border-gray-800"
         :class="{
             'fixed top-0 right-0 left-0 z-50 bg-gray-100 shadow-md dark:bg-gray-900': isNavSticky && sticky,
             'bg-transparent': !(isNavSticky && sticky),
@@ -197,7 +197,7 @@ onBeforeUnmount(() => {
                 variant="black"
                 v-if="showArrows && showLeftArrow"
                 @click="scrollNavLeft"
-                class="absolute top-1/2 left-0 z-10 w-12 -translate-y-1/2 transition-all"
+                class="absolute! top-1/2 left-0 z-10 w-12 -translate-y-1/2 transition-all"
             >
                 <ArrowLeftRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
             </BaseButton>
@@ -226,7 +226,7 @@ onBeforeUnmount(() => {
                 variant="black"
                 v-if="showArrows && showRightArrow"
                 @click="scrollNavRight"
-                class="absolute top-1/2 right-0 z-10 w-12 -translate-y-1/2 transition-all"
+                class="absolute! top-1/2 right-0 z-10 w-12 -translate-y-1/2 transition-all"
             >
                 <ArrowRightRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
             </BaseButton>

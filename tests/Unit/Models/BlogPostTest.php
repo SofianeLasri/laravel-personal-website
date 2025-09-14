@@ -19,6 +19,15 @@ class BlogPostTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
+    public function it_belongs_to_a_title_translation_key(): void
+    {
+        $blogPost = BlogPost::factory()->create();
+
+        $this->assertNotNull($blogPost->titleTranslationKey);
+        $this->assertEquals($blogPost->title_translation_key_id, $blogPost->titleTranslationKey->id);
+    }
+
+    #[Test]
     public function it_belongs_to_a_category(): void
     {
         $category = BlogCategory::factory()->create();
@@ -68,21 +77,6 @@ class BlogPostTest extends TestCase
 
         $this->assertInstanceOf(GameReview::class, $blogPost->gameReview);
         $this->assertEquals($gameReview->id, $blogPost->gameReview->id);
-    }
-
-    #[Test]
-    public function it_scopes_published_posts(): void
-    {
-        BlogPost::factory()->create(['status' => 'draft']);
-        $published1 = BlogPost::factory()->create(['status' => 'published', 'published_at' => now()->subDay()]);
-        $published2 = BlogPost::factory()->create(['status' => 'published', 'published_at' => now()->subHour()]);
-        BlogPost::factory()->create(['status' => 'published', 'published_at' => now()->addDay()]);
-
-        $results = BlogPost::published()->get();
-
-        $this->assertCount(2, $results);
-        $this->assertTrue($results->contains($published1));
-        $this->assertTrue($results->contains($published2));
     }
 
     #[Test]

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\BlogCategory;
+use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -16,14 +17,8 @@ class BlogCategoryFactory extends Factory
 
         return [
             'slug' => Str::slug($name).'-'.uniqid(),
-            'icon' => $this->faker->optional(0.7)->randomElement([
-                'fas fa-gamepad',
-                'fas fa-code',
-                'fas fa-paint-brush',
-                'fas fa-music',
-                'fas fa-camera',
-            ]),
-            'color' => $this->faker->optional(0.8)->hexColor(),
+            'name_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
+            'color' => $this->faker->optional(0.8)->hexColor(), // TODO: Use predefined set of colors
             'order' => $this->faker->numberBetween(0, 100),
         ];
     }

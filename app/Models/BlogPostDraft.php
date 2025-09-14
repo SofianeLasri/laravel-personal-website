@@ -39,8 +39,8 @@ class BlogPostDraft extends Model
     protected $fillable = [
         'blog_post_id',
         'slug',
+        'title_translation_key_id',
         'type',
-        'status',
         'category_id',
         'cover_picture_id',
     ];
@@ -57,6 +57,14 @@ class BlogPostDraft extends Model
     public function blogPost(): BelongsTo
     {
         return $this->belongsTo(BlogPost::class);
+    }
+
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
+    public function titleTranslationKey(): BelongsTo
+    {
+        return $this->belongsTo(TranslationKey::class, 'title_translation_key_id');
     }
 
     /**

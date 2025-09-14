@@ -19,6 +19,7 @@ import {
     LayoutGrid,
     LinkIcon,
     Logs,
+    NotebookPenIcon,
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
@@ -34,6 +35,25 @@ const mainNavItems: NavItem[] = [
         title: 'Créations',
         href: '#',
         icon: Brush,
+        items: [
+            {
+                title: 'Liste',
+                href: route('dashboard.creations.index', undefined, false),
+            },
+            {
+                title: 'Brouillons',
+                href: route('dashboard.creations.drafts.index', undefined, false),
+            },
+            {
+                title: 'Éditeur',
+                href: route('dashboard.creations.edit', undefined, false),
+            },
+        ],
+    },
+    {
+        title: 'Articles',
+        href: '#',
+        icon: NotebookPenIcon,
         items: [
             {
                 title: 'Liste',

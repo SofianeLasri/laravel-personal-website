@@ -6,6 +6,7 @@ use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
 use App\Models\Picture;
+use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -19,9 +20,9 @@ class BlogPostDraftFactory extends Factory
 
         return [
             'blog_post_id' => null, // Usually null for new drafts
+            'title_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'slug' => Str::slug($title).'-'.uniqid(),
             'type' => $this->faker->randomElement(['standard', 'game_review']),
-            'status' => 'draft',
             'category_id' => BlogCategory::factory(),
             'cover_picture_id' => Picture::factory(),
         ];

@@ -20,8 +20,8 @@ class BlogPostFactory extends Factory
 
         return [
             'slug' => Str::slug($title).'-'.uniqid(),
+            'title_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'type' => $this->faker->randomElement(['article', 'game_review']),
-            'status' => $this->faker->randomElement(['draft', 'published']),
             'category_id' => BlogCategory::factory(),
             'cover_picture_id' => Picture::factory(),
             'published_at' => $this->faker->optional(0.7)->dateTimeBetween('-1 year', 'now'),

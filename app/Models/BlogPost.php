@@ -40,6 +40,7 @@ class BlogPost extends Model
 
     protected $fillable = [
         'slug',
+        'title_translation_key_id',
         'type',
         'status',
         'category_id',
@@ -50,9 +51,16 @@ class BlogPost extends Model
     protected $casts = [
         'slug' => 'string',
         'type' => 'string',
-        'status' => 'string',
         'published_at' => 'datetime',
     ];
+
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
+    public function titleTranslationKey(): BelongsTo
+    {
+        return $this->belongsTo(TranslationKey::class, 'title_translation_key_id');
+    }
 
     /**
      * @return BelongsTo<BlogCategory, $this>

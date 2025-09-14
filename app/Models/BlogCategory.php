@@ -6,6 +6,7 @@ use Database\Factories\BlogCategoryFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
@@ -27,17 +28,24 @@ class BlogCategory extends Model
 
     protected $fillable = [
         'slug',
-        'icon',
+        'name_translation_key_id',
         'color',
         'order',
     ];
 
     protected $casts = [
         'slug' => 'string',
-        'icon' => 'string',
-        'color' => 'string',
+        'color' => 'string', // TODO: Use predefined set of colors
         'order' => 'integer',
     ];
+
+    /**
+     * @return BelongsTo<TranslationKey, $this>
+     */
+    public function nameTranslationKey(): BelongsTo
+    {
+        return $this->belongsTo(TranslationKey::class, 'name_translation_key_id');
+    }
 
     /**
      * @return HasMany<BlogPost, $this>

@@ -24,6 +24,10 @@ use App\Http\Controllers\Admin\RequestLogController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Admin\TranslationPageController;
+use App\Http\Controllers\Dashboard\BlogCategoryController;
+use App\Http\Controllers\Dashboard\BlogContentController;
+use App\Http\Controllers\Dashboard\BlogPostController;
+use App\Http\Controllers\Dashboard\GameReviewController;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CertificationsCareerController;
@@ -231,6 +235,48 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('translations.translate-single');
         Route::post('translations/translate-batch', [TranslationPageController::class, 'translateBatch'])
             ->name('translations.translate-batch');
+
+        // Blog routes
+        Route::name('blog.')->prefix('blog')->group(function () {
+            // Blog categories
+            Route::apiResource('categories', BlogCategoryController::class);
+            Route::post('categories/reorder', [BlogCategoryController::class, 'reorder'])
+                ->name('categories.reorder');
+
+            // Blog posts and drafts
+            Route::get('posts', [BlogPostController::class, 'index'])->name('posts.index');
+            Route::get('drafts/{draft}', [BlogPostController::class, 'showDraft'])->name('drafts.show');
+            Route::get('posts/{post}', [BlogPostController::class, 'showPost'])->name('posts.show');
+            Route::post('drafts', [BlogPostController::class, 'storeDraft'])->name('drafts.store');
+            Route::put('drafts/{draft}', [BlogPostController::class, 'updateDraft'])->name('drafts.update');
+            Route::delete('drafts/{draft}', [BlogPostController::class, 'destroyDraft'])->name('drafts.destroy');
+            Route::delete('posts/{post}', [BlogPostController::class, 'destroyPost'])->name('posts.destroy');
+            Route::post('drafts/{draft}/publish', [BlogPostController::class, 'publishDraft'])->name('drafts.publish');
+            Route::post('posts/{post}/create-draft', [BlogPostController::class, 'createDraftFromPost'])->name('posts.create-draft');
+
+            // Blog content management
+            Route::get('drafts/{draft}/contents', [BlogContentController::class, 'index'])->name('drafts.contents.index');
+            Route::get('drafts/{draft}/contents/{content}', [BlogContentController::class, 'show'])->name('drafts.contents.show');
+            Route::post('drafts/{draft}/contents/markdown', [BlogContentController::class, 'storeMarkdown'])->name('drafts.contents.markdown.store');
+            Route::post('drafts/{draft}/contents/gallery', [BlogContentController::class, 'storeGallery'])->name('drafts.contents.gallery.store');
+            Route::post('drafts/{draft}/contents/video', [BlogContentController::class, 'storeVideo'])->name('drafts.contents.video.store');
+            Route::put('drafts/{draft}/contents/{content}/markdown', [BlogContentController::class, 'updateMarkdown'])->name('drafts.contents.markdown.update');
+            Route::put('drafts/{draft}/contents/{content}/gallery', [BlogContentController::class, 'updateGallery'])->name('drafts.contents.gallery.update');
+            Route::put('drafts/{draft}/contents/{content}/video', [BlogContentController::class, 'updateVideo'])->name('drafts.contents.video.update');
+            Route::post('drafts/{draft}/contents/reorder', [BlogContentController::class, 'reorder'])->name('drafts.contents.reorder');
+            Route::delete('drafts/{draft}/contents/{content}', [BlogContentController::class, 'destroy'])->name('drafts.contents.destroy');
+            Route::post('drafts/{draft}/contents/{content}/duplicate', [BlogContentController::class, 'duplicate'])->name('drafts.contents.duplicate');
+
+            // Game review management
+            Route::get('drafts/{draft}/game-review', [GameReviewController::class, 'show'])->name('drafts.game-review.show');
+            Route::post('drafts/{draft}/game-review', [GameReviewController::class, 'store'])->name('drafts.game-review.store');
+            Route::put('drafts/{draft}/game-review', [GameReviewController::class, 'update'])->name('drafts.game-review.update');
+            Route::delete('drafts/{draft}/game-review', [GameReviewController::class, 'destroy'])->name('drafts.game-review.destroy');
+            Route::post('drafts/{draft}/game-review/links', [GameReviewController::class, 'storeLink'])->name('drafts.game-review.links.store');
+            Route::put('drafts/{draft}/game-review/links/{link}', [GameReviewController::class, 'updateLink'])->name('drafts.game-review.links.update');
+            Route::delete('drafts/{draft}/game-review/links/{link}', [GameReviewController::class, 'destroyLink'])->name('drafts.game-review.links.destroy');
+            Route::post('drafts/{draft}/game-review/links/reorder', [GameReviewController::class, 'reorderLinks'])->name('drafts.game-review.links.reorder');
+        });
     });
 
     require __DIR__.'/settings.php';

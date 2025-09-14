@@ -3,8 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\BlogCategory;
+use App\Models\BlogContentMarkdown;
 use App\Models\BlogPost;
 use App\Models\Picture;
+use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -18,7 +20,7 @@ class BlogPostFactory extends Factory
 
         return [
             'slug' => Str::slug($title).'-'.uniqid(),
-            'type' => $this->faker->randomElement(['standard', 'game_review']),
+            'type' => $this->faker->randomElement(['article', 'game_review']),
             'status' => $this->faker->randomElement(['draft', 'published']),
             'category_id' => BlogCategory::factory(),
             'cover_picture_id' => Picture::factory(),
@@ -49,10 +51,26 @@ class BlogPostFactory extends Factory
         ]);
     }
 
-    public function standard(): static
+    public function article(): static
     {
         return $this->state([
-            'type' => 'standard',
+            'type' => 'article',
         ]);
+    }
+
+    public function withContent(): static
+    {
+        return $this->afterCreating(function (BlogPost $post) {
+            $translationKey = TranslationKey::factory()->withTranslations()->create();
+            $markdown = BlogContentMarkdown::create([
+                'translation_key_id' => $translationKey->id,
+            ]);
+
+            $post->contents()->create([
+                'content_type' => BlogContentMarkdown::class,
+                'content_id' => $markdown->id,
+                'order' => 1,
+            ]);
+        });
     }
 }

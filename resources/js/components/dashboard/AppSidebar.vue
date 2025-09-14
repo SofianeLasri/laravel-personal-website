@@ -57,7 +57,7 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: 'Liste',
-                href: route('dashboard.creations.index', undefined, false),
+                href: route('dashboard.blog-posts.index', undefined, false),
             },
             {
                 title: 'Brouillons',

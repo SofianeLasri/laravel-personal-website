@@ -150,7 +150,7 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('cancel');
     });
 
-    Route::name('articles.')->prefix('articles')->group(function () {
+    Route::name('articles.')->prefix('blog-posts')->group(function () {
         Route::get('/', [ArticlesPageController::class, 'listPage'])
             ->name('index');
         /*Route::get('/drafts', [CreationPageController::class, 'listDraftPage'])

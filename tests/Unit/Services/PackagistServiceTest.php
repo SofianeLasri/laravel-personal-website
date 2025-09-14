@@ -20,7 +20,7 @@ class PackagistServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new PackagistService();
+        $this->service = new PackagistService;
         Cache::flush();
     }
 
@@ -196,7 +196,7 @@ class PackagistServiceTest extends TestCase
     public function get_package_data_handles_http_errors(int $statusCode, string $expectedLogLevel, string $expectedMessage): void
     {
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
-        
+
         Http::fake([
             '*' => Http::response(null, $statusCode),
         ]);
@@ -227,7 +227,7 @@ class PackagistServiceTest extends TestCase
     public function get_package_data_handles_malformed_json(): void
     {
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
-        
+
         Http::fake([
             '*' => Http::response('not valid json', 200),
         ]);
@@ -246,7 +246,7 @@ class PackagistServiceTest extends TestCase
     public function get_package_data_handles_missing_package_key(): void
     {
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
-        
+
         Http::fake([
             '*' => Http::response(['error' => 'Something went wrong'], 200),
         ]);
@@ -281,12 +281,12 @@ class PackagistServiceTest extends TestCase
 
         // First call
         $result1 = $this->service->getPackageData($packagistUrl);
-        
+
         // Second call should use cache
         Http::fake([
             '*' => Http::response(null, 500), // Would fail if called
         ]);
-        
+
         $result2 = $this->service->getPackageData($packagistUrl);
 
         $this->assertEquals($result1, $result2);
@@ -297,9 +297,9 @@ class PackagistServiceTest extends TestCase
     public function get_package_data_uses_configured_cache_ttl(): void
     {
         Config::set('services.packagist.cache_ttl', 3600);
-        
-        $service = new PackagistService();
-        
+
+        $service = new PackagistService;
+
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
         $apiResponse = [
             'package' => [
@@ -348,7 +348,7 @@ class PackagistServiceTest extends TestCase
             ]);
 
         $result = $service->getPackageData($packagistUrl);
-        
+
         $this->assertNotNull($result);
     }
 
@@ -356,7 +356,7 @@ class PackagistServiceTest extends TestCase
     public function get_package_data_handles_empty_package_data(): void
     {
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
-        
+
         Http::fake([
             '*' => Http::response(['package' => []]),
         ]);
@@ -445,7 +445,7 @@ class PackagistServiceTest extends TestCase
     public function get_package_data_handles_exception(): void
     {
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
-        
+
         Http::fake(function () {
             throw new \Exception('Network error');
         });
@@ -500,7 +500,7 @@ class PackagistServiceTest extends TestCase
     public function get_package_statistics_handles_api_error(): void
     {
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
-        
+
         Http::fake([
             '*' => Http::response(null, 404),
         ]);
@@ -532,12 +532,12 @@ class PackagistServiceTest extends TestCase
 
         // First call
         $result1 = $this->service->getPackageStatistics($packagistUrl);
-        
+
         // Second call should use cache
         Http::fake([
             '*' => Http::response(null, 500),
         ]);
-        
+
         $result2 = $this->service->getPackageStatistics($packagistUrl);
 
         $this->assertEquals($result1, $result2);
@@ -548,7 +548,7 @@ class PackagistServiceTest extends TestCase
     public function get_package_statistics_handles_exception(): void
     {
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
-        
+
         Http::fake(function () {
             throw new \Exception('Network error');
         });
@@ -567,7 +567,7 @@ class PackagistServiceTest extends TestCase
     public function clear_cache_removes_cached_data(): void
     {
         $packagistUrl = 'https://packagist.org/packages/vendor/package';
-        
+
         // Mock cache operations
         Cache::shouldReceive('remember')
             ->once()
@@ -575,15 +575,15 @@ class PackagistServiceTest extends TestCase
             ->andReturnUsing(function ($key, $ttl, $callback) {
                 return $callback();
             });
-            
+
         Cache::shouldReceive('forget')
             ->once()
             ->with('packagist_package_vendor_package');
-            
+
         Cache::shouldReceive('forget')
             ->once()
             ->with('packagist_stats_vendor_package');
-        
+
         // Setup API response
         $apiResponse = [
             'package' => [
@@ -601,10 +601,10 @@ class PackagistServiceTest extends TestCase
 
         $result = $this->service->getPackageData($packagistUrl);
         $this->assertEquals(1000, $result['downloads']);
-        
+
         // Clear cache - this should call Cache::forget
         $this->service->clearCache($packagistUrl);
-        
+
         // Assert that cache forget was called (handled by Mockery above)
         $this->assertTrue(true);
     }

@@ -10,13 +10,13 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property int $video_id
+ * @property int|null $video_id
  * @property int|null $caption_translation_key_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $videos_count
  * @property int|null $caption_translation_keys_count
- * @property-read Video $video
+ * @property-read Video|null $video
  * @property-read TranslationKey|null $captionTranslationKey
  */
 class BlogContentVideo extends Model

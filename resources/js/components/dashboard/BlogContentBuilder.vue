@@ -9,7 +9,7 @@ import { useRoute } from '@/composables/useRoute';
 import type { Picture, Video } from '@/types';
 import axios from 'axios';
 import { GripVertical, Image, Text, Trash2, Video as VideoIcon } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { toast } from 'vue-sonner';
 import Sortable from 'sortablejs';
 
@@ -44,7 +44,18 @@ const localContents = ref<BlogContent[]>([...props.contents]);
 const sortableInstance = ref<Sortable | null>(null);
 const contentListRef = ref<HTMLElement | null>(null);
 
-// Initialize sortable on mount
+// Initialiser le cache avec les contenus existants
+const initializeContentCache = () => {
+    localContents.value.forEach((content) => {
+        if (getContentTypeFromClass(content.content_type) === 'markdown') {
+            const currentText = content.content?.translation_key?.translations?.find((t) => t.locale === props.locale)?.text || '';
+            contentCache.value[content.content_id] = currentText;
+            savingStatus.value[content.content_id] = 'idle';
+        }
+    });
+};
+
+// Initialize sortable and cache on mount
 onMounted(() => {
     if (contentListRef.value) {
         sortableInstance.value = Sortable.create(contentListRef.value, {
@@ -59,6 +70,16 @@ onMounted(() => {
             },
         });
     }
+
+    // Initialiser le cache des contenus
+    initializeContentCache();
+});
+
+// Nettoyer les timeouts lors de la destruction du composant
+onUnmounted(() => {
+    Object.values(saveTimeouts.value).forEach((timeout) => {
+        if (timeout) clearTimeout(timeout);
+    });
 });
 
 const contentTypes = [
@@ -80,15 +101,18 @@ const addContent = async (type: string) => {
         if (type === 'markdown') {
             // Create a new markdown content
             const response = await axios.post(route('dashboard.api.blog-content-markdown.store'), {
-                text_fr: '',
-                text_en: '',
+                content: '',
+                locale: props.locale,
             });
             contentId = response.data.id;
         } else if (type === 'gallery') {
             // Create a new gallery content
-            const response = await axios.post(route('dashboard.api.blog-content-galleries.store'), {
+            const response = await axios.post(route('dashboard.api.blog-content-gallery.store'), {
                 layout: 'grid',
                 columns: 2,
+                picture_ids: [],
+                captions: [],
+                locale: props.locale,
             });
             contentId = response.data.id;
         } else if (type === 'video') {
@@ -109,14 +133,28 @@ const addContent = async (type: string) => {
                       ? 'App\\Models\\BlogContentGallery'
                       : 'App\\Models\\BlogContentVideo',
             content_id: contentId,
-            order: localContents.value.length,
+            order: localContents.value.length + 1,
         });
 
         localContents.value.push(response.data);
+
+        // Initialiser le cache et le statut pour le nouveau contenu markdown
+        if (type === 'markdown') {
+            contentCache.value[contentId] = '';
+            savingStatus.value[contentId] = 'idle';
+        }
+
         toast.success('Bloc de contenu ajouté');
     } catch (error) {
         console.error("Erreur lors de l'ajout du contenu:", error);
-        toast.error("Erreur lors de l'ajout du contenu");
+        console.error("Détails de l'erreur:", error.response?.data);
+
+        if (error.response?.status === 422 && error.response?.data?.errors) {
+            const errors = Object.values(error.response.data.errors).flat();
+            toast.error(`Erreurs de validation: ${errors.join(', ')}`);
+        } else {
+            toast.error("Erreur lors de l'ajout du contenu");
+        }
     }
 };
 
@@ -168,19 +206,59 @@ const updateContentOrder = async () => {
     }
 };
 
-const updateMarkdownContent = async (contentId: number, text: string) => {
+// Cache local pour les contenus en cours d'édition
+const contentCache = ref<Record<number, string>>({});
+const savingStatus = ref<Record<number, 'idle' | 'saving' | 'saved' | 'error'>>({});
+
+// Fonction debounced pour sauvegarder le contenu
+const debouncedSave = (contentId: number, text: string) => {
+    // Annuler la sauvegarde précédente si elle existe
+    if (saveTimeouts.value[contentId]) {
+        clearTimeout(saveTimeouts.value[contentId]);
+    }
+
+    // Programmer une nouvelle sauvegarde après 1.5 secondes
+    saveTimeouts.value[contentId] = setTimeout(() => {
+        saveMarkdownContent(contentId, text);
+    }, 1500);
+};
+
+const saveTimeouts = ref<Record<number, NodeJS.Timeout>>({});
+
+const saveMarkdownContent = async (contentId: number, text: string) => {
+    savingStatus.value[contentId] = 'saving';
+
     try {
         await axios.put(
             route('dashboard.api.blog-content-markdown.update', {
                 blog_content_markdown: contentId,
             }),
             {
-                [`text_${props.locale}`]: text,
+                content: text,
+                locale: props.locale,
             },
         );
+
+        savingStatus.value[contentId] = 'saved';
+
+        // Marquer comme "idle" après 2 secondes
+        setTimeout(() => {
+            if (savingStatus.value[contentId] === 'saved') {
+                savingStatus.value[contentId] = 'idle';
+            }
+        }, 2000);
     } catch (error) {
         console.error('Erreur lors de la mise à jour:', error);
+        savingStatus.value[contentId] = 'error';
     }
+};
+
+const updateMarkdownContent = (contentId: number, text: string) => {
+    // Mise à jour immédiate du cache local
+    contentCache.value[contentId] = text;
+
+    // Sauvegarde debounced
+    debouncedSave(contentId, text);
 };
 
 const updateGalleryImages = async (contentId: number, pictureIds: number[]) => {
@@ -241,6 +319,7 @@ const getContentTypeFromClass = (className: string): string => {
                 variant="outline"
                 size="sm"
                 @click="addContent(contentType.value)"
+                :data-testid="contentType.value === 'markdown' ? 'add-text-button' : `add-${contentType.value}-button`"
             >
                 <component :is="contentType.icon" class="mr-2 h-4 w-4" />
                 Ajouter {{ contentType.label }}
@@ -264,9 +343,23 @@ const getContentTypeFromClass = (className: string): string => {
                 <CardContent>
                     <!-- Markdown Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'markdown'" class="space-y-2">
-                        <Label>Contenu Markdown ({{ locale.toUpperCase() }})</Label>
+                        <div class="flex items-center justify-between">
+                            <Label>Contenu Markdown ({{ locale.toUpperCase() }})</Label>
+                            <!-- Indicateur de sauvegarde -->
+                            <div class="flex items-center gap-2 text-xs">
+                                <div v-if="savingStatus[content.content_id] === 'saving'" class="flex items-center gap-1 text-blue-600">
+                                    <div class="h-3 w-3 animate-spin rounded-full border-b-2 border-blue-600"></div>
+                                    Sauvegarde...
+                                </div>
+                                <div v-else-if="savingStatus[content.content_id] === 'saved'" class="text-green-600">✓ Sauvegardé</div>
+                                <div v-else-if="savingStatus[content.content_id] === 'error'" class="text-red-600">⚠ Erreur de sauvegarde</div>
+                            </div>
+                        </div>
                         <Textarea
-                            :value="content.content?.translation_key?.translations?.find((t) => t.locale === locale)?.text || ''"
+                            :value="
+                                contentCache[content.content_id] ??
+                                (content.content?.translation_key?.translations?.find((t) => t.locale === locale)?.text || '')
+                            "
                             @input="(e: any) => updateMarkdownContent(content.content_id, e.target.value)"
                             placeholder="Écrivez votre contenu en Markdown..."
                             class="min-h-[200px] font-mono"

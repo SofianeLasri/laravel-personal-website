@@ -218,7 +218,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                 :description="currentBlogPostDraft?.original_blog_post_id ? 'Modification d\'un article publié' : 'Création d\'un nouvel article'"
             />
 
-            <form @submit="handleSubmit" class="space-y-8">
+            <form @submit="handleSubmit" class="space-y-8" data-testid="blog-form">
                 <!-- Language selector -->
                 <div class="flex items-center gap-2">
                     <label class="text-sm font-medium">Langue :</label>
@@ -234,7 +234,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                         <FormItem>
                             <FormLabel>Titre</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="Titre de l'article" v-bind="componentField" />
+                                <Input type="text" placeholder="Titre de l'article" v-bind="componentField" data-testid="blog-title-input" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -257,7 +257,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                                 <FormLabel>Type d'article</FormLabel>
                                 <Select v-bind="componentField">
                                     <FormControl>
-                                        <SelectTrigger>
+                                        <SelectTrigger data-testid="blog-type-select">
                                             <SelectValue placeholder="Sélectionner un type" />
                                         </SelectTrigger>
                                     </FormControl>
@@ -279,7 +279,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                                 </div>
                                 <Select v-bind="componentField">
                                     <FormControl>
-                                        <SelectTrigger>
+                                        <SelectTrigger data-testid="blog-category-select">
                                             <SelectValue placeholder="Sélectionner une catégorie" />
                                         </SelectTrigger>
                                     </FormControl>
@@ -340,6 +340,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                         :pictures="pictures"
                         :videos="videos"
                         :locale="locale"
+                        data-testid="content-builder"
                     />
                 </div>
 

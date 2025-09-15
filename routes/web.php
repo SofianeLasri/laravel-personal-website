@@ -1,13 +1,19 @@
 <?php
 
 use App\Http\Controllers\Admin\Api\BlogCategoryController;
+use App\Http\Controllers\Admin\Api\BlogContentGalleryController;
+use App\Http\Controllers\Admin\Api\BlogContentMarkdownController;
+use App\Http\Controllers\Admin\Api\BlogContentVideoController;
 use App\Http\Controllers\Admin\Api\BlogPostController;
+use App\Http\Controllers\Admin\Api\BlogPostDraftContentController;
+use App\Http\Controllers\Admin\Api\BlogPostDraftController;
 use App\Http\Controllers\Admin\Api\CertificationController;
 use App\Http\Controllers\Admin\Api\CreationController;
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
 use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
 use App\Http\Controllers\Admin\Api\ExperienceController;
+use App\Http\Controllers\Admin\Api\GameReviewDraftController;
 use App\Http\Controllers\Admin\Api\PersonController;
 use App\Http\Controllers\Admin\Api\PictureController;
 use App\Http\Controllers\Admin\Api\SocialMediaLinkController;
@@ -185,6 +191,22 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::apiResource('blog-categories', BlogCategoryController::class);
         Route::post('blog-categories/reorder', [BlogCategoryController::class, 'reorder'])
             ->name('blog-categories.reorder');
+
+        // Blog post drafts routes
+        Route::apiResource('blog-post-drafts', BlogPostDraftController::class);
+
+        // Blog post draft content routes
+        Route::apiResource('blog-post-draft-contents', BlogPostDraftContentController::class)->except(['index', 'show']);
+        Route::post('blog-post-drafts/{blog_post_draft}/contents/reorder', [BlogPostDraftContentController::class, 'reorder'])
+            ->name('blog-post-draft-contents.reorder');
+
+        // Blog content routes
+        Route::apiResource('blog-content-markdown', BlogContentMarkdownController::class)->except(['index']);
+        Route::apiResource('blog-content-gallery', BlogContentGalleryController::class)->except(['index']);
+        Route::apiResource('blog-content-video', BlogContentVideoController::class)->except(['index']);
+
+        // Game review draft routes
+        Route::apiResource('game-review-drafts', GameReviewDraftController::class)->except(['index', 'create', 'edit']);
 
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\BlogPostType;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
@@ -19,10 +20,10 @@ class BlogPostDraftFactory extends Factory
         $title = $this->faker->sentence();
 
         return [
-            'blog_post_id' => null, // Usually null for new drafts
+            'original_blog_post_id' => null, // Usually null for new drafts
             'title_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'slug' => Str::slug($title).'-'.uniqid(),
-            'type' => $this->faker->randomElement(['standard', 'game_review']),
+            'type' => $this->faker->randomElement([BlogPostType::ARTICLE, BlogPostType::GAME_REVIEW]),
             'category_id' => BlogCategory::factory(),
             'cover_picture_id' => Picture::factory(),
         ];
@@ -31,7 +32,7 @@ class BlogPostDraftFactory extends Factory
     public function forBlogPost(BlogPost $blogPost): static
     {
         return $this->state([
-            'blog_post_id' => $blogPost->id,
+            'original_blog_post_id' => $blogPost->id,
             'slug' => $blogPost->slug,
             'type' => $blogPost->type,
             'category_id' => $blogPost->category_id,
@@ -42,14 +43,14 @@ class BlogPostDraftFactory extends Factory
     public function gameReview(): static
     {
         return $this->state([
-            'type' => 'game_review',
+            'type' => BlogPostType::GAME_REVIEW,
         ]);
     }
 
-    public function standard(): static
+    public function article(): static
     {
         return $this->state([
-            'type' => 'standard',
+            'type' => BlogPostType::ARTICLE,
         ]);
     }
 }

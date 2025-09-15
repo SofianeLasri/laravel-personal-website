@@ -67,22 +67,35 @@ class BlogPostEditTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($user, $category) {
             $browser->loginAs($user)
                 ->visit('/dashboard/blog-posts/edit')
-                ->waitFor('[data-testid="blog-form"]', 10)
-                    // Fill in basic blog post info
-                ->click('[data-testid="blog-type-select"]')
-                ->pause(500)
-                ->click('*[data-value="article"]')
-                ->type('[data-testid="blog-title-input"]', 'Test Article Title')
-                ->click('[data-testid="blog-category-select"]')
-                ->pause(500)
-                ->click('*[data-value="'.$category->id.'"]')
-                ->click('button:contains("Sauvegarder le brouillon")')
+                ->waitFor('[data-testid="blog-form"]')
+                // Fill in basic blog post info first and save draft
+                ->type('[data-testid="blog-title-input"]', 'Test Article avec Markdown')
+                ->type('slug', 'test-article-markdown')
+                ->select('category_id', $category->id)
+                ->press('Sauvegarder le brouillon')
+                ->waitForText('Brouillon mis à jour avec succès', 10)
                 ->waitFor('[data-testid="content-builder"]', 10)
-                    // Try to add markdown content
+                // Add markdown content
                 ->click('[data-testid="add-text-button"]')
-                ->pause(3000) // Wait for potential AJAX errors
-                ->assertDontSee('Erreur lors de l\'ajout du contenu');
+                ->waitForText('Bloc de contenu ajouté', 10)
+                // Target the textarea that should now be visible
+                ->waitFor('[data-testid="markdown-content-textarea"]')
+                ->type('[data-testid="markdown-content-textarea"]', 'Test content')
+                ->pause(2000) // Wait for debounced save
+                ->screenshot('blog-post-with-markdown-content');
         });
+
+        // Verify the content was saved to database
+        $this->assertDatabaseHas('blog_post_drafts', [
+            'slug' => 'test-article-markdown',
+            'category_id' => $category->id,
+        ]);
+
+        // Verify translation was created with our content
+        $this->assertDatabaseHas('translations', [
+            'locale' => 'fr',
+            'text' => 'Test content',
+        ]);
     }
 
     public function test_api_endpoints_work(): void

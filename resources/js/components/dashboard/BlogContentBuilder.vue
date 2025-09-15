@@ -9,7 +9,7 @@ import { useRoute } from '@/composables/useRoute';
 import type { Picture, Video } from '@/types';
 import axios from 'axios';
 import { GripVertical, Image, Text, Trash2, Video as VideoIcon } from 'lucide-vue-next';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watchEffect } from 'vue';
 import { toast } from 'vue-sonner';
 import Sortable from 'sortablejs';
 
@@ -44,6 +44,11 @@ const localContents = ref<BlogContent[]>([...props.contents]);
 const sortableInstance = ref<Sortable | null>(null);
 const contentListRef = ref<HTMLElement | null>(null);
 
+// Cache local pour les contenus en cours d'édition
+const contentCache = ref<Record<number, string>>({});
+const savingStatus = ref<Record<number, 'idle' | 'saving' | 'saved' | 'error'>>({});
+const saveTimeouts = ref<Record<number, NodeJS.Timeout>>({});
+
 // Initialiser le cache avec les contenus existants
 const initializeContentCache = () => {
     localContents.value.forEach((content) => {
@@ -75,11 +80,41 @@ onMounted(() => {
     initializeContentCache();
 });
 
-// Nettoyer les timeouts lors de la destruction du composant
+// Protection contre la perte de données
+const hasUnsavedChanges = ref(false);
+
+// Surveiller les modifications non sauvegardées
+watchEffect(() => {
+    const hasSavingContent = Object.values(savingStatus.value).some((status) => status === 'saving');
+    const hasErrorContent = Object.values(savingStatus.value).some((status) => status === 'error');
+
+    // Vérifier s'il y a des modifications en attente (contenu qui a changé mais pas encore sauvegardé)
+    const hasPendingChanges = Object.entries(saveTimeouts.value).some(([contentId, timeout]) => {
+        return timeout !== null;
+    });
+
+    hasUnsavedChanges.value = hasSavingContent || hasErrorContent || hasPendingChanges;
+});
+
+// Ajouter un gestionnaire d'événement pour avertir avant de quitter
+const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
+    if (hasUnsavedChanges.value) {
+        event.preventDefault();
+        event.returnValue = '';
+        return '';
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+});
+
+// Nettoyer les timeouts et les event listeners lors de la destruction du composant
 onUnmounted(() => {
     Object.values(saveTimeouts.value).forEach((timeout) => {
         if (timeout) clearTimeout(timeout);
     });
+    window.removeEventListener('beforeunload', beforeUnloadHandler);
 });
 
 const contentTypes = [
@@ -206,10 +241,6 @@ const updateContentOrder = async () => {
     }
 };
 
-// Cache local pour les contenus en cours d'édition
-const contentCache = ref<Record<number, string>>({});
-const savingStatus = ref<Record<number, 'idle' | 'saving' | 'saved' | 'error'>>({});
-
 // Fonction debounced pour sauvegarder le contenu
 const debouncedSave = (contentId: number, text: string) => {
     // Annuler la sauvegarde précédente si elle existe
@@ -222,8 +253,6 @@ const debouncedSave = (contentId: number, text: string) => {
         saveMarkdownContent(contentId, text);
     }, 1500);
 };
-
-const saveTimeouts = ref<Record<number, NodeJS.Timeout>>({});
 
 const saveMarkdownContent = async (contentId: number, text: string) => {
     savingStatus.value[contentId] = 'saving';
@@ -241,6 +270,12 @@ const saveMarkdownContent = async (contentId: number, text: string) => {
 
         savingStatus.value[contentId] = 'saved';
 
+        // Nettoyer le timeout après sauvegarde réussie
+        if (saveTimeouts.value[contentId]) {
+            clearTimeout(saveTimeouts.value[contentId]);
+            delete saveTimeouts.value[contentId];
+        }
+
         // Marquer comme "idle" après 2 secondes
         setTimeout(() => {
             if (savingStatus.value[contentId] === 'saved') {
@@ -250,6 +285,12 @@ const saveMarkdownContent = async (contentId: number, text: string) => {
     } catch (error) {
         console.error('Erreur lors de la mise à jour:', error);
         savingStatus.value[contentId] = 'error';
+
+        // Nettoyer le timeout même en cas d'erreur
+        if (saveTimeouts.value[contentId]) {
+            clearTimeout(saveTimeouts.value[contentId]);
+            delete saveTimeouts.value[contentId];
+        }
     }
 };
 
@@ -310,6 +351,15 @@ const getContentTypeFromClass = (className: string): string => {
 
 <template>
     <div class="space-y-4">
+        <!-- Indicateur de modifications non sauvegardées -->
+        <div
+            v-if="hasUnsavedChanges"
+            class="flex items-center gap-2 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200"
+        >
+            <div class="h-2 w-2 animate-pulse rounded-full bg-yellow-500"></div>
+            <span>Modifications en cours de sauvegarde... Ne fermez pas cette page.</span>
+        </div>
+
         <!-- Add Content Buttons -->
         <div class="flex gap-2">
             <Button
@@ -363,6 +413,7 @@ const getContentTypeFromClass = (className: string): string => {
                             @input="(e: any) => updateMarkdownContent(content.content_id, e.target.value)"
                             placeholder="Écrivez votre contenu en Markdown..."
                             class="min-h-[200px] font-mono"
+                            :data-testid="`markdown-textarea-${content.content_id}`"
                         />
                         <p class="text-muted-foreground text-xs">
                             Vous pouvez utiliser la syntaxe Markdown : **gras**, *italique*, [lien](url), etc.

@@ -30,7 +30,6 @@ class BlogPostDraftController extends Controller
             'type' => 'required|string',
             'category_id' => 'required|integer|exists:blog_categories,id',
             'cover_picture_id' => 'nullable|integer|exists:pictures,id',
-            'published_at' => 'nullable|date',
             'original_blog_post_id' => 'nullable|integer|exists:blog_posts,id',
             'locale' => 'required|string|in:fr,en',
         ]);
@@ -73,7 +72,6 @@ class BlogPostDraftController extends Controller
             'type' => $request->type,
             'category_id' => $request->category_id,
             'cover_picture_id' => $request->cover_picture_id,
-            'published_at' => $request->published_at,
             'original_blog_post_id' => $request->original_blog_post_id,
         ]);
 
@@ -110,7 +108,6 @@ class BlogPostDraftController extends Controller
             'type' => 'required|string',
             'category_id' => 'required|integer|exists:blog_categories,id',
             'cover_picture_id' => 'nullable|integer|exists:pictures,id',
-            'published_at' => 'nullable|date',
             'locale' => 'required|string|in:fr,en',
         ]);
 
@@ -134,7 +131,6 @@ class BlogPostDraftController extends Controller
             'type' => $request->type,
             'category_id' => $request->category_id,
             'cover_picture_id' => $request->cover_picture_id,
-            'published_at' => $request->published_at,
         ]);
 
         // Load relationships for response

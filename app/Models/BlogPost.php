@@ -19,7 +19,6 @@ use Illuminate\Support\Carbon;
  * @property BlogPostType $type
  * @property int $category_id
  * @property int|null $cover_picture_id
- * @property Carbon|null $published_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $categories_count
@@ -44,13 +43,11 @@ class BlogPost extends Model
         'type',
         'category_id',
         'cover_picture_id',
-        'published_at',
     ];
 
     protected $casts = [
         'slug' => 'string',
         'type' => BlogPostType::class,
-        'published_at' => 'datetime',
     ];
 
     /**
@@ -115,10 +112,6 @@ class BlogPost extends Model
      * @param  Builder<BlogPost>  $query
      * @return Builder<BlogPost>
      */
-    public function scopePublished(Builder $query): Builder
-    {
-        return $query->where('published_at', '<=', now());
-    }
 
     /**
      * Scope a query to only include posts from a specific category.

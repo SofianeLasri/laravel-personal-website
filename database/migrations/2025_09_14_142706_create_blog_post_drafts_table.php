@@ -21,7 +21,6 @@ return new class extends Migration
             $table->enum('type', BlogPostType::values());
             $table->foreignId('category_id')->constrained('blog_categories')->onDelete('cascade');
             $table->foreignId('cover_picture_id')->nullable()->constrained('pictures')->onDelete('set null');
-            $table->timestamp('published_at')->nullable();
             $table->timestamps();
 
             $table->index(['original_blog_post_id']);

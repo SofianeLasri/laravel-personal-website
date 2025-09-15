@@ -74,7 +74,6 @@ const formSchema = toTypedSchema(
         category_id: z.coerce.number().min(1, 'Veuillez sélectionner une catégorie'),
         locale: z.enum(['fr', 'en']).default('fr'),
         title_content: z.string().min(1, 'Le titre est requis'),
-        published_at: z.string().nullable(),
     }),
 );
 
@@ -87,7 +86,6 @@ const form = useForm({
         category_id: currentBlogPostDraft.value?.category_id?.toString() || props.categories[0]?.id?.toString() || '1',
         locale: 'fr' as 'fr' | 'en',
         title_content: '',
-        published_at: currentBlogPostDraft.value?.published_at || new Date().toISOString().split('T')[0],
     },
 });
 
@@ -119,10 +117,6 @@ onMounted(() => {
 
         if (currentBlogPostDraft.value.type) {
             form.setFieldValue('type', currentBlogPostDraft.value.type);
-        }
-
-        if (currentBlogPostDraft.value.published_at) {
-            form.setFieldValue('published_at', currentBlogPostDraft.value.published_at);
         }
     }
 });
@@ -327,17 +321,6 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                             </FormItem>
                         </FormField>
                     </div>
-
-                    <FormField v-slot="{ componentField }" name="published_at">
-                        <FormItem>
-                            <FormLabel>Date de publication</FormLabel>
-                            <FormControl>
-                                <Input type="date" v-bind="componentField" />
-                            </FormControl>
-                            <FormDescription> Date à laquelle l'article sera visible publiquement </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    </FormField>
 
                     <FormField name="cover_picture_id">
                         <FormItem>

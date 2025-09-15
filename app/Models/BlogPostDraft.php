@@ -19,7 +19,6 @@ use Illuminate\Support\Carbon;
  * @property BlogPostType $type
  * @property int $category_id
  * @property int|null $cover_picture_id
- * @property Carbon|null $published_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $blog_posts_count
@@ -44,13 +43,11 @@ class BlogPostDraft extends Model
         'type',
         'category_id',
         'cover_picture_id',
-        'published_at',
     ];
 
     protected $casts = [
         'slug' => 'string',
         'type' => BlogPostType::class,
-        'published_at' => 'datetime',
     ];
 
     /**

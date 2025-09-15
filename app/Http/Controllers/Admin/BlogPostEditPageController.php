@@ -98,7 +98,6 @@ class BlogPostEditPageController extends Controller
             'type' => $blogPost->type,
             'category_id' => $blogPost->category_id,
             'cover_picture_id' => $blogPost->cover_picture_id,
-            'published_at' => $blogPost->published_at,
         ]);
 
         // Copy contents

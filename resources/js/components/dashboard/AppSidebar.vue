@@ -61,7 +61,7 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: 'Brouillons',
-                href: route('dashboard.creations.drafts.index', undefined, false),
+                href: route('dashboard.blog-posts.drafts.index', undefined, false),
             },
             {
                 title: 'Éditeur',

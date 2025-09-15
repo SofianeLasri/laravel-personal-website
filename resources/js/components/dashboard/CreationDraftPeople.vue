@@ -378,13 +378,13 @@ watch(
                         </div>
 
                         <div class="ml-2 flex space-x-1">
-                            <Button variant="ghost" size="icon" @click="openEditForm(person)" title="Modifier">
+                            <Button variant="ghost" size="icon" title="Modifier" @click="openEditForm(person)">
                                 <Pencil class="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" @click="dissociatePerson(person.id)" title="Dissocier">
+                            <Button variant="ghost" size="icon" title="Dissocier" @click="dissociatePerson(person.id)">
                                 <UserMinus class="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" @click="confirmDeletePerson(person)" title="Supprimer">
+                            <Button variant="ghost" size="icon" title="Supprimer" @click="confirmDeletePerson(person)">
                                 <Trash2 class="h-4 w-4" />
                             </Button>
                         </div>
@@ -445,7 +445,7 @@ watch(
                                     </div>
 
                                     <div class="ml-2 flex space-x-1">
-                                        <Button variant="ghost" size="icon" @click="openEditForm(person)" title="Modifier">
+                                        <Button variant="ghost" size="icon" title="Modifier" @click="openEditForm(person)">
                                             <Pencil class="h-4 w-4" />
                                         </Button>
 
@@ -453,16 +453,16 @@ watch(
                                             v-if="isPersonAssociated(person.id)"
                                             variant="outline"
                                             size="sm"
-                                            @click="dissociatePerson(person.id)"
                                             title="Dissocier"
+                                            @click="dissociatePerson(person.id)"
                                         >
                                             Dissocier
                                         </Button>
-                                        <Button v-else variant="outline" size="sm" @click="associatePerson(person.id)" title="Ajouter">
+                                        <Button v-else variant="outline" size="sm" title="Ajouter" @click="associatePerson(person.id)">
                                             Ajouter
                                         </Button>
 
-                                        <Button variant="ghost" size="icon" @click="confirmDeletePerson(person)" title="Supprimer">
+                                        <Button variant="ghost" size="icon" title="Supprimer" @click="confirmDeletePerson(person)">
                                             <Trash2 class="h-4 w-4" />
                                         </Button>
                                     </div>
@@ -501,7 +501,7 @@ watch(
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" @click="isAddPersonDialogOpen = false" :disabled="loading">Annuler</Button>
+                        <Button variant="outline" :disabled="loading" @click="isAddPersonDialogOpen = false">Annuler</Button>
                         <Button :disabled="!newPersonName || loading" @click="createPerson">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Créer
@@ -534,7 +534,7 @@ watch(
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" @click="isEditPersonDialogOpen = false" :disabled="loading">Annuler</Button>
+                        <Button variant="outline" :disabled="loading" @click="isEditPersonDialogOpen = false">Annuler</Button>
                         <Button :disabled="!editPersonName || loading" @click="updatePerson">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Enregistrer
@@ -557,7 +557,7 @@ watch(
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction @click="deletePerson" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deletePerson">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Supprimer
                         </AlertDialogAction>

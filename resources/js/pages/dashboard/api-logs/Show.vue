@@ -95,7 +95,7 @@ const goBack = () => {
         <Head :title="`Log API #${log.id}`" />
         <Heading :title="`Détails du log #${log.id}`" :breadcrumbs="breadcrumbs">
             <template #actions>
-                <Button @click="goBack" variant="outline">
+                <Button variant="outline" @click="goBack">
                     <ArrowLeft class="mr-2 h-4 w-4" />
                     Retour à la liste
                 </Button>

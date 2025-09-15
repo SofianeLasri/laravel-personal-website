@@ -242,7 +242,7 @@ const handleCoverChange = (pictureId: number | null) => {
 
             <div class="col-span-2">
                 <Label>Image de couverture du jeu</Label>
-                <PictureInput :picture-id="gameData.cover_picture_id" @update:picture-id="handleCoverChange" label="Pochette du jeu" />
+                <PictureInput :picture-id="gameData.cover_picture_id" label="Pochette du jeu" @update:picture-id="handleCoverChange" />
             </div>
         </div>
 

@@ -80,14 +80,14 @@ onMounted(() => {
 
                     <div class="flex gap-2">
                         <button
-                            @click="acceptTranslation"
                             class="no-glow bg-atomic-tangerine-400 hover:bg-atomic-tangerine-500 rounded-md px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors duration-200"
+                            @click="acceptTranslation"
                         >
                             Yes, English
                         </button>
                         <button
-                            @click="dismissPopup"
                             class="no-glow px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors duration-200 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
+                            @click="dismissPopup"
                         >
                             No, thanks
                         </button>
@@ -95,8 +95,8 @@ onMounted(() => {
                 </div>
 
                 <button
-                    @click="dismissPopup"
                     class="no-glow hover:text-atomic-tangerine-600 dark:hover:text-atomic-tangerine-400 h-6 w-6 flex-shrink-0 text-gray-400 transition-colors duration-200"
+                    @click="dismissPopup"
                 >
                     <X class="h-4 w-4" />
                 </button>

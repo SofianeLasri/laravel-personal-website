@@ -27,9 +27,8 @@ const filteredExperiences = computed(() => {
     return props.experience.filter((exp) => {
         if (selectedType.value === 'emploi') {
             return exp.type === 'emploi';
-        } else {
-            return exp.type === 'formation';
         }
+        return exp.type === 'formation';
     });
 });
 
@@ -180,7 +179,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                             <div
                                 class="flex size-16 items-center justify-center gap-2.5 rounded-xl border bg-white p-3 lg:size-24 lg:p-4 dark:bg-gray-800"
                             >
-                                <picture class="flex h-full w-full items-center justify-center" v-if="selectedExperience.logo">
+                                <picture v-if="selectedExperience.logo" class="flex h-full w-full items-center justify-center">
                                     <source :srcset="selectedExperience.logo.webp.thumbnail" type="image/webp" />
                                     <img
                                         :src="selectedExperience.logo.avif.thumbnail"
@@ -205,10 +204,10 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                         <ArrowUpRightRegular class="h-3 fill-black dark:fill-gray-100" />
                                     </Link>
                                     <BaseButton
+                                        v-if="selectedExperience.websiteUrl"
                                         variant="white"
                                         size="sm"
                                         as="link"
-                                        v-if="selectedExperience.websiteUrl"
                                         :href="selectedExperience.websiteUrl"
                                         target="_blank"
                                     >
@@ -235,7 +234,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                     >
                         <div class="flex flex-col gap-3 self-stretch lg:gap-4">
                             <h3 class="text-design-system-title text-xl font-bold lg:text-2xl">{{ t('career.description') }}</h3>
-                            <vue-markdown class="markdown-view text-sm lg:text-base" :source="selectedExperience.fullDescription" />
+                            <VueMarkdown class="markdown-view text-sm lg:text-base" :source="selectedExperience.fullDescription" />
                         </div>
 
                         <div v-if="selectedExperience.technologies" class="flex flex-col items-start justify-start gap-3 self-stretch lg:gap-4">
@@ -247,7 +246,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
                                     :key="tech.name"
                                     :name="tech.name"
                                     :description="tech.description"
-                                    :iconPicture="tech.iconPicture"
+                                    :icon-picture="tech.iconPicture"
                                 />
                             </div>
                         </div>

@@ -43,13 +43,13 @@ const formattedPeriod = computed(() => {
                             loading="eager"
                         />
                     </div>
-                    <div class="flex flex-col items-end" v-if="creation.endedAt">
+                    <div v-if="creation.endedAt" class="flex flex-col items-end">
                         <div class="text-design-system-paragraph justify-center font-medium">{{ t('project.created_in') }}</div>
                         <div class="text-design-system-paragraph justify-center text-2xl font-bold">
                             {{ new Date(creation.endedAt).getFullYear() }}
                         </div>
                     </div>
-                    <div class="flex flex-col items-end" v-else>
+                    <div v-else class="flex flex-col items-end">
                         <div class="text-design-system-paragraph justify-center font-medium">{{ t('project.realization') }}</div>
                         <div class="text-design-system-paragraph justify-center text-2xl font-bold">{{ t('project.ongoing') }}</div>
                     </div>
@@ -74,9 +74,9 @@ const formattedPeriod = computed(() => {
             </div>
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center" data-testid="project-links">
                 <BaseButton
+                    v-if="creation.externalUrl"
                     variant="black"
                     as="link"
-                    v-if="creation.externalUrl"
                     :href="creation.externalUrl"
                     data-testid="demo-link"
                     target="_blank"
@@ -85,9 +85,9 @@ const formattedPeriod = computed(() => {
                     {{ t('project.visit_website') }}
                 </BaseButton>
                 <BaseButton
+                    v-if="creation.sourceCodeUrl"
                     variant="white"
                     as="link"
-                    v-if="creation.sourceCodeUrl"
                     :href="creation.sourceCodeUrl"
                     data-testid="github-link"
                     target="_blank"

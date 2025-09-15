@@ -111,7 +111,7 @@ const formatBytes = (bytes: number | null): string => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 
 const formatDate = (dateString: string): string => {
@@ -304,7 +304,7 @@ const handlePageChange = (page: number) => {
                                                     <Download class="mr-2 h-4 w-4" />
                                                     Télécharger
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem @click="confirmDelete(picture)" class="text-destructive focus:text-destructive">
+                                                <DropdownMenuItem class="text-destructive focus:text-destructive" @click="confirmDelete(picture)">
                                                     <Trash2 class="mr-2 h-4 w-4" />
                                                     Supprimer
                                                 </DropdownMenuItem>
@@ -357,13 +357,13 @@ const handlePageChange = (page: number) => {
             <!-- Pagination -->
             <div v-if="pictures.last_page > 1" class="mt-6 flex justify-center">
                 <Pagination
+                    v-slot="{ page }"
                     :total="pictures.total"
                     :items-per-page="pictures.per_page"
                     :default-page="pictures.current_page"
                     show-edges
                     :sibling-count="1"
                     @update:page="handlePageChange"
-                    v-slot="{ page }"
                 >
                     <PaginationContent v-slot="{ items }" class="flex items-center gap-1">
                         <PaginationFirst />
@@ -467,11 +467,11 @@ const handlePageChange = (page: number) => {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel @click="isDeleteDialogOpen = false" :disabled="isLoading"> Annuler </AlertDialogCancel>
+                    <AlertDialogCancel :disabled="isLoading" @click="isDeleteDialogOpen = false"> Annuler </AlertDialogCancel>
                     <AlertDialogAction
-                        @click="deletePicture"
                         class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         :disabled="isLoading"
+                        @click="deletePicture"
                     >
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Supprimer

@@ -100,7 +100,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
 
 <template>
     <Dialog v-model:open="open">
-        <DialogTrigger asChild>
+        <DialogTrigger as-child>
             <Button type="button" variant="outline" size="sm">
                 <Plus class="mr-2 h-4 w-4" />
                 Nouvelle catégorie
@@ -112,7 +112,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
                 <DialogDescription> Ajoutez une nouvelle catégorie pour organiser vos articles. </DialogDescription>
             </DialogHeader>
 
-            <form @submit="handleSubmit" class="space-y-4">
+            <form class="space-y-4" @submit="handleSubmit">
                 <FormField v-slot="{ componentField }" name="name_fr">
                     <FormItem>
                         <FormLabel>Nom (Français)</FormLabel>
@@ -158,10 +158,8 @@ const handleSubmit = form.handleSubmit(async (values) => {
                                         v-for="color in predefinedColors"
                                         :key="color"
                                         type="button"
-                                        :class="[
-                                            'h-8 w-8 rounded-md border-2 transition-all',
-                                            form.values.color === color ? 'border-foreground scale-110' : 'border-transparent hover:scale-105',
-                                        ]"
+                                        class="h-8 w-8 rounded-md border-2 transition-all"
+                                        :class="[form.values.color === color ? 'border-foreground scale-110' : 'border-transparent hover:scale-105']"
                                         :style="{ backgroundColor: color }"
                                         @click="form.setFieldValue('color', color)"
                                     />

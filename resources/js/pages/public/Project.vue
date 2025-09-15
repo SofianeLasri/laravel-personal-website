@@ -78,7 +78,7 @@ if (props.creation.screenshots.length > 0) {
         <meta name="twitter:image" :content="pageImage" />
         <meta name="twitter:image:alt" :content="pageImageAlt" />
     </Head>
-    <PublicAppLayout :socialMediaLinks="socialMediaLinks">
+    <PublicAppLayout :social-media-links="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
             <LightShape class="absolute top-[40rem] right-[-27rem] xl:right-[-15rem]" />
@@ -92,12 +92,12 @@ if (props.creation.screenshots.length > 0) {
 
             <div ref="contentContainer" class="flex flex-col">
                 <HorizontalNavbar
+                    v-model:active-item="activeSection"
                     :items="sections"
-                    v-model:activeItem="activeSection"
                     mode="auto"
                     :sticky="true"
-                    :showArrows="true"
-                    :containerRef="contentContainer"
+                    :show-arrows="true"
+                    :container-ref="contentContainer"
                 />
 
                 <div class="content-sections mt-8" data-testid="project-content">
@@ -106,7 +106,7 @@ if (props.creation.screenshots.length > 0) {
                         <MarkdownViewer :source="creation.fullDescription" data-testid="project-description" />
                     </section>
 
-                    <section id="features" class="mt-16 flex flex-col gap-8" v-if="creation.features.length > 0" data-testid="features-section">
+                    <section v-if="creation.features.length > 0" id="features" class="mt-16 flex flex-col gap-8" data-testid="features-section">
                         <ContentSectionTitle>{{ t('project.key_features') }}</ContentSectionTitle>
                         <div class="grid gap-16 md:grid-cols-2 lg:grid-cols-3">
                             <div v-for="feature in creation.features" :key="feature.id" class="flex flex-col gap-6" data-testid="feature-card">
@@ -117,9 +117,9 @@ if (props.creation.screenshots.length > 0) {
                     </section>
 
                     <section
+                        v-if="creation.githubData || creation.packagistData"
                         id="statistics"
                         class="mt-16 flex flex-col"
-                        v-if="creation.githubData || creation.packagistData"
                         data-testid="statistics-section"
                     >
                         <ContentSectionTitle>{{ t('project.statistics') }}</ContentSectionTitle>
@@ -129,13 +129,13 @@ if (props.creation.screenshots.length > 0) {
                         </div>
                     </section>
 
-                    <section id="people" class="mt-16 flex flex-col gap-8" v-if="creation.people.length > 0" data-testid="people-section">
+                    <section v-if="creation.people.length > 0" id="people" class="mt-16 flex flex-col gap-8" data-testid="people-section">
                         <ContentSectionTitle>{{ t('project.people_involved') }}</ContentSectionTitle>
                         <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                             <div
-                                class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-100 p-2 dark:border-gray-700 dark:bg-gray-900"
                                 v-for="person in creation.people"
                                 :key="person.id"
+                                class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-100 p-2 dark:border-gray-700 dark:bg-gray-900"
                                 data-testid="person-card"
                             >
                                 <div class="flex size-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full lg:size-16">
@@ -150,7 +150,7 @@ if (props.creation.screenshots.length > 0) {
                                 </div>
                                 <div class="flex w-full flex-col justify-center gap-1">
                                     <div class="text-design-system-title text-sm lg:text-base">{{ person.name }}</div>
-                                    <div class="w-full justify-center text-xs lg:text-sm" v-if="person.url">
+                                    <div v-if="person.url" class="w-full justify-center text-xs lg:text-sm">
                                         <a :href="person.url" class="text-primary hover:underline">{{ person.url }}</a>
                                     </div>
                                 </div>
@@ -158,7 +158,7 @@ if (props.creation.screenshots.length > 0) {
                         </div>
                     </section>
 
-                    <section id="technologies" class="mt-16 flex flex-col" v-if="creation.technologies.length > 0" data-testid="technologies-section">
+                    <section v-if="creation.technologies.length > 0" id="technologies" class="mt-16 flex flex-col" data-testid="technologies-section">
                         <ContentSectionTitle>{{ t('project.technologies_used') }}</ContentSectionTitle>
                         <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                             <TechnologyCard
@@ -166,7 +166,7 @@ if (props.creation.screenshots.length > 0) {
                                 :key="tech.name"
                                 :name="tech.name"
                                 :description="tech.description"
-                                :iconPicture="tech.iconPicture"
+                                :icon-picture="tech.iconPicture"
                                 :technology="tech"
                                 class="bg-gray-100 dark:bg-gray-900"
                                 data-testid="technology-card"
@@ -174,12 +174,12 @@ if (props.creation.screenshots.length > 0) {
                         </div>
                     </section>
 
-                    <section id="videos" class="mt-16 flex flex-col" v-if="creation.videos.length > 0" data-testid="videos-section">
+                    <section v-if="creation.videos.length > 0" id="videos" class="mt-16 flex flex-col" data-testid="videos-section">
                         <ContentSectionTitle>{{ t('project.videos') }}</ContentSectionTitle>
                         <ProjectVideoGallery :videos="creation.videos" />
                     </section>
 
-                    <section id="screenshots" class="mt-16 flex flex-col" v-if="creation.screenshots.length > 0" data-testid="screenshots-section">
+                    <section v-if="creation.screenshots.length > 0" id="screenshots" class="mt-16 flex flex-col" data-testid="screenshots-section">
                         <ContentSectionTitle>{{ t('project.screenshots') }}</ContentSectionTitle>
                         <ProjectScreenshotsContainer :screenshots="creation.screenshots" />
                     </section>

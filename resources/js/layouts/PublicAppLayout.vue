@@ -23,7 +23,7 @@ withDefaults(defineProps<Props>(), {
         <slot />
         <LanguagePopup />
     </div>
-    <Footer :socialMediaLinks="socialMediaLinks" />
+    <Footer :social-media-links="socialMediaLinks" />
 </template>
 
 <style>

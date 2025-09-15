@@ -123,8 +123,8 @@ onUnmounted(() => {
     <div class="navbar z-10 container flex content-center justify-between px-4 py-16">
         <NavBrand />
         <div class="flex flex-nowrap items-center justify-center gap-4">
-            <NavSearchBar class="hidden md:flex" @click="openSearchModal" :placeholder="t('navigation.search_placeholder')" />
-            <BaseButton variant="black" @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
+            <NavSearchBar class="hidden md:flex" :placeholder="t('navigation.search_placeholder')" @click="openSearchModal" />
+            <BaseButton variant="black" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12" @click="toggleMenu">
                 <span class="xs:block hidden">{{ t('navigation.menu') }}</span>
                 <BarStaggeredRegular class="xs:relative dark:fill-gray-990 absolute size-4 fill-white" />
             </BaseButton>
@@ -146,16 +146,16 @@ onUnmounted(() => {
             >
                 <div class="flex w-full flex-col gap-12">
                     <div class="flex items-center justify-end gap-4">
-                        <BaseButton variant="black" class="md:hidden" @click="openSearchModal" :aria-label="t('navigation.open_search')">
+                        <BaseButton variant="black" class="md:hidden" :aria-label="t('navigation.open_search')" @click="openSearchModal">
                             <span>{{ t('navigation.search') }}</span>
                             <MagnifyingGlassRegular class="dark:fill-gray-990 size-4 fill-white" />
                         </BaseButton>
                         <BaseButton
                             variant="black"
-                            @click="closeMenu"
                             :aria-expanded="isMenuOpen"
                             aria-controls="fullscreen-menu"
                             :aria-label="t('navigation.close_menu')"
+                            @click="closeMenu"
                         >
                             <span>{{ t('navigation.close') }}</span>
                             <BarStaggeredRegular class="dark:fill-gray-990 size-4 fill-white" />
@@ -199,5 +199,5 @@ onUnmounted(() => {
     </Transition>
 
     <!-- Search Modal -->
-    <SearchModal :isOpen="isSearchModalOpen" @close="closeSearchModal" />
+    <SearchModal :is-open="isSearchModalOpen" @close="closeSearchModal" />
 </template>

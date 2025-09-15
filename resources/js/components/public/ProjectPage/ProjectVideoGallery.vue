@@ -48,7 +48,7 @@ const closeVideoModal = () => {
             </div>
         </div>
 
-        <ProjectVideoModal :video="selectedVideo" :isOpen="isModalOpen" @close="closeVideoModal" />
+        <ProjectVideoModal :video="selectedVideo" :is-open="isModalOpen" @close="closeVideoModal" />
     </div>
 </template>
 

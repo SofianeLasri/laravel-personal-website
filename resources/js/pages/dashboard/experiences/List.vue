@@ -99,7 +99,7 @@ const formatDate = (dateString: string) => {
 };
 
 const getTranslation = (translationKey: any, locale: string) => {
-    if (!translationKey || !translationKey.translations) return '';
+    if (!translationKey?.translations) return '';
     const translation = translationKey.translations.find((t: any) => t.locale === locale);
     return translation ? translation.text : '';
 };
@@ -350,7 +350,7 @@ const deleteExperience = async () => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel @click="deleteConfirmationOpen = false"> Annuler </AlertDialogCancel>
-                    <AlertDialogAction @click="deleteExperience" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deleteExperience">
                         Supprimer
                     </AlertDialogAction>
                 </AlertDialogFooter>

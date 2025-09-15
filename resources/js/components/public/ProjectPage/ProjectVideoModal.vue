@@ -76,9 +76,9 @@ onUnmounted(() => {
                 <div class="relative max-h-full w-full max-w-6xl">
                     <!-- Close button -->
                     <button
-                        @click="emit('close')"
                         class="absolute -top-12 right-0 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                         aria-label="Fermer la vidéo"
+                        @click="emit('close')"
                     >
                         <X class="size-6" />
                     </button>
@@ -86,8 +86,8 @@ onUnmounted(() => {
                     <!-- Video container -->
                     <div class="relative aspect-video w-full overflow-hidden rounded-lg bg-black shadow-2xl">
                         <iframe
-                            ref="iframeRef"
                             v-if="isOpen"
+                            ref="iframeRef"
                             :src="iframeUrl"
                             class="h-full w-full"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

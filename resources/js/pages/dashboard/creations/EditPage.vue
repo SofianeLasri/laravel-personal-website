@@ -317,7 +317,7 @@ onMounted(() => {
                     <FormItem v-bind="componentField">
                         <FormLabel>Langue</FormLabel>
 
-                        <Select v-model="locale" @update:modelValue="handleLocaleChange">
+                        <Select v-model="locale" @update:model-value="handleLocaleChange">
                             <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sélectionner une langue" />

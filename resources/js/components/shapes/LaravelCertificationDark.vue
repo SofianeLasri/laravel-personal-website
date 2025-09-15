@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import LaravelCertification from './LaravelCertification.vue';
+</script>
+
 <template>
     <a
         href="https://verifier.certificationforlaravel.org/8710738c-4208-4309-8c19-c8e07a55ecdd"
@@ -9,7 +13,3 @@
         <LaravelCertification />
     </a>
 </template>
-
-<script setup lang="ts">
-import LaravelCertification from './LaravelCertification.vue';
-</script>

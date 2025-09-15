@@ -88,8 +88,8 @@ const toggleFilter = (techId: number) => {
     >
         <div
             class="flex w-full cursor-pointer items-center justify-between gap-2.5 px-4 py-3 transition-colors hover:bg-gray-200 dark:hover:bg-gray-800"
-            @click="toggleCollapse"
             :aria-expanded="!isCollapsed"
+            @click="toggleCollapse"
         >
             <div class="text-design-system-title justify-center">{{ name }}</div>
             <svg
@@ -113,10 +113,10 @@ const toggleFilter = (techId: number) => {
                         v-if="selectedFilters.has(tech.id)"
                         variant="active"
                         class="w-full rounded-lg !px-3 py-2"
-                        @click="toggleFilter(tech.id)"
                         :data-filter-type="props.name.toLowerCase()"
                         :data-filter-value="tech.name.toLowerCase().replace(/[^a-z0-9]/gi, '')"
                         data-selected="true"
+                        @click="toggleFilter(tech.id)"
                     >
                         <div class="flex grow items-center gap-2">
                             <div
@@ -138,10 +138,10 @@ const toggleFilter = (techId: number) => {
                         v-else
                         variant="white"
                         class="w-full rounded-lg border-none !px-3 py-2"
-                        @click="toggleFilter(tech.id)"
                         :data-filter-type="props.name.toLowerCase()"
                         :data-filter-value="tech.name.toLowerCase().replace(/[^a-z0-9]/gi, '')"
                         data-selected="false"
+                        @click="toggleFilter(tech.id)"
                     >
                         <div class="flex grow items-center gap-2">
                             <div

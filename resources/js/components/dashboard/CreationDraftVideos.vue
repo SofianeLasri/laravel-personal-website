@@ -244,7 +244,7 @@ const formatFileSize = (bytes: number): string => {
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 
 const getStatusLabel = (status: string): string => {
@@ -337,11 +337,11 @@ watch(
 
         <div v-else>
             <div class="mb-4 flex gap-2">
-                <Button @click="isSelectModalOpen = true" variant="outline" size="sm">
+                <Button variant="outline" size="sm" @click="isSelectModalOpen = true">
                     <Plus class="mr-2 h-4 w-4" />
                     Sélectionner une vidéo
                 </Button>
-                <Button @click="isUploadModalOpen = true" variant="outline" size="sm">
+                <Button variant="outline" size="sm" @click="isUploadModalOpen = true">
                     <Upload class="mr-2 h-4 w-4" />
                     Uploader une vidéo
                 </Button>
@@ -376,16 +376,16 @@ watch(
                                     v-if="video.status === 'ready'"
                                     variant="ghost"
                                     size="icon"
-                                    @click.stop="downloadThumbnail(video)"
                                     title="Télécharger miniature comme couverture"
                                     :disabled="loading"
+                                    @click.stop="downloadThumbnail(video)"
                                 >
                                     <ImageDown class="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" @click.stop="openEditModal(video)" title="Modifier la vidéo">
+                                <Button variant="ghost" size="icon" title="Modifier la vidéo" @click.stop="openEditModal(video)">
                                     <Edit class="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" @click.stop="detachVideo(video)" title="Retirer de la création">
+                                <Button variant="ghost" size="icon" title="Retirer de la création" @click.stop="detachVideo(video)">
                                     <Trash2 class="h-4 w-4" />
                                 </Button>
                             </div>
@@ -434,7 +434,7 @@ watch(
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isSelectModalOpen = false" :disabled="loading">Annuler</Button>
+                    <Button variant="outline" :disabled="loading" @click="isSelectModalOpen = false">Annuler</Button>
                     <Button :disabled="!selectedVideoId || loading" @click="attachVideo">
                         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                         Ajouter
@@ -453,7 +453,7 @@ watch(
                 <div class="space-y-4 py-4">
                     <div class="space-y-2">
                         <Label>Fichier vidéo</Label>
-                        <Input type="file" accept="video/*" @change="handleFileSelect" :disabled="loading" />
+                        <Input type="file" accept="video/*" :disabled="loading" @change="handleFileSelect" />
                         <p class="text-muted-foreground text-xs">Formats supportés: MP4, AVI, MOV, WMV, FLV, WebM, MKV (max 2000MB)</p>
                         <div v-if="newVideoFile" class="text-sm">
                             <p><strong>Fichier:</strong> {{ newVideoFile.name }}</p>
@@ -474,14 +474,14 @@ watch(
                     <div v-if="uploadProgress > 0" class="space-y-2">
                         <Label>Progression de l'upload</Label>
                         <div class="h-2 w-full rounded-full bg-gray-200">
-                            <div class="h-2 rounded-full bg-blue-600 transition-all duration-300" :style="{ width: uploadProgress + '%' }"></div>
+                            <div class="h-2 rounded-full bg-blue-600 transition-all duration-300" :style="{ width: `${uploadProgress}%` }"></div>
                         </div>
                         <p class="text-muted-foreground text-sm">{{ uploadProgress }}%</p>
                     </div>
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isUploadModalOpen = false" :disabled="loading">Annuler</Button>
+                    <Button variant="outline" :disabled="loading" @click="isUploadModalOpen = false">Annuler</Button>
                     <Button :disabled="!newVideoFile || loading" @click="uploadVideo">
                         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                         <Upload v-else class="mr-2 h-4 w-4" />
@@ -548,7 +548,7 @@ watch(
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isEditModalOpen = false" :disabled="loading">Annuler</Button>
+                    <Button variant="outline" :disabled="loading" @click="isEditModalOpen = false">Annuler</Button>
                     <Button :disabled="!editVideoName.trim() || loading" @click="updateVideo">
                         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                         <Edit v-else class="mr-2 h-4 w-4" />

@@ -32,10 +32,9 @@ const props = defineProps<{
 }>();
 
 const pageTitle = 'Sofiane Lasri - Développeur Full Stack';
-const pageDescription =
-    'Portfolio de Sofiane Lasri, développeur Full-Stack spécialisé sur le framework Laravel, avec plus de ' +
-    props.yearsOfExperience +
-    " ans d'expérience dans le développement web.";
+const pageDescription = `Portfolio de Sofiane Lasri, développeur Full-Stack spécialisé sur le framework Laravel, avec plus de ${
+    props.yearsOfExperience
+} ans d'expérience dans le développement web.`;
 const pageKeywords =
     'Sofiane Lasri, Sofiane Lasri-Trienpont, développeur web, Laravel, Vue.js, PHP, JavaScript, Full-Stack, portfolio, développement web';
 const pageUrl = page.props.ziggy.location;
@@ -64,7 +63,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
         <meta name="twitter:description" :content="pageDescription" />
         <meta name="twitter:image" :content="pageImage" />
     </Head>
-    <PublicAppLayout :socialMediaLinks="socialMediaLinks">
+    <PublicAppLayout :social-media-links="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
             <LightShape class="absolute top-[40rem] right-[-27rem] xl:right-[-15rem]" />
@@ -74,13 +73,13 @@ const pageImage = '/opengraph-image-1200-630.jpg';
         </div>
 
         <HeroSection
-            :socialMediaLinks="socialMediaLinks"
-            :yearsOfExperience="yearsOfExperience"
-            :developmentCreationsCount="developmentCreationsCount"
-            :masteredFrameworksCount="masteredFrameworksCount"
+            :social-media-links="socialMediaLinks"
+            :years-of-experience="yearsOfExperience"
+            :development-creations-count="developmentCreationsCount"
+            :mastered-frameworks-count="masteredFrameworksCount"
         />
 
-        <div class="z-10 container mt-16 mb-16 flex flex-col gap-32 px-4" id="backend-and-laravel-specialization-section">
+        <div id="backend-and-laravel-specialization-section" class="z-10 container mt-16 mb-16 flex flex-col gap-32 px-4">
             <section class="flex">
                 <div class="hidden flex-1 items-center justify-center xl:flex">
                     <div class="h-64 w-60 overflow-hidden">
@@ -112,7 +111,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
                 </div>
             </section>
 
-            <section class="flex flex-col gap-16" id="laravel-section">
+            <section id="laravel-section" class="flex flex-col gap-16">
                 <div class="flex">
                     <div class="relative flex flex-1 flex-col gap-8">
                         <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[128px] left-[-80px]" />
@@ -137,7 +136,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
                 </div>
             </section>
 
-            <section class="flex flex-col items-center gap-16" id="other-skills-section">
+            <section id="other-skills-section" class="flex flex-col items-center gap-16">
                 <div class="relative inline-flex max-w-[56rem] flex-col items-center gap-8 text-center">
                     <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[8px] left-[-80px]" />
                     <HeroSectionTitle>{{ t('home.other_skills.title') }}</HeroSectionTitle>
@@ -148,7 +147,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
                 <TechnologyExperiencesContainer :experiences="technologyExperiences" />
             </section>
 
-            <section class="flex flex-col items-center gap-16" id="career-section">
+            <section id="career-section" class="flex flex-col items-center gap-16">
                 <div class="flex">
                     <div class="relative flex flex-1 flex-col gap-8">
                         <Cube class="motion-preset-oscillate motion-duration-5000 absolute top-[0px] right-[-64px] hidden lg:block" />

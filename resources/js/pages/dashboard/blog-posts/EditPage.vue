@@ -218,7 +218,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                 :description="currentBlogPostDraft?.original_blog_post_id ? 'Modification d\'un article publié' : 'Création d\'un nouvel article'"
             />
 
-            <form @submit="handleSubmit" class="space-y-8" data-testid="blog-form">
+            <form class="space-y-8" data-testid="blog-form" @submit="handleSubmit">
                 <!-- Language selector -->
                 <div class="flex items-center gap-2">
                     <label class="text-sm font-medium">Langue :</label>
@@ -314,8 +314,8 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                             <FormControl>
                                 <PictureInput
                                     :picture-id="form.values.cover_picture_id"
-                                    @update:picture-id="handleCoverPictureChange"
                                     label="Image de couverture (16:9 recommandé)"
+                                    @update:picture-id="handleCoverPictureChange"
                                 />
                             </FormControl>
                             <FormMessage />
@@ -373,7 +373,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                     <Button type="submit" :disabled="isSubmitting">
                         {{ isSubmitting ? 'Sauvegarde...' : 'Sauvegarder le brouillon' }}
                     </Button>
-                    <Button v-if="currentBlogPostDraft" type="button" @click="handlePublish" :disabled="isPublishing">
+                    <Button v-if="currentBlogPostDraft" type="button" :disabled="isPublishing" @click="handlePublish">
                         {{ isPublishing ? 'Publication...' : 'Publier' }}
                     </Button>
                 </div>

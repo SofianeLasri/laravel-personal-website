@@ -65,7 +65,7 @@ const formatPeriod = () => {
         <meta name="twitter:title" :content="pageTitle" />
         <meta name="twitter:description" :content="pageDescription" />
     </Head>
-    <PublicAppLayout :socialMediaLinks="socialMediaLinks">
+    <PublicAppLayout :social-media-links="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
         </div>
@@ -136,7 +136,7 @@ const formatPeriod = () => {
                 <!-- Description Section -->
                 <section class="flex flex-col">
                     <ContentSectionTitle>{{ t('experience.description') }}</ContentSectionTitle>
-                    <vue-markdown class="markdown-view" :source="experience.fullDescription" />
+                    <VueMarkdown class="markdown-view" :source="experience.fullDescription" />
                 </section>
 
                 <!-- Technologies Section -->
@@ -148,7 +148,7 @@ const formatPeriod = () => {
                             :key="tech.name"
                             :name="tech.name"
                             :description="tech.description"
-                            :iconPicture="tech.iconPicture"
+                            :icon-picture="tech.iconPicture"
                             class="bg-gray-100"
                         />
                     </div>

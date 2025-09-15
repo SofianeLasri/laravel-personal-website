@@ -127,12 +127,12 @@ const getMethodBadgeVariant = (method: string) => {
 
 const truncateUrl = (url: string | null, maxLength: number = 50) => {
     if (!url) return '-';
-    return url.length > maxLength ? url.substring(0, maxLength) + '...' : url;
+    return url.length > maxLength ? `${url.substring(0, maxLength)}...` : url;
 };
 
 const truncateUserAgent = (userAgent: string | null, maxLength: number = 60) => {
     if (!userAgent) return '-';
-    return userAgent.length > maxLength ? userAgent.substring(0, maxLength) + '...' : userAgent;
+    return userAgent.length > maxLength ? `${userAgent.substring(0, maxLength)}...` : userAgent;
 };
 
 const search = () => {
@@ -182,7 +182,7 @@ const changePage = (page: number) => {
     router.get(
         route('dashboard.request-logs.index'),
         {
-            page: page,
+            page,
             search: searchQuery.value || undefined,
             per_page: perPage.value,
             is_bot: isBotFilter.value !== 'all' ? isBotFilter.value : undefined,
@@ -588,7 +588,7 @@ const markSelectedAsBot = async () => {
                                     <TableCell>
                                         <TooltipProvider>
                                             <Tooltip v-if="isDetectedAsBot(request)">
-                                                <TooltipTrigger asChild>
+                                                <TooltipTrigger as-child>
                                                     <div class="flex cursor-help items-center">
                                                         <Bot class="h-4 w-4 text-orange-500" />
                                                     </div>

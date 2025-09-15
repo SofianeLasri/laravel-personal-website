@@ -112,7 +112,7 @@ const selectedTechnologies = ref<Technology[]>(props.experience?.technologies ||
 
 // Obtenir les traductions
 const getTranslation = (translationKey: any, targetLocale: string) => {
-    if (!translationKey || !translationKey.translations) return '';
+    if (!translationKey?.translations) return '';
     const translation = translationKey.translations.find((t: any) => t.locale === targetLocale);
     return translation ? translation.text : '';
 };
@@ -282,7 +282,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                 <FormField v-slot="{ componentField }" name="locale">
                     <FormItem v-bind="componentField">
                         <FormLabel>Langue</FormLabel>
-                        <Select v-model="locale" @update:modelValue="handleLocaleChange">
+                        <Select v-model="locale" @update:model-value="handleLocaleChange">
                             <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sélectionner une langue" />

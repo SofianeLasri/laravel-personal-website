@@ -38,7 +38,7 @@ const projectsUrl = computed(() => {
         class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 p-2 transition-all hover:scale-[1.01] dark:border dark:border-gray-700 dark:border-gray-700/30 dark:bg-gray-900/50 dark:hover:bg-gray-900/70"
         :class="{ 'cursor-pointer': technology && projectsUrl }"
     >
-        <div class="flex size-10 items-center justify-center rounded-lg bg-white p-1.5 lg:size-16 dark:bg-white" v-if="iconPicture">
+        <div v-if="iconPicture" class="flex size-10 items-center justify-center rounded-lg bg-white p-1.5 lg:size-16 dark:bg-white">
             <img :src="iconPicture.webp.small" :alt="`${name} icon`" class="h-full w-full object-contain" loading="lazy" />
         </div>
         <div class="flex w-full flex-col justify-center gap-1">

@@ -141,7 +141,7 @@ onMounted(() => {
                                     class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
                                 />
                             </div>
-                            <Button @click="applyCustomPeriod" class="mt-7"> Appliquer </Button>
+                            <Button class="mt-7" @click="applyCustomPeriod"> Appliquer </Button>
                         </div>
                     </div>
                 </CardContent>

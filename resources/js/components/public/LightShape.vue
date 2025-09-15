@@ -1,10 +1,3 @@
-<template>
-    <div
-        ref="lightElement"
-        class="light-shape from-atomic-tangerine-400/40 to-atomic-tangerine-400/0 size-[32rem] rounded-full bg-radial-[50%_50%_at_50%_50%]"
-    ></div>
-</template>
-
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
 
@@ -67,6 +60,13 @@ onMounted(() => {
     });
 });
 </script>
+
+<template>
+    <div
+        ref="lightElement"
+        class="light-shape from-atomic-tangerine-400/40 to-atomic-tangerine-400/0 size-[32rem] rounded-full bg-radial-[50%_50%_at_50%_50%]"
+    ></div>
+</template>
 
 <style scoped>
 .light-shape {

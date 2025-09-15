@@ -27,7 +27,7 @@ const error = ref<string | null>(null);
 
 const imageUrl = computed(() => {
     if (picture.value) {
-        return '/storage/' + picture.value.path_original;
+        return `/storage/${picture.value.path_original}`;
     }
     return null;
 });
@@ -136,13 +136,13 @@ watch([() => props.modelValue], ([newModelValue]) => {
             </p>
 
             <div class="flex gap-2">
-                <Button v-if="picture" variant="destructive" size="sm" type="button" @click="removePicture" :disabled="loading">Supprimer</Button>
-                <Button v-else variant="outline" size="sm" type="button" @click="triggerFileInput" :disabled="loading">Ajouter</Button>
+                <Button v-if="picture" variant="destructive" size="sm" type="button" :disabled="loading" @click="removePicture">Supprimer</Button>
+                <Button v-else variant="outline" size="sm" type="button" :disabled="loading" @click="triggerFileInput">Ajouter</Button>
             </div>
 
             <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
 
-            <input type="hidden" v-model="modelValue" />
+            <input v-model="modelValue" type="hidden" />
 
             <p v-if="error" class="text-destructive mt-1 text-xs">{{ error }}</p>
         </div>

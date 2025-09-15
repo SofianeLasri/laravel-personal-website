@@ -28,18 +28,18 @@ const submit = () => {
     <AuthBase title="Create an account" description="Enter your details below to create your account">
         <Head title="Register" />
 
-        <form @submit.prevent="submit" class="flex flex-col gap-6" data-form-type="register">
+        <form class="flex flex-col gap-6" data-form-type="register" @submit.prevent="submit">
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <Label for="name">Name</Label>
                     <Input
                         id="name"
+                        v-model="form.name"
                         type="text"
                         required
                         autofocus
                         :tabindex="1"
                         autocomplete="name"
-                        v-model="form.name"
                         placeholder="Full name"
                         data-form-type="username"
                     />
@@ -50,11 +50,11 @@ const submit = () => {
                     <Label for="email">Email address</Label>
                     <Input
                         id="email"
+                        v-model="form.email"
                         type="email"
                         required
                         :tabindex="2"
                         autocomplete="email"
-                        v-model="form.email"
                         placeholder="email@example.com"
                         data-form-type="email"
                     />
@@ -65,11 +65,11 @@ const submit = () => {
                     <Label for="password">Password</Label>
                     <Input
                         id="password"
+                        v-model="form.password"
                         type="password"
                         required
                         :tabindex="3"
                         autocomplete="new-password"
-                        v-model="form.password"
                         placeholder="Password"
                         data-form-type="password"
                     />
@@ -80,11 +80,11 @@ const submit = () => {
                     <Label for="password_confirmation">Confirm password</Label>
                     <Input
                         id="password_confirmation"
+                        v-model="form.password_confirmation"
                         type="password"
                         required
                         :tabindex="4"
                         autocomplete="new-password"
-                        v-model="form.password_confirmation"
                         placeholder="Confirm password"
                         data-form-type="password,confirmation"
                     />

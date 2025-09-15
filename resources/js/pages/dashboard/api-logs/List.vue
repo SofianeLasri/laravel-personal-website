@@ -1,184 +1,3 @@
-<template>
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
-            <div class="space-y-6">
-                <!-- Header -->
-                <div>
-                    <h1 class="text-2xl font-bold">Logs des requêtes API</h1>
-                    <p class="text-muted-foreground">Historique et analyse des requêtes aux providers IA</p>
-                </div>
-
-                <!-- Statistics Panel -->
-                <div data-testid="statistics-panel" class="grid gap-4 md:grid-cols-4">
-                    <Card>
-                        <CardHeader class="pb-2">
-                            <CardTitle class="text-sm font-medium">Total Requests</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div class="text-2xl font-bold">{{ statistics.total }}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader class="pb-2">
-                            <CardTitle class="text-sm font-medium">Success Rate</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div class="text-2xl font-bold">{{ statistics.successRate }}%</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader class="pb-2">
-                            <CardTitle class="text-sm font-medium">Cache Hit Rate</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div class="text-2xl font-bold">{{ statistics.cacheHitRate }}%</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader class="pb-2">
-                            <CardTitle class="text-sm font-medium">Total Cost</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div class="text-2xl font-bold">${{ statistics.totalCost }}</div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <!-- Filters -->
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Filters</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div class="flex gap-4">
-                            <select
-                                v-model="filters.provider"
-                                data-testid="provider-filter"
-                                class="border-input bg-background rounded-md border px-3 py-2 text-sm"
-                            >
-                                <option value="">All Providers</option>
-                                <option value="openai">OpenAI</option>
-                                <option value="anthropic">Anthropic</option>
-                            </select>
-
-                            <select
-                                v-model="filters.status"
-                                data-testid="status-filter"
-                                class="border-input bg-background rounded-md border px-3 py-2 text-sm"
-                            >
-                                <option value="">All Status</option>
-                                <option value="success">Success</option>
-                                <option value="error">Error</option>
-                            </select>
-
-                            <select
-                                v-model="filters.cached"
-                                data-testid="cache-filter"
-                                class="border-input bg-background rounded-md border px-3 py-2 text-sm"
-                            >
-                                <option value="">All Requests</option>
-                                <option value="true">Cached</option>
-                                <option value="false">Not Cached</option>
-                            </select>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <!-- Logs Table -->
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Request Logs</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div class="relative overflow-x-auto">
-                            <table data-testid="api-logs-table" class="w-full text-left text-sm">
-                                <thead class="bg-muted text-xs uppercase">
-                                    <tr>
-                                        <th class="px-6 py-3">Provider</th>
-                                        <th class="px-6 py-3">Model</th>
-                                        <th class="px-6 py-3">Status</th>
-                                        <th class="px-6 py-3">Tokens</th>
-                                        <th class="px-6 py-3">Cost</th>
-                                        <th class="px-6 py-3">Response Time</th>
-                                        <th class="px-6 py-3">Cached</th>
-                                        <th class="px-6 py-3">Date</th>
-                                        <th class="px-6 py-3">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="log in paginatedLogs" :key="log.id" class="border-b">
-                                        <td class="px-6 py-4">{{ log.provider }}</td>
-                                        <td class="px-6 py-4">{{ log.model }}</td>
-                                        <td class="px-6 py-4">
-                                            <span :class="log.status === 'success' ? 'text-green-600' : 'text-red-600'">
-                                                {{ log.status }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4">{{ log.input_tokens + log.output_tokens }}</td>
-                                        <td class="px-6 py-4">${{ log.cost.toFixed(4) }}</td>
-                                        <td class="px-6 py-4">{{ log.response_time }}ms</td>
-                                        <td class="px-6 py-4">{{ log.cached ? 'Yes' : 'No' }}</td>
-                                        <td class="px-6 py-4">{{ formatDate(log.created_at) }}</td>
-                                        <td class="px-6 py-4">
-                                            <Button size="sm" variant="ghost" :data-testid="`view-details-${log.id}`" @click="viewDetails(log)">
-                                                View
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div data-testid="pagination" class="mt-4 flex justify-center gap-2">
-                            <Button
-                                v-for="page in totalPages"
-                                :key="page"
-                                :data-testid="`page-${page}`"
-                                :variant="currentPage === page ? 'default' : 'outline'"
-                                size="sm"
-                                @click="currentPage = page"
-                            >
-                                {{ page }}
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-
-        <!-- Details Modal -->
-        <Dialog v-model:open="detailsOpen">
-            <DialogContent class="max-w-4xl">
-                <DialogHeader>
-                    <DialogTitle>Détails de la requête</DialogTitle>
-                </DialogHeader>
-                <div v-if="selectedLog" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <h3 class="mb-2 font-semibold">System Prompt</h3>
-                            <pre class="bg-muted rounded p-2 text-xs">{{ selectedLog.system_prompt }}</pre>
-                        </div>
-                        <div>
-                            <h3 class="mb-2 font-semibold">User Prompt</h3>
-                            <pre class="bg-muted rounded p-2 text-xs">{{ selectedLog.prompt }}</pre>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="mb-2 font-semibold">Response</h3>
-                        <pre class="bg-muted rounded p-2 text-xs">{{ selectedLog.response }}</pre>
-                    </div>
-                    <div class="grid grid-cols-3 gap-4 text-sm">
-                        <div><span class="font-semibold">Input Tokens:</span> {{ selectedLog.input_tokens }}</div>
-                        <div><span class="font-semibold">Output Tokens:</span> {{ selectedLog.output_tokens }}</div>
-                        <div><span class="font-semibold">Cost:</span> ${{ selectedLog.cost.toFixed(4) }}</div>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-    </AppLayout>
-</template>
-
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -370,3 +189,184 @@ onMounted(() => {
     calculateStatistics();
 });
 </script>
+
+<template>
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+            <div class="space-y-6">
+                <!-- Header -->
+                <div>
+                    <h1 class="text-2xl font-bold">Logs des requêtes API</h1>
+                    <p class="text-muted-foreground">Historique et analyse des requêtes aux providers IA</p>
+                </div>
+
+                <!-- Statistics Panel -->
+                <div data-testid="statistics-panel" class="grid gap-4 md:grid-cols-4">
+                    <Card>
+                        <CardHeader class="pb-2">
+                            <CardTitle class="text-sm font-medium">Total Requests</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div class="text-2xl font-bold">{{ statistics.total }}</div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader class="pb-2">
+                            <CardTitle class="text-sm font-medium">Success Rate</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div class="text-2xl font-bold">{{ statistics.successRate }}%</div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader class="pb-2">
+                            <CardTitle class="text-sm font-medium">Cache Hit Rate</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div class="text-2xl font-bold">{{ statistics.cacheHitRate }}%</div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader class="pb-2">
+                            <CardTitle class="text-sm font-medium">Total Cost</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div class="text-2xl font-bold">${{ statistics.totalCost }}</div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <!-- Filters -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Filters</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="flex gap-4">
+                            <select
+                                v-model="filters.provider"
+                                data-testid="provider-filter"
+                                class="border-input bg-background rounded-md border px-3 py-2 text-sm"
+                            >
+                                <option value="">All Providers</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="anthropic">Anthropic</option>
+                            </select>
+
+                            <select
+                                v-model="filters.status"
+                                data-testid="status-filter"
+                                class="border-input bg-background rounded-md border px-3 py-2 text-sm"
+                            >
+                                <option value="">All Status</option>
+                                <option value="success">Success</option>
+                                <option value="error">Error</option>
+                            </select>
+
+                            <select
+                                v-model="filters.cached"
+                                data-testid="cache-filter"
+                                class="border-input bg-background rounded-md border px-3 py-2 text-sm"
+                            >
+                                <option value="">All Requests</option>
+                                <option value="true">Cached</option>
+                                <option value="false">Not Cached</option>
+                            </select>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Logs Table -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Request Logs</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="relative overflow-x-auto">
+                            <table data-testid="api-logs-table" class="w-full text-left text-sm">
+                                <thead class="bg-muted text-xs uppercase">
+                                    <tr>
+                                        <th class="px-6 py-3">Provider</th>
+                                        <th class="px-6 py-3">Model</th>
+                                        <th class="px-6 py-3">Status</th>
+                                        <th class="px-6 py-3">Tokens</th>
+                                        <th class="px-6 py-3">Cost</th>
+                                        <th class="px-6 py-3">Response Time</th>
+                                        <th class="px-6 py-3">Cached</th>
+                                        <th class="px-6 py-3">Date</th>
+                                        <th class="px-6 py-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="log in paginatedLogs" :key="log.id" class="border-b">
+                                        <td class="px-6 py-4">{{ log.provider }}</td>
+                                        <td class="px-6 py-4">{{ log.model }}</td>
+                                        <td class="px-6 py-4">
+                                            <span :class="log.status === 'success' ? 'text-green-600' : 'text-red-600'">
+                                                {{ log.status }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">{{ log.input_tokens + log.output_tokens }}</td>
+                                        <td class="px-6 py-4">${{ log.cost.toFixed(4) }}</td>
+                                        <td class="px-6 py-4">{{ log.response_time }}ms</td>
+                                        <td class="px-6 py-4">{{ log.cached ? 'Yes' : 'No' }}</td>
+                                        <td class="px-6 py-4">{{ formatDate(log.created_at) }}</td>
+                                        <td class="px-6 py-4">
+                                            <Button size="sm" variant="ghost" :data-testid="`view-details-${log.id}`" @click="viewDetails(log)">
+                                                View
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div data-testid="pagination" class="mt-4 flex justify-center gap-2">
+                            <Button
+                                v-for="page in totalPages"
+                                :key="page"
+                                :data-testid="`page-${page}`"
+                                :variant="currentPage === page ? 'default' : 'outline'"
+                                size="sm"
+                                @click="currentPage = page"
+                            >
+                                {{ page }}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+
+        <!-- Details Modal -->
+        <Dialog v-model:open="detailsOpen">
+            <DialogContent class="max-w-4xl">
+                <DialogHeader>
+                    <DialogTitle>Détails de la requête</DialogTitle>
+                </DialogHeader>
+                <div v-if="selectedLog" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h3 class="mb-2 font-semibold">System Prompt</h3>
+                            <pre class="bg-muted rounded p-2 text-xs">{{ selectedLog.system_prompt }}</pre>
+                        </div>
+                        <div>
+                            <h3 class="mb-2 font-semibold">User Prompt</h3>
+                            <pre class="bg-muted rounded p-2 text-xs">{{ selectedLog.prompt }}</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="mb-2 font-semibold">Response</h3>
+                        <pre class="bg-muted rounded p-2 text-xs">{{ selectedLog.response }}</pre>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 text-sm">
+                        <div><span class="font-semibold">Input Tokens:</span> {{ selectedLog.input_tokens }}</div>
+                        <div><span class="font-semibold">Output Tokens:</span> {{ selectedLog.output_tokens }}</div>
+                        <div><span class="font-semibold">Cost:</span> ${{ selectedLog.cost.toFixed(4) }}</div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    </AppLayout>
+</template>

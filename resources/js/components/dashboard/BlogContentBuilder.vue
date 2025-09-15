@@ -361,8 +361,8 @@ const getContentTypeFromClass = (className: string): string => {
                 type="button"
                 variant="outline"
                 size="sm"
-                @click="addContent(contentType.value)"
                 :data-testid="contentType.value === 'markdown' ? 'add-text-button' : `add-${contentType.value}-button`"
+                @click="addContent(contentType.value)"
             >
                 <component :is="contentType.icon" class="mr-2 h-4 w-4" />
                 Ajouter {{ contentType.label }}
@@ -403,10 +403,10 @@ const getContentTypeFromClass = (className: string): string => {
                                 contentCache[content.content_id] ??
                                 (content.content?.translation_key?.translations?.find((t) => t.locale === locale)?.text || '')
                             "
-                            @input="(e: any) => updateMarkdownContent(content.content_id, e.target.value)"
                             placeholder="Écrivez votre contenu en Markdown..."
                             class="min-h-[200px] font-mono"
                             :data-testid="`markdown-textarea-${content.content_id}`"
+                            @input="(e: any) => updateMarkdownContent(content.content_id, e.target.value)"
                         />
                         <p class="text-muted-foreground text-xs">
                             Vous pouvez utiliser la syntaxe Markdown : **gras**, *italique*, [lien](url), etc.
@@ -422,8 +422,8 @@ const getContentTypeFromClass = (className: string): string => {
                         <PictureInput
                             :picture-id="null"
                             :multiple="true"
-                            @update:picture-ids="(ids: number[]) => updateGalleryImages(content.content_id, ids)"
                             label="Sélectionner les images"
+                            @update:picture-ids="(ids: number[]) => updateGalleryImages(content.content_id, ids)"
                         />
                     </div>
 

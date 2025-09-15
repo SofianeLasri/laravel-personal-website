@@ -248,7 +248,7 @@ const formatFileSize = (bytes: number) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     if (bytes === 0) return '0 Bytes';
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i];
+    return `${Math.round((bytes / Math.pow(1024, i)) * 100) / 100} ${sizes[i]}`;
 };
 
 // Cleanup on component unmount
@@ -323,12 +323,12 @@ onUnmounted(() => {
                         </div>
 
                         <div class="space-y-2">
-                            <Button @click="handleExport" :disabled="isExporting" class="w-full">
+                            <Button :disabled="isExporting" class="w-full" @click="handleExport">
                                 <Download class="mr-2 h-4 w-4" />
                                 {{ isExporting ? 'Exporting...' : 'Export Website Data' }}
                             </Button>
 
-                            <Button v-if="exportDownloadUrl" @click="downloadExport" variant="outline" class="w-full">
+                            <Button v-if="exportDownloadUrl" variant="outline" class="w-full" @click="downloadExport">
                                 <Download class="mr-2 h-4 w-4" />
                                 Download Export File
                             </Button>
@@ -351,12 +351,12 @@ onUnmounted(() => {
                         <!-- File Selection -->
                         <div class="space-y-2">
                             <Label for="import-file">Select import file</Label>
-                            <Input ref="fileInput" id="import-file" type="file" accept=".zip" @change="handleFileSelect" :disabled="isImporting" />
+                            <Input id="import-file" ref="fileInput" type="file" accept=".zip" :disabled="isImporting" @change="handleFileSelect" />
                             <p class="text-muted-foreground text-sm">Select a ZIP file exported from this website.</p>
                         </div>
 
                         <!-- Upload Button -->
-                        <Button v-if="hasImportFile && !uploadedFilePath" @click="uploadImportFile" variant="outline" class="w-full">
+                        <Button v-if="hasImportFile && !uploadedFilePath" variant="outline" class="w-full" @click="uploadImportFile">
                             <Upload class="mr-2 h-4 w-4" />
                             Upload and Validate File
                         </Button>
@@ -402,12 +402,12 @@ onUnmounted(() => {
 
                             <!-- Import Actions -->
                             <div class="flex gap-2">
-                                <Button @click="handleImport" :disabled="!canImport || isImporting" variant="destructive" class="flex-1">
+                                <Button :disabled="!canImport || isImporting" variant="destructive" class="flex-1" @click="handleImport">
                                     <Upload class="mr-2 h-4 w-4" />
                                     {{ isImporting ? 'Importing...' : 'Import Data' }}
                                 </Button>
 
-                                <Button @click="cancelImport" :disabled="isImporting" variant="outline">
+                                <Button :disabled="isImporting" variant="outline" @click="cancelImport">
                                     <Trash2 class="h-4 w-4" />
                                 </Button>
                             </div>

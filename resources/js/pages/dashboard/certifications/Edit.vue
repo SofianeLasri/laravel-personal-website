@@ -47,7 +47,7 @@ const props = defineProps<Props>();
 const isSubmitting = ref(false);
 
 // Mode édition ou création
-const isEditing = computed(() => !!props.certification);
+const isEditing = computed(() => Boolean(props.certification));
 
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
@@ -140,7 +140,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                 :description="isEditing ? 'Modifiez les informations de votre certification.' : 'Ajoutez une nouvelle certification à votre profil.'"
             />
 
-            <form @submit="onSubmit" class="mt-8 max-w-2xl space-y-6">
+            <form class="mt-8 max-w-2xl space-y-6" @submit="onSubmit">
                 <!-- Nom de la certification -->
                 <FormField v-slot="{ componentField }" name="name">
                     <FormItem>

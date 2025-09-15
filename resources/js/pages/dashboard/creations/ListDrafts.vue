@@ -277,7 +277,7 @@ const publishDraft = async (id: number) => {
                             </TableCell>
                             <TableCell class="text-right">
                                 <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
+                                    <DropdownMenuTrigger as-child>
                                         <Button variant="ghost" class="h-8 w-8 p-0">
                                             <span class="sr-only">Ouvrir menu</span>
                                             <MoreHorizontal class="h-4 w-4" />
@@ -327,13 +327,13 @@ const publishDraft = async (id: number) => {
                 <div class="mt-6 flex justify-center">
                     <Pagination
                         v-if="props.creationDrafts.length > 0"
+                        v-slot="{ page }"
                         :total="props.creationDrafts.length"
                         :items-per-page="itemsPerPage"
                         :default-page="1"
                         show-edges
                         :sibling-count="1"
                         @update:page="handlePageChange"
-                        v-slot="{ page }"
                     >
                         <PaginationContent v-slot="{ items }" class="flex items-center gap-1">
                             <PaginationFirst />

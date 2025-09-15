@@ -13,7 +13,7 @@ const markdownOptions = {
     breaks: true,
     linkify: true,
     typographer: true,
-    highlight: function (str: string, lang: string) {
+    highlight(str: string, lang: string) {
         if (lang && hljs.getLanguage(lang)) {
             try {
                 return hljs.highlight(str, { language: lang }).value;
@@ -34,5 +34,5 @@ const markdownOptions = {
 </script>
 
 <template>
-    <vue-markdown class="markdown-view" :source="source" :options="markdownOptions" />
+    <VueMarkdown class="markdown-view" :source="source" :options="markdownOptions" />
 </template>

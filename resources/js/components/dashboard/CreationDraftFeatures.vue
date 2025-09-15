@@ -220,10 +220,10 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                                 </p>
                             </div>
                             <div class="ml-2 flex flex-shrink-0 space-x-1">
-                                <Button variant="ghost" size="icon" @click.stop="openEditModal(feature)" title="Modifier">
+                                <Button variant="ghost" size="icon" title="Modifier" @click.stop="openEditModal(feature)">
                                     <Pencil class="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" @click.stop="deleteFeature(feature)" title="Supprimer">
+                                <Button variant="ghost" size="icon" title="Supprimer" @click.stop="deleteFeature(feature)">
                                     <Trash2 class="h-4 w-4" />
                                 </Button>
                             </div>
@@ -266,7 +266,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isAddModalOpen = false" :disabled="loading">Annuler</Button>
+                    <Button variant="outline" :disabled="loading" @click="isAddModalOpen = false">Annuler</Button>
                     <Button :disabled="!newFeatureTitle || !newFeatureDescription || loading" @click="addFeature">
                         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                         Ajouter
@@ -307,7 +307,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isEditModalOpen = false" :disabled="loading">Annuler</Button>
+                    <Button variant="outline" :disabled="loading" @click="isEditModalOpen = false">Annuler</Button>
                     <Button :disabled="!editFeatureTitle || !editFeatureDescription || loading" @click="updateFeature">
                         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                         Enregistrer

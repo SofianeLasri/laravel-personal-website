@@ -20,8 +20,8 @@ const handleClick = () => {
 
 <template>
     <button
-        @click="handleClick"
         class="relative flex w-64 items-center gap-4 rounded-full bg-gray-200 pe-6 transition-all hover:bg-gray-300 dark:border dark:border-gray-700/50 dark:bg-gray-800/90 dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] dark:hover:bg-gray-700/90"
+        @click="handleClick"
     >
         <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-black transition-all dark:bg-white dark:shadow-sm">
             <MagnifyingGlassRegular class="dark:fill-gray-990 size-4 fill-white" />

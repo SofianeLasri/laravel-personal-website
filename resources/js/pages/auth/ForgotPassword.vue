@@ -38,10 +38,10 @@ const submit = () => {
                     <Label for="email">Email address</Label>
                     <Input
                         id="email"
+                        v-model="form.email"
                         type="email"
                         name="email"
                         autocomplete="off"
-                        v-model="form.email"
                         autofocus
                         placeholder="email@example.com"
                         data-form-type="email"

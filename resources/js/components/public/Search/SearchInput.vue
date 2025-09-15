@@ -55,17 +55,17 @@ onMounted(() => {
             ref="inputRef"
             type="text"
             :value="modelValue"
-            @input="handleInput"
             :placeholder="t('search.placeholder')"
             class="flex-1 bg-transparent py-3 text-black outline-none placeholder:text-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
+            @input="handleInput"
         />
         <div class="flex items-center gap-2">
             <div v-if="loading" class="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
             <button
                 v-if="modelValue"
-                @click="handleClear"
                 class="rounded-full p-1 text-gray-600 hover:bg-gray-200 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
                 :aria-label="t('search.clear')"
+                @click="handleClear"
             >
                 <X class="h-4 w-4" />
             </button>

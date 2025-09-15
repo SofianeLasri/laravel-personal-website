@@ -84,9 +84,9 @@ onUnmounted(() => {
             <div
                 v-if="isOpen"
                 class="fixed inset-0 z-50 flex items-center justify-center bg-gray-200/25 backdrop-blur-sm"
-                @click="handleBackdropClick"
                 role="dialog"
                 aria-labelledby="searchModalTitle"
+                @click="handleBackdropClick"
             >
                 <div
                     class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur mx-4 w-full max-w-4xl overflow-hidden rounded-3xl p-2"
@@ -97,13 +97,13 @@ onUnmounted(() => {
                         <!-- Header -->
                         <div class="flex flex-col gap-4 border-b p-6 dark:border-gray-700">
                             <div class="flex items-center justify-between">
-                                <h2 class="text-design-system-title text-2xl font-bold" id="searchModalTitle">
+                                <h2 id="searchModalTitle" class="text-design-system-title text-2xl font-bold">
                                     {{ t('search.search') }}
                                 </h2>
                                 <button
-                                    @click="closeModal"
                                     class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
                                     :aria-label="t('search.close_search')"
+                                    @click="closeModal"
                                 >
                                     <X class="h-5 w-5" />
                                 </button>

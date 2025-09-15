@@ -65,7 +65,7 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: 'Éditeur',
-                href: route('dashboard.creations.edit', undefined, false),
+                href: route('dashboard.blog-posts.edit', undefined, false),
             },
         ],
     },

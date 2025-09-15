@@ -12,8 +12,9 @@ class BlogPostDraftsPageController extends Controller
     {
         $drafts = BlogPostDraft::with([
             'titleTranslationKey.translations',
-            'contentTranslationKey.translations',
             'originalBlogPost',
+            'category',
+            'coverPicture',
         ])->get();
 
         return Inertia::render('dashboard/blog-posts/ListDrafts', [

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Api\BlogCategoryController;
 use App\Http\Controllers\Admin\Api\BlogPostController;
 use App\Http\Controllers\Admin\Api\CertificationController;
 use App\Http\Controllers\Admin\Api\CreationController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Http\Controllers\Admin\ApiRequestLogController;
 use App\Http\Controllers\Admin\BlogPostDraftsPageController;
+use App\Http\Controllers\Admin\BlogPostEditPageController;
 use App\Http\Controllers\Admin\BlogPostsPageController;
 use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
@@ -156,10 +158,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('index');
         Route::get('/drafts', [BlogPostDraftsPageController::class, 'listPage'])
             ->name('drafts.index');
-        /*Route::get('/drafts', [CreationPageController::class, 'listDraftPage'])
-            ->name('drafts.index');
-        Route::get('/edit', [CreationPageController::class, 'editPage'])
-            ->name('edit');*/
+        Route::get('/edit', [BlogPostEditPageController::class, 'editPage'])
+            ->name('edit');
     });
 
     Route::name('api.')->prefix('api')->group(function () {
@@ -180,6 +180,11 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('notifications.store');
         Route::get('notifications/stream', [NotificationController::class, 'stream'])
             ->name('notifications.stream');
+
+        // Blog categories routes
+        Route::apiResource('blog-categories', BlogCategoryController::class);
+        Route::post('blog-categories/reorder', [BlogCategoryController::class, 'reorder'])
+            ->name('blog-categories.reorder');
 
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();

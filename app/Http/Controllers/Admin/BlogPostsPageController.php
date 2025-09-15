@@ -10,7 +10,12 @@ class BlogPostsPageController extends Controller
 {
     public function listPage()
     {
-        $articles = BlogPost::all()->withRelationshipAutoloading();
+        $articles = BlogPost::with([
+            'titleTranslationKey.translations',
+            'category',
+            'coverPicture',
+            'drafts',
+        ])->get();
 
         return Inertia::render('dashboard/blog-posts/List', [
             'blogPosts' => $articles,

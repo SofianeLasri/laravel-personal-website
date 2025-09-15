@@ -160,12 +160,32 @@ class BlogPostEditPageController extends Controller
             ['locale' => 'en', 'text' => ''],
         ]);
 
+        // Get first category or create a default one if none exists
+        $category = BlogCategory::first();
+        if (! $category) {
+            $categoryNameKey = TranslationKey::create([
+                'key' => 'blog_category_default',
+            ]);
+
+            $categoryNameKey->translations()->createMany([
+                ['locale' => 'fr', 'text' => 'Non catégorisé'],
+                ['locale' => 'en', 'text' => 'Uncategorized'],
+            ]);
+
+            $category = BlogCategory::create([
+                'slug' => 'uncategorized',
+                'name_translation_key_id' => $categoryNameKey->id,
+                'color' => '#6B7280',
+                'order' => 0,
+            ]);
+        }
+
         // Create the draft
         $draft = BlogPostDraft::create([
             'slug' => 'new-article-'.uniqid(),
             'title_translation_key_id' => $titleTranslationKey->id,
             'type' => BlogPostType::ARTICLE,
-            'category_id' => BlogCategory::first()->id,
+            'category_id' => $category->id,
             'published_at' => now(),
         ]);
 

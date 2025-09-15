@@ -28,7 +28,7 @@ class BlogPostEditPageController extends Controller
                 'titleTranslationKey.translations',
                 'category',
                 'coverPicture.optimizedPictures',
-                'contents.content',
+                'contents.content.translationKey.translations',
                 'originalBlogPost',
                 'gameReviewDraft',
             ])->findOrFail($draftId);
@@ -38,7 +38,7 @@ class BlogPostEditPageController extends Controller
                 'titleTranslationKey.translations',
                 'category',
                 'coverPicture.optimizedPictures',
-                'contents.content',
+                'contents.content.translationKey.translations',
                 'gameReview',
             ])->findOrFail($blogPostId);
 
@@ -54,7 +54,7 @@ class BlogPostEditPageController extends Controller
                     'titleTranslationKey.translations',
                     'category',
                     'coverPicture.optimizedPictures',
-                    'contents.content',
+                    'contents.content.translationKey.translations',
                     'originalBlogPost',
                     'gameReviewDraft',
                 ]);
@@ -140,7 +140,7 @@ class BlogPostEditPageController extends Controller
             'titleTranslationKey.translations',
             'category',
             'coverPicture.optimizedPictures',
-            'contents.content',
+            'contents.content.translationKey.translations',
             'originalBlogPost',
             'gameReviewDraft',
         ]);

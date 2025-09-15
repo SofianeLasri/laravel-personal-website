@@ -51,13 +51,16 @@ const saveTimeouts = ref<Record<number, ReturnType<typeof setTimeout>>>({});
 
 // Initialiser le cache avec les contenus existants
 const initializeContentCache = () => {
+    console.log('Initializing content cache for', localContents.value.length, 'contents');
     localContents.value.forEach((content) => {
         if (getContentTypeFromClass(content.content_type) === 'markdown') {
             const currentText = content.content?.translation_key?.translations?.find((t) => t.locale === props.locale)?.text ?? '';
+            console.log(`Content ${content.content_id}: found text "${currentText}" for locale ${props.locale}`);
             contentCache.value[content.content_id] = currentText;
             savingStatus.value[content.content_id] = 'idle';
         }
     });
+    console.log('Content cache initialized:', contentCache.value);
 };
 
 // Initialize sortable and cache on mount
@@ -225,12 +228,8 @@ const updateContentOrder = async () => {
     });
 
     try {
-        await axios.post(route('dashboard.api.blog-post-draft-contents.reorder'), {
-            blog_post_draft_id: props.draftId,
-            contents: localContents.value.map((c, index) => ({
-                id: c.id,
-                order: index,
-            })),
+        await axios.post(route('dashboard.api.blog-post-draft-contents.reorder', { blog_post_draft: props.draftId }), {
+            content_ids: localContents.value.map((c) => c.id),
         });
     } catch (error: unknown) {
         console.error('Erreur lors de la réorganisation:', error);

@@ -47,7 +47,7 @@ const contentListRef = ref<HTMLElement | null>(null);
 // Cache local pour les contenus en cours d'édition
 const contentCache = ref<Record<number, string>>({});
 const savingStatus = ref<Record<number, 'idle' | 'saving' | 'saved' | 'error'>>({});
-const saveTimeouts = ref<Record<number, NodeJS.Timeout>>({});
+const saveTimeouts = ref<Record<number, ReturnType<typeof setTimeout>>>({});
 
 // Initialiser le cache avec les contenus existants
 const initializeContentCache = () => {
@@ -97,13 +97,11 @@ watchEffect(() => {
 });
 
 // Ajouter un gestionnaire d'événement pour avertir avant de quitter
-const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
+const beforeUnloadHandler = (event: BeforeUnloadEvent): void => {
     if (hasUnsavedChanges.value) {
         event.preventDefault();
         event.returnValue = '';
-        return '';
     }
-    return;
 };
 
 onMounted(() => {
@@ -176,13 +174,18 @@ const addContent = async (type: string) => {
         }
 
         toast.success('Bloc de contenu ajouté');
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Erreur lors de l'ajout du contenu:", error);
-        console.error("Détails de l'erreur:", error.response?.data);
 
-        if (error.response?.status === 422 && error.response?.data?.errors) {
-            const errors = Object.values(error.response.data.errors).flat();
-            toast.error(`Erreurs de validation: ${errors.join(', ')}`);
+        if (axios.isAxiosError(error)) {
+            console.error("Détails de l'erreur:", error.response?.data);
+
+            if (error.response?.status === 422 && error.response?.data?.errors) {
+                const errors = Object.values(error.response.data.errors).flat();
+                toast.error(`Erreurs de validation: ${errors.join(', ')}`);
+            } else {
+                toast.error("Erreur lors de l'ajout du contenu");
+            }
         } else {
             toast.error("Erreur lors de l'ajout du contenu");
         }
@@ -209,7 +212,7 @@ const removeContent = async (index: number) => {
 
         // Update order for remaining items
         await updateContentOrder();
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la suppression:', error);
         toast.error('Erreur lors de la suppression');
     }
@@ -229,7 +232,7 @@ const updateContentOrder = async () => {
                 order: index,
             })),
         });
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la réorganisation:', error);
         toast.error('Erreur lors de la réorganisation');
     }
@@ -276,7 +279,7 @@ const saveMarkdownContent = async (contentId: number, text: string) => {
                 savingStatus.value[contentId] = 'idle';
             }
         }, 2000);
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la mise à jour:', error);
         savingStatus.value[contentId] = 'error';
 
@@ -307,7 +310,7 @@ const updateGalleryImages = async (contentId: number, pictureIds: number[]) => {
             },
         );
         toast.success('Images mises à jour');
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la mise à jour des images:', error);
         toast.error('Erreur lors de la mise à jour');
     }
@@ -324,7 +327,7 @@ const updateVideoContent = async (contentId: number, videoId: number) => {
             },
         );
         toast.success('Vidéo mise à jour');
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la mise à jour:', error);
         toast.error('Erreur lors de la mise à jour');
     }
@@ -433,7 +436,7 @@ const getContentTypeFromClass = (className: string): string => {
                         <Label>Sélectionner une vidéo</Label>
                         <Select
                             :value="content.content_id?.toString()"
-                            @update:model-value="(value: string) => updateVideoContent(content.id!, parseInt(value))"
+                            @update:model-value="(value) => updateVideoContent(content.id!, parseInt(String(value)))"
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Choisir une vidéo" />

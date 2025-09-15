@@ -54,19 +54,25 @@ export default defineConfigWithVueTs(
             'vue/require-prop-types': 'error',
             'vue/require-v-for-key': 'error',
             'vue/no-v-html': 'warn', // Security warning
-            'vue/component-tags-order': ['error', {
-                order: ['script', 'template', 'style'],
-            }],
+            'vue/component-tags-order': [
+                'error',
+                {
+                    order: ['script', 'template', 'style'],
+                },
+            ],
             'vue/block-tag-newline': 'error',
             'vue/component-name-in-template-casing': ['error', 'PascalCase'],
             'vue/custom-event-name-casing': ['error', 'kebab-case'],
-            'vue/html-self-closing': ['error', {
-                html: {
-                    void: 'always',
-                    normal: 'never',
-                    component: 'always',
+            'vue/html-self-closing': [
+                'error',
+                {
+                    html: {
+                        void: 'always',
+                        normal: 'never',
+                        component: 'always',
+                    },
                 },
-            }],
+            ],
             'vue/no-unused-refs': 'error',
             'vue/no-unused-vars': 'error',
             'vue/no-use-v-if-with-v-for': 'error',
@@ -84,28 +90,34 @@ export default defineConfigWithVueTs(
             'vue/prop-name-casing': ['error', 'camelCase'],
             'vue/v-bind-style': ['error', 'shorthand'],
             'vue/v-on-style': ['error', 'shorthand'],
-            'vue/attributes-order': ['error', {
-                order: [
-                    'DEFINITION',
-                    'LIST_RENDERING',
-                    'CONDITIONALS',
-                    'RENDER_MODIFIERS',
-                    'GLOBAL',
-                    'UNIQUE',
-                    'SLOT',
-                    'TWO_WAY_BINDING',
-                    'OTHER_DIRECTIVES',
-                    'OTHER_ATTR',
-                    'EVENTS',
-                    'CONTENT',
-                ],
-            }],
+            'vue/attributes-order': [
+                'error',
+                {
+                    order: [
+                        'DEFINITION',
+                        'LIST_RENDERING',
+                        'CONDITIONALS',
+                        'RENDER_MODIFIERS',
+                        'GLOBAL',
+                        'UNIQUE',
+                        'SLOT',
+                        'TWO_WAY_BINDING',
+                        'OTHER_DIRECTIVES',
+                        'OTHER_ATTR',
+                        'EVENTS',
+                        'CONTENT',
+                    ],
+                },
+            ],
             'vue/no-lone-template': 'error',
             'vue/this-in-template': ['error', 'never'],
-            'vue/no-duplicate-attributes': ['error', {
-                allowCoexistClass: true,
-                allowCoexistStyle: true,
-            }],
+            'vue/no-duplicate-attributes': [
+                'error',
+                {
+                    allowCoexistClass: true,
+                    allowCoexistStyle: true,
+                },
+            ],
 
             // General JavaScript/TypeScript Rules
             'no-console': ['warn', { allow: ['warn', 'error'] }],
@@ -119,10 +131,10 @@ export default defineConfigWithVueTs(
             'no-param-reassign': ['error', { props: false }],
             'array-callback-return': 'error',
             'consistent-return': 'warn',
-            'curly': ['error', 'all'],
+            curly: ['error', 'all'],
             'default-case': 'warn',
             'dot-notation': 'error',
-            'eqeqeq': ['error', 'always'],
+            eqeqeq: ['error', 'always'],
             'no-else-return': 'error',
             'no-empty-function': 'warn',
             'no-implicit-coercion': 'error',
@@ -140,9 +152,9 @@ export default defineConfigWithVueTs(
             'no-useless-concat': 'error',
             'no-useless-return': 'error',
             'prefer-promise-reject-errors': 'error',
-            'radix': 'error',
+            radix: 'error',
             'require-await': 'error',
-            'yoda': 'error',
+            yoda: 'error',
         },
     },
     prettier,

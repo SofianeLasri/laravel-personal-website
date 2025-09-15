@@ -53,7 +53,7 @@ const saveTimeouts = ref<Record<number, NodeJS.Timeout>>({});
 const initializeContentCache = () => {
     localContents.value.forEach((content) => {
         if (getContentTypeFromClass(content.content_type) === 'markdown') {
-            const currentText = content.content?.translation_key?.translations?.find((t) => t.locale === props.locale)?.text || '';
+            const currentText = content.content?.translation_key?.translations?.find((t) => t.locale === props.locale)?.text ?? '';
             contentCache.value[content.content_id] = currentText;
             savingStatus.value[content.content_id] = 'idle';
         }
@@ -70,7 +70,7 @@ onMounted(() => {
                 if (evt.oldIndex !== undefined && evt.newIndex !== undefined) {
                     const item = localContents.value.splice(evt.oldIndex, 1)[0];
                     localContents.value.splice(evt.newIndex, 0, item);
-                    updateContentOrder();
+                    void updateContentOrder();
                 }
             },
         });
@@ -89,7 +89,7 @@ watchEffect(() => {
     const hasErrorContent = Object.values(savingStatus.value).some((status) => status === 'error');
 
     // Vérifier s'il y a des modifications en attente (contenu qui a changé mais pas encore sauvegardé)
-    const hasPendingChanges = Object.entries(saveTimeouts.value).some(([contentId, timeout]) => {
+    const hasPendingChanges = Object.entries(saveTimeouts.value).some(([_contentId, timeout]) => {
         return timeout !== null;
     });
 
@@ -103,6 +103,7 @@ const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
         event.returnValue = '';
         return '';
     }
+    return;
 };
 
 onMounted(() => {
@@ -243,7 +244,7 @@ const debouncedSave = (contentId: number, text: string) => {
 
     // Programmer une nouvelle sauvegarde après 1.5 secondes
     saveTimeouts.value[contentId] = setTimeout(() => {
-        saveMarkdownContent(contentId, text);
+        void saveMarkdownContent(contentId, text);
     }, 1500);
 };
 
@@ -331,7 +332,7 @@ const updateVideoContent = async (contentId: number, videoId: number) => {
 
 const getContentTypeLabel = (type: string) => {
     const contentType = contentTypes.find((t) => t.value === type);
-    return contentType?.label || type;
+    return contentType?.label ?? type;
 };
 
 const getContentTypeFromClass = (className: string): string => {

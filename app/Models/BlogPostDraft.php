@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BlogPostType;
 use Database\Factories\BlogPostDraftFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,19 +14,19 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property int|null $blog_post_id
+ * @property int|null $original_blog_post_id
  * @property string $slug
- * @property string $type
- * @property string $status
+ * @property BlogPostType $type
  * @property int $category_id
  * @property int|null $cover_picture_id
+ * @property Carbon|null $published_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $blog_posts_count
  * @property int|null $categories_count
  * @property int|null $cover_pictures_count
  * @property int|null $contents_count
- * @property-read BlogPost|null $blogPost
+ * @property-read BlogPost|null $originalBlogPost
  * @property-read BlogCategory $category
  * @property-read Picture|null $coverPicture
  * @property-read Collection|BlogPostDraftContent[] $contents
@@ -37,26 +38,27 @@ class BlogPostDraft extends Model
     use HasFactory;
 
     protected $fillable = [
-        'blog_post_id',
+        'original_blog_post_id',
         'slug',
         'title_translation_key_id',
         'type',
         'category_id',
         'cover_picture_id',
+        'published_at',
     ];
 
     protected $casts = [
         'slug' => 'string',
-        'type' => 'string',
-        'status' => 'string',
+        'type' => BlogPostType::class,
+        'published_at' => 'datetime',
     ];
 
     /**
      * @return BelongsTo<BlogPost, $this>
      */
-    public function blogPost(): BelongsTo
+    public function originalBlogPost(): BelongsTo
     {
-        return $this->belongsTo(BlogPost::class);
+        return $this->belongsTo(BlogPost::class, 'original_blog_post_id');
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\BlogPostType;
 use App\Models\TranslationKey;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('slug')->unique();
             $table->foreignIdFor(TranslationKey::class, 'title_translation_key_id')->constrained('translation_keys');
-            $table->string('type'); // TODO: Use Enum
+            $table->enum('type', BlogPostType::values());
             $table->foreignId('category_id')->constrained('blog_categories')->onDelete('cascade');
             $table->foreignId('cover_picture_id')->nullable()->constrained('pictures')->onDelete('set null');
             $table->timestamp('published_at')->nullable();

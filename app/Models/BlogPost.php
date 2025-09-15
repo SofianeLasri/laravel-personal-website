@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BlogPostType;
 use Database\Factories\BlogPostFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -15,8 +16,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $slug
- * @property string $type
- * @property string $status
+ * @property BlogPostType $type
  * @property int $category_id
  * @property int|null $cover_picture_id
  * @property Carbon|null $published_at
@@ -42,7 +42,6 @@ class BlogPost extends Model
         'slug',
         'title_translation_key_id',
         'type',
-        'status',
         'category_id',
         'cover_picture_id',
         'published_at',
@@ -50,7 +49,7 @@ class BlogPost extends Model
 
     protected $casts = [
         'slug' => 'string',
-        'type' => 'string',
+        'type' => BlogPostType::class,
         'published_at' => 'datetime',
     ];
 
@@ -118,8 +117,7 @@ class BlogPost extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', 'published')
-            ->where('published_at', '<=', now());
+        return $query->where('published_at', '<=', now());
     }
 
     /**

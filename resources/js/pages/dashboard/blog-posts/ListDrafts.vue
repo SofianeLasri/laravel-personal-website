@@ -53,7 +53,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const itemsPerPage = 25;
 const currentPage = ref(1);
 
-type SortColumn = 'id' | 'type' | 'status' | 'published_at' | 'updated_at' | 'original_blog_post_id';
+type SortColumn = 'id' | 'type' | 'published_at' | 'updated_at' | 'original_blog_post_id';
 type SortDirection = 'asc' | 'desc';
 
 const sortColumn = ref<SortColumn>('updated_at');
@@ -125,7 +125,7 @@ const sortedDrafts = computed(() => {
     return [...props.blogPostDrafts].sort((a, b) => {
         if (sortColumn.value === 'id' || sortColumn.value === 'original_blog_post_id') {
             return compareValues(a[sortColumn.value], b[sortColumn.value], sortDirection.value);
-        } else if (sortColumn.value === 'type' || sortColumn.value === 'status') {
+        } else if (sortColumn.value === 'type') {
             return compareValues(a[sortColumn.value], b[sortColumn.value], sortDirection.value);
         } else if (sortColumn.value === 'published_at' || sortColumn.value === 'updated_at') {
             return compareValues(a[sortColumn.value], b[sortColumn.value], sortDirection.value);
@@ -167,15 +167,6 @@ const getTypeLabel = (type: string): string => {
         game_review: 'Critique de jeu',
     };
     return typeLabels[type] || type;
-};
-
-const getStatusLabel = (status: string): string => {
-    const statusLabels: Record<string, string> = {
-        draft: 'Brouillon',
-        published: 'Publié',
-        archived: 'Archivé',
-    };
-    return statusLabels[status] || status;
 };
 
 const deleteDraft = async (id: number) => {
@@ -239,13 +230,6 @@ const publishDraft = async (id: number) => {
                                     <ArrowDown v-if="sortColumn === 'type' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
                                 </div>
                             </TableHead>
-                            <TableHead class="cursor-pointer" @click="toggleSort('status')">
-                                <div class="flex items-center">
-                                    Statut
-                                    <ArrowUp v-if="sortColumn === 'status' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
-                                    <ArrowDown v-if="sortColumn === 'status' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
-                                </div>
-                            </TableHead>
                             <TableHead class="cursor-pointer" @click="toggleSort('published_at')">
                                 <div class="flex items-center">
                                     Date de publication
@@ -276,9 +260,6 @@ const publishDraft = async (id: number) => {
                             <TableCell>{{ getFrenchTranslation(draft.title_translation_key) }}</TableCell>
                             <TableCell>
                                 <Badge variant="outline">{{ getTypeLabel(draft.type) }}</Badge>
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="outline">{{ getStatusLabel(draft.status) }}</Badge>
                             </TableCell>
                             <TableCell>{{ formatDate(draft.published_at) }}</TableCell>
                             <TableCell class="whitespace-nowrap">

@@ -53,6 +53,8 @@ interface TranslationKey {
 
 type CreationType = 'portfolio' | 'game' | 'library' | 'website' | 'tool' | 'map' | 'other';
 
+type BlogPostType = 'article' | 'tutorial' | 'news' | 'review' | 'guide' | 'game_review';
+
 interface CreationWithTranslationsAndDrafts {
     id: number;
     name: string;
@@ -87,26 +89,26 @@ interface BlogCategory {
 
 interface BlogPostDraftWithAllRelations {
     id: number;
-    blog_post_id: number | null;
+    original_blog_post_id: number | null;
     slug: string;
     title_translation_key_id: number;
-    type: string; // TODO: Use Enum
-    status: string; // TODO: Use Enum
+    type: BlogPostType;
     category_id: number;
     cover_picture_id: number | null;
+    published_at: string | null;
     created_at: string;
     updated_at: string;
     title_translation_key: TranslationKey;
     category: BlogCategory;
     cover_picture: Picture | null;
+    original_blog_post: BlogPost | null;
 }
 
 interface BlogPostWithAllRelations {
     id: number;
     slug: string;
     title_translation_key_id: number;
-    type: string; // TODO: Use Enum
-    status: string; // TODO: Use Enum
+    type: BlogPostType;
     category_id: number;
     cover_picture_id: number | null;
     published_at: string;

@@ -58,7 +58,7 @@ const selectedPost = ref<BlogPostWithAllRelations | null>(null);
 const itemsPerPage = 25;
 const currentPage = ref(1);
 
-type SortColumn = 'id' | 'type' | 'status' | 'published_at';
+type SortColumn = 'id' | 'type' | 'published_at';
 type SortDirection = 'asc' | 'desc';
 
 const sortColumn = ref<SortColumn>('id');
@@ -122,9 +122,7 @@ const sortedPosts = computed(() => {
             return compareValues(a[sortColumn.value], b[sortColumn.value], sortDirection.value);
         } else if (sortColumn.value === 'type') {
             return compareValues(a.type, b.type, sortDirection.value);
-        } else if (sortColumn.value === 'status') {
-            return compareValues(a.type, b.type, sortDirection.value);
-        } else if (sortColumn.value === 'published_at' || sortColumn.value === 'published_at') {
+        } else if (sortColumn.value === 'published_at') {
             return compareValues(a[sortColumn.value], b[sortColumn.value], sortDirection.value);
         }
 

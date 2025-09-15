@@ -69,7 +69,7 @@ const originalBlogPostId = ref(getOriginalBlogPostId());
 const formSchema = toTypedSchema(
     z.object({
         slug: z.string().min(1, 'Le slug est requis'),
-        cover_picture_id: z.number().nullable(),
+        cover_picture_id: z.coerce.number().nullable(),
         type: z.string(),
         category_id: z.coerce.number().min(1, 'Veuillez sélectionner une catégorie'),
         locale: z.enum(['fr', 'en']).default('fr'),
@@ -84,19 +84,45 @@ const form = useForm({
         slug: currentBlogPostDraft.value?.slug || '',
         cover_picture_id: currentBlogPostDraft.value?.cover_picture_id || null,
         type: currentBlogPostDraft.value?.type || 'article',
-        category_id: currentBlogPostDraft.value?.category_id || props.categories[0]?.id || 1,
+        category_id: currentBlogPostDraft.value?.category_id?.toString() || props.categories[0]?.id?.toString() || '1',
         locale: 'fr' as 'fr' | 'en',
         title_content: '',
         published_at: currentBlogPostDraft.value?.published_at || new Date().toISOString().split('T')[0],
     },
 });
 
-// Load initial translation content
+// Load initial content from existing draft
 onMounted(() => {
-    if (currentBlogPostDraft.value?.title_translation_key) {
-        const translation = currentBlogPostDraft.value.title_translation_key.translations.find((t) => t.locale === locale.value);
-        if (translation) {
-            form.setFieldValue('title_content', translation.text);
+    if (currentBlogPostDraft.value) {
+        // Load title translation
+        if (currentBlogPostDraft.value.title_translation_key) {
+            const translation = currentBlogPostDraft.value.title_translation_key.translations.find((t) => t.locale === locale.value);
+            if (translation) {
+                form.setFieldValue('title_content', translation.text);
+            }
+        }
+
+        // Load category
+        if (currentBlogPostDraft.value.category_id) {
+            form.setFieldValue('category_id', currentBlogPostDraft.value.category_id.toString());
+        }
+
+        // Load cover picture
+        if (currentBlogPostDraft.value.cover_picture_id) {
+            form.setFieldValue('cover_picture_id', currentBlogPostDraft.value.cover_picture_id);
+        }
+
+        // Load other fields that might not be in initialValues
+        if (currentBlogPostDraft.value.slug) {
+            form.setFieldValue('slug', currentBlogPostDraft.value.slug);
+        }
+
+        if (currentBlogPostDraft.value.type) {
+            form.setFieldValue('type', currentBlogPostDraft.value.type);
+        }
+
+        if (currentBlogPostDraft.value.published_at) {
+            form.setFieldValue('published_at', currentBlogPostDraft.value.published_at);
         }
     }
 });
@@ -144,6 +170,9 @@ const handleSubmit = form.handleSubmit(async (values) => {
             title_translation_key_id: currentBlogPostDraft.value?.title_translation_key_id,
             original_blog_post_id: currentBlogPostDraft.value?.original_blog_post_id || originalBlogPostId.value,
         };
+
+        console.log('Submit payload:', payload); // Debug
+        console.log('Cover picture ID in payload:', payload.cover_picture_id); // Debug
 
         if (currentBlogPostDraft.value) {
             // Update existing draft
@@ -196,7 +225,9 @@ const handlePublish = async () => {
 };
 
 const handleCoverPictureChange = (pictureId: number | null) => {
+    console.log('Cover picture changed:', pictureId); // Debug
     form.setFieldValue('cover_picture_id', pictureId);
+    console.log('Form value after change:', form.values.cover_picture_id); // Debug
 };
 
 const categories = ref([...props.categories]);
@@ -313,9 +344,9 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                             <FormLabel>Image de couverture</FormLabel>
                             <FormControl>
                                 <PictureInput
-                                    :picture-id="form.values.cover_picture_id"
+                                    :model-value="form.values.cover_picture_id"
                                     label="Image de couverture (16:9 recommandé)"
-                                    @update:picture-id="handleCoverPictureChange"
+                                    @update:model-value="handleCoverPictureChange"
                                 />
                             </FormControl>
                             <FormMessage />

@@ -15,19 +15,12 @@ class BlogPostEditTest extends DuskTestCase
     public function test_debug_page_loading(): void
     {
         $user = User::factory()->create();
-        $category = BlogCategory::factory()->create();
 
         $this->browse(function (Browser $browser) use ($user) {
             $browser->loginAs($user)
                 ->visit('/dashboard/blog-posts/edit')
-                ->pause(8000) // Attendre que le JS se charge complètement (WSL lenteur)
-                ->screenshot('debug-page-initial-load')
-                ->dump() // Afficher le DOM actuel
-                ->waitUntilMissing('.loader', 15) // Attendre que les loaders disparaissent s'il y en a
-                ->screenshot('debug-page-after-loaders')
-                    // Vérifier si la page de base se charge (peut être "Nouvel article" ou "Modifier l'article")
-                ->assertSeeIn('h1', 'article') // Le mot "article" devrait être présent
-                ->screenshot('debug-page-success');
+                ->waitForText("Modifier l'article")
+                ->assertSee("Création d'un nouvel article");
         });
     }
 

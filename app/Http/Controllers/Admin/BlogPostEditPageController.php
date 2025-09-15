@@ -8,7 +8,6 @@ use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
 use App\Models\Picture;
-use App\Models\TranslationKey;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -61,8 +60,8 @@ class BlogPostEditPageController extends Controller
                 ]);
             }
         } else {
-            // Creating a new draft from scratch
-            $draft = $this->createNewDraft();
+            // Creating a new draft from scratch - will be created on first save
+            $draft = null;
         }
 
         // Get all categories for the select dropdown
@@ -82,7 +81,10 @@ class BlogPostEditPageController extends Controller
             'categories' => $categories,
             'pictures' => $pictures,
             'videos' => $videos,
-            'blogPostTypes' => BlogPostType::cases(),
+            'blogPostTypes' => array_map(fn (BlogPostType $type) => [
+                'name' => $type->name,
+                'value' => $type->value,
+            ], BlogPostType::cases()),
         ]);
     }
 
@@ -133,61 +135,6 @@ class BlogPostEditPageController extends Controller
                 ]);
             }
         }
-
-        // Load relationships
-        $draft->load([
-            'titleTranslationKey.translations',
-            'category',
-            'coverPicture.optimizedPictures',
-            'contents.content',
-            'originalBlogPost',
-            'gameReviewDraft',
-        ]);
-
-        return $draft;
-    }
-
-    private function createNewDraft(): BlogPostDraft
-    {
-        // Create translation key for title
-        $titleTranslationKey = TranslationKey::create([
-            'key' => 'blog_post_draft_title_'.uniqid(),
-        ]);
-
-        // Create empty translations
-        $titleTranslationKey->translations()->createMany([
-            ['locale' => 'fr', 'text' => ''],
-            ['locale' => 'en', 'text' => ''],
-        ]);
-
-        // Get first category or create a default one if none exists
-        $category = BlogCategory::first();
-        if (! $category) {
-            $categoryNameKey = TranslationKey::create([
-                'key' => 'blog_category_default',
-            ]);
-
-            $categoryNameKey->translations()->createMany([
-                ['locale' => 'fr', 'text' => 'Non catégorisé'],
-                ['locale' => 'en', 'text' => 'Uncategorized'],
-            ]);
-
-            $category = BlogCategory::create([
-                'slug' => 'uncategorized',
-                'name_translation_key_id' => $categoryNameKey->id,
-                'color' => '#6B7280',
-                'order' => 0,
-            ]);
-        }
-
-        // Create the draft
-        $draft = BlogPostDraft::create([
-            'slug' => 'new-article-'.uniqid(),
-            'title_translation_key_id' => $titleTranslationKey->id,
-            'type' => BlogPostType::ARTICLE,
-            'category_id' => $category->id,
-            'published_at' => now(),
-        ]);
 
         // Load relationships
         $draft->load([

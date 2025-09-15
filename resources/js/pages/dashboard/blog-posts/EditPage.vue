@@ -324,17 +324,40 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                 </div>
 
                 <!-- Game Review Section (if type is game_review) -->
-                <GameReviewEditor
-                    v-if="showGameReviewSection"
-                    :draft-id="currentBlogPostDraft?.id"
-                    :game-review-draft="currentBlogPostDraft?.game_review_draft"
-                    :locale="locale"
-                />
+                <div v-if="showGameReviewSection">
+                    <div
+                        v-if="!currentBlogPostDraft"
+                        class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20"
+                    >
+                        <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                            <strong>Info :</strong> Veuillez d'abord sauvegarder le brouillon pour pouvoir ajouter les informations de critique de
+                            jeu.
+                        </p>
+                    </div>
+                    <GameReviewEditor
+                        v-else
+                        :draft-id="currentBlogPostDraft?.id"
+                        :game-review-draft="currentBlogPostDraft?.game_review_draft"
+                        :locale="locale"
+                    />
+                </div>
 
                 <!-- Content Builder -->
                 <div class="space-y-4">
                     <HeadingSmall title="Contenu de l'article" />
+                    <div
+                        v-if="!currentBlogPostDraft"
+                        class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20"
+                    >
+                        <p class="text-sm text-blue-800 dark:text-blue-200">
+                            <strong>Info :</strong> Veuillez d'abord sauvegarder le brouillon pour pouvoir ajouter du contenu à l'article.
+                        </p>
+                        <p class="mt-2 text-xs text-blue-600 dark:text-blue-300">
+                            Cette mesure évite la création de contenus orphelins dans la base de données.
+                        </p>
+                    </div>
                     <BlogContentBuilder
+                        v-else
                         :draft-id="currentBlogPostDraft?.id"
                         :contents="currentBlogPostDraft?.contents || []"
                         :pictures="pictures"

@@ -25,6 +25,22 @@ class BlogPostEditTest extends DuskTestCase
         });
     }
 
+    public function test_content_builder_not_available_before_saving_draft(): void
+    {
+        $user = User::factory()->create();
+        $category = BlogCategory::factory()->withNames(['fr' => 'Test', 'en' => 'Test'])->create();
+
+        $this->browse(function (Browser $browser) use ($user) {
+            $browser->loginAs($user)
+                ->visit('/dashboard/blog-posts/edit')
+                ->waitFor('[data-testid="blog-form"]')
+                // Content builder should not be visible initially
+                ->assertDontSee('[data-testid="content-builder"]')
+                ->assertSee('Veuillez d\'abord sauvegarder le brouillon pour pouvoir ajouter du contenu')
+                ->screenshot('no-content-builder-before-save');
+        });
+    }
+
     public function test_can_create_new_blog_post_draft(): void
     {
         $user = User::factory()->create();
@@ -76,6 +92,7 @@ class BlogPostEditTest extends DuskTestCase
                 ->waitForText('Brouillon mis à jour avec succès', 10)
                 ->waitFor('[data-testid="content-builder"]', 10)
                 // Add markdown content
+                ->assertVisible('[data-testid="content-builder"]')
                 ->click('[data-testid="add-text-button"]')
                 ->waitForText('Bloc de contenu ajouté', 10)
                 // Target the textarea that should now be visible

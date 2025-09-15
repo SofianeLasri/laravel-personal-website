@@ -30,7 +30,7 @@ interface BlogContent {
 }
 
 interface Props {
-    draftId?: number;
+    draftId: number; // Now required since we only show this component when draft exists
     contents: BlogContent[];
     pictures: Picture[];
     videos: Video[];
@@ -124,11 +124,6 @@ const contentTypes = [
 ];
 
 const addContent = async (type: string) => {
-    if (!props.draftId) {
-        toast.error("Veuillez d'abord sauvegarder le brouillon");
-        return;
-    }
-
     try {
         let contentId: number;
 
@@ -196,7 +191,7 @@ const addContent = async (type: string) => {
 const removeContent = async (index: number) => {
     const content = localContents.value[index];
 
-    if (!content.id || !props.draftId) {
+    if (!content.id) {
         localContents.value.splice(index, 1);
         return;
     }
@@ -220,8 +215,6 @@ const removeContent = async (index: number) => {
 };
 
 const updateContentOrder = async () => {
-    if (!props.draftId) return;
-
     // Update local order
     localContents.value.forEach((content, index) => {
         content.order = index;

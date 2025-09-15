@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\BlogPostType;
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
+use App\Models\BlogContentGallery;
+use App\Models\BlogContentMarkdown;
+use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
 use App\Models\Picture;
@@ -28,19 +31,25 @@ class BlogPostEditPageController extends Controller
                 'titleTranslationKey.translations',
                 'category',
                 'coverPicture.optimizedPictures',
-                'contents.content.translationKey.translations',
+                'contents.content',
                 'originalBlogPost',
                 'gameReviewDraft',
             ])->findOrFail($draftId);
+
+            // Load specific relations based on content type
+            $this->loadContentSpecificRelations($draft);
         } elseif ($blogPostId) {
             // Creating a draft from an existing blog post
             $blogPost = BlogPost::with([
                 'titleTranslationKey.translations',
                 'category',
                 'coverPicture.optimizedPictures',
-                'contents.content.translationKey.translations',
+                'contents.content',
                 'gameReview',
             ])->findOrFail($blogPostId);
+
+            // Load specific relations based on content type for the blog post
+            $this->loadContentSpecificRelations($blogPost);
 
             // Check if a draft already exists for this blog post
             $draft = BlogPostDraft::where('original_blog_post_id', $blogPostId)->first();
@@ -54,10 +63,13 @@ class BlogPostEditPageController extends Controller
                     'titleTranslationKey.translations',
                     'category',
                     'coverPicture.optimizedPictures',
-                    'contents.content.translationKey.translations',
+                    'contents.content',
                     'originalBlogPost',
                     'gameReviewDraft',
                 ]);
+
+                // Load specific relations for the existing draft
+                $this->loadContentSpecificRelations($draft);
             }
         } else {
             // Creating a new draft from scratch - will be created on first save
@@ -140,11 +152,38 @@ class BlogPostEditPageController extends Controller
             'titleTranslationKey.translations',
             'category',
             'coverPicture.optimizedPictures',
-            'contents.content.translationKey.translations',
+            'contents.content',
             'originalBlogPost',
             'gameReviewDraft',
         ]);
 
+        // Load specific relations for the created draft
+        $this->loadContentSpecificRelations($draft);
+
         return $draft;
+    }
+
+    /**
+     * Load content-specific relations based on the content type
+     */
+    private function loadContentSpecificRelations($entity): void
+    {
+        if (! $entity || ! $entity->contents) {
+            return;
+        }
+
+        foreach ($entity->contents as $content) {
+            if (! $content->content) {
+                continue;
+            }
+
+            if ($content->content instanceof BlogContentMarkdown) {
+                $content->content->load('translationKey.translations');
+            } elseif ($content->content instanceof BlogContentVideo) {
+                $content->content->load('captionTranslationKey.translations');
+            } elseif ($content->content instanceof BlogContentGallery) {
+                $content->content->load('pictures');
+            }
+        }
     }
 }

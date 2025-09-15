@@ -51,16 +51,13 @@ const saveTimeouts = ref<Record<number, ReturnType<typeof setTimeout>>>({});
 
 // Initialiser le cache avec les contenus existants
 const initializeContentCache = () => {
-    console.log('Initializing content cache for', localContents.value.length, 'contents');
     localContents.value.forEach((content) => {
         if (getContentTypeFromClass(content.content_type) === 'markdown') {
             const currentText = content.content?.translation_key?.translations?.find((t) => t.locale === props.locale)?.text ?? '';
-            console.log(`Content ${content.content_id}: found text "${currentText}" for locale ${props.locale}`);
             contentCache.value[content.content_id] = currentText;
             savingStatus.value[content.content_id] = 'idle';
         }
     });
-    console.log('Content cache initialized:', contentCache.value);
 };
 
 // Initialize sortable and cache on mount

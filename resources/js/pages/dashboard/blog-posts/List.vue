@@ -48,7 +48,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Liste des articles',
-        href: route('dashboard.articles.index', undefined, false),
+        href: route('dashboard.blog-posts.index', undefined, false),
     },
 ];
 
@@ -170,130 +170,128 @@ const navigateToDraftEdit = () => {
 </script>
 
 <template>
-    <template>
-        <AppLayout :breadcrumbs="breadcrumbs">
-            <Head title="Liste des articles" />
-            <div class="px-5 py-6">
-                <Heading title="Liste des articles" description="Sont affichées ici uniquement les créations publiées." />
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <Head title="Liste des articles" />
+        <div class="px-5 py-6">
+            <Heading title="Liste des articles" description="Sont affichées ici uniquement les créations publiées." />
 
-                <div class="py-4">
-                    <Table>
-                        <TableCaption>Liste des articles publiés</TableCaption>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead class="w-[100px] cursor-pointer" @click="toggleSort('id')">
-                                    <div class="flex items-center">
-                                        ID
-                                        <ArrowUp v-if="sortColumn === 'id' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
-                                        <ArrowDown v-if="sortColumn === 'id' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
-                                    </div>
-                                </TableHead>
-                                <TableHead class="text-right">Titre</TableHead>
-                                <TableHead class="cursor-pointer" @click="toggleSort('type')">
-                                    <div class="flex items-center">
-                                        Type
-                                        <ArrowUp v-if="sortColumn === 'type' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
-                                        <ArrowDown v-if="sortColumn === 'type' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
-                                    </div>
-                                </TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead class="cursor-pointer" @click="toggleSort('published_at')">
-                                    <div class="flex items-center">
-                                        Publié le
-                                        <ArrowUp v-if="sortColumn === 'published_at' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
-                                        <ArrowDown v-if="sortColumn === 'published_at' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
-                                    </div>
-                                </TableHead>
-                                <TableHead class="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow v-for="post in paginatedPosts" :key="post.id">
-                                <TableCell class="font-medium">{{ post.id }}</TableCell>
-                                <TableCell>{{ getFrenchTranslation(post.title_translation_key) }}</TableCell>
-                                <TableCell>
-                                    <Badge variant="outline">{{ post.type }}</Badge>
-                                    <!--                                    <Badge variant="outline">{{ getTypeLabel(post.type) }}</Badge>-->
-                                </TableCell>
-                                <TableCell>{{ formatDate(post.published_at) }}</TableCell>
-                                <TableCell class="text-right">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" class="h-8 w-8 p-0">
-                                                <span class="sr-only">Ouvrir menu</span>
-                                                <MoreHorizontal class="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem @click="handleEditCreation(post)">
-                                                <Edit class="mr-2 h-4 w-4" />
-                                                <span>Modifier</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem class="text-destructive" @click="deletePost(post.id)">
-                                                <Trash2 class="mr-2 h-4 w-4" />
-                                                <span>Supprimer</span>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-
-                    <!-- Pagination -->
-                    <div class="mt-6 flex justify-center">
-                        <Pagination
-                            :total="props.blogPosts.length"
-                            :items-per-page="itemsPerPage"
-                            :default-page="1"
-                            show-edges
-                            :sibling-count="1"
-                            @update:page="handlePageChange"
-                            v-slot="{ page }"
-                        >
-                            <PaginationContent v-slot="{ items }" class="flex items-center gap-1">
-                                <PaginationFirst />
-                                <PaginationPrevious />
-
-                                <template v-for="(item, index) in items">
-                                    <PaginationItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-                                        <Button class="h-10 w-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
-                                            {{ item.value }}
+            <div class="py-4">
+                <Table>
+                    <TableCaption>Liste des articles publiés</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead class="w-[100px] cursor-pointer" @click="toggleSort('id')">
+                                <div class="flex items-center">
+                                    ID
+                                    <ArrowUp v-if="sortColumn === 'id' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
+                                    <ArrowDown v-if="sortColumn === 'id' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
+                                </div>
+                            </TableHead>
+                            <TableHead class="text-right">Titre</TableHead>
+                            <TableHead class="cursor-pointer" @click="toggleSort('type')">
+                                <div class="flex items-center">
+                                    Type
+                                    <ArrowUp v-if="sortColumn === 'type' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
+                                    <ArrowDown v-if="sortColumn === 'type' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
+                                </div>
+                            </TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead class="cursor-pointer" @click="toggleSort('published_at')">
+                                <div class="flex items-center">
+                                    Publié le
+                                    <ArrowUp v-if="sortColumn === 'published_at' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
+                                    <ArrowDown v-if="sortColumn === 'published_at' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
+                                </div>
+                            </TableHead>
+                            <TableHead class="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow v-for="post in paginatedPosts" :key="post.id">
+                            <TableCell class="font-medium">{{ post.id }}</TableCell>
+                            <TableCell>{{ getFrenchTranslation(post.title_translation_key) }}</TableCell>
+                            <TableCell>
+                                <Badge variant="outline">{{ post.type }}</Badge>
+                                <!--                                    <Badge variant="outline">{{ getTypeLabel(post.type) }}</Badge>-->
+                            </TableCell>
+                            <TableCell>{{ formatDate(post.published_at) }}</TableCell>
+                            <TableCell class="text-right">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" class="h-8 w-8 p-0">
+                                            <span class="sr-only">Ouvrir menu</span>
+                                            <MoreHorizontal class="h-4 w-4" />
                                         </Button>
-                                    </PaginationItem>
-                                    <PaginationEllipsis v-else :key="item.type" :index="index" />
-                                </template>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                        <DropdownMenuItem @click="handleEditCreation(post)">
+                                            <Edit class="mr-2 h-4 w-4" />
+                                            <span>Modifier</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem class="text-destructive" @click="deletePost(post.id)">
+                                            <Trash2 class="mr-2 h-4 w-4" />
+                                            <span>Supprimer</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
 
-                                <PaginationNext />
-                                <PaginationLast />
-                            </PaginationContent>
-                        </Pagination>
-                    </div>
+                <!-- Pagination -->
+                <div class="mt-6 flex justify-center">
+                    <Pagination
+                        :total="props.blogPosts.length"
+                        :items-per-page="itemsPerPage"
+                        :default-page="1"
+                        show-edges
+                        :sibling-count="1"
+                        @update:page="handlePageChange"
+                        v-slot="{ page }"
+                    >
+                        <PaginationContent v-slot="{ items }" class="flex items-center gap-1">
+                            <PaginationFirst />
+                            <PaginationPrevious />
 
-                    <!-- Information sur le nombre d'éléments -->
-                    <div class="text-muted-foreground mt-2 text-center text-sm">
-                        Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} à
-                        {{ Math.min(currentPage * itemsPerPage, props.blogPosts.length) }}
-                        sur {{ props.blogPosts.length }} créations
-                    </div>
+                            <template v-for="(item, index) in items">
+                                <PaginationItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
+                                    <Button class="h-10 w-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
+                                        {{ item.value }}
+                                    </Button>
+                                </PaginationItem>
+                                <PaginationEllipsis v-else :key="item.type" :index="index" />
+                            </template>
+
+                            <PaginationNext />
+                            <PaginationLast />
+                        </PaginationContent>
+                    </Pagination>
+                </div>
+
+                <!-- Information sur le nombre d'éléments -->
+                <div class="text-muted-foreground mt-2 text-center text-sm">
+                    Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} à
+                    {{ Math.min(currentPage * itemsPerPage, props.blogPosts.length) }}
+                    sur {{ props.blogPosts.length }} créations
                 </div>
             </div>
+        </div>
 
-            <AlertDialog :open="showDraftAlert" @update:open="showDraftAlert = $event">
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Brouillon existant</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Cet article possède déjà un brouillon. Voulez-vous continuer et modifier ce brouillon existant ?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel @click="showDraftAlert = false">Annuler</AlertDialogCancel>
-                        <AlertDialogAction @click="navigateToDraftEdit">Modifier le brouillon</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </AppLayout>
-    </template>
+        <AlertDialog :open="showDraftAlert" @update:open="showDraftAlert = $event">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Brouillon existant</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Cet article possède déjà un brouillon. Voulez-vous continuer et modifier ce brouillon existant ?
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel @click="showDraftAlert = false">Annuler</AlertDialogCancel>
+                    <AlertDialogAction @click="navigateToDraftEdit">Modifier le brouillon</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    </AppLayout>
 </template>

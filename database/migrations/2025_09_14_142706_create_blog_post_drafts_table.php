@@ -23,8 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['blog_post_id']);
-            $table->index(['status']);
-            $table->index(['type', 'status']);
+            $table->index('type');
         });
     }
 

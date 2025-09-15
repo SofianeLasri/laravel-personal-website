@@ -95,6 +95,14 @@ class BlogPost extends Model
     }
 
     /**
+     * @return HasMany<BlogPostDraft, $this>
+     */
+    public function drafts(): HasMany
+    {
+        return $this->hasMany(BlogPostDraft::class);
+    }
+
+    /**
      * @return HasOne<GameReview, $this>
      */
     public function gameReview(): HasOne

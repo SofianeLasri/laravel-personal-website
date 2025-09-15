@@ -15,7 +15,7 @@ use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Http\Controllers\Admin\ApiRequestLogController;
-use App\Http\Controllers\Admin\ArticlesPageController;
+use App\Http\Controllers\Admin\BlogPostsPageController;
 use App\Http\Controllers\Admin\CertificationPageController;
 use App\Http\Controllers\Admin\CreationPageController;
 use App\Http\Controllers\Admin\DataManagementController;
@@ -150,8 +150,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('cancel');
     });
 
-    Route::name('articles.')->prefix('blog-posts')->group(function () {
-        Route::get('/', [ArticlesPageController::class, 'listPage'])
+    Route::name('blog-posts.')->prefix('blog-posts')->group(function () {
+        Route::get('/', [BlogPostsPageController::class, 'listPage'])
             ->name('index');
         /*Route::get('/drafts', [CreationPageController::class, 'listDraftPage'])
             ->name('drafts.index');

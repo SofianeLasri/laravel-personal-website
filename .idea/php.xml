@@ -195,6 +195,7 @@
       <path value="$PROJECT_DIR$/vendor/symfony/dom-crawler" />
       <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
       <path value="$PROJECT_DIR$/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/vendor/itsgoingd/clockwork" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

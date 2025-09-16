@@ -469,6 +469,31 @@ interface SSRBlogPost {
     excerpt: string;
 }
 
+interface SSRBlogPostDetailed extends SSRBlogPost {
+    contents: Array<{
+        id: number;
+        order: number;
+        content_type: string;
+        markdown?: string;
+        gallery?: {
+            id: number;
+            pictures: SSRPicture[];
+        };
+    }>;
+    gameReview?: {
+        gameTitle: string;
+        releaseDate: string | null;
+        genre: string | null;
+        developer: string | null;
+        publisher: string | null;
+        platforms: string[] | null;
+        rating: 'positive' | 'negative' | null;
+        pros: string | null;
+        cons: string | null;
+        coverPicture: SSRPicture | null;
+    };
+}
+
 interface SSRBlogCategory {
     name: string;
     color: string;

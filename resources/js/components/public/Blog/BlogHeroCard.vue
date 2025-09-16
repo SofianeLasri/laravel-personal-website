@@ -2,6 +2,7 @@
 import { SSRBlogPost } from '@/types';
 import BlogCategoryBadge from './BlogCategoryBadge.vue';
 import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
+import { Link } from '@inertiajs/vue3';
 
 interface Props {
     post: SSRBlogPost;
@@ -11,7 +12,10 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="group flex cursor-pointer flex-col gap-6 transition-transform hover:scale-[1.01] lg:flex-row lg:items-center lg:gap-10">
+    <Link
+        :href="route('public.blog.post', { slug: post.slug })"
+        class="group flex cursor-pointer flex-col gap-6 transition-transform hover:scale-[1.01] lg:flex-row lg:items-center lg:gap-10"
+    >
         <!-- Hero Image -->
         <div class="flex aspect-video h-96 shrink-0 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] lg:h-96">
             <picture>
@@ -51,5 +55,5 @@ defineProps<Props>();
                 </div>
             </div>
         </div>
-    </div>
+    </Link>
 </template>

@@ -2,6 +2,7 @@
 import { SSRBlogPost } from '@/types';
 import BlogCategoryBadge from './BlogCategoryBadge.vue';
 import ArrowRightRegular from '@/components/font-awesome/ArrowRightRegular.vue';
+import { Link } from '@inertiajs/vue3';
 
 interface Props {
     post: SSRBlogPost;
@@ -11,7 +12,10 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="group flex cursor-pointer flex-col gap-4 transition-transform hover:scale-[1.02]">
+    <Link
+        :href="route('public.blog.post', { slug: post.slug })"
+        class="group flex cursor-pointer flex-col gap-4 transition-transform hover:scale-[1.02]"
+    >
         <!-- Article Card -->
         <div class="relative aspect-video w-full overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
             <!-- Category Badge Overlay -->
@@ -54,5 +58,5 @@ defineProps<Props>();
                 <div class="group-hover/button:bg-primary h-1 bg-transparent transition-colors duration-200"></div>
             </div>
         </div>
-    </div>
+    </Link>
 </template>

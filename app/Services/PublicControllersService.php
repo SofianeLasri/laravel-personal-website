@@ -1048,4 +1048,110 @@ class PublicControllersService
             ];
         })->toArray();
     }
+
+    /**
+     * Get a blog post by slug with all its content
+     */
+    public function getBlogPostBySlug(string $slug): ?array
+    {
+        $blogPost = BlogPost::with([
+            'titleTranslationKey.translations',
+            'category.nameTranslationKey.translations',
+            'coverPicture',
+            'contents' => function ($query) {
+                $query->orderBy('order');
+            },
+            'contents.content' => function ($query) {
+                // Load different relations based on content type
+                $query->morphWith([
+                    BlogContentMarkdown::class => ['translationKey.translations'],
+                    \App\Models\BlogContentGallery::class => ['pictures'],
+                ]);
+            },
+            'gameReview.coverPicture',
+            'gameReview.prosTranslationKey.translations',
+            'gameReview.consTranslationKey.translations',
+        ])
+            ->where('slug', $slug)
+            ->first();
+
+        if (! $blogPost) {
+            return null;
+        }
+
+        $title = $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations);
+        $categoryName = $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations);
+
+        // Format contents
+        $contents = $blogPost->contents->map(function ($content) {
+            $result = [
+                'id' => $content->id,
+                'order' => $content->order,
+                'content_type' => $content->content_type,
+            ];
+
+            // Handle different content types
+            if ($content->content_type === BlogContentMarkdown::class) {
+                $markdownContent = $this->getTranslationWithFallback($content->content->translationKey->translations);
+                $result['markdown'] = $markdownContent;
+            } elseif ($content->content_type === \App\Models\BlogContentGallery::class) {
+                $result['gallery'] = [
+                    'id' => $content->content->id,
+                    'pictures' => $content->content->pictures->map(function ($picture) {
+                        return $this->formatPictureForSSR($picture);
+                    })->toArray(),
+                ];
+            }
+
+            return $result;
+        });
+
+        // Generate excerpt from first markdown content
+        $excerpt = '';
+        $firstMarkdownContent = $contents->first(function ($content) {
+            return $content['content_type'] === BlogContentMarkdown::class;
+        });
+
+        if ($firstMarkdownContent && isset($firstMarkdownContent['markdown'])) {
+            $excerpt = Str::limit(strip_tags($firstMarkdownContent['markdown']), 200);
+        }
+
+        $result = [
+            'id' => $blogPost->id,
+            'title' => $title,
+            'slug' => $blogPost->slug,
+            'type' => $blogPost->type,
+            'category' => [
+                'name' => $categoryName,
+                'color' => $blogPost->category->color,
+            ],
+            'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
+            'publishedAt' => $blogPost->published_at,
+            'publishedAtFormatted' => Carbon::parse($blogPost->published_at)->locale($this->locale)->translatedFormat('j F Y'),
+            'excerpt' => $excerpt,
+            'contents' => $contents->toArray(),
+        ];
+
+        // Add game review data if it's a game review
+        if ($blogPost->type === BlogPostType::GAME_REVIEW && $blogPost->gameReview) {
+            $gameReview = $blogPost->gameReview;
+            $pros = $gameReview->prosTranslationKey ? $this->getTranslationWithFallback($gameReview->prosTranslationKey->translations) : null;
+            $cons = $gameReview->consTranslationKey ? $this->getTranslationWithFallback($gameReview->consTranslationKey->translations) : null;
+
+            $result['gameReview'] = [
+                'gameTitle' => $gameReview->game_title,
+                'releaseDate' => $gameReview->release_date,
+                'genre' => $gameReview->genre,
+                'developer' => $gameReview->developer,
+                'publisher' => $gameReview->publisher,
+                'platforms' => $gameReview->platforms,
+                'rating' => $gameReview->rating,
+                'pros' => $pros,
+                'cons' => $cons,
+                'coverPicture' => $gameReview->coverPicture ? $this->formatPictureForSSR($gameReview->coverPicture) : null,
+            ];
+        }
+
+        return $result;
+    }
 }

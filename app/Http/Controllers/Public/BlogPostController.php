@@ -10,8 +10,14 @@ use Inertia\Response;
 
 class BlogPostController extends PublicController
 {
-    public function __invoke(Request $request, PublicControllersService $publicService): Response
+    public function __invoke(Request $request, string $slug, PublicControllersService $publicService): Response
     {
+        $blogPost = $publicService->getBlogPostBySlug($slug);
+
+        if (! $blogPost) {
+            abort(404, 'Article de blog non trouvé');
+        }
+
         return Inertia::render('public/BlogPost', [
             'locale' => app()->getLocale(),
             'browserLanguage' => $this->getBrowserLanguage($request),
@@ -22,6 +28,7 @@ class BlogPostController extends PublicController
                 'blog' => __('blog'),
             ],
             'socialMediaLinks' => SocialMediaLink::all(),
+            'blogPost' => $blogPost,
         ]);
     }
 }

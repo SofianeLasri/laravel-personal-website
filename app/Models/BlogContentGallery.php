@@ -22,7 +22,7 @@ class BlogContentGallery extends Model
     use HasFactory;
 
     protected $fillable = [
-        // No specific fillable fields needed for now
+        // No specific fillable fields needed
     ];
 
     /**

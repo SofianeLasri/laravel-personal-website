@@ -29,11 +29,8 @@ interface BlogIndexProps {
     }>;
     currentFilters: {
         category?: string;
-        type?: string;
         sort?: string;
-        search?: string;
     };
-    availableTypes: Record<string, string>;
 }
 
 const props = defineProps<BlogIndexProps>();
@@ -92,7 +89,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
             <div class="flex flex-col gap-8 lg:flex-row">
                 <!-- Filters Sidebar -->
                 <div class="w-full lg:w-72">
-                    <BlogFilters :categories="categories" :available-types="availableTypes" :current-filters="currentFilters" />
+                    <BlogFilters :categories="categories" :current-filters="currentFilters" />
                 </div>
 
                 <!-- Articles Grid Section -->

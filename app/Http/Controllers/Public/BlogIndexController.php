@@ -16,11 +16,9 @@ class BlogIndexController extends PublicController
 
         // Get filters from request (handle comma-separated values)
         $categoryFilter = $request->get('category');
-        $typeFilter = $request->get('type');
 
         $filters = [
             'category' => $categoryFilter ? explode(',', $categoryFilter) : [],
-            'type' => $typeFilter ? explode(',', $typeFilter) : [],
             'sort' => $request->get('sort', 'newest'),
         ];
 
@@ -29,18 +27,6 @@ class BlogIndexController extends PublicController
 
         // Get all categories with post counts
         $categories = $publicService->getBlogCategoriesWithCounts();
-
-        // Get type post counts
-        $typePostCounts = $publicService->getBlogTypePostCounts();
-
-        // Available post types
-        $availableTypes = [
-            'article' => 'Article',
-            'tutorial' => 'Tutoriel',
-            'game_review' => 'Critique de jeu',
-            'news' => 'Actualité',
-            'guide' => 'Guide',
-        ];
 
         return Inertia::render('public/BlogIndex', [
             'locale' => app()->getLocale(),
@@ -56,11 +42,8 @@ class BlogIndexController extends PublicController
             'categories' => $categories,
             'currentFilters' => [
                 'category' => $categoryFilter ? explode(',', $categoryFilter) : [],
-                'type' => $typeFilter ? explode(',', $typeFilter) : [],
                 'sort' => $request->get('sort', 'newest'),
             ],
-            'availableTypes' => $availableTypes,
-            'typePostCounts' => $typePostCounts,
         ]);
     }
 }

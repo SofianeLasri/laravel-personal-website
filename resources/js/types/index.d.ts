@@ -87,7 +87,7 @@ interface TranslationKey {
 
 type CreationType = 'portfolio' | 'game' | 'library' | 'website' | 'tool' | 'map' | 'other';
 
-type BlogPostType = 'article' | 'tutorial' | 'news' | 'review' | 'guide' | 'game_review';
+type BlogPostType = 'article' | 'game_review';
 
 interface CreationWithTranslationsAndDrafts {
     id: number;

@@ -956,12 +956,6 @@ class PublicControllersService
             });
         }
 
-        // Apply type filter (handle array)
-        if (! empty($filters['type'])) {
-            $types = is_array($filters['type']) ? $filters['type'] : [$filters['type']];
-            $query->whereIn('type', $types);
-        }
-
         // Apply search filter
         if (! empty($filters['search'])) {
             $searchTerm = $filters['search'];
@@ -1053,26 +1047,5 @@ class PublicControllersService
                 'postCount' => $category->blogPosts->count(),
             ];
         })->toArray();
-    }
-
-    /**
-     * Get post counts for each blog post type
-     *
-     * @return array<string, int>
-     */
-    public function getBlogTypePostCounts(): array
-    {
-        $counts = BlogPost::selectRaw('type, COUNT(*) as count')
-            ->groupBy('type')
-            ->pluck('count', 'type')
-            ->toArray();
-
-        // Convert enum keys to string values if needed
-        $result = [];
-        foreach ($counts as $type => $count) {
-            $result[$type] = $count;
-        }
-
-        return $result;
     }
 }

@@ -22,7 +22,7 @@ class BlogPostFactory extends Factory
         return [
             'slug' => Str::slug($title).'-'.uniqid(),
             'title_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
-            'type' => $this->faker->randomElement(['article', 'game_review', 'tutorial']),
+            'type' => $this->faker->randomElement(['article', 'game_review']),
             'category_id' => BlogCategory::factory(),
             'cover_picture_id' => Picture::factory(),
         ];

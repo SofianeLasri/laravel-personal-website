@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import BlogCategoryFilter from './BlogCategoryFilter.vue';
-import BlogTypeFilter from './BlogTypeFilter.vue';
 import BlogSortDropdown from './BlogSortDropdown.vue';
 import { computed, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
@@ -13,11 +12,8 @@ interface Props {
         color: string;
         postCount?: number;
     }>;
-    availableTypes: Record<string, string>;
-    typePostCounts?: Record<string, number>;
     currentFilters: {
         category?: string | string[];
-        type?: string | string[];
         sort?: string;
     };
 }
@@ -33,14 +29,10 @@ const selectedCategories = ref<string[]>(
           : [],
 );
 
-const selectedTypes = ref<string[]>(
-    Array.isArray(props.currentFilters.type) ? props.currentFilters.type : props.currentFilters.type ? [props.currentFilters.type] : [],
-);
-
 const selectedSort = ref(props.currentFilters.sort || 'newest');
 
 const hasActiveFilters = computed(() => {
-    return selectedCategories.value.length > 0 || selectedTypes.value.length > 0;
+    return selectedCategories.value.length > 0;
 });
 
 const applyFilters = () => {
@@ -48,9 +40,6 @@ const applyFilters = () => {
 
     if (selectedCategories.value.length > 0) {
         params.category = selectedCategories.value.join(',');
-    }
-    if (selectedTypes.value.length > 0) {
-        params.type = selectedTypes.value.join(',');
     }
     if (selectedSort.value && selectedSort.value !== 'newest') {
         params.sort = selectedSort.value;
@@ -67,11 +56,6 @@ const handleCategoryFilterChange = (categories: string[]) => {
     applyFilters();
 };
 
-const handleTypeFilterChange = (types: string[]) => {
-    selectedTypes.value = types;
-    applyFilters();
-};
-
 const handleSortChange = (sort: string) => {
     selectedSort.value = sort;
     applyFilters();
@@ -79,7 +63,6 @@ const handleSortChange = (sort: string) => {
 
 const clearAllFilters = () => {
     selectedCategories.value = [];
-    selectedTypes.value = [];
     applyFilters();
 };
 
@@ -88,8 +71,6 @@ watch(
     () => props.currentFilters,
     (newFilters) => {
         selectedCategories.value = Array.isArray(newFilters.category) ? newFilters.category : newFilters.category ? [newFilters.category] : [];
-
-        selectedTypes.value = Array.isArray(newFilters.type) ? newFilters.type : newFilters.type ? [newFilters.type] : [];
 
         selectedSort.value = newFilters.sort || 'newest';
     },
@@ -105,15 +86,6 @@ watch(
             :categories="categories"
             :initial-selected-filters="selectedCategories"
             @filter-change="handleCategoryFilterChange"
-        />
-
-        <!-- Type Filter -->
-        <BlogTypeFilter
-            name="Types d'articles"
-            :available-types="availableTypes"
-            :type-post-counts="typePostCounts"
-            :initial-selected-filters="selectedTypes"
-            @filter-change="handleTypeFilterChange"
         />
 
         <!-- Sort Filter -->

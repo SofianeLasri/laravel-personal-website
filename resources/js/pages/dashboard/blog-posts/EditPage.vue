@@ -149,10 +149,6 @@ watch(
 
 const blogPostTypeLabels: Record<BlogPostType, string> = {
     article: 'Article',
-    tutorial: 'Tutoriel',
-    news: 'Actualité',
-    review: 'Critique',
-    guide: 'Guide',
     game_review: 'Critique de jeu',
 };
 

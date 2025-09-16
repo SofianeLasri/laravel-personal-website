@@ -138,8 +138,9 @@ class DatabaseSeeder extends Seeder
             ->withCompleteContent()
             ->create()
             ->each(function ($blogPost) use ($categories) {
-                // Assign random category
-                $blogPost->update(['category_id' => $categories->random()->id]);
+                // Assign random category based on content type
+                $category = $categories->random();
+                $blogPost->update(['category_id' => $category->id]);
 
                 // Create optimized pictures for cover images
                 $this->createOptimizedPicturesFor($blogPost->coverPicture);

@@ -35,6 +35,7 @@ use App\Http\Controllers\Admin\RequestLogController;
 use App\Http\Controllers\Admin\SocialMediaLinkPageController;
 use App\Http\Controllers\Admin\TechnologyExperiencePageController;
 use App\Http\Controllers\Admin\TranslationPageController;
+use App\Http\Controllers\Admin\VideosPageController;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CertificationsCareerController;
@@ -126,6 +127,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
 
     Route::get('/pictures', PicturePageController::class)
         ->name('pictures.index');
+
+    Route::get('/videos', VideosPageController::class)
+        ->name('videos.index');
 
     Route::get('/translations', [TranslationPageController::class, 'index'])
         ->name('translations.index');

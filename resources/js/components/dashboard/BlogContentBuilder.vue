@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import BlogContentGalleryManager from '@/components/dashboard/BlogContentGalleryManager.vue';
+import BlogContentVideoManager from '@/components/dashboard/BlogContentVideoManager.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
 import type { Picture, Video } from '@/types';
@@ -199,9 +199,13 @@ const addContent = async (type: string) => {
             });
             contentId = response.data.id;
         } else if (type === 'video') {
-            // For video, we'll need to select an existing video first
-            toast.info('Sélectionnez une vidéo dans la liste');
-            return;
+            // Create a new video content without a video initially
+            const response = await axios.post(route('dashboard.api.blog-content-videos.store'), {
+                video_id: null, // No video selected initially
+                caption: '',
+                locale: props.locale,
+            });
+            contentId = response.data.id;
         } else {
             return;
         }
@@ -374,6 +378,36 @@ const updateVideoContent = async (contentId: number, videoId: number) => {
     }
 };
 
+const updateVideoCaption = async (contentId: number, caption: string) => {
+    try {
+        await axios.put(
+            route('dashboard.api.blog-content-videos.update', {
+                blog_content_video: contentId,
+            }),
+            {
+                video_id: getVideoIdFromContent(contentId),
+                caption,
+                locale: props.locale,
+            },
+        );
+    } catch (error: unknown) {
+        console.error('Erreur lors de la mise à jour de la description:', error);
+        toast.error('Erreur lors de la mise à jour de la description');
+    }
+};
+
+const getVideoIdFromContent = (contentId: number): number => {
+    const content = localContents.value.find((c) => c.content_id === contentId);
+    return content?.content?.video_id ?? 0;
+};
+
+const getVideoCaption = (contentData: BlogContentVideo): string => {
+    if (!contentData?.caption_translation_key?.translations) return '';
+
+    const translation = contentData.caption_translation_key.translations.find((t: Translation) => t.locale === props.locale);
+    return translation?.text ?? '';
+};
+
 const getContentTypeLabel = (type: string) => {
     const contentType = contentTypes.find((t) => t.value === type);
     return contentType?.label ?? type;
@@ -529,20 +563,13 @@ defineExpose({
 
                     <!-- Video Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'video'" class="space-y-2">
-                        <Label>Sélectionner une vidéo</Label>
-                        <Select
-                            :value="content.content_id?.toString()"
-                            @update:model-value="(value) => updateVideoContent(content.id!, parseInt(String(value)))"
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Choisir une vidéo" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem v-for="video in videos" :key="video.id" :value="video.id.toString()">
-                                    {{ video.name }}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <BlogContentVideoManager
+                            :video-id="getVideoIdFromContent(content.content_id)"
+                            :initial-caption="getVideoCaption(content.content)"
+                            :locale="locale"
+                            @video-selected="(videoId) => updateVideoContent(content.content_id, videoId)"
+                            @caption-updated="(caption) => updateVideoCaption(content.content_id, caption)"
+                        />
                     </div>
                 </CardContent>
             </Card>

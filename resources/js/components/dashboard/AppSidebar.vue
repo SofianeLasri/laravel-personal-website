@@ -12,6 +12,7 @@ import {
     Briefcase,
     Brush,
     Code,
+    FileVideo,
     Folder,
     FolderOutput,
     Image as ImageIcon,
@@ -93,6 +94,11 @@ const mainNavItems: NavItem[] = [
         title: 'Images',
         href: route('dashboard.pictures.index', undefined, false),
         icon: ImageIcon,
+    },
+    {
+        title: 'Vidéos',
+        href: route('dashboard.videos.index', undefined, false),
+        icon: FileVideo,
     },
     {
         title: 'Traductions',

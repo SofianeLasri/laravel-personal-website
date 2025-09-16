@@ -6,6 +6,7 @@ use Database\Factories\BlogContentVideoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -48,5 +49,13 @@ class BlogContentVideo extends Model
     public function captionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'caption_translation_key_id');
+    }
+
+    /**
+     * @return MorphOne<BlogPostDraftContent, $this>
+     */
+    public function blogContent(): MorphOne
+    {
+        return $this->morphOne(BlogPostDraftContent::class, 'content');
     }
 }

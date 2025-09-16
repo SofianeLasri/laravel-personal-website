@@ -129,11 +129,11 @@ const pageImage = '/opengraph-image-1200-630.jpg';
                             odio vitae mattis. Mauris tristique urna sed nibh consectetur, sed dignissim enim rhoncus. Morbi congue lacinia viverra.
                         </p>
 
-                        <div class="flex w-full items-end">
+                        <div class="flex w-full justify-end">
                             <!-- View Article Button -->
-                            <div class="flex flex-col">
+                            <div class="flex w-fit flex-col">
                                 <div class="flex items-center gap-1">
-                                    <div class="text-bold">Lire l'article</div>
+                                    <div class="font-bold">Lire l'article</div>
                                     <ArrowRightRegular class="size-3 fill-black" />
                                 </div>
                                 <!-- Underline, should be transparent if button not hovered -->

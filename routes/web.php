@@ -38,6 +38,7 @@ use App\Http\Controllers\Admin\TranslationPageController;
 use App\Http\Controllers\Admin\VideosPageController;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Public\AboutController;
+use App\Http\Controllers\Public\BlogHomeController;
 use App\Http\Controllers\Public\CertificationsCareerController;
 use App\Http\Controllers\Public\ExperienceController as PublicExperienceController;
 use App\Http\Controllers\Public\HomeController;
@@ -69,6 +70,9 @@ Route::name('public.')->group(function () {
     Route::get('/certifications-career/{slug}', PublicExperienceController::class)
         ->where('slug', '[A-Za-z0-9\-]+')
         ->name('experience.show');
+
+    // Blog routes
+    Route::get('/blog', [BlogHomeController::class, '__invoke'])->name('blog.home');
 
     // Search routes
     Route::get('/search', [SearchController::class, 'search'])->name('search');

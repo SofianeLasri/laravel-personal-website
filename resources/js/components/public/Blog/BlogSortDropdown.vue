@@ -45,7 +45,7 @@ watch(selectedSort, (newSort) => {
                 <SelectTrigger class="w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-950">
                     <SelectValue placeholder="Trier par" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent class="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-950">
                     <SelectItem v-for="option in sortOptions" :key="option.value" :value="option.value">
                         {{ option.label }}
                     </SelectItem>

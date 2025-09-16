@@ -26,18 +26,29 @@ const route = useRoute();
 const open = ref(false);
 const isSubmitting = ref(false);
 
-const predefinedColors = [
-    '#EF4444', // red
-    '#F97316', // orange
-    '#EAB308', // yellow
-    '#22C55E', // green
-    '#06B6D4', // cyan
-    '#3B82F6', // blue
-    '#8B5CF6', // violet
-    '#EC4899', // pink
-    '#6B7280', // gray
-    '#10B981', // emerald
+// Available category colors with enum values and hex colors
+const availableColors = [
+    { value: 'red', hexColor: '#ef4444', label: 'Rouge' },
+    { value: 'orange', hexColor: '#f97316', label: 'Orange' },
+    { value: 'yellow', hexColor: '#eab308', label: 'Jaune' },
+    { value: 'green', hexColor: '#22c55e', label: 'Vert' },
+    { value: 'blue', hexColor: '#3b82f6', label: 'Bleu' },
+    { value: 'purple', hexColor: '#a855f7', label: 'Violet' },
+    { value: 'pink', hexColor: '#ec4899', label: 'Rose' },
+    { value: 'gray', hexColor: '#6b7280', label: 'Gris' },
 ];
+
+// Helper function to find closest color from hex value
+const findClosestColor = (hexColor: string) => {
+    const normalizedHex = hexColor.toLowerCase();
+
+    // Direct match
+    const directMatch = availableColors.find((color) => color.hexColor === normalizedHex);
+    if (directMatch) return directMatch.value;
+
+    // Default fallback
+    return 'orange';
+};
 
 const formSchema = toTypedSchema(
     z.object({
@@ -54,7 +65,7 @@ const form = useForm({
         slug: '',
         name_fr: '',
         name_en: '',
-        color: predefinedColors[0],
+        color: availableColors[0].value, // Use enum value instead of hex
     },
 });
 
@@ -153,18 +164,31 @@ const handleSubmit = form.handleSubmit(async (values) => {
                         <FormLabel>Couleur</FormLabel>
                         <FormControl>
                             <div class="space-y-2">
-                                <div class="grid grid-cols-5 gap-2">
+                                <div class="grid grid-cols-4 gap-2">
                                     <button
-                                        v-for="color in predefinedColors"
-                                        :key="color"
+                                        v-for="color in availableColors"
+                                        :key="color.value"
                                         type="button"
                                         class="h-8 w-8 rounded-md border-2 transition-all"
-                                        :class="[form.values.color === color ? 'border-foreground scale-110' : 'border-transparent hover:scale-105']"
-                                        :style="{ backgroundColor: color }"
-                                        @click="form.setFieldValue('color', color)"
+                                        :class="[
+                                            form.values.color === color.value ? 'border-foreground scale-110' : 'border-transparent hover:scale-105',
+                                        ]"
+                                        :style="{ backgroundColor: color.hexColor }"
+                                        :title="color.label"
+                                        @click="form.setFieldValue('color', color.value)"
                                     />
                                 </div>
-                                <Input type="color" v-bind="componentField" class="h-8 w-16" />
+                                <div class="flex items-center space-x-2">
+                                    <Input
+                                        type="color"
+                                        :value="availableColors.find((c) => c.value === form.values.color)?.hexColor || '#f97316'"
+                                        class="h-8 w-16"
+                                        @input="(e: any) => form.setFieldValue('color', findClosestColor(e.target.value))"
+                                    />
+                                    <span class="text-muted-foreground text-sm">
+                                        {{ availableColors.find((c) => c.value === form.values.color)?.label || 'Orange' }}
+                                    </span>
+                                </div>
                             </div>
                         </FormControl>
                         <FormMessage />

@@ -90,4 +90,38 @@ enum CategoryColor: string
     {
         return array_map(fn (self $color) => $color->label(), self::cases());
     }
+
+    /**
+     * Get the closest enum value from a hex color
+     */
+    public static function fromHex(string $hexColor): self
+    {
+        $hexColor = strtolower($hexColor);
+
+        return match ($hexColor) {
+            '#ef4444', '#dc2626', '#b91c1c', '#991b1b' => self::RED,
+            '#3b82f6', '#2563eb', '#1d4ed8', '#1e40af' => self::BLUE,
+            '#22c55e', '#16a34a', '#15803d', '#166534' => self::GREEN,
+            '#eab308', '#ca8a04', '#a16207', '#854d0e' => self::YELLOW,
+            '#a855f7', '#9333ea', '#7c3aed', '#6d28d9' => self::PURPLE,
+            '#ec4899', '#db2777', '#be185d', '#9d174d' => self::PINK,
+            '#f97316', '#ea580c', '#c2410c', '#9a3412' => self::ORANGE,
+            '#6b7280', '#4b5563', '#374151', '#1f2937' => self::GRAY,
+            default => self::ORANGE, // Default fallback
+        };
+    }
+
+    /**
+     * Get all enum values with their hex colors as array
+     */
+    public static function all(): array
+    {
+        return array_map(fn (self $color) => [
+            'value' => $color->value,
+            'label' => $color->label(),
+            'labelEn' => $color->labelEn(),
+            'hexColor' => $color->hexColor(),
+            'badgeClass' => $color->badgeClass(),
+        ], self::cases());
+    }
 }

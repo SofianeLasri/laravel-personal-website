@@ -14,8 +14,6 @@ class BlogContentGalleryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'layout' => 'required|string|in:grid,masonry,carousel',
-            'columns' => 'required|integer|min:1|max:6',
             'picture_ids' => 'nullable|array',
             'picture_ids.*' => 'integer|exists:pictures,id',
             'captions' => 'nullable|array',
@@ -34,10 +32,7 @@ class BlogContentGalleryController extends Controller
 
         try {
             // Create the gallery
-            $gallery = BlogContentGallery::create([
-                'layout' => $request->layout,
-                'columns' => $request->columns,
-            ]);
+            $gallery = BlogContentGallery::create();
 
             // Attach pictures with captions if any provided
             if ($request->picture_ids && count($request->picture_ids) > 0) {
@@ -95,8 +90,6 @@ class BlogContentGalleryController extends Controller
     public function update(Request $request, BlogContentGallery $blogContentGallery)
     {
         $validator = Validator::make($request->all(), [
-            'layout' => 'required|string|in:grid,masonry,carousel',
-            'columns' => 'required|integer|min:1|max:6',
             'picture_ids' => 'nullable|array',
             'picture_ids.*' => 'integer|exists:pictures,id',
             'captions' => 'nullable|array',
@@ -114,11 +107,7 @@ class BlogContentGalleryController extends Controller
         DB::beginTransaction();
 
         try {
-            // Update gallery properties
-            $blogContentGallery->update([
-                'layout' => $request->layout,
-                'columns' => $request->columns,
-            ]);
+            // Gallery has no specific properties to update now
 
             // Delete old caption translation keys
             $oldCaptionKeys = DB::table('blog_content_gallery_pictures')
@@ -178,6 +167,87 @@ class BlogContentGalleryController extends Controller
 
             return response()->json([
                 'message' => 'Failed to update gallery',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updatePictures(Request $request, BlogContentGallery $blogContentGallery)
+    {
+        $validator = Validator::make($request->all(), [
+            'pictures' => 'required|array',
+            'pictures.*.id' => 'required|integer|exists:pictures,id',
+            'pictures.*.caption' => 'nullable|string|max:500',
+            'pictures.*.order' => 'required|integer|min:1',
+            'locale' => 'required|string|in:fr,en',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Delete old caption translation keys
+            $oldCaptionKeys = DB::table('blog_content_gallery_pictures')
+                ->where('gallery_id', $blogContentGallery->id)
+                ->whereNotNull('caption_translation_key_id')
+                ->pluck('caption_translation_key_id');
+
+            foreach ($oldCaptionKeys as $keyId) {
+                $translationKey = TranslationKey::find($keyId);
+                if ($translationKey) {
+                    $translationKey->translations()->delete();
+                    $translationKey->delete();
+                }
+            }
+
+            // Detach all existing pictures
+            $blogContentGallery->pictures()->detach();
+
+            // Attach new pictures with captions and order
+            foreach ($request->pictures as $pictureData) {
+                $captionTranslationKey = null;
+
+                // Create caption if provided
+                if (isset($pictureData['caption']) && ! empty($pictureData['caption'])) {
+                    $captionTranslationKey = TranslationKey::create([
+                        'key' => 'blog_gallery_caption_'.uniqid(),
+                    ]);
+
+                    // Create empty translations for both locales
+                    $captionTranslationKey->translations()->createMany([
+                        ['locale' => 'fr', 'text' => ''],
+                        ['locale' => 'en', 'text' => ''],
+                    ]);
+
+                    // Update the translation for the current locale
+                    $captionTranslationKey->translations()->updateOrCreate(
+                        ['locale' => $request->locale],
+                        ['text' => $pictureData['caption']]
+                    );
+                }
+
+                $blogContentGallery->pictures()->attach($pictureData['id'], [
+                    'order' => $pictureData['order'],
+                    'caption_translation_key_id' => $captionTranslationKey?->id,
+                ]);
+            }
+
+            DB::commit();
+
+            $blogContentGallery->load('pictures');
+
+            return response()->json($blogContentGallery);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Failed to update gallery pictures',
                 'error' => $e->getMessage(),
             ], 500);
         }

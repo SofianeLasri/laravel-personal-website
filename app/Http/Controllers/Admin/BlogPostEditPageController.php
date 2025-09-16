@@ -182,7 +182,21 @@ class BlogPostEditPageController extends Controller
             } elseif ($content->content instanceof BlogContentVideo) {
                 $content->content->load('captionTranslationKey.translations');
             } elseif ($content->content instanceof BlogContentGallery) {
-                $content->content->load('pictures');
+                $content->content->load([
+                    'pictures' => function ($query) {
+                        $query->orderBy('blog_content_gallery_pictures.order')
+                            ->withPivot('caption_translation_key_id');
+                    },
+                ]);
+
+                // Load caption translations for each picture pivot
+                foreach ($content->content->pictures as $picture) {
+                    if ($picture->pivot && $picture->pivot->caption_translation_key_id) {
+                        $captionKey = \App\Models\TranslationKey::with('translations')
+                            ->find($picture->pivot->caption_translation_key_id);
+                        $picture->pivot->caption_translation_key = $captionKey;
+                    }
+                }
             }
         }
     }

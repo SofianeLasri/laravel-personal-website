@@ -47,6 +47,9 @@ const isSubmitting = ref(false);
 const isPublishing = ref(false);
 const currentBlogPostDraft = ref<BlogPostDraftWithAllRelations | null>(null);
 
+// Ref for BlogContentBuilder to access saveAllGalleries method
+const blogContentBuilderRef = ref<InstanceType<typeof BlogContentBuilder> | null>(null);
+
 if (props.blogPostDraft) {
     currentBlogPostDraft.value = props.blogPostDraft;
 }
@@ -159,6 +162,15 @@ const handleSubmit = form.handleSubmit(async (values) => {
     isSubmitting.value = true;
 
     try {
+        // Save all galleries first
+        if (blogContentBuilderRef.value?.saveAllGalleries) {
+            const galleriesSaved = await blogContentBuilderRef.value.saveAllGalleries();
+            if (!galleriesSaved) {
+                toast.error('Erreur lors de la sauvegarde des galeries. Veuillez réessayer.');
+                return;
+            }
+        }
+
         const payload = {
             ...values,
             title_translation_key_id: currentBlogPostDraft.value?.title_translation_key_id,
@@ -372,6 +384,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                     </div>
                     <BlogContentBuilder
                         v-else
+                        ref="blogContentBuilderRef"
                         :draft-id="currentBlogPostDraft?.id"
                         :contents="currentBlogPostDraft?.contents || []"
                         :pictures="pictures"

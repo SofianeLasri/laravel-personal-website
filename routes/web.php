@@ -203,6 +203,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         // Blog content routes
         Route::apiResource('blog-content-markdown', BlogContentMarkdownController::class)->except(['index']);
         Route::apiResource('blog-content-gallery', BlogContentGalleryController::class)->except(['index']);
+        Route::put('blog-content-galleries/{blog_content_gallery}/pictures', [BlogContentGalleryController::class, 'updatePictures'])
+            ->name('blog-content-galleries.update-pictures');
         Route::apiResource('blog-content-video', BlogContentVideoController::class)->except(['index']);
 
         // Game review draft routes

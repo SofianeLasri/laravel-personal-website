@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PictureInput from '@/components/dashboard/PictureInput.vue';
+import BlogContentGalleryManager from '@/components/dashboard/BlogContentGalleryManager.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,47 @@ import { GripVertical, Image, Text, Trash2, Video as VideoIcon } from 'lucide-vu
 import Sortable from 'sortablejs';
 import { onMounted, onUnmounted, ref, watchEffect } from 'vue';
 import { toast } from 'vue-sonner';
+
+interface Translation {
+    locale: string;
+    text: string;
+}
+
+interface TranslationKey {
+    id: number;
+    key: string;
+    translations: Translation[];
+}
+
+interface PicturePivot {
+    order: number;
+    caption_translation_key_id?: number;
+    caption_translation_key?: TranslationKey;
+}
+
+interface PictureWithPivot {
+    id: number;
+    path_original: string;
+    path_medium: string;
+    path_small: string;
+    path_thumbnail?: string;
+    path_large?: string;
+    pivot?: PicturePivot;
+}
+
+interface GalleryImage {
+    id: number;
+    picture: {
+        id: number;
+        path_original: string;
+        path_medium: string;
+        path_small: string;
+        path_thumbnail?: string;
+        path_large?: string;
+    };
+    caption: string;
+    order: number;
+}
 
 interface BlogContent {
     id?: number;
@@ -26,6 +67,16 @@ interface BlogContent {
                 text: string;
             }>;
         };
+        pictures?: Array<{
+            id: number;
+            path_original: string;
+            path_medium: string;
+            path_small: string;
+            pivot?: {
+                order: number;
+                caption_translation_key_id?: number;
+            };
+        }>;
     };
 }
 
@@ -43,6 +94,9 @@ const route = useRoute();
 const localContents = ref<BlogContent[]>([...props.contents]);
 const sortableInstance = ref<Sortable | null>(null);
 const contentListRef = ref<HTMLElement | null>(null);
+
+// Refs for gallery managers
+const galleryRefs = ref<Record<number, InstanceType<typeof BlogContentGalleryManager>>>({});
 
 // Cache local pour les contenus en cours d'édition
 const contentCache = ref<Record<number, string>>({});
@@ -295,21 +349,10 @@ const updateMarkdownContent = (contentId: number, text: string) => {
     debouncedSave(contentId, text);
 };
 
-const updateGalleryImages = async (contentId: number, pictureIds: number[]) => {
-    try {
-        await axios.put(
-            route('dashboard.api.blog-content-galleries.update-pictures', {
-                blog_content_gallery: contentId,
-            }),
-            {
-                picture_ids: pictureIds,
-            },
-        );
-        toast.success('Images mises à jour');
-    } catch (error: unknown) {
-        console.error('Erreur lors de la mise à jour des images:', error);
-        toast.error('Erreur lors de la mise à jour');
-    }
+const updateGalleryComplete = async (contentId: number, images: GalleryImage[]) => {
+    // This method is handled by the BlogContentGalleryManager component itself
+    // We just need to refresh the content to show updated data
+    console.log('Gallery updated for content:', contentId, images);
 };
 
 const updateVideoContent = async (contentId: number, videoId: number) => {
@@ -340,6 +383,60 @@ const getContentTypeFromClass = (className: string): string => {
     if (className.includes('BlogContentVideo')) return 'video';
     return 'unknown';
 };
+
+// Helper function to get translated caption from translation key
+const getTranslatedCaption = (captionTranslationKey: TranslationKey | undefined, locale: string): string => {
+    if (!captionTranslationKey?.translations) return '';
+
+    const translation = captionTranslationKey.translations.find((t: Translation) => t.locale === locale);
+    return translation?.text || '';
+};
+
+// Transform gallery data for the BlogContentGalleryManager
+const transformGalleryImages = (content: { pictures?: PictureWithPivot[] }): GalleryImage[] => {
+    if (!content?.pictures) return [];
+
+    return content.pictures.map((picture: PictureWithPivot) => ({
+        id: picture.id,
+        picture: {
+            id: picture.id,
+            path_original: picture.path_original,
+            path_medium: picture.path_medium,
+            path_small: picture.path_small,
+            path_thumbnail: picture.path_thumbnail,
+            path_large: picture.path_large,
+        },
+        caption: getTranslatedCaption(picture.pivot?.caption_translation_key, props.locale) || '',
+        order: picture.pivot?.order || 1,
+    }));
+};
+
+// Save all galleries method
+const saveAllGalleries = async (): Promise<boolean> => {
+    const galleryContents = localContents.value.filter((content) => getContentTypeFromClass(content.content_type) === 'gallery');
+
+    let allSuccess = true;
+
+    for (const galleryContent of galleryContents) {
+        const galleryRef = galleryRefs.value[galleryContent.content_id];
+
+        if (galleryRef?.saveChanges) {
+            try {
+                await galleryRef.saveChanges();
+            } catch (error) {
+                console.error(`Failed to save gallery ${galleryContent.content_id}:`, error);
+                allSuccess = false;
+            }
+        }
+    }
+
+    return allSuccess;
+};
+
+// Expose methods for parent component
+defineExpose({
+    saveAllGalleries,
+});
 </script>
 
 <template>
@@ -406,7 +503,7 @@ const getContentTypeFromClass = (className: string): string => {
                             placeholder="Écrivez votre contenu en Markdown..."
                             class="min-h-[200px] font-mono"
                             :data-testid="`markdown-textarea-${content.content_id}`"
-                            @input="(e: any) => updateMarkdownContent(content.content_id, e.target.value)"
+                            @input="(e: Event) => updateMarkdownContent(content.content_id, (e.target as HTMLTextAreaElement).value)"
                         />
                         <p class="text-muted-foreground text-xs">
                             Vous pouvez utiliser la syntaxe Markdown : **gras**, *italique*, [lien](url), etc.
@@ -415,15 +512,16 @@ const getContentTypeFromClass = (className: string): string => {
 
                     <!-- Gallery Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'gallery'" class="space-y-2">
-                        <Label>Images de la galerie</Label>
-                        <div class="text-muted-foreground mb-2 text-sm">
-                            Sélectionnez une ou plusieurs images. Une seule image sera affichée en grand, plusieurs seront en galerie.
-                        </div>
-                        <PictureInput
-                            :picture-id="null"
-                            :multiple="true"
-                            label="Sélectionner les images"
-                            @update:picture-ids="(ids: number[]) => updateGalleryImages(content.content_id, ids)"
+                        <BlogContentGalleryManager
+                            :ref="
+                                (el: InstanceType<typeof BlogContentGalleryManager> | null) => {
+                                    if (el) galleryRefs[content.content_id] = el;
+                                }
+                            "
+                            :gallery-id="content.content_id"
+                            :initial-images="transformGalleryImages(content.content)"
+                            :locale="locale"
+                            @update:images="(images) => updateGalleryComplete(content.content_id, images)"
                         />
                     </div>
 

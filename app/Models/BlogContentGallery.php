@@ -11,8 +11,6 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property string $layout
- * @property int $columns
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $pictures_count
@@ -24,13 +22,7 @@ class BlogContentGallery extends Model
     use HasFactory;
 
     protected $fillable = [
-        'layout',
-        'columns',
-    ];
-
-    protected $casts = [
-        'layout' => 'string',
-        'columns' => 'integer',
+        // No specific fillable fields needed for now
     ];
 
     /**

@@ -13,11 +13,7 @@ return new class extends Migration
     {
         Schema::create('blog_content_galleries', function (Blueprint $table) {
             $table->id();
-            $table->string('layout')->default('grid');
-            $table->integer('columns')->nullable()->default(2);
             $table->timestamps();
-
-            $table->index(['layout', 'columns']);
         });
     }
 

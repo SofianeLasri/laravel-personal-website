@@ -75,6 +75,9 @@ Route::name('public.')->group(function () {
     // Blog routes
     Route::get('/blog', [BlogHomeController::class, '__invoke'])->name('blog.home');
     Route::get('/blog/articles', [BlogIndexController::class, '__invoke'])->name('blog.index');
+    Route::get('/blog/articles/{slug}', [\App\Http\Controllers\Public\BlogPostController::class, '__invoke'])
+        ->where('slug', '[A-Za-z0-9\-]+')
+        ->name('blog.post');
 
     // Search routes
     Route::get('/search', [SearchController::class, 'search'])->name('search');

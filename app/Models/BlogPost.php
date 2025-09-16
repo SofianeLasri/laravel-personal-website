@@ -87,7 +87,7 @@ class BlogPost extends Model
      */
     public function draft(): HasOne
     {
-        return $this->hasOne(BlogPostDraft::class);
+        return $this->hasOne(BlogPostDraft::class, 'original_blog_post_id');
     }
 
     /**
@@ -95,7 +95,7 @@ class BlogPost extends Model
      */
     public function drafts(): HasMany
     {
-        return $this->hasMany(BlogPostDraft::class);
+        return $this->hasMany(BlogPostDraft::class, 'original_blog_post_id');
     }
 
     /**

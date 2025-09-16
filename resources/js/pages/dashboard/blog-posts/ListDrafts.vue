@@ -53,7 +53,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const itemsPerPage = 25;
 const currentPage = ref(1);
 
-type SortColumn = 'id' | 'type' | 'published_at' | 'updated_at' | 'original_blog_post_id';
+type SortColumn = 'id' | 'type' | 'updated_at' | 'original_blog_post_id';
 type SortDirection = 'asc' | 'desc';
 
 const sortColumn = ref<SortColumn>('updated_at');
@@ -65,16 +65,6 @@ const toggleSort = (column: SortColumn) => {
     } else {
         sortColumn.value = column;
         sortDirection.value = 'asc';
-    }
-};
-
-const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Non définie';
-    try {
-        return format(new Date(dateString), 'dd MMMM yyyy', { locale: fr });
-    } catch (e) {
-        console.error(e);
-        return 'Date invalide';
     }
 };
 
@@ -127,7 +117,7 @@ const sortedDrafts = computed(() => {
             return compareValues(a[sortColumn.value], b[sortColumn.value], sortDirection.value);
         } else if (sortColumn.value === 'type') {
             return compareValues(a[sortColumn.value], b[sortColumn.value], sortDirection.value);
-        } else if (sortColumn.value === 'published_at' || sortColumn.value === 'updated_at') {
+        } else if (sortColumn.value === 'updated_at') {
             return compareValues(a[sortColumn.value], b[sortColumn.value], sortDirection.value);
         }
 
@@ -230,13 +220,6 @@ const publishDraft = async (id: number) => {
                                     <ArrowDown v-if="sortColumn === 'type' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
                                 </div>
                             </TableHead>
-                            <TableHead class="cursor-pointer" @click="toggleSort('published_at')">
-                                <div class="flex items-center">
-                                    Date de publication
-                                    <ArrowUp v-if="sortColumn === 'published_at' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
-                                    <ArrowDown v-if="sortColumn === 'published_at' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
-                                </div>
-                            </TableHead>
                             <TableHead class="cursor-pointer" @click="toggleSort('updated_at')">
                                 <div class="flex items-center">
                                     Dernière modif.
@@ -246,7 +229,7 @@ const publishDraft = async (id: number) => {
                             </TableHead>
                             <TableHead class="cursor-pointer" @click="toggleSort('original_blog_post_id')">
                                 <div class="flex items-center">
-                                    Version
+                                    Status
                                     <ArrowUp v-if="sortColumn === 'original_blog_post_id' && sortDirection === 'asc'" class="ml-1 h-4 w-4" />
                                     <ArrowDown v-if="sortColumn === 'original_blog_post_id' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
                                 </div>
@@ -261,7 +244,6 @@ const publishDraft = async (id: number) => {
                             <TableCell>
                                 <Badge variant="outline">{{ getTypeLabel(draft.type) }}</Badge>
                             </TableCell>
-                            <TableCell>{{ formatDate(draft.published_at) }}</TableCell>
                             <TableCell class="whitespace-nowrap">
                                 <div class="flex items-center">
                                     <Clock class="text-muted-foreground mr-1.5 h-3.5 w-3.5" />

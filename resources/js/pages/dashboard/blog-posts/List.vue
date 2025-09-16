@@ -29,8 +29,6 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import type { BlogPostWithAllRelations, BreadcrumbItem, TranslationKey } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Edit, MoreHorizontal, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
@@ -70,15 +68,6 @@ const toggleSort = (column: SortColumn) => {
     } else {
         sortColumn.value = column;
         sortDirection.value = 'asc';
-    }
-};
-
-const formatDate = (dateString: string) => {
-    try {
-        return format(new Date(dateString), 'dd MMMM yyyy', { locale: fr });
-    } catch (e) {
-        console.error('Erreur de formatage de la date:', e);
-        return 'Date invalide';
     }
 };
 
@@ -193,7 +182,7 @@ const navigateToDraftEdit = () => {
                                     <ArrowDown v-if="sortColumn === 'type' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
                                 </div>
                             </TableHead>
-                            <TableHead>Description</TableHead>
+                            <TableHead>Catégorie</TableHead>
                             <TableHead class="cursor-pointer" @click="toggleSort('published_at')">
                                 <div class="flex items-center">
                                     Publié le
@@ -212,7 +201,7 @@ const navigateToDraftEdit = () => {
                                 <Badge variant="outline">{{ post.type }}</Badge>
                                 <!--                                    <Badge variant="outline">{{ getTypeLabel(post.type) }}</Badge>-->
                             </TableCell>
-                            <TableCell>{{ formatDate(post.published_at) }}</TableCell>
+                            <TableCell>{{ post.category?.name || 'Non définie' }}</TableCell>
                             <TableCell class="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger as-child>

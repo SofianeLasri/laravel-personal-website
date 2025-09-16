@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CategoryColor;
 use Database\Factories\BlogCategoryFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $slug
  * @property string|null $icon
- * @property string|null $color
+ * @property CategoryColor $color
  * @property int $order
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -35,7 +36,7 @@ class BlogCategory extends Model
 
     protected $casts = [
         'slug' => 'string',
-        'color' => 'string', // TODO: Use predefined set of colors
+        'color' => CategoryColor::class,
         'order' => 'integer',
     ];
 

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('slug')->unique();
             $table->foreignIdFor(TranslationKey::class, 'name_translation_key_id')->constrained('translation_keys');
-            $table->string('color', 7)->nullable(); // TODO: Use predefined set of colors
+            $table->enum('color', ['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'orange', 'gray'])->default('gray');
             $table->unsignedInteger('order')->default(0);
             $table->timestamps();
 

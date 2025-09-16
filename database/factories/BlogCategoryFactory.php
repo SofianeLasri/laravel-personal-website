@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CategoryColor;
 use App\Models\BlogCategory;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -21,24 +22,24 @@ class BlogCategoryFactory extends Factory
         return [
             'slug' => Str::slug($name).'-'.uniqid(),
             'name_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
-            'color' => $this->faker->optional(0.8)->hexColor(), // TODO: Use predefined set of colors
+            'color' => $this->faker->randomElement(CategoryColor::values()),
             'order' => $this->faker->numberBetween(0, 100),
         ];
     }
 
     /**
-     * Create a category with specific names for different locales
+     * Create a category with specific names and color for different locales
      *
      * @param  array<string, string>  $names  Array with locale as key and name as value, e.g., ['fr' => 'Technologie', 'en' => 'Technology']
      */
-    public function withNames(array $names): static
+    public function withNames(array $names, ?CategoryColor $color = null): static
     {
-        return $this->state(function (array $attributes) use ($names): array {
+        return $this->state(function (array $attributes) use ($names, $color): array {
             // Use French name for slug if available, otherwise use the first name
             $frenchName = $names['fr'] ?? (string) reset($names);
             $slug = Str::slug($frenchName).'-'.uniqid();
 
-            return [
+            $state = [
                 'slug' => $slug,
                 'name_translation_key_id' => TranslationKey::factory()
                     ->state(['key' => 'blog_category_'.Str::slug($frenchName).'_'.uniqid()])
@@ -64,6 +65,12 @@ class BlogCategoryFactory extends Factory
                     })
                     ->create(),
             ];
+
+            if ($color !== null) {
+                $state['color'] = $color->value;
+            }
+
+            return $state;
         });
     }
 

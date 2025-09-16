@@ -16,17 +16,17 @@ class TranslationKeyFactory extends Factory
         ];
     }
 
-    public function withTranslations(): static
+    public function withTranslations(array $customTranslations = []): static
     {
-        return $this->afterCreating(function (TranslationKey $translationKey) {
+        return $this->afterCreating(function (TranslationKey $translationKey) use ($customTranslations) {
             $translationKey->translations()->create([
                 'locale' => 'en',
-                'text' => $this->faker->sentence(),
+                'text' => $customTranslations['en'] ?? $this->faker->sentence(),
             ]);
 
             $translationKey->translations()->create([
                 'locale' => 'fr',
-                'text' => $this->faker->sentence(),
+                'text' => $customTranslations['fr'] ?? $this->faker->sentence(),
             ]);
         });
     }

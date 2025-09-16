@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\BlogCategory;
+use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
 use App\Models\BlogPost;
 use App\Models\Picture;
@@ -21,7 +22,7 @@ class BlogPostFactory extends Factory
         return [
             'slug' => Str::slug($title).'-'.uniqid(),
             'title_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
-            'type' => $this->faker->randomElement(['article', 'game_review']),
+            'type' => $this->faker->randomElement(['article', 'game_review', 'tutorial']),
             'category_id' => BlogCategory::factory(),
             'cover_picture_id' => Picture::factory(),
             'published_at' => $this->faker->optional(0.7)->dateTimeBetween('-1 year', 'now'),
@@ -70,6 +71,54 @@ class BlogPostFactory extends Factory
                 'content_type' => BlogContentMarkdown::class,
                 'content_id' => $markdown->id,
                 'order' => 1,
+            ]);
+        });
+    }
+
+    public function withCompleteContent(): static
+    {
+        return $this->afterCreating(function (BlogPost $post) {
+            $order = 1;
+
+            // Create first markdown section (introduction)
+            $introTranslationKey = TranslationKey::factory()->withTranslations([
+                'fr' => $this->faker->paragraphs(3, true),
+                'en' => $this->faker->paragraphs(3, true),
+            ])->create();
+
+            $introMarkdown = BlogContentMarkdown::create([
+                'translation_key_id' => $introTranslationKey->id,
+            ]);
+
+            $post->contents()->create([
+                'content_type' => BlogContentMarkdown::class,
+                'content_id' => $introMarkdown->id,
+                'order' => $order++,
+            ]);
+
+            // Create image gallery section
+            $gallery = BlogContentGallery::factory()->withPictures(4)->create();
+
+            $post->contents()->create([
+                'content_type' => BlogContentGallery::class,
+                'content_id' => $gallery->id,
+                'order' => $order++,
+            ]);
+
+            // Create second markdown section (conclusion)
+            $conclusionTranslationKey = TranslationKey::factory()->withTranslations([
+                'fr' => $this->faker->paragraphs(2, true),
+                'en' => $this->faker->paragraphs(2, true),
+            ])->create();
+
+            $conclusionMarkdown = BlogContentMarkdown::create([
+                'translation_key_id' => $conclusionTranslationKey->id,
+            ]);
+
+            $post->contents()->create([
+                'content_type' => BlogContentMarkdown::class,
+                'content_id' => $conclusionMarkdown->id,
+                'order' => $order,
             ]);
         });
     }

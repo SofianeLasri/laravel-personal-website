@@ -11,7 +11,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="flex cursor-pointer flex-col gap-4 transition-transform hover:scale-[1.02]">
+    <div class="group flex cursor-pointer flex-col gap-4 transition-transform hover:scale-[1.02]">
         <!-- Article Card -->
         <div class="relative aspect-video w-full overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
             <!-- Category Badge Overlay -->
@@ -36,7 +36,7 @@ defineProps<Props>();
 
         <!-- Article Info -->
         <div class="flex flex-col gap-0.5">
-            <h4 class="text-design-system-title hover:text-primary text-xl font-bold transition-colors duration-200">{{ post.title }}</h4>
+            <h4 class="text-design-system-title group-hover:text-primary text-xl font-bold transition-colors duration-200">{{ post.title }}</h4>
             <div class="text-design-system-paragraph text-sm">{{ post.publishedAtFormatted }}</div>
         </div>
 
@@ -45,13 +45,13 @@ defineProps<Props>();
 
         <!-- Read More Button -->
         <div class="flex w-full justify-end">
-            <div class="group flex w-fit flex-col">
+            <div class="group/button flex w-fit flex-col">
                 <div class="flex items-center gap-1">
                     <div class="font-bold">Lire l'article</div>
                     <ArrowRightRegular class="size-3 fill-black dark:fill-white" />
                 </div>
                 <!-- Underline -->
-                <div class="group-hover:bg-primary h-1 bg-transparent transition-colors duration-200"></div>
+                <div class="group-hover/button:bg-primary h-1 bg-transparent transition-colors duration-200"></div>
             </div>
         </div>
     </div>

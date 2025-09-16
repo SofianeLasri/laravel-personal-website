@@ -453,4 +453,25 @@ interface SSRCertificationsCareerData {
     workExperiences: SSRExperience[];
 }
 
+// Blog SSR types for public pages
+interface SSRBlogPost {
+    id: number;
+    title: string;
+    slug: string;
+    type: BlogPostType;
+    category: {
+        name: string;
+        color: string;
+    };
+    coverImage: SSRPicture;
+    publishedAt: string;
+    publishedAtFormatted: string;
+    excerpt: string;
+}
+
+interface SSRBlogCategory {
+    name: string;
+    color: string;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;

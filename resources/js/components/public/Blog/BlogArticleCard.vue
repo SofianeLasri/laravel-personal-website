@@ -1,0 +1,58 @@
+<script setup lang="ts">
+import { SSRBlogPost } from '@/types';
+import BlogCategoryBadge from './BlogCategoryBadge.vue';
+import ArrowRightRegular from '@/components/font-awesome/ArrowRightRegular.vue';
+
+interface Props {
+    post: SSRBlogPost;
+}
+
+defineProps<Props>();
+</script>
+
+<template>
+    <div class="flex flex-col gap-4">
+        <!-- Article Card -->
+        <div class="relative aspect-video w-full overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
+            <!-- Category Badge Overlay -->
+            <div class="absolute z-10 flex h-full w-full p-2">
+                <div>
+                    <BlogCategoryBadge :category="post.category" size="sm" />
+                </div>
+            </div>
+
+            <!-- Cover Image -->
+            <picture>
+                <source :srcset="post.coverImage.avif.medium" type="image/avif" />
+                <source :srcset="post.coverImage.webp.medium" type="image/webp" />
+                <img
+                    :src="post.coverImage.webp.medium"
+                    :alt="`Image de couverture - ${post.title}`"
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                />
+            </picture>
+        </div>
+
+        <!-- Article Info -->
+        <div class="flex flex-col gap-0.5">
+            <h4 class="text-design-system-title text-xl font-bold">{{ post.title }}</h4>
+            <div class="text-design-system-paragraph text-sm">{{ post.publishedAtFormatted }}</div>
+        </div>
+
+        <!-- Excerpt -->
+        <p class="text-design-system-paragraph">{{ post.excerpt }}</p>
+
+        <!-- Read More Button -->
+        <div class="flex w-full justify-end">
+            <div class="flex w-fit flex-col">
+                <div class="flex items-center gap-1">
+                    <div class="font-bold">Lire l'article</div>
+                    <ArrowRightRegular class="size-3 fill-black dark:fill-white" />
+                </div>
+                <!-- Underline -->
+                <div class="bg-primary h-1"></div>
+            </div>
+        </div>
+    </div>
+</template>

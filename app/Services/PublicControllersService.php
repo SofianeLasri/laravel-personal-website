@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Enums\BlogPostType;
 use App\Enums\CreationType;
 use App\Enums\ExperienceType;
 use App\Enums\TechnologyType;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
+use App\Models\BlogContentMarkdown;
+use App\Models\BlogPost;
 use App\Models\Certification;
 use App\Models\Creation;
 use App\Models\Experience;
@@ -757,5 +760,155 @@ class PublicControllersService
             'startedAtFormatted' => $startedAtFormatted ?? '',
             'endedAtFormatted' => $endedAtFormatted,
         ];
+    }
+
+    /**
+     * Get blog posts for public home page with latest article first
+     *
+     * @return \Illuminate\Support\Collection<int, BlogPost>
+     */
+    public function getBlogPostsForPublicHome(): Collection
+    {
+        return BlogPost::with([
+            'titleTranslationKey.translations',
+            'category.nameTranslationKey.translations',
+            'coverPicture',
+            'contents' => function ($query) {
+                $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
+            },
+            'contents.content.translationKey.translations',
+        ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * Format the BlogPost model for Server-Side Rendering (SSR) with short excerpt.
+     * Returns a SSRBlogPost TypeScript type compatible array.
+     *
+     * @param  BlogPost  $blogPost  The blog post to format
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: string},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     publishedAt: string,
+     *     publishedAtFormatted: string,
+     *     excerpt: string
+     * }
+     */
+    public function formatBlogPostForSSRShort(BlogPost $blogPost): array
+    {
+        $title = $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations);
+        $categoryName = $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations);
+        $excerpt = $this->extractExcerptFromFirstTextBlock($blogPost, 150);
+
+        return [
+            'id' => $blogPost->id,
+            'title' => $title,
+            'slug' => $blogPost->slug,
+            'type' => $blogPost->type,
+            'category' => [
+                'name' => $categoryName,
+                'color' => $blogPost->category->color,
+            ],
+            'coverImage' => $this->formatPictureForSSR($blogPost->coverPicture),
+            'publishedAt' => $blogPost->created_at,
+            'publishedAtFormatted' => $this->formatDate($blogPost->created_at),
+            'excerpt' => $excerpt,
+        ];
+    }
+
+    /**
+     * Format the BlogPost model for Server-Side Rendering (SSR) with long excerpt for hero.
+     * Returns a SSRBlogPost TypeScript type compatible array.
+     *
+     * @param  BlogPost  $blogPost  The blog post to format
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: string},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     publishedAt: string,
+     *     publishedAtFormatted: string,
+     *     excerpt: string
+     * }
+     */
+    public function formatBlogPostForSSRHero(BlogPost $blogPost): array
+    {
+        $title = $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations);
+        $categoryName = $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations);
+        $excerpt = $this->extractExcerptFromFirstTextBlock($blogPost, 300);
+
+        return [
+            'id' => $blogPost->id,
+            'title' => $title,
+            'slug' => $blogPost->slug,
+            'type' => $blogPost->type,
+            'category' => [
+                'name' => $categoryName,
+                'color' => $blogPost->category->color,
+            ],
+            'coverImage' => $this->formatPictureForSSR($blogPost->coverPicture),
+            'publishedAt' => $blogPost->created_at,
+            'publishedAtFormatted' => $this->formatDate($blogPost->created_at),
+            'excerpt' => $excerpt,
+        ];
+    }
+
+    /**
+     * Extract excerpt from the first text block of a blog post
+     *
+     * @param  BlogPost  $blogPost  The blog post
+     * @param  int  $maxLength  Maximum length of excerpt
+     */
+    private function extractExcerptFromFirstTextBlock(BlogPost $blogPost, int $maxLength = 200): string
+    {
+        // Get first markdown content ordered by position
+        $firstTextContent = $blogPost->contents
+            ->where('content_type', BlogContentMarkdown::class)
+            ->sortBy('order')
+            ->first();
+
+        if (! $firstTextContent || ! $firstTextContent->content) {
+            return '';
+        }
+
+        $markdownContent = $firstTextContent->content;
+
+        if (! $markdownContent->translationKey || ! $markdownContent->translationKey->translations) {
+            return '';
+        }
+
+        // Get text content with fallback
+        $text = $this->getTranslationWithFallback($markdownContent->translationKey->translations);
+
+        if (empty($text)) {
+            return '';
+        }
+
+        // Remove markdown formatting
+        $plainText = strip_tags(str_replace(['#', '*', '_', '`'], '', $text));
+
+        // Clean up whitespace
+        $plainText = preg_replace('/\s+/', ' ', trim($plainText));
+
+        if (strlen($plainText) <= $maxLength) {
+            return $plainText;
+        }
+
+        // Truncate at word boundary
+        $truncated = substr($plainText, 0, $maxLength);
+        $lastSpace = strrpos($truncated, ' ');
+
+        if ($lastSpace !== false) {
+            $truncated = substr($truncated, 0, $lastSpace);
+        }
+
+        return $truncated.'...';
     }
 }

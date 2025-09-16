@@ -77,9 +77,35 @@ class Picture extends Model
         }
 
         $originalImage = Storage::disk('public')->get($this->path_original);
-        // $imageTranscodingService = new ImageTranscodingService(new Driver);
         $imageTranscodingService = app(ImageTranscodingService::class);
+        $imageCacheService = app(\App\Services\ImageCacheService::class);
 
+        // Try to use cache if enabled
+        if (config('images.cache.enabled', false)) {
+            $checksum = $imageCacheService->calculateChecksum($originalImage);
+            $cachedOptimizations = $imageCacheService->getCachedOptimizations($checksum);
+
+            if ($cachedOptimizations) {
+                if ($imageCacheService->copyCachedFiles($cachedOptimizations, $this)) {
+                    Log::info('Used cached optimizations for picture', [
+                        'picture_id' => $this->id,
+                        'checksum' => $checksum,
+                    ]);
+
+                    return;
+                }
+            }
+        }
+
+        // Fallback to normal optimization
+        $this->optimizeWithoutCache($imageTranscodingService, $originalImage, $imageCacheService);
+    }
+
+    /**
+     * Perform optimization without using cache (or when cache miss occurs)
+     */
+    private function optimizeWithoutCache(ImageTranscodingService $imageTranscodingService, string $originalImage, ?\App\Services\ImageCacheService $imageCacheService = null): void
+    {
         $dimensions = $imageTranscodingService->getDimensions($originalImage);
         $highestDimension = max($dimensions['width'], $dimensions['height']);
 
@@ -90,6 +116,8 @@ class Picture extends Model
             'large' => OptimizedPicture::LARGE_SIZE,
             'full' => $highestDimension,
         ];
+
+        $allOptimizedImages = [];
 
         foreach (OptimizedPicture::FORMATS as $format) {
             $optimizedImages = [];
@@ -110,12 +138,24 @@ class Picture extends Model
             }
 
             $this->storeOptimizedImages($optimizedImages, $format);
+            $allOptimizedImages[$format] = $optimizedImages;
         }
 
         $this->update([
             'width' => $dimensions['width'],
             'height' => $dimensions['height'],
         ]);
+
+        // Store in cache if enabled and cache service is available
+        if ($imageCacheService && config('images.cache.enabled', false)) {
+            $checksum = $imageCacheService->calculateChecksum($originalImage);
+            $imageCacheService->storeCachedOptimizations(
+                $checksum,
+                $allOptimizedImages,
+                $dimensions['width'],
+                $dimensions['height']
+            );
+        }
 
         // $this->deleteOriginal();
     }

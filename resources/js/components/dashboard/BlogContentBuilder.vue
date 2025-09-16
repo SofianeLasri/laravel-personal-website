@@ -349,10 +349,12 @@ const updateMarkdownContent = (contentId: number, text: string) => {
     debouncedSave(contentId, text);
 };
 
-const updateGalleryComplete = async (contentId: number, images: GalleryImage[]) => {
+const updateGalleryComplete = (contentId: number, images: GalleryImage[]) => {
     // This method is handled by the BlogContentGalleryManager component itself
     // We just need to refresh the content to show updated data
-    console.log('Gallery updated for content:', contentId, images);
+    // Gallery updates are managed automatically by the child component
+    void contentId;
+    void images;
 };
 
 const updateVideoContent = async (contentId: number, videoId: number) => {
@@ -389,7 +391,7 @@ const getTranslatedCaption = (captionTranslationKey: TranslationKey | undefined,
     if (!captionTranslationKey?.translations) return '';
 
     const translation = captionTranslationKey.translations.find((t: Translation) => t.locale === locale);
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 // Transform gallery data for the BlogContentGalleryManager
@@ -406,8 +408,8 @@ const transformGalleryImages = (content: { pictures?: PictureWithPivot[] }): Gal
             path_thumbnail: picture.path_thumbnail,
             path_large: picture.path_large,
         },
-        caption: getTranslatedCaption(picture.pivot?.caption_translation_key, props.locale) || '',
-        order: picture.pivot?.order || 1,
+        caption: getTranslatedCaption(picture.pivot?.caption_translation_key, props.locale) ?? '',
+        order: picture.pivot?.order ?? 1,
     }));
 };
 

@@ -911,4 +911,168 @@ class PublicControllersService
 
         return $truncated.'...';
     }
+
+    /**
+     * Get blog posts for index page with filters and pagination
+     *
+     * @param  array{category?: string|null, type?: string|null, sort?: string|null, search?: string|null}  $filters
+     * @return array{
+     *     data: array<int, array{
+     *         id: int,
+     *         title: string,
+     *         slug: string,
+     *         type: BlogPostType,
+     *         category: array{name: string, color: string},
+     *         coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *         publishedAt: string,
+     *         publishedAtFormatted: string,
+     *         excerpt: string
+     *     }>,
+     *     current_page: int,
+     *     last_page: int,
+     *     per_page: int,
+     *     total: int,
+     *     from: int|null,
+     *     to: int|null
+     * }
+     */
+    public function getBlogPostsForIndex(array $filters, int $perPage = 12): array
+    {
+        $query = BlogPost::with([
+            'titleTranslationKey.translations',
+            'category.nameTranslationKey.translations',
+            'coverPicture',
+            'contents' => function ($query) {
+                $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
+            },
+            'contents.content.translationKey.translations',
+        ]);
+
+        // Apply category filter (handle array)
+        if (! empty($filters['category'])) {
+            $categories = is_array($filters['category']) ? $filters['category'] : [$filters['category']];
+            $query->whereHas('category', function ($q) use ($categories) {
+                $q->whereIn('slug', $categories);
+            });
+        }
+
+        // Apply type filter (handle array)
+        if (! empty($filters['type'])) {
+            $types = is_array($filters['type']) ? $filters['type'] : [$filters['type']];
+            $query->whereIn('type', $types);
+        }
+
+        // Apply search filter
+        if (! empty($filters['search'])) {
+            $searchTerm = $filters['search'];
+            $query->whereHas('titleTranslationKey.translations', function ($q) use ($searchTerm) {
+                $q->where('text', 'like', '%'.$searchTerm.'%');
+            });
+        }
+
+        // Apply sorting
+        $sort = $filters['sort'] ?? 'newest';
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'alphabetical':
+                $query->join('translation_keys', 'blog_posts.title_translation_key_id', '=', 'translation_keys.id')
+                    ->join('translations', function ($join) {
+                        $join->on('translation_keys.id', '=', 'translations.translation_key_id')
+                            ->where('translations.locale', '=', $this->locale);
+                    })
+                    ->orderBy('translations.text', 'asc')
+                    ->select('blog_posts.*');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        // Paginate results
+        $paginator = $query->paginate($perPage);
+
+        // Format posts for SSR
+        $formattedPosts = $paginator->map(fn ($post) => $this->formatBlogPostForSSRShort($post));
+
+        return [
+            'data' => $formattedPosts->toArray(),
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'per_page' => $paginator->perPage(),
+            'total' => $paginator->total(),
+            'from' => $paginator->firstItem(),
+            'to' => $paginator->lastItem(),
+        ];
+    }
+
+    /**
+     * Get all blog categories for filters
+     *
+     * @return array<int, array{id: int, name: string, slug: string, color: string}>
+     */
+    public function getBlogCategories(): array
+    {
+        $categories = \App\Models\BlogCategory::with('nameTranslationKey.translations')
+            ->orderBy('order')
+            ->get();
+
+        return $categories->map(function ($category) {
+            $name = $this->getTranslationWithFallback($category->nameTranslationKey->translations);
+
+            return [
+                'id' => $category->id,
+                'name' => $name,
+                'slug' => $category->slug,
+                'color' => $category->color,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get all blog categories with post counts for filters
+     *
+     * @return array<int, array{id: int, name: string, slug: string, color: string, postCount: int}>
+     */
+    public function getBlogCategoriesWithCounts(): array
+    {
+        $categories = \App\Models\BlogCategory::with(['nameTranslationKey.translations', 'blogPosts'])
+            ->orderBy('order')
+            ->get();
+
+        return $categories->map(function ($category) {
+            $name = $this->getTranslationWithFallback($category->nameTranslationKey->translations);
+
+            return [
+                'id' => $category->id,
+                'name' => $name,
+                'slug' => $category->slug,
+                'color' => $category->color,
+                'postCount' => $category->blogPosts->count(),
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get post counts for each blog post type
+     *
+     * @return array<string, int>
+     */
+    public function getBlogTypePostCounts(): array
+    {
+        $counts = BlogPost::selectRaw('type, COUNT(*) as count')
+            ->groupBy('type')
+            ->pluck('count', 'type')
+            ->toArray();
+
+        // Convert enum keys to string values if needed
+        $result = [];
+        foreach ($counts as $type => $count) {
+            $result[$type] = $count;
+        }
+
+        return $result;
+    }
 }

@@ -200,7 +200,7 @@ const addContent = async (type: string) => {
             contentId = response.data.id;
         } else if (type === 'video') {
             // Create a new video content without a video initially
-            const response = await axios.post(route('dashboard.api.blog-content-videos.store'), {
+            const response = await axios.post(route('dashboard.api.blog-content-video.store'), {
                 video_id: null, // No video selected initially
                 caption: '',
                 locale: props.locale,
@@ -364,7 +364,7 @@ const updateGalleryComplete = (contentId: number, images: GalleryImage[]) => {
 const updateVideoContent = async (contentId: number, videoId: number) => {
     try {
         await axios.put(
-            route('dashboard.api.blog-content-videos.update', {
+            route('dashboard.api.blog-content-video.update', {
                 blog_content_video: contentId,
             }),
             {
@@ -381,7 +381,7 @@ const updateVideoContent = async (contentId: number, videoId: number) => {
 const updateVideoCaption = async (contentId: number, caption: string) => {
     try {
         await axios.put(
-            route('dashboard.api.blog-content-videos.update', {
+            route('dashboard.api.blog-content-video.update', {
                 blog_content_video: contentId,
             }),
             {

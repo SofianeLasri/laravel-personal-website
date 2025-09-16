@@ -9,9 +9,9 @@ import { useRoute } from '@/composables/useRoute';
 import type { Picture, Video } from '@/types';
 import axios from 'axios';
 import { GripVertical, Image, Text, Trash2, Video as VideoIcon } from 'lucide-vue-next';
+import Sortable from 'sortablejs';
 import { onMounted, onUnmounted, ref, watchEffect } from 'vue';
 import { toast } from 'vue-sonner';
-import Sortable from 'sortablejs';
 
 interface BlogContent {
     id?: number;
@@ -53,8 +53,8 @@ const saveTimeouts = ref<Record<number, ReturnType<typeof setTimeout>>>({});
 const initializeContentCache = () => {
     localContents.value.forEach((content) => {
         if (getContentTypeFromClass(content.content_type) === 'markdown') {
-            const currentText = content.content?.translation_key?.translations?.find((t) => t.locale === props.locale)?.text ?? '';
-            contentCache.value[content.content_id] = currentText;
+            contentCache.value[content.content_id] =
+                content.content?.translation_key?.translations?.find((t) => t.locale === props.locale)?.text ?? '';
             savingStatus.value[content.content_id] = 'idle';
         }
     });

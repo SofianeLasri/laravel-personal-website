@@ -35,7 +35,7 @@ defineProps<Props>();
         </div>
 
         <!-- Article Info -->
-        <div class="flex flex-col gap-0.5">
+        <div class="flex flex-col">
             <h4 class="text-design-system-title group-hover:text-primary text-xl font-bold transition-colors duration-200">{{ post.title }}</h4>
             <div class="text-design-system-paragraph text-sm">{{ post.publishedAtFormatted }}</div>
         </div>

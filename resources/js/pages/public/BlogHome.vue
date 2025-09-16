@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import LightShape from '@/components/public/LightShape.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
-import SectionParagraph from '@/components/public/Ui/SectionParagraph.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 
 const page = usePage();
 const { t } = useTranslation();
@@ -51,14 +51,47 @@ const pageImage = '/opengraph-image-1200-630.jpg';
         </div>
 
         <div class="relative z-10 container px-4 pt-16 pb-8">
-            <div class="mb-12 flex">
-                <div class="flex flex-col gap-6">
-                    <HeroSectionTitle>{{ t('about.title') }}</HeroSectionTitle>
-                    <SectionParagraph>
-                        {{ t('about.subtitle') }}
-                    </SectionParagraph>
+            <div class="flex flex-col gap-6">
+                <HeroSectionTitle>Blog.</HeroSectionTitle>
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-design-system-title text-2xl font-bold">Dernier article</h3>
+
+                    <div class="flex items-center gap-10">
+                        <!-- Article Card -->
+                        <div class="flex aspect-video h-96 shrink-0 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
+                            <img class="h-full w-full object-cover" loading="eager" src="https://placehold.co/709x398" alt="Image de couverture" />
+                        </div>
+
+                        <div class="flex grow flex-col gap-4">
+                            <div class="flex flex-col gap-3">
+                                <h4 class="text-design-system-title text-4xl font-bold">
+                                    Découvrez comment logger toutes les requêtes entrante de votre application Laravel !
+                                </h4>
+
+                                <div class="flex gap-4">
+                                    <!-- Category Badge -->
+                                    <div class="bg-atomic-tangerine-100 flex items-center justify-center gap-2.5 rounded-lg px-2 py-1">
+                                        <div class="text-atomic-tangerine-800 justify-center">Astuce</div>
+                                    </div>
+
+                                    <div class="text-design-system-paragraph flex items-center">1er septembre 2025</div>
+                                </div>
+
+                                <p class="text-design-system-paragraph">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce consequat purus et auctor gravida. Praesent
+                                    tristique quis odio vitae mattis. Mauris tristique urna sed nibh consectetur, sed dignissim enim rhoncus. Morbi
+                                    congue lacinia viverra. Sed malesuada fermentum rhoncus. Sed tempus finibus ullamcorper. In efficitur magna orci,
+                                    ut gravida ante ultricies non. Phasellus ante est, volutpat ut neque at, ornare cursus eros. Curabitur arcu nulla,
+                                    interdum a gravida convallis, tempor quis tortor. Quisque pretium at risus quis iaculis.
+                                </p>
+
+                                <div>
+                                    <BaseButton variant="black">Lire l'article</BaseButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="hidden xl:block"></div>
             </div>
         </div>
     </PublicAppLayout>

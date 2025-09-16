@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import LightShape from '@/components/public/LightShape.vue';
+import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
-import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
+import ArrowRightRegular from '@/components/font-awesome/ArrowRightRegular.vue';
 
 const page = usePage();
 const { t } = useTranslation();
@@ -51,11 +52,13 @@ const pageImage = '/opengraph-image-1200-630.jpg';
         </div>
 
         <div class="relative z-10 container px-4 pt-16 pb-8">
-            <div class="flex flex-col gap-6">
+            <!-- Hero Section -->
+            <section class="mb-16 flex flex-col gap-6">
                 <HeroSectionTitle>Blog.</HeroSectionTitle>
                 <div class="flex flex-col gap-4">
                     <h3 class="text-design-system-title text-2xl font-bold">Dernier article</h3>
 
+                    <!-- Hero Article Card -->
                     <div class="flex items-center gap-10">
                         <!-- Article Card -->
                         <div class="flex aspect-video h-96 shrink-0 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
@@ -92,7 +95,54 @@ const pageImage = '/opengraph-image-1200-630.jpg';
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <section class="mb-16 flex flex-col gap-4">
+                <h3 class="text-design-system-title text-2xl font-bold">Articles récents</h3>
+
+                <!-- Articles Grid -->
+                <div class="grid grid-cols-4">
+                    <!-- Article Card Placeholder -->
+                    <div class="flex flex-col gap-4">
+                        <!-- Article Card -->
+                        <div class="relative aspect-video w-full overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
+                            <!-- div to make the badge over the background image -->
+                            <div class="absolute z-10 flex h-full w-full p-2">
+                                <!-- div to not make the badge ultra wide -->
+                                <div>
+                                    <!-- Category Badge -->
+                                    <div class="bg-atomic-tangerine-100 flex items-center justify-center gap-2.5 rounded-lg px-2 py-1">
+                                        <div class="text-atomic-tangerine-800 justify-center">Astuce</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <img class="h-full w-full object-cover" loading="lazy" src="https://placehold.co/709x398" alt="Image de couverture" />
+                        </div>
+
+                        <div class="flex flex-col gap-0.5">
+                            <h4 class="text-design-system-title text-xl font-bold">Un avis (pas objectif) sur DiRT 3 :)</h4>
+                            <div class="text-design-system-paragraph text-sm">31 aout 2025</div>
+                        </div>
+
+                        <p class="text-design-system-paragraph">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce consequat purus et auctor gravida. Praesent tristique quis
+                            odio vitae mattis. Mauris tristique urna sed nibh consectetur, sed dignissim enim rhoncus. Morbi congue lacinia viverra.
+                        </p>
+
+                        <div class="flex w-full items-end">
+                            <!-- View Article Button -->
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-1">
+                                    <div class="text-bold">Lire l'article</div>
+                                    <ArrowRightRegular class="size-3 fill-black" />
+                                </div>
+                                <!-- Underline, should be transparent if button not hovered -->
+                                <div class="bg-primary h-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </PublicAppLayout>
 </template>

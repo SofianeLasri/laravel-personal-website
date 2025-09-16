@@ -394,9 +394,7 @@ const debouncedSaveVideoCaption = (blogContentVideoId: number, caption: string) 
 
 const saveVideoCaption = async (blogContentVideoId: number, caption: string) => {
     // Find the BlogPostDraftContent that contains this BlogContentVideo
-    const draftContent = localContents.value.find((c) =>
-        c.content_type === 'App\\Models\\BlogContentVideo' && c.content?.id === blogContentVideoId
-    );
+    const draftContent = localContents.value.find((c) => c.content_type === 'App\\Models\\BlogContentVideo' && c.content?.id === blogContentVideoId);
     const videoId = draftContent?.content?.video_id ?? 0;
 
     savingStatus.value[`video_${blogContentVideoId}`] = 'saving';
@@ -448,14 +446,6 @@ const updateVideoCaption = (blogContentVideoId: number, caption: string) => {
 const getVideoIdFromContent = (contentId: number): number => {
     const content = localContents.value.find((c) => c.id === contentId);
     return content?.content?.video_id ?? 0;
-};
-
-const getVideoCaption = (contentData: any): string => {
-    // The server loads the relation as 'captionTranslationKey' (camelCase), not 'caption_translation_key'
-    if (!contentData?.captionTranslationKey?.translations) return '';
-
-    const translation = contentData.captionTranslationKey.translations.find((t: Translation) => t.locale === props.locale);
-    return translation?.text ?? '';
 };
 
 const getContentTypeLabel = (type: string) => {
@@ -615,7 +605,7 @@ defineExpose({
                     <div v-if="getContentTypeFromClass(content.content_type) === 'video'" class="space-y-2">
                         <BlogContentVideoManager
                             :video-id="getVideoIdFromContent(content.id)"
-                            :initial-caption="getVideoCaption(content.content)"
+                            :content-data="content.content"
                             :locale="locale"
                             @video-selected="(videoId) => updateVideoContent(content.content.id, videoId)"
                             @caption-updated="(caption) => updateVideoCaption(content.content.id, caption)"

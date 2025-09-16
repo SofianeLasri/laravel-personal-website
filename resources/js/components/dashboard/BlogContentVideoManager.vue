@@ -10,18 +10,18 @@ import { useRoute } from '@/composables/useRoute';
 import type { Video } from '@/types';
 import axios from 'axios';
 import { Download, Edit, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { toast } from 'vue-sonner';
 
 interface Props {
     videoId?: number;
-    initialCaption?: string;
+    contentData?: any;
     locale: 'fr' | 'en';
 }
 
 const props = withDefaults(defineProps<Props>(), {
     videoId: undefined,
-    initialCaption: '',
+    contentData: undefined,
 });
 
 const emit = defineEmits<{
@@ -33,10 +33,17 @@ const route = useRoute();
 
 // State
 const currentVideo = ref<Video | null>(null);
-const currentCaption = ref(props.initialCaption);
 const allVideos = ref<Video[]>([]);
 const loading = ref(false);
 const loadingVideos = ref(false);
+
+// Computed réactif pour extraire la caption depuis contentData
+const currentCaption = computed(() => {
+    if (!props.contentData?.caption_translation_key?.translations) return '';
+
+    const translation = props.contentData.caption_translation_key.translations.find((t: any) => t.locale === props.locale);
+    return translation?.text ?? '';
+});
 const isSelectModalOpen = ref(false);
 const isUploadModalOpen = ref(false);
 const selectedVideoId = ref<number | undefined>(undefined);
@@ -144,7 +151,6 @@ const removeVideo = () => {
     if (!window.confirm('Êtes-vous sûr de vouloir retirer cette vidéo ?')) return;
 
     currentVideo.value = null;
-    currentCaption.value = '';
     emit('video-selected', 0);
     emit('caption-updated', '');
     toast.success('Vidéo retirée');
@@ -152,7 +158,6 @@ const removeVideo = () => {
 
 // Update caption
 const updateCaption = (caption: string) => {
-    currentCaption.value = caption;
     emit('caption-updated', caption);
 };
 

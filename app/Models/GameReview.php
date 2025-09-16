@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\GameReviewRating;
 use Database\Factories\GameReviewFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +23,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $cover_picture_id
  * @property int|null $pros_translation_key_id
  * @property int|null $cons_translation_key_id
- * @property float|null $score
+ * @property GameReviewRating|null $rating
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $blog_posts_count
@@ -52,7 +53,7 @@ class GameReview extends Model
         'cover_picture_id',
         'pros_translation_key_id',
         'cons_translation_key_id',
-        'score',
+        'rating',
     ];
 
     protected $casts = [
@@ -62,7 +63,7 @@ class GameReview extends Model
         'developer' => 'string',
         'publisher' => 'string',
         'platforms' => 'array',
-        'score' => 'decimal:1',
+        'rating' => GameReviewRating::class,
     ];
 
     /**

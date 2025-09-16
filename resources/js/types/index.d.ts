@@ -1,6 +1,40 @@
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
 
+export interface GameReview {
+    id: number;
+    blog_post_id: number;
+    game_title: string;
+    release_date: string | null;
+    genre: string | null;
+    developer: string | null;
+    publisher: string | null;
+    platforms: string[] | null;
+    cover_picture_id: number | null;
+    pros_translation_key_id: number | null;
+    cons_translation_key_id: number | null;
+    rating: 'positive' | 'negative' | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GameReviewDraft {
+    id: number;
+    blog_post_draft_id: number;
+    game_title: string;
+    release_date: string | null;
+    genre: string | null;
+    developer: string | null;
+    publisher: string | null;
+    platforms: string[] | null;
+    cover_picture_id: number | null;
+    pros_translation_key_id: number | null;
+    cons_translation_key_id: number | null;
+    rating: 'positive' | 'negative' | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Auth {
     user: User;
 }

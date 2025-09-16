@@ -25,7 +25,7 @@ class GameReviewDraftController extends Controller
             'cover_picture_id' => 'nullable|integer|exists:pictures,id',
             'pros' => 'nullable|string',
             'cons' => 'nullable|string',
-            'score' => 'nullable|numeric|min:0|max:10',
+            'rating' => 'nullable|string|in:positive,negative',
             'locale' => 'required|string|in:fr,en',
         ]);
 
@@ -88,7 +88,7 @@ class GameReviewDraftController extends Controller
                 'cover_picture_id' => $request->cover_picture_id,
                 'pros_translation_key_id' => $prosTranslationKey?->id,
                 'cons_translation_key_id' => $consTranslationKey?->id,
-                'score' => $request->score,
+                'rating' => $request->rating,
             ]);
 
             DB::commit();
@@ -138,7 +138,7 @@ class GameReviewDraftController extends Controller
             'cover_picture_id' => 'nullable|integer|exists:pictures,id',
             'pros' => 'nullable|string',
             'cons' => 'nullable|string',
-            'score' => 'nullable|numeric|min:0|max:10',
+            'rating' => 'nullable|string|in:positive,negative',
             'locale' => 'required|string|in:fr,en',
         ]);
 
@@ -219,7 +219,7 @@ class GameReviewDraftController extends Controller
                 'publisher' => $request->publisher,
                 'platforms' => $request->platforms,
                 'cover_picture_id' => $request->cover_picture_id,
-                'score' => $request->score,
+                'rating' => $request->rating,
             ]);
 
             DB::commit();

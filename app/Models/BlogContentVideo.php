@@ -35,6 +35,10 @@ class BlogContentVideo extends Model
         'caption_translation_key_id' => 'integer',
     ];
 
+    protected $with = [
+        'captionTranslationKey.translations',
+    ];
+
     /**
      * @return BelongsTo<Video, $this>
      */

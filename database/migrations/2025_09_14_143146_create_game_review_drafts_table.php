@@ -23,11 +23,11 @@ return new class extends Migration
             $table->foreignId('cover_picture_id')->nullable()->constrained('pictures')->onDelete('set null');
             $table->foreignId('pros_translation_key_id')->nullable()->constrained('translation_keys')->onDelete('set null');
             $table->foreignId('cons_translation_key_id')->nullable()->constrained('translation_keys')->onDelete('set null');
-            $table->decimal('score', 3, 1)->nullable();
+            $table->enum('rating', ['positive', 'negative'])->nullable();
             $table->timestamps();
 
             $table->index('blog_post_draft_id');
-            $table->index(['genre', 'score']);
+            $table->index(['genre', 'rating']);
             $table->index('game_title');
         });
     }

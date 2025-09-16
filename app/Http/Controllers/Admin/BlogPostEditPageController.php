@@ -182,7 +182,6 @@ class BlogPostEditPageController extends Controller
             } elseif ($content->content instanceof BlogContentVideo) {
                 $content->content->load([
                     'video.coverPicture',
-                    'captionTranslationKey.translations',
                 ]);
             } elseif ($content->content instanceof BlogContentGallery) {
                 $content->content->load([

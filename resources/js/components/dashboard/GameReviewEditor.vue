@@ -30,7 +30,7 @@ interface GameReviewDraft {
     cover_picture_id: number | null;
     pros_translation_key_id: number | null;
     cons_translation_key_id: number | null;
-    score: number | null;
+    rating: 'positive' | 'negative' | null;
     pros_translation_key?: {
         translations: Array<{
             locale: string;
@@ -63,7 +63,7 @@ const gameData = ref({
     publisher: props.gameReviewDraft?.publisher || '',
     platforms: props.gameReviewDraft?.platforms?.join(', ') || '',
     cover_picture_id: props.gameReviewDraft?.cover_picture_id || null,
-    score: props.gameReviewDraft?.score || null,
+    rating: props.gameReviewDraft?.rating || null,
     pros: '',
     cons: '',
 });
@@ -217,8 +217,21 @@ const handleCoverChange = (pictureId: number | null) => {
             </div>
 
             <div>
-                <Label>Score (optionnel)</Label>
-                <Input v-model.number="gameData.score" type="number" min="0" max="100" placeholder="Score sur 100" @blur="saveGameReview" />
+                <Label>Appréciation</Label>
+                <div class="mt-2 flex gap-4">
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input v-model="gameData.rating" type="radio" value="positive" class="text-green-600" @change="saveGameReview" />
+                        <span class="text-green-600">Review positive</span>
+                    </label>
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input v-model="gameData.rating" type="radio" value="negative" class="text-red-600" @change="saveGameReview" />
+                        <span class="text-red-600">Review négative</span>
+                    </label>
+                    <label class="flex cursor-pointer items-center gap-2">
+                        <input v-model="gameData.rating" type="radio" :value="null" class="text-gray-400" @change="saveGameReview" />
+                        <span class="text-gray-400">Non défini</span>
+                    </label>
+                </div>
             </div>
 
             <div>

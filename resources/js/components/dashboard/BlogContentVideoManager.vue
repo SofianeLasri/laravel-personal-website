@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
 import type { Video } from '@/types';
 import axios from 'axios';
-import { Edit, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
+import { Download, Edit, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -36,6 +36,7 @@ const currentVideo = ref<Video | null>(null);
 const currentCaption = ref(props.initialCaption);
 const allVideos = ref<Video[]>([]);
 const loading = ref(false);
+const loadingVideos = ref(false);
 const isSelectModalOpen = ref(false);
 const isUploadModalOpen = ref(false);
 const selectedVideoId = ref<number | undefined>(undefined);
@@ -43,6 +44,7 @@ const newVideoFile = ref<File | null>(null);
 const newVideoName = ref('');
 const newVideoCoverPictureId = ref<number | undefined>(undefined);
 const uploadProgress = ref(0);
+const downloadingThumbnail = ref(false);
 
 // Load current video if videoId is provided
 const loadCurrentVideo = async () => {
@@ -58,18 +60,21 @@ const loadCurrentVideo = async () => {
 
 // Load all available videos
 const fetchAllVideos = async () => {
+    loadingVideos.value = true;
     try {
         const response = await axios.get(route('dashboard.api.videos.index'));
         allVideos.value = response.data;
     } catch (error) {
         console.error('Erreur lors du chargement des vidéos disponibles:', error);
+    } finally {
+        loadingVideos.value = false;
     }
 };
 
 // Select existing video
-const selectExistingVideo = () => {
-    void fetchAllVideos();
+const selectExistingVideo = async () => {
     isSelectModalOpen.value = true;
+    await fetchAllVideos();
 };
 
 // Upload new video
@@ -151,6 +156,27 @@ const updateCaption = (caption: string) => {
     emit('caption-updated', caption);
 };
 
+// Download thumbnail from BunnyCDN
+const downloadThumbnail = async () => {
+    if (!currentVideo.value) return;
+
+    downloadingThumbnail.value = true;
+
+    try {
+        const response = await axios.post(route('dashboard.api.videos.download-thumbnail', { video: currentVideo.value.id }));
+
+        // Update current video with new cover picture
+        currentVideo.value = response.data.video;
+
+        toast.success('Miniature téléchargée et définie comme image de couverture');
+    } catch (error) {
+        console.error('Erreur lors du téléchargement de la miniature:', error);
+        toast.error('Erreur lors du téléchargement de la miniature');
+    } finally {
+        downloadingThumbnail.value = false;
+    }
+};
+
 // Reset forms
 const resetUploadForm = () => {
     newVideoFile.value = null;
@@ -213,6 +239,17 @@ onMounted(() => {
                                 </div>
 
                                 <div class="flex items-center gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        :disabled="downloadingThumbnail || currentVideo.status !== 'ready'"
+                                        @click="downloadThumbnail"
+                                        title="Télécharger la miniature depuis BunnyCDN"
+                                    >
+                                        <Loader2 v-if="downloadingThumbnail" class="h-4 w-4 animate-spin" />
+                                        <Download v-else class="h-4 w-4" />
+                                    </Button>
                                     <Button type="button" variant="ghost" size="sm" @click="selectExistingVideo">
                                         <Edit class="h-4 w-4" />
                                     </Button>
@@ -293,7 +330,11 @@ onMounted(() => {
                         </div>
                     </div>
 
-                    <div v-if="allVideos.length === 0" class="py-8 text-center text-gray-500">
+                    <div v-if="loadingVideos" class="py-8 text-center text-gray-500">
+                        <Loader2 class="mx-auto mb-4 h-12 w-12 animate-spin" />
+                        <p>Chargement des vidéos...</p>
+                    </div>
+                    <div v-else-if="allVideos.length === 0" class="py-8 text-center text-gray-500">
                         <FileVideo class="mx-auto mb-4 h-12 w-12" />
                         <p>Aucune vidéo disponible</p>
                     </div>

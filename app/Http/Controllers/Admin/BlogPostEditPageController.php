@@ -180,7 +180,10 @@ class BlogPostEditPageController extends Controller
             if ($content->content instanceof BlogContentMarkdown) {
                 $content->content->load('translationKey.translations');
             } elseif ($content->content instanceof BlogContentVideo) {
-                $content->content->load('captionTranslationKey.translations');
+                $content->content->load([
+                    'video.coverPicture',
+                    'captionTranslationKey.translations',
+                ]);
             } elseif ($content->content instanceof BlogContentGallery) {
                 $content->content->load([
                     'pictures' => function ($query) {

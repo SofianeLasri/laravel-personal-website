@@ -368,7 +368,8 @@ const updateVideoContent = async (contentId: number, videoId: number) => {
                 blog_content_video: contentId,
             }),
             {
-                video_id: videoId,
+                video_id: videoId === 0 ? null : videoId,
+                locale: props.locale,
             },
         );
         toast.success('Vidéo mise à jour');
@@ -378,33 +379,82 @@ const updateVideoContent = async (contentId: number, videoId: number) => {
     }
 };
 
-const updateVideoCaption = async (contentId: number, caption: string) => {
+// Fonction debounced pour sauvegarder les captions vidéo
+const debouncedSaveVideoCaption = (blogContentVideoId: number, caption: string) => {
+    // Annuler la sauvegarde précédente si elle existe
+    if (saveTimeouts.value[`video_${blogContentVideoId}`]) {
+        clearTimeout(saveTimeouts.value[`video_${blogContentVideoId}`]);
+    }
+
+    // Programmer une nouvelle sauvegarde après 1.5 secondes
+    saveTimeouts.value[`video_${blogContentVideoId}`] = setTimeout(() => {
+        void saveVideoCaption(blogContentVideoId, caption);
+    }, 1500);
+};
+
+const saveVideoCaption = async (blogContentVideoId: number, caption: string) => {
+    // Find the BlogPostDraftContent that contains this BlogContentVideo
+    const draftContent = localContents.value.find((c) =>
+        c.content_type === 'App\\Models\\BlogContentVideo' && c.content?.id === blogContentVideoId
+    );
+    const videoId = draftContent?.content?.video_id ?? 0;
+
+    savingStatus.value[`video_${blogContentVideoId}`] = 'saving';
+
     try {
         await axios.put(
             route('dashboard.api.blog-content-video.update', {
-                blog_content_video: contentId,
+                blog_content_video: blogContentVideoId,
             }),
             {
-                video_id: getVideoIdFromContent(contentId),
+                video_id: videoId,
                 caption,
                 locale: props.locale,
             },
         );
+
+        savingStatus.value[`video_${blogContentVideoId}`] = 'saved';
+
+        // Nettoyer le timeout après sauvegarde réussie
+        if (saveTimeouts.value[`video_${blogContentVideoId}`]) {
+            clearTimeout(saveTimeouts.value[`video_${blogContentVideoId}`]);
+            delete saveTimeouts.value[`video_${blogContentVideoId}`];
+        }
+
+        // Marquer comme "idle" après 2 secondes
+        setTimeout(() => {
+            if (savingStatus.value[`video_${blogContentVideoId}`] === 'saved') {
+                savingStatus.value[`video_${blogContentVideoId}`] = 'idle';
+            }
+        }, 2000);
     } catch (error: unknown) {
         console.error('Erreur lors de la mise à jour de la description:', error);
+        savingStatus.value[`video_${blogContentVideoId}`] = 'error';
         toast.error('Erreur lors de la mise à jour de la description');
+
+        // Nettoyer le timeout même en cas d'erreur
+        if (saveTimeouts.value[`video_${blogContentVideoId}`]) {
+            clearTimeout(saveTimeouts.value[`video_${blogContentVideoId}`]);
+            delete saveTimeouts.value[`video_${blogContentVideoId}`];
+        }
     }
 };
 
+const updateVideoCaption = (blogContentVideoId: number, caption: string) => {
+    // Sauvegarde debounced
+    debouncedSaveVideoCaption(blogContentVideoId, caption);
+};
+
 const getVideoIdFromContent = (contentId: number): number => {
-    const content = localContents.value.find((c) => c.content_id === contentId);
+    const content = localContents.value.find((c) => c.id === contentId);
     return content?.content?.video_id ?? 0;
 };
 
-const getVideoCaption = (contentData: BlogContentVideo): string => {
-    if (!contentData?.caption_translation_key?.translations) return '';
+const getVideoCaption = (contentData: any): string => {
+    // The server loads the relation as 'captionTranslationKey' (camelCase), not 'caption_translation_key'
+    if (!contentData?.captionTranslationKey?.translations) return '';
 
-    const translation = contentData.caption_translation_key.translations.find((t: Translation) => t.locale === props.locale);
+    const translation = contentData.captionTranslationKey.translations.find((t: Translation) => t.locale === props.locale);
     return translation?.text ?? '';
 };
 
@@ -564,11 +614,11 @@ defineExpose({
                     <!-- Video Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'video'" class="space-y-2">
                         <BlogContentVideoManager
-                            :video-id="getVideoIdFromContent(content.content_id)"
+                            :video-id="getVideoIdFromContent(content.id)"
                             :initial-caption="getVideoCaption(content.content)"
                             :locale="locale"
-                            @video-selected="(videoId) => updateVideoContent(content.content_id, videoId)"
-                            @caption-updated="(caption) => updateVideoCaption(content.content_id, caption)"
+                            @video-selected="(videoId) => updateVideoContent(content.content.id, videoId)"
+                            @caption-updated="(caption) => updateVideoCaption(content.content.id, caption)"
                         />
                     </div>
                 </CardContent>

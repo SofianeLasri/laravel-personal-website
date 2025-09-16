@@ -68,7 +68,7 @@ class BlogContentVideoController extends Controller
     public function update(Request $request, BlogContentVideo $blogContentVideo)
     {
         $validator = Validator::make($request->all(), [
-            'video_id' => 'required|integer|exists:videos,id',
+            'video_id' => 'nullable|integer|exists:videos,id',
             'caption' => 'nullable|string|max:500',
             'locale' => 'required|string|in:fr,en',
         ]);
@@ -80,10 +80,12 @@ class BlogContentVideoController extends Controller
             ], 422);
         }
 
-        // Update video_id
-        $blogContentVideo->update([
-            'video_id' => $request->video_id,
-        ]);
+        // Update video_id if provided
+        if ($request->has('video_id')) {
+            $blogContentVideo->update([
+                'video_id' => $request->video_id,
+            ]);
+        }
 
         // Handle caption
         if ($request->caption && ! empty($request->caption)) {

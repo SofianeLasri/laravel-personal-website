@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BlogCategoryBadge from '@/components/public/Blog/BlogCategoryBadge.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink } from '@/types';
@@ -46,6 +47,29 @@ const pageImage = '/opengraph-image-1200-630.jpg';
             <LightShape class="absolute top-[80rem] left-[-27rem] xl:left-[-15rem]" />
         </div>
 
-        <div class="relative z-10 container px-4 pt-16 pb-8"></div>
+        <div class="relative z-10 container flex flex-col items-center px-4 pt-16 pb-8">
+            <div class="flex max-w-5xl flex-col gap-8">
+                <div class="flex flex-col gap-2">
+                    <!-- Category and Date -->
+                    <div class="flex gap-4">
+                        <BlogCategoryBadge :category="{ name: 'Placeholder', color: 'orange' }" />
+                        <div class="text-design-system-paragraph flex items-center">1er septembre 2025</div>
+                    </div>
+                    <h1 class="text-design-system-title text-4xl font-bold">Placeholder article title</h1>
+                </div>
+
+                <!-- Hero Image -->
+                <div class="flex aspect-32/15 shrink-0 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)]">
+                    <img alt="Image de couverture" class="h-full w-full object-cover" loading="eager" src="https://placehold.co/1024x462" />
+                </div>
+
+                <div class="flex flex-col gap-8">
+                    <p class="text-lg text-gray-950">
+                        The first paragraph must have the font height set to 18px (or text-lg), and have text-gray 950 color.
+                    </p>
+                    <p class="text-design-system-paragraph">Others are normal ones.</p>
+                </div>
+            </div>
+        </div>
     </PublicAppLayout>
 </template>

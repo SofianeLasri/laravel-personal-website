@@ -11,7 +11,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-10">
+    <div class="flex cursor-pointer flex-col gap-6 transition-transform hover:scale-[1.01] lg:flex-row lg:items-center lg:gap-10">
         <!-- Hero Image -->
         <div class="flex aspect-video h-96 shrink-0 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] lg:h-96">
             <picture>
@@ -30,12 +30,12 @@ defineProps<Props>();
         <div class="flex grow flex-col gap-4">
             <div class="flex flex-col gap-3">
                 <!-- Title -->
-                <h4 class="text-design-system-title text-2xl font-bold lg:text-4xl">
+                <h4 class="text-design-system-title hover:text-primary text-2xl font-bold transition-colors duration-200 lg:text-4xl">
                     {{ post.title }}
                 </h4>
 
                 <!-- Category and Date -->
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <div class="flex gap-4">
                     <BlogCategoryBadge :category="post.category" />
                     <div class="text-design-system-paragraph flex items-center">{{ post.publishedAtFormatted }}</div>
                 </div>

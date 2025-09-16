@@ -25,7 +25,7 @@ const getBadgeClasses = (color: string) => {
         yellow: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
         purple: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
         pink: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
-        orange: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+        orange: 'bg-atomic-tangerine-100 text-atomic-tangerine-800 dark:bg-atomic-tangerine-900 dark:text-atomic-tangerine-200',
         gray: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
     };
 

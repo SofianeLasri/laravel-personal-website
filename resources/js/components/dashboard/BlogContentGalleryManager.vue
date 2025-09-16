@@ -55,6 +55,23 @@ watch(
     { deep: true },
 );
 
+// Watch for changes in initial images (when data is loaded from database)
+watch(
+    () => props.initialImages,
+    (newInitialImages, oldInitialImages) => {
+        console.log('InitialImages changed:', {
+            newLength: newInitialImages?.length || 0,
+            oldLength: oldInitialImages?.length || 0,
+            newImages: newInitialImages,
+            currentImages: images.value,
+        });
+
+        // Always update if we have new initial images, even if empty
+        images.value = [...(newInitialImages || [])];
+    },
+    { deep: true, immediate: true },
+);
+
 // Initialize sortable
 onMounted(() => {
     if (gridRef.value) {

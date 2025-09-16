@@ -63,33 +63,64 @@ const goToPage = (page: number) => {
         <!-- Pagination Controls -->
         <div class="flex items-center gap-2">
             <!-- First Page -->
-            <Button variant="outline" size="icon" :disabled="currentPage === 1" @click="goToPage(1)">
+            <Button
+                variant="outline"
+                size="icon"
+                :disabled="currentPage === 1"
+                :class="currentPage === 1 ? 'cursor-not-allowed' : 'cursor-pointer'"
+                @click="goToPage(1)"
+            >
                 <ChevronsLeft class="h-4 w-4" />
             </Button>
 
             <!-- Previous Page -->
-            <Button variant="outline" size="icon" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+            <Button
+                variant="outline"
+                size="icon"
+                :disabled="currentPage === 1"
+                :class="currentPage === 1 ? 'cursor-not-allowed' : 'cursor-pointer'"
+                @click="goToPage(currentPage - 1)"
+            >
                 <ChevronLeft class="h-4 w-4" />
             </Button>
 
             <!-- Page Numbers -->
             <div class="flex gap-1">
-                <Button v-if="pages[0] > 1" variant="ghost" size="icon" disabled> ... </Button>
+                <Button v-if="pages[0] > 1" variant="ghost" size="icon" disabled class="cursor-not-allowed"> ... </Button>
 
-                <Button v-for="page in pages" :key="page" :variant="page === currentPage ? 'default' : 'outline'" size="icon" @click="goToPage(page)">
+                <Button
+                    v-for="page in pages"
+                    :key="page"
+                    :variant="page === currentPage ? 'default' : 'outline'"
+                    size="icon"
+                    class="cursor-pointer"
+                    @click="goToPage(page)"
+                >
                     {{ page }}
                 </Button>
 
-                <Button v-if="pages[pages.length - 1] < lastPage" variant="ghost" size="icon" disabled> ... </Button>
+                <Button v-if="pages[pages.length - 1] < lastPage" variant="ghost" size="icon" disabled class="cursor-not-allowed"> ... </Button>
             </div>
 
             <!-- Next Page -->
-            <Button variant="outline" size="icon" :disabled="currentPage === lastPage" @click="goToPage(currentPage + 1)">
+            <Button
+                variant="outline"
+                size="icon"
+                :disabled="currentPage === lastPage"
+                :class="currentPage === lastPage ? 'cursor-not-allowed' : 'cursor-pointer'"
+                @click="goToPage(currentPage + 1)"
+            >
                 <ChevronRight class="h-4 w-4" />
             </Button>
 
             <!-- Last Page -->
-            <Button variant="outline" size="icon" :disabled="currentPage === lastPage" @click="goToPage(lastPage)">
+            <Button
+                variant="outline"
+                size="icon"
+                :disabled="currentPage === lastPage"
+                :class="currentPage === lastPage ? 'cursor-not-allowed' : 'cursor-pointer'"
+                @click="goToPage(lastPage)"
+            >
                 <ChevronsRight class="h-4 w-4" />
             </Button>
         </div>

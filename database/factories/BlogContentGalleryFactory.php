@@ -13,8 +13,7 @@ class BlogContentGalleryFactory extends Factory
     public function definition(): array
     {
         return [
-            'layout' => $this->faker->randomElement(['grid', 'masonry', 'carousel']),
-            'columns' => $this->faker->numberBetween(1, 4),
+            // Simple gallery without layout configuration
         ];
     }
 
@@ -30,26 +29,5 @@ class BlogContentGalleryFactory extends Factory
                 ]);
             }
         });
-    }
-
-    public function grid(): static
-    {
-        return $this->state([
-            'layout' => 'grid',
-        ]);
-    }
-
-    public function masonry(): static
-    {
-        return $this->state([
-            'layout' => 'masonry',
-        ]);
-    }
-
-    public function carousel(): static
-    {
-        return $this->state([
-            'layout' => 'carousel',
-        ]);
     }
 }

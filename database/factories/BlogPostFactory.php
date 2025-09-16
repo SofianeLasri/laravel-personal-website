@@ -25,23 +25,20 @@ class BlogPostFactory extends Factory
             'type' => $this->faker->randomElement(['article', 'game_review', 'tutorial']),
             'category_id' => BlogCategory::factory(),
             'cover_picture_id' => Picture::factory(),
-            'published_at' => $this->faker->optional(0.7)->dateTimeBetween('-1 year', 'now'),
         ];
     }
 
     public function published(): static
     {
         return $this->state([
-            'status' => 'published',
-            'published_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            // Published posts don't need additional state - created_at serves as publication date
         ]);
     }
 
     public function draft(): static
     {
         return $this->state([
-            'status' => 'draft',
-            'published_at' => null,
+            // Draft posts don't need additional state
         ]);
     }
 

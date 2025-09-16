@@ -108,17 +108,27 @@ class DatabaseSeeder extends Seeder
         $this->command->info('6. Creating Blog Content');
 
         // Create blog categories with specific names and colors
-        $categories = collect([
-            ['names' => ['fr' => 'Technologie', 'en' => 'Technology'], 'color' => CategoryColor::BLUE],
-            ['names' => ['fr' => 'Gaming', 'en' => 'Gaming'], 'color' => CategoryColor::GREEN],
-            ['names' => ['fr' => 'Tutoriels', 'en' => 'Tutorials'], 'color' => CategoryColor::PURPLE],
-            ['names' => ['fr' => 'Actualités', 'en' => 'News'], 'color' => CategoryColor::ORANGE],
-            ['names' => ['fr' => 'Critiques', 'en' => 'Reviews'], 'color' => CategoryColor::RED],
-        ])->map(function ($categoryData) {
-            return BlogCategory::factory()
-                ->withNames($categoryData['names'], $categoryData['color'])
-                ->create();
-        });
+        $technologyCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Technologie', 'en' => 'Technology'], CategoryColor::BLUE)
+            ->create();
+
+        $gamingCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Gaming', 'en' => 'Gaming'], CategoryColor::GREEN)
+            ->create();
+
+        $tutorialsCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Tutoriels', 'en' => 'Tutorials'], CategoryColor::PURPLE)
+            ->create();
+
+        $newsCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Actualités', 'en' => 'News'], CategoryColor::ORANGE)
+            ->create();
+
+        $reviewsCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Critiques', 'en' => 'Reviews'], CategoryColor::RED)
+            ->create();
+
+        $categories = collect([$technologyCategory, $gamingCategory, $tutorialsCategory, $newsCategory, $reviewsCategory]);
 
         $this->command->info('-- Created '.$categories->count().' blog categories');
 
@@ -143,9 +153,9 @@ class DatabaseSeeder extends Seeder
             ->gameReview()
             ->withCompleteContent()
             ->create()
-            ->each(function ($blogPost) use ($categories) {
+            ->each(function ($blogPost) use ($gamingCategory, $reviewsCategory) {
                 // Assign to gaming or reviews category
-                $gameCategory = $categories->whereIn('slug', ['gaming', 'critiques'])->random();
+                $gameCategory = collect([$gamingCategory, $reviewsCategory])->random();
                 $blogPost->update(['category_id' => $gameCategory->id]);
 
                 $this->createOptimizedPicturesFor($blogPost->coverPicture);

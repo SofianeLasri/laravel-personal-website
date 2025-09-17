@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
-import type { Video } from '@/types';
+import type { BlogContentVideo, Translation, Video } from '@/types';
 import axios from 'axios';
 import { Download, Edit, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
@@ -15,7 +15,7 @@ import { toast } from 'vue-sonner';
 
 interface Props {
     videoId?: number;
-    contentData?: any;
+    contentData?: BlogContentVideo;
     locale: 'fr' | 'en';
 }
 
@@ -41,7 +41,7 @@ const loadingVideos = ref(false);
 const currentCaption = computed(() => {
     if (!props.contentData?.caption_translation_key?.translations) return '';
 
-    const translation = props.contentData.caption_translation_key.translations.find((t: any) => t.locale === props.locale);
+    const translation = props.contentData.caption_translation_key.translations.find((t: Translation) => t.locale === props.locale);
     return translation?.text ?? '';
 });
 const isSelectModalOpen = ref(false);

@@ -15,7 +15,7 @@ export function useSearch() {
     const availableTags = ref<Tag[]>([]);
     const availableTechnologies = ref<SSRTechnology[]>([]);
     const isLoading = ref(false);
-    const searchCache = ref<Map<string, any>>(new Map());
+    const searchCache = ref<Map<string, SSRSimplifiedCreation[]>>(new Map());
 
     // Computed
     const searchKey = computed(() => {

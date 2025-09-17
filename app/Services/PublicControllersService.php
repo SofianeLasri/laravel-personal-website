@@ -1095,10 +1095,36 @@ class PublicControllersService
                 $markdownContent = $this->getTranslationWithFallback($content->content->translationKey->translations);
                 $result['markdown'] = $markdownContent;
             } elseif ($content->content_type === \App\Models\BlogContentGallery::class) {
+                // Get caption translation keys from the pivot data
+                $captionTranslationKeyIds = $content->content->pictures
+                    ->pluck('pivot.caption_translation_key_id')
+                    ->filter()
+                    ->unique();
+
+                // Load translation keys with their translations if any captions exist
+                $captionTranslations = [];
+                if ($captionTranslationKeyIds->isNotEmpty()) {
+                    $translationKeys = \App\Models\TranslationKey::with('translations')
+                        ->whereIn('id', $captionTranslationKeyIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    foreach ($translationKeys as $key => $translationKey) {
+                        $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
+                    }
+                }
+
                 $result['gallery'] = [
                     'id' => $content->content->id,
-                    'pictures' => $content->content->pictures->map(function ($picture) {
-                        return $this->formatPictureForSSR($picture);
+                    'pictures' => $content->content->pictures->map(function ($picture) use ($captionTranslations) {
+                        $formattedPicture = $this->formatPictureForSSR($picture);
+
+                        // Add caption if it exists in the pivot data
+                        if ($picture->pivot->caption_translation_key_id && isset($captionTranslations[$picture->pivot->caption_translation_key_id])) {
+                            $formattedPicture['caption'] = $captionTranslations[$picture->pivot->caption_translation_key_id];
+                        }
+
+                        return $formattedPicture;
                     })->toArray(),
                 ];
             }

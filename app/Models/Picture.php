@@ -109,6 +109,14 @@ class Picture extends Model
         $dimensions = $imageTranscodingService->getDimensions($originalImage);
         $highestDimension = max($dimensions['width'], $dimensions['height']);
 
+        // Update picture dimensions if not already set
+        if ($this->width === null || $this->height === null) {
+            $this->update([
+                'width' => $dimensions['width'],
+                'height' => $dimensions['height'],
+            ]);
+        }
+
         $variants = [
             'thumbnail' => OptimizedPicture::THUMBNAIL_SIZE,
             'small' => OptimizedPicture::SMALL_SIZE,

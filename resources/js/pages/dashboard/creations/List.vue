@@ -28,6 +28,7 @@ import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, CreationWithTranslationsAndDrafts, TranslationKey } from '@/types';
 import { getTypeLabel } from '@/utils/creationTypes';
+import { compareValues, type SortDirection } from '@/utils/sorting';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -60,7 +61,6 @@ const itemsPerPage = 25;
 const currentPage = ref(1);
 
 type SortColumn = 'id' | 'name' | 'type' | 'started_at' | 'ended_at' | 'featured';
-type SortDirection = 'asc' | 'desc';
 
 const sortColumn = ref<SortColumn>('id');
 const sortDirection = ref<SortDirection>('asc');
@@ -88,39 +88,7 @@ const getFrenchDescription = (translationKey: TranslationKey): string => {
     return frTranslation ? frTranslation.text : '';
 };
 
-const compareValues = (a: unknown, b: unknown, direction: SortDirection) => {
-    const multiplier = direction === 'asc' ? 1 : -1;
-
-    if (a === null || a === undefined) return multiplier;
-    if (b === null || b === undefined) return -multiplier;
-
-    if (typeof a === 'string' && typeof b === 'string') {
-        return multiplier * a.localeCompare(b, 'fr', { sensitivity: 'base' });
-    }
-
-    if (typeof a === 'number' && typeof b === 'number') {
-        return multiplier * (a - b);
-    }
-
-    if (typeof a === 'boolean' && typeof b === 'boolean') {
-        return multiplier * (a === b ? 0 : a ? -1 : 1);
-    }
-
-    if (a instanceof Date && b instanceof Date) {
-        return multiplier * (a.getTime() - b.getTime());
-    }
-
-    if (typeof a === 'string' && !isNaN(Date.parse(a)) && typeof b === 'string' && !isNaN(Date.parse(b))) {
-        return multiplier * (new Date(a).getTime() - new Date(b).getTime());
-    }
-
-    // Fallback to string comparison for primitive values
-    const aStr = (a === null || a === undefined) ? '' :
-                 (typeof a === 'string' || typeof a === 'number' || typeof a === 'boolean') ? String(a) : '';
-    const bStr = (b === null || b === undefined) ? '' :
-                 (typeof b === 'string' || typeof b === 'number' || typeof b === 'boolean') ? String(b) : '';
-    return multiplier * aStr.localeCompare(bStr);
-};
+// Function moved to @/utils/sorting
 
 const sortedCreations = computed(() => {
     return [...props.creations].sort((a, b) => {

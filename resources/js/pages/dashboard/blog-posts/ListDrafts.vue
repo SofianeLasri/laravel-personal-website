@@ -31,6 +31,7 @@ import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Clock, Edit, Eye, MoreHorizontal, Send, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
+import { compareValues, type SortDirection } from '@/utils/sorting';
 
 interface Props {
     blogPostDrafts: BlogPostDraftWithAllRelations[];
@@ -54,7 +55,6 @@ const itemsPerPage = 25;
 const currentPage = ref(1);
 
 type SortColumn = 'id' | 'type' | 'updated_at' | 'original_blog_post_id';
-type SortDirection = 'asc' | 'desc';
 
 const sortColumn = ref<SortColumn>('updated_at');
 const sortDirection = ref<SortDirection>('desc');
@@ -82,34 +82,7 @@ const getFrenchTranslation = (translationKey: TranslationKey): string => {
     return frTranslation ? frTranslation.text : '';
 };
 
-const compareValues = (a: any, b: any, direction: SortDirection) => {
-    const multiplier = direction === 'asc' ? 1 : -1;
-
-    if (a === null || a === undefined) return multiplier;
-    if (b === null || b === undefined) return -multiplier;
-
-    if (typeof a === 'string' && typeof b === 'string') {
-        return multiplier * a.localeCompare(b, 'fr', { sensitivity: 'base' });
-    }
-
-    if (typeof a === 'number' && typeof b === 'number') {
-        return multiplier * (a - b);
-    }
-
-    if (typeof a === 'boolean' && typeof b === 'boolean') {
-        return multiplier * (a === b ? 0 : a ? -1 : 1);
-    }
-
-    if (a instanceof Date && b instanceof Date) {
-        return multiplier * (a.getTime() - b.getTime());
-    }
-
-    if (typeof a === 'string' && !isNaN(Date.parse(a)) && typeof b === 'string' && !isNaN(Date.parse(b))) {
-        return multiplier * (new Date(a).getTime() - new Date(b).getTime());
-    }
-
-    return multiplier * String(a).localeCompare(String(b));
-};
+// Function moved to @/utils/sorting
 
 const sortedDrafts = computed(() => {
     return [...props.blogPostDrafts].sort((a, b) => {

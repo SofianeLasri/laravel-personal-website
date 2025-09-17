@@ -133,6 +133,35 @@ interface BlogCategory {
     name_translation_key: TranslationKey;
 }
 
+interface BlogContentMarkdown {
+    id: number;
+    translation_key_id: number;
+    created_at: string;
+    updated_at: string;
+    translation_key?: TranslationKey;
+}
+
+interface BlogContentGallery {
+    id: number;
+    layout?: string;
+    columns?: number;
+    created_at: string;
+    updated_at: string;
+    pictures?: Picture[];
+}
+
+interface BlogContentVideo {
+    id: number;
+    video_id: number | null;
+    caption_translation_key_id: number | null;
+    created_at: string;
+    updated_at: string;
+    video?: Video;
+    caption_translation_key?: TranslationKey;
+}
+
+type BlogContent = BlogContentMarkdown | BlogContentGallery | BlogContentVideo;
+
 interface BlogPostDraftWithAllRelations {
     id: number;
     original_blog_post_id: number | null;

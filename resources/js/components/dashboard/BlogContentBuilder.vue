@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
-import type { Picture, Video } from '@/types';
+import type { BlogContent, Picture, Video } from '@/types';
 import axios from 'axios';
 import { GripVertical, Image, Text, Trash2, Video as VideoIcon } from 'lucide-vue-next';
 import Sortable from 'sortablejs';
@@ -186,7 +186,7 @@ const addContent = async (type: string) => {
         }
 
         let contentId: number;
-        let newContent: any;
+        let newContent: BlogContent;
 
         // Create the content based on type
         if (type === 'markdown') {

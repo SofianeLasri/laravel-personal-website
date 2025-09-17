@@ -202,7 +202,7 @@ class Picture extends Model
                 $notificationService = app(\App\Services\NotificationService::class);
                 $notificationService->error(
                     'Échec critique d\'optimisation d\'image',
-                    'L\'image "' . $this->filename . '" n\'a pas pu être optimisée: ' . $e->getMessage(),
+                    'L\'image "'.$this->filename.'" n\'a pas pu être optimisée: '.$e->getMessage(),
                     [
                         'picture_id' => $this->id,
                         'error_details' => $e->toArray(),
@@ -255,6 +255,7 @@ class Picture extends Model
                     'filename' => $this->filename,
                 ]);
                 $failedVariants[] = "$variantName.$format";
+
                 continue;
             }
 
@@ -262,7 +263,7 @@ class Picture extends Model
             Storage::disk('public')->put($path, $image);
 
             // Verify the file was written correctly
-            if (!Storage::disk('public')->exists($path) || Storage::disk('public')->size($path) === 0) {
+            if (! Storage::disk('public')->exists($path) || Storage::disk('public')->size($path) === 0) {
                 Log::error('Failed to store optimized image or file has 0 bytes', [
                     'picture_id' => $this->id,
                     'variant' => $variantName,
@@ -274,6 +275,7 @@ class Picture extends Model
                     Storage::disk('public')->delete($path);
                 }
                 $failedVariants[] = "$variantName.$format";
+
                 continue;
             }
 
@@ -289,11 +291,11 @@ class Picture extends Model
         }
 
         // Send notification if there were failures
-        if (!empty($failedVariants)) {
+        if (! empty($failedVariants)) {
             $notificationService = app(\App\Services\NotificationService::class);
             $notificationService->error(
                 'Échec d\'optimisation d\'image',
-                'Certaines variantes n\'ont pas pu être créées pour l\'image "' . $this->filename . '": ' . implode(', ', $failedVariants),
+                'Certaines variantes n\'ont pas pu être créées pour l\'image "'.$this->filename.'": '.implode(', ', $failedVariants),
                 [
                     'picture_id' => $this->id,
                     'failed_variants' => $failedVariants,
@@ -365,6 +367,7 @@ class Picture extends Model
                 }
             }
         }
+
         return false;
     }
 }

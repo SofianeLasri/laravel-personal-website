@@ -37,7 +37,6 @@ class Video extends Model
         'path',
         'cover_picture_id',
         'bunny_video_id',
-        'file_size',
         'status',
         'visibility',
     ];

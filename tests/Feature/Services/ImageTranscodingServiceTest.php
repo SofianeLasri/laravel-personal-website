@@ -3,12 +3,11 @@
 namespace Tests\Feature\Services;
 
 use App\Services\ImageTranscodingService;
+use App\Services\NotificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use Imagick;
 use ImagickException;
 use Intervention\Image\Drivers\Imagick\Driver;
-use Intervention\Image\Exceptions\DecoderException;
 use Intervention\Image\ImageManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -37,7 +36,9 @@ class ImageTranscodingServiceTest extends TestCase
     {
         $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toJpeg()->toString();
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
         $transcodedImageContent = $service->transcode($image, 100, 'webp');
 
         $this->assertNotEmpty($transcodedImageContent);
@@ -49,7 +50,9 @@ class ImageTranscodingServiceTest extends TestCase
     {
         $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toJpeg()->toString();
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
         $transcodedImageContent = $service->transcode($image, 100, 'jpeg');
 
         $this->assertNotEmpty($transcodedImageContent);
@@ -61,7 +64,9 @@ class ImageTranscodingServiceTest extends TestCase
     {
         $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toPng()->toString();
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
         $transcodedImageContent = $service->transcode($image, 100, 'png');
 
         $this->assertNotEmpty($transcodedImageContent);
@@ -73,7 +78,9 @@ class ImageTranscodingServiceTest extends TestCase
     {
         $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toJpeg()->toString();
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
         $transcodedImageContent = $service->transcode($image, 100);
 
         // AVIF encoder currently returns empty string due to Intervention Image library issue
@@ -87,7 +94,9 @@ class ImageTranscodingServiceTest extends TestCase
     {
         $image = (new ImageManager(new Driver))->create(512, 512)->fill('ccc')->toJpeg()->toString();
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
         $transcodedImageContent = $service->transcode($image, null, 'webp');
 
         $this->assertNotEmpty($transcodedImageContent);
@@ -97,43 +106,30 @@ class ImageTranscodingServiceTest extends TestCase
     #[Test]
     public function test_it_returns_null_for_image_exceeding_max_resolution()
     {
+        $this->expectException(\App\Exceptions\ImageTranscodingException::class);
+        $this->expectExceptionMessage('Image resolution exceeds maximum allowed');
+
         $image = (new ImageManager(new Driver))->create(2000, 2000)->fill('ccc')->toJpeg()->toString();
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
 
-        Log::shouldReceive('error')
-            ->once()
-            ->with('Image resolution exceeds maximum allowed resolution', [
-                'image_height' => 2000,
-                'image_width' => 2000,
-                'image_surface' => 2000 * 2000,
-                'max_width' => 1024,
-                'max_height' => 1024,
-                'max_surface' => 1024 * 1024,
-            ]);
-
-        $transcodedImageContent = $service->transcode($image, null, 'webp');
-        $this->assertNull($transcodedImageContent);
-        $this->assertTrue(config('app.imagick.max_width') < 2000, 'La largeur dépasse la limite maximale');
-        $this->assertTrue(config('app.imagick.max_height') < 2000, 'La hauteur dépasse la limite maximale');
+        $service->transcode($image, null, 'webp');
     }
 
     #[Test]
     public function test_it_handles_invalid_source_image()
     {
-        $this->withoutExceptionHandling();
+        $this->expectException(\App\Exceptions\ImageTranscodingException::class);
+
         $invalidImage = 'not-an-image-content';
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
 
-        $transcodedImage = null;
-        try {
-            $transcodedImage = $service->transcode($invalidImage);
-        } catch (DecoderException $e) {
-            $this->assertInstanceOf(DecoderException::class, $e);
-        }
-
-        $this->assertNull($transcodedImage);
+        $service->transcode($invalidImage);
     }
 
     #[Test]
@@ -141,7 +137,9 @@ class ImageTranscodingServiceTest extends TestCase
     {
         $image = (new ImageManager(new Driver))->create(512, 256)->fill('ccc')->toJpeg()->toString();
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
         $dimensions = $service->getDimensions($image);
 
         $this->assertEquals(['width' => 512, 'height' => 256], $dimensions);
@@ -152,7 +150,9 @@ class ImageTranscodingServiceTest extends TestCase
     {
         $image = (new ImageManager(new Driver))->create(1024, 1024)->fill('ccc')->toJpeg()->toString();
 
-        $service = new ImageTranscodingService(new Driver);
+        $notificationService = $this->mock(NotificationService::class);
+        $notificationService->shouldReceive('warning')->andReturn(null);
+        $service = new ImageTranscodingService($notificationService);
         $transcodedImageContent = $service->transcode($image, 512, 'webp');
 
         $this->assertNotEmpty($transcodedImageContent);

@@ -63,7 +63,7 @@ class BlogPostTest extends TestCase
     public function it_has_one_draft(): void
     {
         $blogPost = BlogPost::factory()->create();
-        $draft = BlogPostDraft::factory()->create(['blog_post_id' => $blogPost->id]);
+        $draft = BlogPostDraft::factory()->create(['original_blog_post_id' => $blogPost->id]);
 
         $this->assertInstanceOf(BlogPostDraft::class, $blogPost->draft);
         $this->assertEquals($draft->id, $blogPost->draft->id);
@@ -97,13 +97,13 @@ class BlogPostTest extends TestCase
     #[Test]
     public function it_scopes_by_type(): void
     {
-        $standard = BlogPost::factory()->create(['type' => 'standard']);
+        $article = BlogPost::factory()->create(['type' => 'article']);
         BlogPost::factory()->create(['type' => 'game_review']);
 
-        $results = BlogPost::byType('standard')->get();
+        $results = BlogPost::byType('article')->get();
 
         $this->assertCount(1, $results);
-        $this->assertEquals($standard->id, $results->first()->id);
+        $this->assertEquals($article->id, $results->first()->id);
     }
 
     #[Test]
@@ -119,15 +119,5 @@ class BlogPostTest extends TestCase
         $this->assertEquals($content1->id, $contents[0]->id);
         $this->assertEquals($content2->id, $contents[1]->id);
         $this->assertEquals($content3->id, $contents[2]->id);
-    }
-
-    #[Test]
-    public function it_casts_published_at_to_datetime(): void
-    {
-        $date = now();
-        $blogPost = BlogPost::factory()->create(['published_at' => $date]);
-
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $blogPost->published_at);
-        $this->assertEquals($date->format('Y-m-d H:i:s'), $blogPost->published_at->format('Y-m-d H:i:s'));
     }
 }

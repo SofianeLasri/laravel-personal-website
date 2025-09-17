@@ -9,8 +9,11 @@ use Throwable;
 class ImageTranscodingException extends Exception
 {
     protected ImageTranscodingError $errorCode;
+
     protected string $driverUsed;
+
     protected ?string $fallbackAttempted;
+
     protected array $context;
 
     public function __construct(
@@ -73,7 +76,8 @@ class ImageTranscodingException extends Exception
      */
     public static function allDriversFailed(array $attempts, array $context = []): self
     {
-        $message = 'All available drivers failed. Attempts: ' . implode(', ', array_keys($attempts));
+        $message = 'All available drivers failed. Attempts: '.implode(', ', array_keys($attempts));
+
         return new self(
             ImageTranscodingError::ALL_DRIVERS_FAILED,
             'Multiple',
@@ -163,6 +167,7 @@ class ImageTranscodingException extends Exception
     public function setFallbackAttempted(string $fallbackDriver): self
     {
         $this->fallbackAttempted = $fallbackDriver;
+
         return $this;
     }
 

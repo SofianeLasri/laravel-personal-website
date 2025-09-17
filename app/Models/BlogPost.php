@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $slug
+ * @property int $title_translation_key_id
  * @property BlogPostType $type
  * @property int $category_id
  * @property int|null $cover_picture_id
@@ -26,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $contents_count
  * @property int|null $drafts_count
  * @property int|null $game_reviews_count
+ * @property-read TranslationKey $titleTranslationKey
  * @property-read BlogCategory $category
  * @property-read Picture|null $coverPicture
  * @property-read Collection|BlogPostContent[] $contents

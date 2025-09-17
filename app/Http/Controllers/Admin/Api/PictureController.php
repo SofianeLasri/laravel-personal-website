@@ -61,12 +61,12 @@ class PictureController extends Controller
     {
         try {
             $picture = Picture::findOrFail($pictureId);
-            
+
             // Check if original file exists
-            if (!$picture->hasValidOriginalPath() || !\Storage::disk('public')->exists($picture->path_original)) {
+            if (! $picture->hasValidOriginalPath() || ! \Storage::disk('public')->exists($picture->path_original)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Le fichier original n\'existe pas'
+                    'message' => 'Le fichier original n\'existe pas',
                 ], 422);
             }
 
@@ -80,7 +80,7 @@ class PictureController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la recompression: ' . $e->getMessage()
+                'message' => 'Erreur lors de la recompression: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -93,7 +93,7 @@ class PictureController extends Controller
         try {
             $picture = Picture::with('optimizedPictures')->findOrFail($pictureId);
             $hasInvalidFiles = $picture->hasInvalidOptimizedPictures();
-            
+
             $invalidFiles = [];
             if ($hasInvalidFiles) {
                 foreach ($picture->optimizedPictures as $optimized) {
@@ -121,7 +121,7 @@ class PictureController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la vérification: ' . $e->getMessage()
+                'message' => 'Erreur lors de la vérification: '.$e->getMessage(),
             ], 500);
         }
     }

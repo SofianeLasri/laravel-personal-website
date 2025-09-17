@@ -197,7 +197,10 @@ class AiProviderServiceTest extends TestCase
 
         $mockTranscodingService = Mockery::mock(ImageTranscodingService::class);
         $mockTranscodingService->shouldReceive('transcode')
-            ->andReturn(null);
+            ->andThrow(new \App\Exceptions\ImageTranscodingException(
+                'Test transcoding failure',
+                \App\Enums\ImageTranscodingError::IMAGICK_ENCODING_FAILED
+            ));
         App::instance(ImageTranscodingService::class, $mockTranscodingService);
 
         Config::set('ai-provider.selected-provider', 'openai');

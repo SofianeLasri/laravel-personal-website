@@ -5,11 +5,10 @@ namespace Tests\Feature\Services;
 use App\Enums\ImageTranscodingError;
 use App\Exceptions\ImageTranscodingException;
 use App\Services\ImageTranscodingService;
-use App\Services\NotificationService;
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ImageTranscodingServiceFallbackTest extends TestCase
 {
@@ -86,7 +85,7 @@ class ImageTranscodingServiceFallbackTest extends TestCase
         } catch (ImageTranscodingException $e) {
             // If transcoding fails, log the details but don't fail the test
             // as this might be expected in some environments
-            $this->markTestSkipped('Transcoding failed: ' . $e->getMessage());
+            $this->markTestSkipped('Transcoding failed: '.$e->getMessage());
         }
     }
 

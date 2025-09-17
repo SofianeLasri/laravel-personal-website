@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use App\Enums\ImageTranscodingError;
 use App\Exceptions\ImageTranscodingException;
-use App\Services\NotificationService;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Imagick;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
@@ -15,13 +14,14 @@ use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\Exceptions\RuntimeException;
 use Intervention\Image\ImageManager;
-use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 class ImageTranscodingService
 {
     protected array $availableDrivers = [];
+
     protected array $driverManagers = [];
+
     protected NotificationService $notificationService;
 
     /**
@@ -36,6 +36,7 @@ class ImageTranscodingService
 
     /**
      * Detect which drivers are available on the system
+     *
      * @throws ImageTranscodingException
      */
     protected function detectAvailableDrivers(): void
@@ -50,7 +51,7 @@ class ImageTranscodingService
 
         if (empty($this->availableDrivers)) {
             throw ImageTranscodingException::allDriversFailed([
-                'error' => 'No image processing drivers available'
+                'error' => 'No image processing drivers available',
             ]);
         }
 
@@ -89,8 +90,8 @@ class ImageTranscodingService
         $options = config("image.{$driver}.options", []);
 
         return match ($driver) {
-            'imagick' => new ImageManager(new ImagickDriver(), $options),
-            'gd' => new ImageManager(new GdDriver(), $options),
+            'imagick' => new ImageManager(new ImagickDriver, $options),
+            'gd' => new ImageManager(new GdDriver, $options),
             default => throw new InvalidArgumentException("Unsupported driver: {$driver}"),
         };
     }
@@ -102,6 +103,7 @@ class ImageTranscodingService
      * @param  int|null  $resolution  The new resolution to transcode the image to
      * @param  string  $codec  The codec to use for transcoding
      * @return string The transcoded image content
+     *
      * @throws ImageTranscodingException
      */
     public function transcode(string $source, ?int $resolution = null, string $codec = 'avif'): string
@@ -152,7 +154,7 @@ class ImageTranscodingService
                 ]);
 
                 // If this error shouldn't trigger a fallback, break early
-                if (!$e->shouldTriggerFallback()) {
+                if (! $e->shouldTriggerFallback()) {
                     break;
                 }
             }
@@ -177,6 +179,7 @@ class ImageTranscodingService
 
     /**
      * Transcode with a specific driver
+     *
      * @throws ImageTranscodingException
      */
     protected function transcodeWithDriver(string $source, ?int $resolution, string $codec, string $driverName): string
@@ -185,7 +188,7 @@ class ImageTranscodingService
 
         try {
             // Check format support
-            if (!$this->driverSupportsFormat($driverName, $codec)) {
+            if (! $this->driverSupportsFormat($driverName, $codec)) {
                 throw ImageTranscodingException::unsupportedFormat($codec, $driverName);
             }
 
@@ -204,7 +207,7 @@ class ImageTranscodingService
             $encodedImage = match ($codec) {
                 'jpeg' => $image->encode(new JpegEncoder(config('image.quality.jpeg', 85)))->toString(),
                 'webp' => $image->encode(new WebpEncoder(config('image.quality.webp', 80)))->toString(),
-                'png' => $image->encode(new PngEncoder())->toString(),
+                'png' => $image->encode(new PngEncoder)->toString(),
                 'avif' => $image->encode(new AvifEncoder(config('image.quality.avif', 75)))->toString(),
                 default => throw ImageTranscodingException::unsupportedFormat($codec, $driverName),
             };
@@ -341,6 +344,7 @@ class ImageTranscodingService
             $fallbackFormat = config("image.format_fallbacks.{$format}");
             if ($fallbackFormat) {
                 Log::info("Format {$format} not supported, trying fallback format {$fallbackFormat}");
+
                 return $this->getDriversForFormat($fallbackFormat);
             }
         }
@@ -354,6 +358,7 @@ class ImageTranscodingService
     protected function driverSupportsFormat(string $driver, string $format): bool
     {
         $supportedFormats = config("image.format_support.{$driver}", []);
+
         return in_array($format, $supportedFormats);
     }
 

@@ -68,7 +68,6 @@ class PictureJob implements ShouldQueue
 
             // Re-throw the exception to mark job as failed
             throw $e;
-
         } catch (\Exception $e) {
             Log::error('Picture optimization job failed with general error', [
                 'picture_id' => $this->picture->id,
@@ -83,7 +82,7 @@ class PictureJob implements ShouldQueue
                 $notificationService = app(NotificationService::class);
                 $notificationService->error(
                     'Échec définitif d\'optimisation d\'image',
-                    'L\'optimisation de l\'image "' . $this->picture->filename . '" a échoué après ' . $this->tries . ' tentatives. Veuillez vérifier les logs ou réessayer manuellement.',
+                    'L\'optimisation de l\'image "'.$this->picture->filename.'" a échoué après '.$this->tries.' tentatives. Veuillez vérifier les logs ou réessayer manuellement.',
                     [
                         'picture_id' => $this->picture->id,
                         'filename' => $this->picture->filename,
@@ -110,7 +109,7 @@ class PictureJob implements ShouldQueue
                 if ($this->attempts() >= $this->tries) {
                     $notificationService->error(
                         'Tous les drivers d\'image ont échoué',
-                        'Aucun driver (Imagick, GD) n\'a pu optimiser l\'image "' . $this->picture->filename . '". Vérifiez la configuration système.',
+                        'Aucun driver (Imagick, GD) n\'a pu optimiser l\'image "'.$this->picture->filename.'". Vérifiez la configuration système.',
                         [
                             'picture_id' => $this->picture->id,
                             'error_details' => $e->toArray(),
@@ -125,7 +124,7 @@ class PictureJob implements ShouldQueue
                 // Critical errors - notify immediately
                 $notificationService->error(
                     'Limites système dépassées',
-                    'L\'image "' . $this->picture->filename . '" dépasse les limites système: ' . $e->getMessage(),
+                    'L\'image "'.$this->picture->filename.'" dépasse les limites système: '.$e->getMessage(),
                     [
                         'picture_id' => $this->picture->id,
                         'error_details' => $e->toArray(),
@@ -140,7 +139,7 @@ class PictureJob implements ShouldQueue
                     if ($this->attempts() >= $this->tries) {
                         $notificationService->warning(
                             'Échec Imagick avec fallback tenté',
-                            'Imagick a échoué pour l\'image "' . $this->picture->filename . '", fallback vers ' . $e->getFallbackAttempted() . ' également échoué.',
+                            'Imagick a échoué pour l\'image "'.$this->picture->filename.'", fallback vers '.$e->getFallbackAttempted().' également échoué.',
                             [
                                 'picture_id' => $this->picture->id,
                                 'error_details' => $e->toArray(),
@@ -152,7 +151,7 @@ class PictureJob implements ShouldQueue
                     if ($this->attempts() >= $this->tries) {
                         $notificationService->error(
                             'Échec Imagick sans fallback',
-                            'Imagick a échoué pour l\'image "' . $this->picture->filename . '" et aucun fallback n\'est disponible.',
+                            'Imagick a échoué pour l\'image "'.$this->picture->filename.'" et aucun fallback n\'est disponible.',
                             [
                                 'picture_id' => $this->picture->id,
                                 'error_details' => $e->toArray(),
@@ -165,7 +164,7 @@ class PictureJob implements ShouldQueue
             case \App\Enums\ImageTranscodingError::UNSUPPORTED_FORMAT:
                 $notificationService->warning(
                     'Format d\'image non supporté',
-                    'Le format demandé n\'est pas supporté pour l\'image "' . $this->picture->filename . '": ' . $e->getMessage(),
+                    'Le format demandé n\'est pas supporté pour l\'image "'.$this->picture->filename.'": '.$e->getMessage(),
                     [
                         'picture_id' => $this->picture->id,
                         'error_details' => $e->toArray(),
@@ -178,7 +177,7 @@ class PictureJob implements ShouldQueue
                 if ($this->attempts() >= $this->tries) {
                     $notificationService->error(
                         'Erreur d\'optimisation d\'image',
-                        'L\'optimisation de l\'image "' . $this->picture->filename . '" a échoué: ' . $e->getMessage(),
+                        'L\'optimisation de l\'image "'.$this->picture->filename.'" a échoué: '.$e->getMessage(),
                         [
                             'picture_id' => $this->picture->id,
                             'error_details' => $e->toArray(),
@@ -203,11 +202,11 @@ class PictureJob implements ShouldQueue
 
         // Send a final failure notification if it's not a transcoding exception
         // (transcoding exceptions are handled in handleTranscodingError)
-        if (!$exception instanceof \App\Exceptions\ImageTranscodingException) {
+        if (! $exception instanceof \App\Exceptions\ImageTranscodingException) {
             $notificationService = app(NotificationService::class);
             $notificationService->error(
                 'Échec définitif d\'optimisation d\'image',
-                'L\'optimisation de l\'image "' . $this->picture->filename . '" a définitivement échoué: ' . $exception->getMessage(),
+                'L\'optimisation de l\'image "'.$this->picture->filename.'" a définitivement échoué: '.$exception->getMessage(),
                 [
                     'picture_id' => $this->picture->id,
                     'filename' => $this->picture->filename,

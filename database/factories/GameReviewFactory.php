@@ -35,7 +35,7 @@ class GameReviewFactory extends Factory
             'cons_translation_key_id' => $this->faker->optional(0.8)->passthrough(
                 TranslationKey::factory()->withTranslations()
             ),
-            'score' => $this->faker->optional(0.9)->randomFloat(1, 0, 10),
+            'rating' => $this->faker->optional(0.8)->randomElement(['positive', 'negative']),
         ];
     }
 
@@ -44,13 +44,6 @@ class GameReviewFactory extends Factory
         return $this->state([
             'pros_translation_key_id' => TranslationKey::factory()->withTranslations(),
             'cons_translation_key_id' => TranslationKey::factory()->withTranslations(),
-        ]);
-    }
-
-    public function withScore(float $score): static
-    {
-        return $this->state([
-            'score' => $score,
         ]);
     }
 

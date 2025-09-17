@@ -57,12 +57,27 @@ class ImageTranscodingService
                 $image->scale($resolution);
             }
 
-            return match ($codec) {
+            $encodedImage = match ($codec) {
                 'jpeg' => $image->encode(new JpegEncoder)->toString(),
                 'webp' => $image->encode(new WebpEncoder)->toString(),
                 'png' => $image->encode(new PngEncoder)->toString(),
                 default => $image->encode(new AvifEncoder)->toString(),
             };
+
+            // Validate encoded image size
+            if (empty($encodedImage) || strlen($encodedImage) === 0) {
+                Log::error('Image encoding resulted in empty output', [
+                    'codec' => $codec,
+                    'resolution' => $resolution,
+                    'original_dimensions' => [
+                        'width' => $image->width(),
+                        'height' => $image->height(),
+                    ],
+                ]);
+                return null;
+            }
+
+            return $encodedImage;
         } catch (RuntimeException $exception) {
             Log::error('Failed to transcode image', [
                 'exception' => $exception,

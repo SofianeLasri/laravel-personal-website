@@ -212,7 +212,7 @@ onUnmounted(() => {
 
                             <div
                                 v-for="(item, index) in portfolioRoutes"
-                                :key="'portfolio-' + index"
+                                :key="`portfolio-${index}`"
                                 @mouseenter="updateIndicatorPosition(item.index)"
                                 @mouseleave="resetIndicator"
                             >
@@ -236,7 +236,7 @@ onUnmounted(() => {
 
                             <div
                                 v-for="(item, index) in blogRoutes"
-                                :key="'blog-' + index"
+                                :key="`blog-${index}`"
                                 @mouseenter="updateIndicatorPosition(item.index)"
                                 @mouseleave="resetIndicator"
                             >

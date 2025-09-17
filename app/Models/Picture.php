@@ -209,9 +209,39 @@ class Picture extends Model
             return;
         }
 
+        $failedVariants = [];
+
         foreach ($optimizedImages as $variantName => $image) {
+            // Validate image content
+            if (empty($image) || strlen($image) === 0) {
+                Log::error('Optimized image is empty, skipping storage', [
+                    'picture_id' => $this->id,
+                    'variant' => $variantName,
+                    'format' => $format,
+                    'filename' => $this->filename,
+                ]);
+                $failedVariants[] = "$variantName.$format";
+                continue;
+            }
+
             $path = Str::beforeLast($this->path_original, '.')."_$variantName.$format";
             Storage::disk('public')->put($path, $image);
+
+            // Verify the file was written correctly
+            if (!Storage::disk('public')->exists($path) || Storage::disk('public')->size($path) === 0) {
+                Log::error('Failed to store optimized image or file has 0 bytes', [
+                    'picture_id' => $this->id,
+                    'variant' => $variantName,
+                    'format' => $format,
+                    'path' => $path,
+                ]);
+                // Delete the empty file if it exists
+                if (Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
+                $failedVariants[] = "$variantName.$format";
+                continue;
+            }
 
             if (config('app.cdn_disk')) {
                 Storage::disk(config('app.cdn_disk'))->put($path, $image);
@@ -222,6 +252,20 @@ class Picture extends Model
                 'path' => $path,
                 'format' => $format,
             ]);
+        }
+
+        // Send notification if there were failures
+        if (!empty($failedVariants)) {
+            $notificationService = app(\App\Services\NotificationService::class);
+            $notificationService->error(
+                'Échec d\'optimisation d\'image',
+                'Certaines variantes n\'ont pas pu être créées pour l\'image "' . $this->filename . '": ' . implode(', ', $failedVariants),
+                [
+                    'picture_id' => $this->id,
+                    'failed_variants' => $failedVariants,
+                    'filename' => $this->filename,
+                ]
+            );
         }
     }
 
@@ -255,5 +299,38 @@ class Picture extends Model
     public function hasValidOriginalPath(): bool
     {
         return ! is_null($this->path_original) && ! empty($this->path_original);
+    }
+
+    /**
+     * Force reoptimization of the picture by deleting existing optimized versions
+     * and dispatching a new optimization job
+     */
+    public function reoptimize(): void
+    {
+        // Delete existing optimized pictures
+        $this->deleteOptimized();
+
+        // Dispatch new optimization job
+        \App\Jobs\PictureJob::dispatch($this);
+
+        Log::info('Picture reoptimization initiated', [
+            'picture_id' => $this->id,
+            'filename' => $this->filename,
+        ]);
+    }
+
+    /**
+     * Check if any optimized picture has invalid size (0 bytes)
+     */
+    public function hasInvalidOptimizedPictures(): bool
+    {
+        foreach ($this->optimizedPictures as $optimized) {
+            if (Storage::disk('public')->exists($optimized->path)) {
+                if (Storage::disk('public')->size($optimized->path) === 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

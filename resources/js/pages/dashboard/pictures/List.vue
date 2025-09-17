@@ -32,8 +32,8 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { ArrowUpDown, Download, Eye, Image as ImageIcon, Loader2, MoreHorizontal, Search, Trash2 } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { AlertTriangle, ArrowUpDown, Download, Eye, Image as ImageIcon, Loader2, MoreHorizontal, RefreshCw, Search, Trash2 } from 'lucide-vue-next';
+import { onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
 // Types
@@ -92,6 +92,8 @@ const currentPicture = ref<Picture | null>(null);
 const searchTerm = ref(props.filters.search);
 const sortBy = ref(props.filters.sort_by);
 const sortDirection = ref(props.filters.sort_direction);
+const pictureHealthStatus = ref<Record<number, { hasInvalidFiles: boolean; checking: boolean }>>({});
+const reoptimizingPictures = ref<Set<number>>(new Set());
 
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
@@ -225,6 +227,56 @@ const handlePageChange = (page: number) => {
         preserveScroll: true,
     });
 };
+
+const checkPictureHealth = async (pictureId: number) => {
+    pictureHealthStatus.value[pictureId] = { hasInvalidFiles: false, checking: true };
+
+    try {
+        const response = await axios.get(route('dashboard.api.pictures.health', { picture: pictureId }));
+        pictureHealthStatus.value[pictureId] = {
+            hasInvalidFiles: response.data.has_invalid_files,
+            checking: false,
+        };
+    } catch (error) {
+        console.error('Erreur lors de la vérification:', error);
+        pictureHealthStatus.value[pictureId] = { hasInvalidFiles: false, checking: false };
+    }
+};
+
+const reoptimizePicture = async (picture: Picture) => {
+    reoptimizingPictures.value.add(picture.id);
+
+    try {
+        const response = await axios.post(route('dashboard.api.pictures.reoptimize', { picture: picture.id }));
+
+        if (response.data.success) {
+            toast.success('Recompression lancée avec succès');
+
+            // Remove health status to trigger re-check
+            delete pictureHealthStatus.value[picture.id];
+
+            // Wait a bit and refresh the page
+            setTimeout(() => {
+                router.reload({ only: ['pictures'] });
+            }, 2000);
+        } else {
+            toast.error(response.data.message || 'Erreur lors de la recompression');
+        }
+    } catch (error: any) {
+        console.error('Erreur lors de la recompression:', error);
+        const message = error.response?.data?.message || 'Erreur lors de la recompression';
+        toast.error(message);
+    } finally {
+        reoptimizingPictures.value.delete(picture.id);
+    }
+};
+
+// Check health of all visible pictures on mount
+onMounted(() => {
+    props.pictures.data.forEach((picture) => {
+        checkPictureHealth(picture.id);
+    });
+});
 </script>
 
 <template>
@@ -286,6 +338,29 @@ const handlePageChange = (page: number) => {
                                     <ImageIcon class="text-muted-foreground h-12 w-12" />
                                 </div>
 
+                                <!-- Indicateur de problème -->
+                                <div
+                                    v-if="pictureHealthStatus[picture.id]?.hasInvalidFiles"
+                                    class="absolute top-2 left-2 z-10"
+                                    title="Cette image a des fichiers optimisés invalides (0 octets)"
+                                >
+                                    <div class="flex items-center gap-1 rounded-md bg-red-500/90 px-2 py-1 text-xs text-white">
+                                        <AlertTriangle class="h-3 w-3" />
+                                        <span>Erreur</span>
+                                    </div>
+                                </div>
+
+                                <!-- Indicateur de recompression en cours -->
+                                <div
+                                    v-if="reoptimizingPictures.has(picture.id)"
+                                    class="absolute inset-0 z-20 flex items-center justify-center bg-black/50"
+                                >
+                                    <div class="flex flex-col items-center gap-2 text-white">
+                                        <Loader2 class="h-8 w-8 animate-spin" />
+                                        <span class="text-sm">Recompression...</span>
+                                    </div>
+                                </div>
+
                                 <!-- Overlay avec actions -->
                                 <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20">
                                     <div class="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100">
@@ -303,6 +378,19 @@ const handlePageChange = (page: number) => {
                                                 <DropdownMenuItem v-if="picture.path_original" @click="downloadOriginal(picture)">
                                                     <Download class="mr-2 h-4 w-4" />
                                                     Télécharger
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    @click="reoptimizePicture(picture)"
+                                                    :class="{
+                                                        'text-orange-600 focus:text-orange-600': pictureHealthStatus[picture.id]?.hasInvalidFiles,
+                                                    }"
+                                                >
+                                                    <RefreshCw class="mr-2 h-4 w-4" />
+                                                    {{
+                                                        pictureHealthStatus[picture.id]?.hasInvalidFiles
+                                                            ? 'Réparer (Recompresser)'
+                                                            : 'Forcer la recompression'
+                                                    }}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem class="text-destructive focus:text-destructive" @click="confirmDelete(picture)">
                                                     <Trash2 class="mr-2 h-4 w-4" />

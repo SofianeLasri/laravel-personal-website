@@ -53,4 +53,76 @@ class PictureController extends Controller
 
         return response()->noContent();
     }
+
+    /**
+     * Force reoptimization of a picture
+     */
+    public function reoptimize(int $pictureId): JsonResponse
+    {
+        try {
+            $picture = Picture::findOrFail($pictureId);
+            
+            // Check if original file exists
+            if (!$picture->hasValidOriginalPath() || !\Storage::disk('public')->exists($picture->path_original)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Le fichier original n\'existe pas'
+                ], 422);
+            }
+
+            $picture->reoptimize();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Recompression lancée avec succès',
+                'picture_id' => $picture->id,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la recompression: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Check if a picture has invalid optimized versions (0 bytes files)
+     */
+    public function checkHealth(int $pictureId): JsonResponse
+    {
+        try {
+            $picture = Picture::with('optimizedPictures')->findOrFail($pictureId);
+            $hasInvalidFiles = $picture->hasInvalidOptimizedPictures();
+            
+            $invalidFiles = [];
+            if ($hasInvalidFiles) {
+                foreach ($picture->optimizedPictures as $optimized) {
+                    if (\Storage::disk('public')->exists($optimized->path)) {
+                        $size = \Storage::disk('public')->size($optimized->path);
+                        if ($size === 0) {
+                            $invalidFiles[] = [
+                                'variant' => $optimized->variant,
+                                'format' => $optimized->format,
+                                'path' => $optimized->path,
+                                'size' => $size,
+                            ];
+                        }
+                    }
+                }
+            }
+
+            return response()->json([
+                'picture_id' => $picture->id,
+                'filename' => $picture->filename,
+                'has_invalid_files' => $hasInvalidFiles,
+                'invalid_files' => $invalidFiles,
+                'optimized_count' => $picture->optimized_pictures_count ?? $picture->optimizedPictures->count(),
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la vérification: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

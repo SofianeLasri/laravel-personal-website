@@ -227,6 +227,10 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
         Route::apiResource('pictures', PictureController::class)->except('update');
+        Route::post('pictures/{picture}/reoptimize', [PictureController::class, 'reoptimize'])
+            ->name('pictures.reoptimize');
+        Route::get('pictures/{picture}/health', [PictureController::class, 'checkHealth'])
+            ->name('pictures.health');
         Route::apiResources([
             'blog-posts' => AdminBlogPostController::class,
             'certifications' => CertificationController::class,

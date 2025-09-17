@@ -249,8 +249,8 @@ onMounted(() => {
                                         variant="ghost"
                                         size="sm"
                                         :disabled="downloadingThumbnail || currentVideo.status !== 'ready'"
-                                        @click="downloadThumbnail"
                                         title="Télécharger la miniature depuis BunnyCDN"
+                                        @click="downloadThumbnail"
                                     >
                                         <Loader2 v-if="downloadingThumbnail" class="h-4 w-4 animate-spin" />
                                         <Download v-else class="h-4 w-4" />

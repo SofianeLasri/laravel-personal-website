@@ -4,31 +4,14 @@ import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
-import { SocialMediaLink } from '@/types';
+import { SocialMediaLink, SSRExperience } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import { Building, CalendarDays, MapPin } from 'lucide-vue-next';
 import VueMarkdown from 'vue-markdown-render';
 
-interface Experience {
-    id: number;
-    title: string;
-    organizationName: string;
-    logo: any;
-    location: string;
-    websiteUrl: string | null;
-    shortDescription: string;
-    fullDescription: string;
-    technologies: any[];
-    type: string;
-    startedAt: string;
-    endedAt: string | null;
-    startedAtFormatted: string;
-    endedAtFormatted: string | null;
-}
-
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
-    experience: Experience;
+    experience: SSRExperience;
 }>();
 
 const page = usePage();

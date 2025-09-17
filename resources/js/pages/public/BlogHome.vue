@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import LightShape from '@/components/public/LightShape.vue';
 import BlogArticleCard from '@/components/public/Blog/BlogArticleCard.vue';
 import BlogHeroCard from '@/components/public/Blog/BlogHeroCard.vue';
+import LightShape from '@/components/public/LightShape.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';

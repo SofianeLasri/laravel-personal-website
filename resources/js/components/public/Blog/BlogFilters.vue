@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { router } from '@inertiajs/vue3';
+import { computed, ref, watch } from 'vue';
 import BlogCategoryFilter from './BlogCategoryFilter.vue';
 import BlogSortDropdown from './BlogSortDropdown.vue';
-import { computed, ref, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
 
 interface Props {
     categories: Array<{

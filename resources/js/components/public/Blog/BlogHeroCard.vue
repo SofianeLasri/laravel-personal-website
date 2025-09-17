@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { SSRBlogPost } from '@/types';
-import BlogCategoryBadge from './BlogCategoryBadge.vue';
 import BaseButton from '@/components/public/Ui/Button/BaseButton.vue';
+import { SSRBlogPost } from '@/types';
 import { Link } from '@inertiajs/vue3';
+import BlogCategoryBadge from './BlogCategoryBadge.vue';
 
 interface Props {
     post: SSRBlogPost;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
+import { router } from '@inertiajs/vue3';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { router } from '@inertiajs/vue3';
 
 interface Props {
     currentPage: number;

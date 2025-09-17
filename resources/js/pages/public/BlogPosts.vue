@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import LightShape from '@/components/public/LightShape.vue';
 import BlogFilters from '@/components/public/Blog/BlogFilters.vue';
 import BlogGrid from '@/components/public/Blog/BlogGrid.vue';
 import BlogPagination from '@/components/public/Blog/BlogPagination.vue';
+import LightShape from '@/components/public/LightShape.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRBlogPost } from '@/types';

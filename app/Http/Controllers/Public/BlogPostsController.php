@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class BlogIndexController extends PublicController
+class BlogPostsController extends PublicController
 {
     public function __invoke(Request $request, PublicControllersService $publicService): Response
     {
@@ -28,7 +28,7 @@ class BlogIndexController extends PublicController
         // Get all categories with post counts
         $categories = $publicService->getBlogCategoriesWithCounts();
 
-        return Inertia::render('public/BlogIndex', [
+        return Inertia::render('public/BlogPosts', [
             'locale' => app()->getLocale(),
             'browserLanguage' => $this->getBrowserLanguage($request),
             'translations' => [

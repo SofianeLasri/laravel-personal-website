@@ -178,7 +178,15 @@ const contentTypes = [
 
 const addContent = async (type: string) => {
     try {
+        // First, ensure all galleries are saved
+        const galleriesSaved = await saveAllGalleries();
+        if (!galleriesSaved) {
+            toast.error("Veuillez sauvegarder les galeries avant d'ajouter un nouveau bloc");
+            return;
+        }
+
         let contentId: number;
+        let newContent: any;
 
         // Create the content based on type
         if (type === 'markdown') {
@@ -188,6 +196,7 @@ const addContent = async (type: string) => {
                 locale: props.locale,
             });
             contentId = response.data.id;
+            newContent = response.data;
         } else if (type === 'gallery') {
             // Create a new gallery content
             const response = await axios.post(route('dashboard.api.blog-content-gallery.store'), {
@@ -198,6 +207,7 @@ const addContent = async (type: string) => {
                 locale: props.locale,
             });
             contentId = response.data.id;
+            newContent = response.data;
         } else if (type === 'video') {
             // Create a new video content without a video initially
             const response = await axios.post(route('dashboard.api.blog-content-video.store'), {
@@ -206,6 +216,7 @@ const addContent = async (type: string) => {
                 locale: props.locale,
             });
             contentId = response.data.id;
+            newContent = response.data;
         } else {
             return;
         }
@@ -223,7 +234,13 @@ const addContent = async (type: string) => {
             order: localContents.value.length + 1,
         });
 
-        localContents.value.push(response.data);
+        // Create a properly structured content object for the new block
+        const newBlock = {
+            ...response.data,
+            content: newContent,
+        };
+
+        localContents.value.push(newBlock);
 
         // Initialiser le cache et le statut pour le nouveau contenu markdown
         if (type === 'markdown') {
@@ -491,6 +508,11 @@ const transformGalleryImages = (content: { pictures?: PictureWithPivot[] }): Gal
 const saveAllGalleries = async (): Promise<boolean> => {
     const galleryContents = localContents.value.filter((content) => getContentTypeFromClass(content.content_type) === 'gallery');
 
+    // If no galleries, return true
+    if (galleryContents.length === 0) {
+        return true;
+    }
+
     let allSuccess = true;
 
     for (const galleryContent of galleryContents) {
@@ -498,7 +520,10 @@ const saveAllGalleries = async (): Promise<boolean> => {
 
         if (galleryRef?.saveChanges) {
             try {
-                await galleryRef.saveChanges();
+                const result = await galleryRef.saveChanges();
+                if (!result) {
+                    allSuccess = false;
+                }
             } catch (error) {
                 console.error(`Failed to save gallery ${galleryContent.content_id}:`, error);
                 allSuccess = false;

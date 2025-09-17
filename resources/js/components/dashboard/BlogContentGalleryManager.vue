@@ -40,6 +40,8 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const uploading = ref(false);
 const uploadProgress = ref<Record<string, number>>({});
 const saving = ref(false);
+const autoSaveTimeout = ref<ReturnType<typeof setTimeout> | null>(null);
+const autoSaveStatus = ref<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
 // Computed
 const isEmpty = computed(() => images.value.length === 0);
@@ -56,18 +58,23 @@ watch(
 );
 
 // Watch for changes in initial images (when data is loaded from database)
+// Only update if we don't have local changes OR if we're loading for the first time
 watch(
     () => props.initialImages,
     (newInitialImages, oldInitialImages) => {
-        console.log('InitialImages changed:', {
-            newLength: newInitialImages?.length || 0,
-            oldLength: oldInitialImages?.length || 0,
-            newImages: newInitialImages,
-            currentImages: images.value,
-        });
+        // Only update from props if:
+        // 1. This is the initial load (oldInitialImages is undefined or we have no images)
+        // 2. OR the gallery was just created (images.value is empty and we're getting data from server)
+        const isInitialLoad = oldInitialImages === undefined || (images.value.length === 0 && oldInitialImages.length === 0);
+        const shouldUpdateFromProps = isInitialLoad && !hasUnsavedChanges.value;
 
-        // Always update if we have new initial images, even if empty
-        images.value = [...(newInitialImages || [])];
+        if (shouldUpdateFromProps) {
+            console.log('Loading initial images from props:', {
+                newLength: newInitialImages?.length || 0,
+                isInitialLoad,
+            });
+            images.value = [...(newInitialImages || [])];
+        }
     },
     { deep: true, immediate: true },
 );
@@ -78,11 +85,14 @@ onMounted(() => {
         sortableInstance.value = Sortable.create(gridRef.value, {
             animation: 150,
             handle: '.drag-handle',
-            onEnd: (evt) => {
+            onEnd: async (evt) => {
                 if (evt.oldIndex !== undefined && evt.newIndex !== undefined) {
                     const item = images.value.splice(evt.oldIndex, 1)[0];
                     images.value.splice(evt.newIndex, 0, item);
                     updateOrders();
+
+                    // Auto-save after reordering
+                    await autoSaveGallery();
                 }
             },
         });
@@ -92,6 +102,9 @@ onMounted(() => {
 onUnmounted(() => {
     if (sortableInstance.value) {
         sortableInstance.value.destroy();
+    }
+    if (autoSaveTimeout.value) {
+        clearTimeout(autoSaveTimeout.value);
     }
 });
 
@@ -164,6 +177,9 @@ const uploadSingleFile = async (file: File): Promise<void> => {
         });
 
         toast.success(`Image "${file.name}" ajoutée avec succès`);
+
+        // Auto-save after successful upload
+        await autoSaveGallery();
     } catch (error) {
         console.error("Erreur lors de l'upload:", error);
         toast.error(`Erreur lors de l'upload de "${file.name}"`);
@@ -172,10 +188,13 @@ const uploadSingleFile = async (file: File): Promise<void> => {
     }
 };
 
-const removeImage = (index: number) => {
+const removeImage = async (index: number) => {
     images.value.splice(index, 1);
     updateOrders();
     toast.success('Image supprimée');
+
+    // Auto-save after removing image
+    await autoSaveGallery();
 };
 
 const updateCaption = (index: number, caption: string) => {
@@ -184,8 +203,9 @@ const updateCaption = (index: number, caption: string) => {
 
 const saveChanges = async () => {
     if (images.value.length === 0) {
-        toast.error('Ajoutez au moins une image avant de sauvegarder');
-        return;
+        // Allow saving empty gallery to clear it
+        // toast.error('Ajoutez au moins une image avant de sauvegarder');
+        // return;
     }
 
     saving.value = true;
@@ -209,12 +229,60 @@ const saveChanges = async () => {
 
         hasUnsavedChanges.value = false;
         toast.success('Galerie sauvegardée avec succès');
+        return true;
     } catch (error) {
         console.error('Erreur lors de la sauvegarde:', error);
         toast.error('Erreur lors de la sauvegarde');
+        return false;
     } finally {
         saving.value = false;
     }
+};
+
+// Auto-save function with debouncing
+const autoSaveGallery = async () => {
+    // Clear any existing timeout
+    if (autoSaveTimeout.value) {
+        clearTimeout(autoSaveTimeout.value);
+    }
+
+    // Set status to indicate pending save
+    autoSaveStatus.value = 'saving';
+
+    // Debounce the save operation
+    autoSaveTimeout.value = setTimeout(async () => {
+        try {
+            const payload = {
+                pictures: images.value.map((img) => ({
+                    id: img.picture.id,
+                    caption: img.caption,
+                    order: img.order,
+                })),
+                locale: props.locale,
+            };
+
+            await axios.put(
+                route('dashboard.api.blog-content-galleries.update-pictures', {
+                    blog_content_gallery: props.galleryId,
+                }),
+                payload,
+            );
+
+            autoSaveStatus.value = 'saved';
+            hasUnsavedChanges.value = false;
+
+            // Reset status after 2 seconds
+            setTimeout(() => {
+                if (autoSaveStatus.value === 'saved') {
+                    autoSaveStatus.value = 'idle';
+                }
+            }, 2000);
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde automatique:', error);
+            autoSaveStatus.value = 'error';
+            hasUnsavedChanges.value = true;
+        }
+    }, 1000); // Wait 1 second before auto-saving
 };
 
 // Handle drag & drop on the container
@@ -349,13 +417,32 @@ defineExpose({
             <p class="mt-1 text-sm">Ajoutez des images en utilisant la zone de dépôt ci-dessus</p>
         </div>
 
-        <!-- Unsaved Changes Warning -->
+        <!-- Auto-save status indicator -->
         <div
-            v-if="hasUnsavedChanges"
-            class="flex items-center gap-2 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200"
+            v-if="autoSaveStatus !== 'idle' || hasUnsavedChanges"
+            class="flex items-center gap-2 rounded-md p-3 text-sm"
+            :class="{
+                'bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200': autoSaveStatus === 'saving',
+                'bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-200': autoSaveStatus === 'saved',
+                'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-200': autoSaveStatus === 'error',
+                'bg-yellow-50 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200': hasUnsavedChanges && autoSaveStatus === 'idle',
+            }"
         >
-            <div class="h-2 w-2 animate-pulse rounded-full bg-yellow-500"></div>
-            <span>Vous avez des modifications non sauvegardées</span>
+            <div v-if="autoSaveStatus === 'saving'" class="h-2 w-2 animate-spin rounded-full border-b-2 border-blue-600"></div>
+            <div v-else-if="autoSaveStatus === 'saved'" class="text-green-600">✓</div>
+            <div v-else-if="autoSaveStatus === 'error'" class="text-red-600">⚠</div>
+            <div v-else-if="hasUnsavedChanges" class="h-2 w-2 animate-pulse rounded-full bg-yellow-500"></div>
+            <span>
+                {{
+                    autoSaveStatus === 'saving'
+                        ? 'Sauvegarde automatique en cours...'
+                        : autoSaveStatus === 'saved'
+                          ? 'Galerie sauvegardée automatiquement'
+                          : autoSaveStatus === 'error'
+                            ? 'Erreur lors de la sauvegarde automatique'
+                            : 'Modifications en attente de sauvegarde'
+                }}
+            </span>
         </div>
     </div>
 </template>

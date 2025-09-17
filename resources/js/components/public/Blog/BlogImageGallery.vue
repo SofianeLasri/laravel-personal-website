@@ -60,7 +60,7 @@ onMounted(() => {
                         :src="pictures.length === 1 ? picture.webp.large : picture.webp.medium"
                         :alt="picture.caption"
                         loading="lazy"
-                        :class="['object-cover', pictures.length === 1 ? 'h-auto w-full' : 'h-full w-full']"
+                        class="object-cover" :class="[pictures.length === 1 ? 'h-auto w-full' : 'h-full w-full']"
                     />
                 </picture>
 

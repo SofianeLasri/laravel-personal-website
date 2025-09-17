@@ -13,6 +13,7 @@ export default defineConfigWithVueTs(
             'public',
             'bootstrap/ssr',
             'tailwind.config.js',
+            'eslint.config.js', // Ignore own config file
             'resources/js/ziggy.js',
             'resources/js/components/ui/*',
             'storage',

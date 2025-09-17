@@ -184,7 +184,7 @@ const uploadSingleFile = async (file: File): Promise<void> => {
     }
 };
 
-const removeImage = async (index: number) => {
+const removeImage = (index: number) => {
     images.value.splice(index, 1);
     updateOrders();
     toast.success('Image supprimée');

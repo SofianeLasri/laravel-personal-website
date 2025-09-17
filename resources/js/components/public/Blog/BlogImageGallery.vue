@@ -48,7 +48,7 @@ onMounted(() => {
                 :href="picture.avif.full"
                 :data-pswp-width="picture.width"
                 :data-pswp-height="picture.height"
-                :data-pswp-caption="picture.caption || ''"
+                :data-pswp-caption="picture.caption"
                 target="_blank"
                 class="group relative block overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] focus:ring-2"
                 :class="[pictures.length === 1 ? 'w-full' : 'aspect-square']"
@@ -58,7 +58,7 @@ onMounted(() => {
                     <source :srcset="pictures.length === 1 ? picture.webp.large : picture.webp.medium" type="image/webp" />
                     <img
                         :src="pictures.length === 1 ? picture.webp.large : picture.webp.medium"
-                        :alt="picture.caption || 'Image'"
+                        :alt="picture.caption"
                         loading="lazy"
                         :class="['object-cover', pictures.length === 1 ? 'h-auto w-full' : 'h-full w-full']"
                     />

@@ -40,7 +40,7 @@ export default defineConfigWithVueTs(
             '@typescript-eslint/no-misused-promises': 'error',
             '@typescript-eslint/await-thenable': 'error',
             '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
-            '@typescript-eslint/prefer-nullish-coalescing': 'warn',
+            '@typescript-eslint/prefer-nullish-coalescing': 'off',
             '@typescript-eslint/prefer-optional-chain': 'warn',
             '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
             '@typescript-eslint/no-unsafe-assignment': 'off', // Often too strict with third-party libs

@@ -66,11 +66,12 @@ class AiProviderService
                     throw new RuntimeException('Failed to get picture content from storage');
                 }
 
-                $transcodedPicture = $transcodingService->transcode($picturePath, OptimizedPicture::MEDIUM_SIZE, 'jpeg');
-
-                if (! $transcodedPicture) {
+                try {
+                    $transcodedPicture = $transcodingService->transcode($picturePath, OptimizedPicture::MEDIUM_SIZE, 'jpeg');
+                } catch (\App\Exceptions\ImageTranscodingException $e) {
                     Log::error('Failed to transcode picture', [
                         'picture' => $picture,
+                        'error' => $e->getMessage(),
                     ]);
                     throw new RuntimeException('Failed to transcode picture');
                 }

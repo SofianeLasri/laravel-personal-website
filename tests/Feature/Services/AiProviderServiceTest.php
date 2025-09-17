@@ -198,8 +198,9 @@ class AiProviderServiceTest extends TestCase
         $mockTranscodingService = Mockery::mock(ImageTranscodingService::class);
         $mockTranscodingService->shouldReceive('transcode')
             ->andThrow(new \App\Exceptions\ImageTranscodingException(
-                'Test transcoding failure',
-                \App\Enums\ImageTranscodingError::IMAGICK_ENCODING_FAILED
+                \App\Enums\ImageTranscodingError::IMAGICK_ENCODING_FAILED,
+                'imagick',
+                'Test transcoding failure'
             ));
         App::instance(ImageTranscodingService::class, $mockTranscodingService);
 

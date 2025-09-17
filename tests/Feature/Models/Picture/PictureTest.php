@@ -377,7 +377,9 @@ class PictureTest extends TestCase
         Storage::fake('public');
 
         $path = 'test.jpg';
-        Storage::disk('public')->put($path, fake()->image()->getContent());
+        $manager = new ImageManager(new Driver);
+        $image = $manager->create(512, 384)->fill('F78E57');
+        Storage::disk('public')->put($path, $image->toJpeg()->toString());
 
         $picture = Picture::factory()->create([
             'path_original' => $path,
@@ -388,8 +390,9 @@ class PictureTest extends TestCase
             Mockery::mock(ImageTranscodingService::class, function ($mock) {
                 $mock->shouldReceive('transcode')
                     ->andThrow(new \App\Exceptions\ImageTranscodingException(
-                        'Test error',
-                        \App\Enums\ImageTranscodingError::IMAGICK_ENCODING_FAILED
+                        \App\Enums\ImageTranscodingError::IMAGICK_ENCODING_FAILED,
+                        'imagick',
+                        'Test error'
                     ));
                 $mock->shouldReceive('getDimensions')->andReturn(['width' => 512, 'height' => 384]);
             })

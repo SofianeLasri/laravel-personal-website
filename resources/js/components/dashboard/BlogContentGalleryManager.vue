@@ -85,14 +85,14 @@ onMounted(() => {
         sortableInstance.value = Sortable.create(gridRef.value, {
             animation: 150,
             handle: '.drag-handle',
-            onEnd: async (evt) => {
+            onEnd: (evt) => {
                 if (evt.oldIndex !== undefined && evt.newIndex !== undefined) {
                     const item = images.value.splice(evt.oldIndex, 1)[0];
                     images.value.splice(evt.newIndex, 0, item);
                     updateOrders();
 
                     // Auto-save after reordering
-                    await autoSaveGallery();
+                    autoSaveGallery();
                 }
             },
         });
@@ -240,7 +240,7 @@ const saveChanges = async () => {
 };
 
 // Auto-save function with debouncing
-const autoSaveGallery = async () => {
+const autoSaveGallery = () => {
     // Clear any existing timeout
     if (autoSaveTimeout.value) {
         clearTimeout(autoSaveTimeout.value);
@@ -292,7 +292,7 @@ const handleDrop = (event: DragEvent) => {
 
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
-        handleFileUpload({ target: { files } } as Event & { target: { files: FileList } });
+        void handleFileUpload({ target: { files } } as Event & { target: { files: FileList } });
     }
 };
 

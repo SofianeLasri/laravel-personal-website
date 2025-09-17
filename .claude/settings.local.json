@@ -13,7 +13,8 @@
       "Bash(rg:*)",
       "Bash(cp:*)",
       "Bash(php artisan make:migration:*)",
-      "WebFetch(domain:image.intervention.io)"
+      "WebFetch(domain:image.intervention.io)",
+      "Bash(npx eslint:*)"
     ],
     "deny": []
   },

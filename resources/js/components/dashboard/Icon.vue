@@ -14,6 +14,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     class: '',
     size: 16,
+    color: 'currentColor',
     strokeWidth: 2,
 });
 

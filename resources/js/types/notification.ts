@@ -1,12 +1,12 @@
 export interface Notification {
     id: number;
     user_id?: number;
-    type: 'ai_provider_error' | 'ai_provider_fallback' | 'system' | 'ai_provider' | string;
+    type: string;
     severity: 'info' | 'warning' | 'error' | 'critical';
     title: string;
     message: string;
-    data?: Record<string, any>;
-    context?: Record<string, any>;
+    data?: Record<string, unknown>;
+    context?: Record<string, unknown>;
     source?: string;
     action_url?: string;
     action_label?: string;
@@ -34,7 +34,7 @@ export interface CreateNotificationRequest {
     type: 'success' | 'error' | 'warning' | 'info';
     title: string;
     message: string;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
     source?: string;
     action_url?: string;
     action_label?: string;

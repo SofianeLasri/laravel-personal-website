@@ -44,7 +44,7 @@ const experiencesByYear = computed(() => {
     });
 
     return Object.entries(groupedExperiences)
-        .sort(([a], [b]) => parseInt(b) - parseInt(a))
+        .sort(([a], [b]) => parseInt(b, 10) - parseInt(a, 10))
         .map(([year, exps]) => ({
             year,
             experiences: exps.sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()),

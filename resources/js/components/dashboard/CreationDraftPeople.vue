@@ -305,9 +305,9 @@ const resetEditForm = () => {
 };
 
 onMounted(() => {
-    fetchAllPeople();
+    void fetchAllPeople();
     if (props.creationDraftId) {
-        fetchAssociatedPeople();
+        void fetchAssociatedPeople();
     }
 });
 
@@ -315,7 +315,7 @@ watch(
     () => props.creationDraftId,
     (newVal) => {
         if (newVal) {
-            fetchAssociatedPeople();
+            void fetchAssociatedPeople();
         } else {
             associatedPeople.value = [];
         }

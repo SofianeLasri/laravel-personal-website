@@ -17,9 +17,9 @@ interface Props {
     locale: 'fr' | 'en';
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const emit = defineEmits<{
-    categoryCreated: [category: BlogCategory];
+    'category-created': [category: BlogCategory];
 }>();
 
 const route = useRoute();
@@ -95,7 +95,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
         const response = await axios.post(route('dashboard.api.blog-categories.store'), values);
 
         toast.success('Catégorie créée avec succès');
-        emit('categoryCreated', response.data);
+        emit('category-created', response.data);
 
         // Reset form and close dialog
         form.resetForm();
@@ -159,7 +159,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
                     </FormItem>
                 </FormField>
 
-                <FormField v-slot="{ componentField }" name="color">
+                <FormField name="color">
                     <FormItem>
                         <FormLabel>Couleur</FormLabel>
                         <FormControl>

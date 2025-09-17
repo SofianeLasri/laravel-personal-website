@@ -79,7 +79,7 @@ const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
         const file = target.files[0];
-        uploadPicture(file);
+        void uploadPicture(file);
     }
 };
 
@@ -100,7 +100,7 @@ const triggerFileInput = () => {
 onMounted(() => {
     const idToLoad = props.modelValue;
     if (idToLoad) {
-        loadPicture(idToLoad);
+        void loadPicture(idToLoad);
     }
 });
 
@@ -109,7 +109,7 @@ watch([() => props.modelValue], ([newModelValue]) => {
 
     if (newId !== picture.value?.id) {
         if (newId) {
-            loadPicture(newId);
+            void loadPicture(newId);
         } else {
             picture.value = null;
         }

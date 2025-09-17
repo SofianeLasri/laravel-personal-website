@@ -11,7 +11,7 @@ import { useNotificationStore } from './stores/notification';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-createInertiaApp({
+void createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
@@ -26,13 +26,13 @@ createInertiaApp({
 
         // Initialize notification store after mounting
         const notificationStore = useNotificationStore();
-        notificationStore.fetchNotifications();
-        notificationStore.startPolling();
+        void notificationStore.fetchNotifications();
+        void notificationStore.startPolling();
     },
     progress: {
         color: '#4B5563',
     },
-}).then();
+});
 
 // This will set light / dark mode on page load...
 initializeTheme();

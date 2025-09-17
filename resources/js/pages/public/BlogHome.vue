@@ -3,13 +3,11 @@ import BlogArticleCard from '@/components/public/Blog/BlogArticleCard.vue';
 import BlogHeroCard from '@/components/public/Blog/BlogHeroCard.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import HeroSectionTitle from '@/components/public/Ui/HeroSectionTitle.vue';
-import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { SocialMediaLink, SSRBlogPost } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
-const { t } = useTranslation();
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];

@@ -78,7 +78,7 @@ const getOriginalCreationId = (): number | null => {
     }
 
     const creationId = url.searchParams.get('creation-id');
-    return creationId ? parseInt(creationId) : null;
+    return creationId ? parseInt(creationId, 10) : null;
 };
 
 const originalCreationId = ref(getOriginalCreationId());

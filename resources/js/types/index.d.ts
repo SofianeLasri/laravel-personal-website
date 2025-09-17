@@ -110,6 +110,18 @@ interface CreationWithTranslationsAndDrafts {
     drafts: CreationDraft[];
 }
 
+interface BlogPost {
+    id: number;
+    slug: string;
+    title_translation_key_id: number;
+    type: BlogPostType;
+    category_id: number;
+    cover_picture_id: number | null;
+    published_at: string;
+    created_at: string;
+    updated_at: string;
+}
+
 interface BlogCategory {
     id: number;
     slug: string;

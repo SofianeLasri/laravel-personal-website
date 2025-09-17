@@ -8,18 +8,13 @@ import {
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogTitle
+    AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
     Pagination,
@@ -29,7 +24,7 @@ import {
     PaginationItem,
     PaginationLast,
     PaginationNext,
-    PaginationPrevious
+    PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useRoute } from '@/composables/useRoute';
@@ -37,18 +32,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import {
-    AlertTriangle,
-    ArrowUpDown,
-    Download,
-    Eye,
-    Image as ImageIcon,
-    Loader2,
-    MoreHorizontal,
-    RefreshCw,
-    Search,
-    Trash2
-} from 'lucide-vue-next';
+import { AlertTriangle, ArrowUpDown, Download, Eye, Image as ImageIcon, Loader2, MoreHorizontal, RefreshCw, Search, Trash2 } from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 

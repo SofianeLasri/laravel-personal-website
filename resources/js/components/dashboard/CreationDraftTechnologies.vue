@@ -362,9 +362,9 @@ const resetEditForm = () => {
 };
 
 onMounted(() => {
-    fetchAllTechnologies();
+    void fetchAllTechnologies();
     if (props.creationDraftId) {
-        fetchAssociatedTechnologies();
+        void fetchAssociatedTechnologies();
     }
 });
 
@@ -372,7 +372,7 @@ watch(
     () => props.creationDraftId,
     (newVal) => {
         if (newVal) {
-            fetchAssociatedTechnologies();
+            void fetchAssociatedTechnologies();
         } else {
             associatedTechnologies.value = [];
         }

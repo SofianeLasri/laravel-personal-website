@@ -64,7 +64,7 @@ const getOriginalBlogPostId = (): number | null => {
     }
 
     const blogPostId = url.searchParams.get('blog-post-id');
-    return blogPostId ? parseInt(blogPostId) : null;
+    return blogPostId ? parseInt(blogPostId, 10) : null;
 };
 
 const originalBlogPostId = ref(getOriginalBlogPostId());

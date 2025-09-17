@@ -303,9 +303,9 @@ const resetEditForm = () => {
 };
 
 onMounted(() => {
-    fetchAllTags();
+    void fetchAllTags();
     if (props.creationDraftId) {
-        fetchAssociatedTags();
+        void fetchAssociatedTags();
     }
 });
 
@@ -313,7 +313,7 @@ watch(
     () => props.creationDraftId,
     (newVal) => {
         if (newVal) {
-            fetchAssociatedTags();
+            void fetchAssociatedTags();
         } else {
             associatedTags.value = [];
         }

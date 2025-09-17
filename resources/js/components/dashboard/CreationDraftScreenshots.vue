@@ -160,7 +160,7 @@ const getScreenshotCaption = (screenshot: Screenshot): string => {
 
 onMounted(() => {
     if (props.creationDraftId) {
-        fetchScreenshots();
+        void fetchScreenshots();
     }
 });
 

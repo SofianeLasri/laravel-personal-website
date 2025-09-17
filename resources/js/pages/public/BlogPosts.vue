@@ -33,7 +33,7 @@ interface BlogIndexProps {
     };
 }
 
-const props = defineProps<BlogIndexProps>();
+defineProps<BlogIndexProps>();
 
 const pageTitle = 'Tous les articles - Blog - Sofiane Lasri';
 const pageDescription = 'Découvrez tous mes articles sur le développement web, Laravel, Vue.js, mes tutoriels et critiques de jeux vidéo.';

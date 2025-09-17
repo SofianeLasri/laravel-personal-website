@@ -175,7 +175,7 @@ const getFeatureDescription = (feature: Feature): string => {
 
 onMounted(() => {
     if (props.creationDraftId) {
-        fetchFeatures();
+        void fetchFeatures();
     }
 });
 

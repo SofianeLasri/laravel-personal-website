@@ -8,7 +8,7 @@ import { ZiggyVue } from 'ziggy-js';
 
 const pinia = createPinia();
 
-createInertiaApp({
+void createInertiaApp({
     title: (title) => `${title}`,
     resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
@@ -21,4 +21,4 @@ createInertiaApp({
     progress: {
         color: '#F78E57',
     },
-}).then();
+});

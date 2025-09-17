@@ -19,12 +19,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem, TechnologyExperience, TechnologyWithCreationsCount } from '@/types';
+import { BreadcrumbItem, TechnologyExperience, TechnologyType, TechnologyWithCreationsCount } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import { Code, Edit, Loader2, Plus, Search, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
+
+interface TechnologyUpdateData {
+    name: string;
+    type: TechnologyType;
+    locale: string;
+    description: string;
+    icon_picture_id?: number;
+}
 
 const props = defineProps<{
     technologies: TechnologyWithCreationsCount[];
@@ -82,7 +90,7 @@ const getTechnologyDescription = (technology: TechnologyWithCreationsCount): str
 
     const translation = technology.description_translation_key.translations.find((t) => t.locale === locale.value);
 
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 const getExperienceDescription = (experience: TechnologyExperience): string => {
@@ -90,7 +98,7 @@ const getExperienceDescription = (experience: TechnologyExperience): string => {
 
     const translation = experience.description_translation_key.translations.find((t) => t.locale === locale.value);
 
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 const getTechnologyTypeLabel = (type: string): string => {
@@ -143,7 +151,7 @@ const updateTechnology = async () => {
     isLoading.value = true;
 
     try {
-        const updateData: any = {
+        const updateData: TechnologyUpdateData = {
             name: editTechnologyName.value.trim(),
             type: editTechnologyType.value,
             locale: locale.value,
@@ -220,7 +228,7 @@ const openEditTechnologyForm = (technology: TechnologyWithCreationsCount) => {
     editTechnologyId.value = technology.id;
     editTechnologyName.value = technology.name;
     editTechnologyType.value = technology.type;
-    editTechnologyIconPictureId.value = technology.icon_picture?.id || undefined;
+    editTechnologyIconPictureId.value = technology.icon_picture?.id ?? undefined;
     editTechnologyDescription.value = getTechnologyDescription(technology);
     isEditTechnologyDialogOpen.value = true;
 };

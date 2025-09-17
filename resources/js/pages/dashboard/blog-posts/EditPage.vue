@@ -173,9 +173,6 @@ const handleSubmit = form.handleSubmit(async (values) => {
             original_blog_post_id: currentBlogPostDraft.value?.original_blog_post_id || originalBlogPostId.value,
         };
 
-        console.log('Submit payload:', payload); // Debug
-        console.log('Cover picture ID in payload:', payload.cover_picture_id); // Debug
-
         if (currentBlogPostDraft.value) {
             // Update existing draft
             await axios.put(route('dashboard.api.blog-post-drafts.update', { blog_post_draft: currentBlogPostDraft.value.id }), payload);
@@ -227,9 +224,7 @@ const handlePublish = async () => {
 };
 
 const handleCoverPictureChange = (pictureId: number | null) => {
-    console.log('Cover picture changed:', pictureId); // Debug
     form.setFieldValue('cover_picture_id', pictureId);
-    console.log('Form value after change:', form.values.cover_picture_id); // Debug
 };
 
 const categories = ref([...props.categories]);

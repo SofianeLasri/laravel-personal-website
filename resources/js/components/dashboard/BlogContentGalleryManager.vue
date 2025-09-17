@@ -69,10 +69,6 @@ watch(
         const shouldUpdateFromProps = isInitialLoad && !hasUnsavedChanges.value;
 
         if (shouldUpdateFromProps) {
-            console.log('Loading initial images from props:', {
-                newLength: newInitialImages?.length || 0,
-                isInitialLoad,
-            });
             images.value = [...(newInitialImages || [])];
         }
     },

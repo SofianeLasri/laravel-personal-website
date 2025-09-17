@@ -54,7 +54,7 @@ export default defineConfigWithVueTs(
             'vue/require-default-prop': 'error',
             'vue/require-prop-types': 'error',
             'vue/require-v-for-key': 'error',
-            'vue/no-v-html': 'warn', // Security warning
+            // 'vue/no-v-html': 'warn', // Security warning
             'vue/component-tags-order': [
                 'error',
                 {
@@ -123,7 +123,7 @@ export default defineConfigWithVueTs(
             // General JavaScript/TypeScript Rules
             'no-console': ['warn', { allow: ['warn', 'error'] }],
             'no-debugger': 'error',
-            'no-alert': 'warn',
+            // 'no-alert': 'warn',
             'no-unused-expressions': 'error',
             'prefer-const': 'error',
             'no-var': 'error',

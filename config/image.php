@@ -128,7 +128,7 @@ return [
 
     'format_support' => [
         'imagick' => ['avif', 'webp', 'jpeg', 'png', 'gif', 'bmp', 'tiff'],
-        'gd' => ['webp', 'jpeg', 'png', 'gif', 'bmp'], // Note: GD doesn't support AVIF
+        'gd' => ['avif', 'webp', 'jpeg', 'png', 'gif', 'bmp'], // Note: GD supports AVIF since PHP 8.1
     ],
 
     /*

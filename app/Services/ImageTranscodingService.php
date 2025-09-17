@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ImageTranscodingError;
 use App\Exceptions\ImageTranscodingException;
 use App\Services\NotificationService;
+use Exception;
 use Imagick;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
@@ -15,6 +16,7 @@ use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\Exceptions\RuntimeException;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 
 class ImageTranscodingService
 {
@@ -22,6 +24,9 @@ class ImageTranscodingService
     protected array $driverManagers = [];
     protected NotificationService $notificationService;
 
+    /**
+     * @throws ImageTranscodingException
+     */
     public function __construct(NotificationService $notificationService)
     {
         $this->notificationService = $notificationService;
@@ -31,6 +36,7 @@ class ImageTranscodingService
 
     /**
      * Detect which drivers are available on the system
+     * @throws ImageTranscodingException
      */
     protected function detectAvailableDrivers(): void
     {
@@ -85,7 +91,7 @@ class ImageTranscodingService
         return match ($driver) {
             'imagick' => new ImageManager(new ImagickDriver(), $options),
             'gd' => new ImageManager(new GdDriver(), $options),
-            default => throw new \InvalidArgumentException("Unsupported driver: {$driver}"),
+            default => throw new InvalidArgumentException("Unsupported driver: {$driver}"),
         };
     }
 
@@ -171,6 +177,7 @@ class ImageTranscodingService
 
     /**
      * Transcode with a specific driver
+     * @throws ImageTranscodingException
      */
     protected function transcodeWithDriver(string $source, ?int $resolution, string $codec, string $driverName): string
     {
@@ -217,7 +224,7 @@ class ImageTranscodingService
                 'codec' => $codec,
                 'resolution' => $resolution,
             ], $e);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle GD-specific errors or other exceptions
             if ($driverName === 'gd') {
                 throw ImageTranscodingException::gdFailed($e->getMessage(), [
@@ -277,7 +284,7 @@ class ImageTranscodingService
                     'max_area' => $maxArea,
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning('Failed to check Imagick resource limits', [
                 'error' => $e->getMessage(),
             ]);
@@ -309,7 +316,7 @@ class ImageTranscodingService
                     'max_height' => $maxHeight,
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning('Failed to check GD limits', [
                 'error' => $e->getMessage(),
             ]);

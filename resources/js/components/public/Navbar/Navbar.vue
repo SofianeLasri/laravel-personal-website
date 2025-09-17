@@ -20,7 +20,7 @@ const currentPath = computed(() => currentUrl.value.href);
 
 const isMenuOpen = ref(false);
 const isSearchModalOpen = ref(false);
-const hoveredItemIndex = ref(null);
+const hoveredItemIndex = ref<number | null>(null);
 const indicatorPosition = ref(0);
 const indicatorVisible = ref(false);
 const linkHeight = ref(48);
@@ -56,7 +56,7 @@ const getRelativeIndex = (absoluteIndex: number) => {
     return absoluteIndex - 4;
 };
 
-const isItemActive = (index: any) => {
+const isItemActive = (index: number | null) => {
     return index === activeIndex.value;
 };
 
@@ -83,7 +83,7 @@ const handleEscKey = (event: KeyboardEvent) => {
     }
 };
 
-const updateIndicatorPosition = (index: any) => {
+const updateIndicatorPosition = (index: number) => {
     hoveredItemIndex.value = index;
     indicatorVisible.value = true;
 

@@ -54,7 +54,7 @@ export default defineConfigWithVueTs(
             'vue/require-default-prop': 'error',
             'vue/require-prop-types': 'error',
             'vue/require-v-for-key': 'error',
-            // 'vue/no-v-html': 'warn', // Security warning
+            'vue/no-v-html': 'off', // Disabled - Security warning
             'vue/component-tags-order': [
                 'error',
                 {

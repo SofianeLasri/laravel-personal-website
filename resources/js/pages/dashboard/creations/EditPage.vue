@@ -162,7 +162,7 @@ watch(nameField, (newName) => {
     }
 });
 
-const updateContentForLocale = (newLocale: any) => {
+const updateContentForLocale = (newLocale: string) => {
     if (currentCreationDraft.value) {
         const newShortDesc = getContentForLocale(currentCreationDraft.value.short_description_translation_key, newLocale);
 
@@ -176,7 +176,7 @@ const updateContentForLocale = (newLocale: any) => {
     locale.value = newLocale;
 };
 
-const handleLocaleChange = (newLocale: any) => {
+const handleLocaleChange = (newLocale: string) => {
     if (hasUnsavedChanges.value) {
         pendingLocale.value = newLocale;
         showLocaleChangeDialog.value = true;

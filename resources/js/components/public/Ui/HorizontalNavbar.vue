@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
         if (props.showArrows && navScrollContainer.value) {
             navScrollContainer.value.removeEventListener('scroll', checkNavArrows);
         }
-        window.removeEventListener('resize', () => {});
+        // Note: No specific resize handler to remove in this implementation
     }
 });
 </script>

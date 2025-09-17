@@ -22,7 +22,7 @@ const className = computed(() => cn('h-4 w-4', props.class));
 
 const icon = computed(() => {
     const iconName = props.name.charAt(0).toUpperCase() + props.name.slice(1);
-    return (icons as Record<string, any>)[iconName];
+    return (icons as Record<string, unknown>)[iconName];
 });
 </script>
 

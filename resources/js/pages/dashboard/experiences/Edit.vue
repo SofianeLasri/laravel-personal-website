@@ -111,9 +111,9 @@ const searchTechQuery = ref('');
 const selectedTechnologies = ref<Technology[]>(props.experience?.technologies || []);
 
 // Obtenir les traductions
-const getTranslation = (translationKey: any, targetLocale: string) => {
+const getTranslation = (translationKey: { translations: { locale: string; text: string }[] }, targetLocale: string) => {
     if (!translationKey?.translations) return '';
-    const translation = translationKey.translations.find((t: any) => t.locale === targetLocale);
+    const translation = translationKey.translations.find((t) => t.locale === targetLocale);
     return translation ? translation.text : '';
 };
 
@@ -184,7 +184,7 @@ const updateContentForLocale = (newLocale: 'fr' | 'en') => {
     locale.value = newLocale;
 };
 
-const handleLocaleChange = (newLocale: any) => {
+const handleLocaleChange = (newLocale: string) => {
     if (hasUnsavedChanges.value) {
         pendingLocale.value = newLocale;
         showLocaleChangeDialog.value = true;

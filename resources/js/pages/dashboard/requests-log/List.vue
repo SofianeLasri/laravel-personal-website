@@ -597,7 +597,7 @@ const markSelectedAsBot = async () => {
                                                     <div class="space-y-1">
                                                         <p class="font-semibold">Raisons de détection:</p>
                                                         <ul class="list-inside list-disc text-sm">
-                                                            <li v-for="(reason, index) in getBotDetectionReasons(request)" :key="index">
+                                                            <li v-for="(reason, reasonIndex) in getBotDetectionReasons(request)" :key="reasonIndex">
                                                                 {{ reason }}
                                                             </li>
                                                         </ul>

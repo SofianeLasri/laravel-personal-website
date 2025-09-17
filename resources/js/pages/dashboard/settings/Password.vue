@@ -33,7 +33,7 @@ const updatePassword = () => {
     form.put(route('dashboard.password.update'), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
-        onError: (errors: any) => {
+        onError: (errors: Record<string, string>) => {
             if (errors.password) {
                 form.reset('password', 'password_confirmation');
                 if (passwordInput.value instanceof HTMLInputElement) {

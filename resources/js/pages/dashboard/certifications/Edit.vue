@@ -98,7 +98,10 @@ const onSubmit = form.handleSubmit(async (values) => {
     try {
         if (isEditing.value) {
             // Mise à jour
-            await axios.put(route('dashboard.api.certifications.update', { certification: props.certification!.id }), values);
+            if (!props.certification?.id) {
+                throw new Error('Certification ID is required for update');
+            }
+            await axios.put(route('dashboard.api.certifications.update', { certification: props.certification.id }), values);
             toast.success('Certification mise à jour avec succès');
         } else {
             // Création
@@ -108,10 +111,10 @@ const onSubmit = form.handleSubmit(async (values) => {
 
         // Redirection vers la liste
         router.visit(route('dashboard.certifications.index'));
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la sauvegarde :', error);
 
-        if (error.response?.status === 422) {
+        if ((error as { response?: { status?: number } }).response?.status === 422) {
             // Erreurs de validation
             const errors = error.response.data.errors;
             Object.keys(errors).forEach((field) => {

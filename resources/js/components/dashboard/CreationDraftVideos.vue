@@ -226,7 +226,7 @@ const resetEditForm = () => {
 
 const handleFileSelect = (event: Event) => {
     const target = event.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
+    if (target.files?.[0]) {
         newVideoFile.value = target.files[0];
         if (!newVideoName.value) {
             newVideoName.value = target.files[0].name.replace(/\.[^/.]+$/, '');

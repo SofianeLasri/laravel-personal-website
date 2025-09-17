@@ -36,7 +36,7 @@ const hasActiveFilters = computed(() => {
 });
 
 const applyFilters = () => {
-    const params: any = {};
+    const params: Record<string, string> = {};
 
     if (selectedCategories.value.length > 0) {
         params.category = selectedCategories.value.join(',');

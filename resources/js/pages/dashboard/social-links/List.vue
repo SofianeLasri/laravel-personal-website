@@ -101,7 +101,7 @@ const saveLink = async () => {
             );
 
             // Mettre à jour dans le tableau local
-            const index = links.value.findIndex((link) => link.id === currentLink.value!.id);
+            const index = links.value.findIndex((link) => link.id === currentLink.value?.id);
             if (index !== -1) {
                 links.value[index] = response.data;
             }
@@ -142,7 +142,7 @@ const deleteLink = async () => {
         await axios.delete(route('dashboard.api.social-media-links.destroy', { social_media_link: currentLink.value.id }));
 
         // Supprimer du tableau local
-        links.value = links.value.filter((link) => link.id !== currentLink.value!.id);
+        links.value = links.value.filter((link) => link.id !== currentLink.value?.id);
 
         toast.success('Lien supprimé avec succès');
         isDeleteDialogOpen.value = false;

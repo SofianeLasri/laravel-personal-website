@@ -37,6 +37,9 @@ const projectsUrl = computed(() => {
             params.tab = 'games';
             params.gameEngines = props.experience.technologyId.toString();
             break;
+        default:
+            // Other technology types don't have specific filtering
+            break;
     }
 
     return route('public.projects', params);

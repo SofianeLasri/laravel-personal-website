@@ -215,7 +215,7 @@ const updateTechnology = async () => {
     error.value = null;
 
     try {
-        const updateData: any = {
+        const updateData: Record<string, unknown> = {
             name: editTechnologyName.value.trim(),
             type: editTechnologyType.value,
             locale: props.locale,

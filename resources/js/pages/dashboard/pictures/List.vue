@@ -262,9 +262,9 @@ const reoptimizePicture = async (picture: Picture) => {
         } else {
             toast.error(response.data.message || 'Erreur lors de la recompression');
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la recompression:', error);
-        const message = error.response?.data?.message || 'Erreur lors de la recompression';
+        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Erreur lors de la recompression';
         toast.error(message);
     } finally {
         reoptimizingPictures.value.delete(picture.id);
@@ -274,7 +274,7 @@ const reoptimizePicture = async (picture: Picture) => {
 // Check health of all visible pictures on mount
 onMounted(() => {
     props.pictures.data.forEach((picture) => {
-        checkPictureHealth(picture.id);
+        void checkPictureHealth(picture.id);
     });
 });
 </script>

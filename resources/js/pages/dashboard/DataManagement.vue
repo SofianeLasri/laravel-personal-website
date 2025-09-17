@@ -42,8 +42,8 @@ const isImporting = ref(false);
 const importProgress = ref(0);
 const importFile = ref<File | null>(null);
 const uploadedFilePath = ref<string | null>(null);
-const importMetadata = ref<any>(null);
-const importStats = ref<any>(null);
+const importMetadata = ref<Record<string, unknown> | null>(null);
+const importStats = ref<Record<string, unknown> | null>(null);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
 
@@ -74,8 +74,8 @@ const handleExport = async () => {
             error.value = response.data.message;
             isExporting.value = false;
         }
-    } catch (err: any) {
-        error.value = err.response?.data?.message || 'Failed to start export. Please try again.';
+    } catch (err: unknown) {
+        error.value = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to start export. Please try again.';
         isExporting.value = false;
     }
 };
@@ -112,8 +112,11 @@ const startExportStatusPolling = () => {
                     stopExportStatusPolling();
                     isExporting.value = false;
                     break;
+                default:
+                    // Unknown status, continue polling
+                    break;
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             error.value = 'Failed to check export status. Please refresh the page.';
             stopExportStatusPolling();
             isExporting.value = false;
@@ -166,7 +169,7 @@ const uploadImportFile = async () => {
         uploadedFilePath.value = response.data.file_path;
         importMetadata.value = response.data.metadata;
         success.value = 'File uploaded and validated successfully!';
-    } catch (err: any) {
+    } catch (err: unknown) {
         error.value = err.response?.data?.message || 'Upload failed. Please check your file and try again.';
         if (err.response?.data?.errors?.import_file) {
             error.value = err.response.data.errors.import_file.join(', ');
@@ -208,7 +211,7 @@ const handleImport = async () => {
         if (fileInput.value) {
             fileInput.value.value = '';
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         clearInterval(progressInterval);
         error.value = err.response?.data?.message || 'Import failed. Please try again.';
     } finally {
@@ -234,7 +237,7 @@ const cancelImport = async () => {
         }
 
         success.value = 'Import cancelled successfully.';
-    } catch (err: any) {
+    } catch (err: unknown) {
         error.value = 'Failed to cancel import.';
         console.error(err);
     }

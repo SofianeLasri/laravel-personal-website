@@ -98,9 +98,9 @@ const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMMM yyyy', { locale: fr });
 };
 
-const getTranslation = (translationKey: any, locale: string) => {
+const getTranslation = (translationKey: { translations: { locale: string; text: string }[] }, locale: string) => {
     if (!translationKey?.translations) return '';
-    const translation = translationKey.translations.find((t: any) => t.locale === locale);
+    const translation = translationKey.translations.find((t) => t.locale === locale);
     return translation ? translation.text : '';
 };
 

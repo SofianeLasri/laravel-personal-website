@@ -3,7 +3,7 @@ declare module 'photoswipe-dynamic-caption-plugin' {
 
     interface DynamicCaptionOptions {
         type?: 'auto' | 'below' | 'above';
-        captionContent?: string | ((slide: any) => string);
+        captionContent?: string | ((slide: unknown) => string);
         horizontalPadding?: number;
         mobileCaptionOverlapRatio?: number;
         mobileLayoutBreakpoint?: number;

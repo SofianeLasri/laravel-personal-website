@@ -17,7 +17,7 @@ defineProps<Props>();
         class="group flex cursor-pointer flex-col gap-6 transition-transform hover:scale-[1.01] lg:flex-row lg:items-center lg:gap-10"
     >
         <!-- Hero Image -->
-        <div class="flex aspect-video h-96 shrink-0 no-glow overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] lg:h-96">
+        <div class="no-glow flex aspect-video h-96 shrink-0 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] lg:h-96">
             <picture>
                 <source :srcset="post.coverImage.avif.large" type="image/avif" />
                 <source :srcset="post.coverImage.webp.large" type="image/webp" />

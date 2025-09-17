@@ -308,9 +308,9 @@ const downloadThumbnail = async (video: Video) => {
 
 onMounted(() => {
     if (props.creationDraftId) {
-        fetchVideos();
+        void fetchVideos();
     }
-    fetchAllVideos();
+    void fetchAllVideos();
 });
 
 watch(

@@ -112,7 +112,7 @@ export function useSearch() {
 
     // Debounced search
     const debouncedSearch = debounce(() => {
-        performSearch();
+        void performSearch();
     }, 300);
 
     // Watch for changes

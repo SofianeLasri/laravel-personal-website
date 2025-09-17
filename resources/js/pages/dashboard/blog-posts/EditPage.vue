@@ -48,7 +48,7 @@ const isPublishing = ref(false);
 const currentBlogPostDraft = ref<BlogPostDraftWithAllRelations | null>(null);
 
 // Ref for BlogContentBuilder to access saveAllGalleries method
-const blogContentBuilderRef = ref<InstanceType<typeof BlogContentBuilder> | null>(null);
+const blogContentBuilderRef = ref<{ saveAllGalleries?: () => Promise<void> } | null>(null);
 
 if (props.blogPostDraft) {
     currentBlogPostDraft.value = props.blogPostDraft;

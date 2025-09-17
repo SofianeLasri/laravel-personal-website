@@ -21,10 +21,10 @@ const notificationStore = useNotificationStore();
 
 onMounted(() => {
     // Fetch initial notifications
-    notificationStore.fetchNotifications();
+    void notificationStore.fetchNotifications();
 
     // Start polling for new notifications
-    notificationStore.startPolling(30000); // Poll every 30 seconds
+    void notificationStore.startPolling(30000); // Poll every 30 seconds
 });
 </script>
 

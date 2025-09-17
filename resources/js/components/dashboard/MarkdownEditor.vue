@@ -52,11 +52,11 @@ const editor = useEditor({
 watch(
     () => props.modelValue,
     (newValue) => {
-        newValue = newValue || '';
+        const sanitizedValue = newValue ?? '';
 
-        if (newValue !== content.value) {
-            content.value = newValue;
-            rawContent.value = newValue;
+        if (sanitizedValue !== content.value) {
+            content.value = sanitizedValue;
+            rawContent.value = sanitizedValue;
 
             if (editor.value && editor.value.storage.markdown.getMarkdown() !== newValue) {
                 editor.value.commands.setContent(newValue, false);

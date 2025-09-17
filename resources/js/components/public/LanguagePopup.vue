@@ -36,7 +36,7 @@ const dismissPopup = () => {
 };
 
 const acceptTranslation = () => {
-    setLanguage('en');
+    void setLanguage('en');
 };
 
 onMounted(() => {

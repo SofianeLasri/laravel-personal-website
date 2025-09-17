@@ -63,12 +63,12 @@ const handlePeriodChange = (period: string) => {
     if (period === 'custom') return;
 
     const today = new Date().toISOString().split('T')[0];
-    loadStats(period, today);
+    void loadStats(period, today);
 };
 
 const applyCustomPeriod = () => {
     if (customStartDate.value && customEndDate.value) {
-        loadStats(customStartDate.value, customEndDate.value);
+        void loadStats(customStartDate.value, customEndDate.value);
     }
 };
 
@@ -92,7 +92,7 @@ const totalVisitsForPeriod = computed(() => {
 });
 
 onMounted(() => {
-    loadStats();
+    void loadStats();
 });
 </script>
 

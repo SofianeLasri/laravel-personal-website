@@ -23,7 +23,7 @@ const gridClasses = computed(() => {
 });
 
 onMounted(() => {
-    nextTick(() => {
+    void nextTick(() => {
         const lightbox = new PhotoSwipeLightbox({
             gallery: `#${galleryId.value}`,
             children: 'a',

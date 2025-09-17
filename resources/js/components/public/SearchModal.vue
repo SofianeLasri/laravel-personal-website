@@ -60,7 +60,7 @@ watch(
     (isOpen) => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            loadFilters();
+            void loadFilters();
         } else {
             document.body.style.overflow = '';
             resetSearch();

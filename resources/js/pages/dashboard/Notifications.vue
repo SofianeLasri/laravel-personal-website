@@ -15,7 +15,7 @@ const notifications = computed(() => notificationStore.notifications);
 const unreadCount = computed(() => notificationStore.unreadCount);
 
 onMounted(() => {
-    notificationStore.fetchNotifications();
+    void notificationStore.fetchNotifications();
 });
 
 const handleMarkAsRead = async (id: number) => {

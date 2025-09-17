@@ -179,7 +179,7 @@ const uploadSingleFile = async (file: File): Promise<void> => {
         toast.success(`Image "${file.name}" ajoutée avec succès`);
 
         // Auto-save after successful upload
-        await autoSaveGallery();
+        autoSaveGallery();
     } catch (error) {
         console.error("Erreur lors de l'upload:", error);
         toast.error(`Erreur lors de l'upload de "${file.name}"`);
@@ -194,7 +194,7 @@ const removeImage = async (index: number) => {
     toast.success('Image supprimée');
 
     // Auto-save after removing image
-    await autoSaveGallery();
+    autoSaveGallery();
 };
 
 const updateCaption = (index: number, caption: string) => {

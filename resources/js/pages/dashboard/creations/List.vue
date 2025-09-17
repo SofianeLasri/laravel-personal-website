@@ -88,7 +88,7 @@ const getFrenchDescription = (translationKey: TranslationKey): string => {
     return frTranslation ? frTranslation.text : '';
 };
 
-const compareValues = (a: any, b: any, direction: SortDirection) => {
+const compareValues = (a: unknown, b: unknown, direction: SortDirection) => {
     const multiplier = direction === 'asc' ? 1 : -1;
 
     if (a === null || a === undefined) return multiplier;
@@ -114,7 +114,12 @@ const compareValues = (a: any, b: any, direction: SortDirection) => {
         return multiplier * (new Date(a).getTime() - new Date(b).getTime());
     }
 
-    return multiplier * String(a).localeCompare(String(b));
+    // Fallback to string comparison for primitive values
+    const aStr = (a === null || a === undefined) ? '' :
+                 (typeof a === 'string' || typeof a === 'number' || typeof a === 'boolean') ? String(a) : '';
+    const bStr = (b === null || b === undefined) ? '' :
+                 (typeof b === 'string' || typeof b === 'number' || typeof b === 'boolean') ? String(b) : '';
+    return multiplier * aStr.localeCompare(bStr);
 };
 
 const sortedCreations = computed(() => {

@@ -15,6 +15,124 @@ use Illuminate\Validation\ValidationException;
 
 class BlogPostConversionService
 {
+    public function __construct(
+        private readonly BlogContentDuplicationService $contentDuplicationService
+    ) {}
+
+    /**
+     * Create a draft from an existing published blog post
+     * This allows editing a published post through the draft workflow
+     */
+    public function createDraftFromBlogPost(BlogPost $blogPost): BlogPostDraft
+    {
+        return DB::transaction(function () use ($blogPost) {
+            // Create draft from published post
+            $draft = BlogPostDraft::create([
+                'original_blog_post_id' => $blogPost->id,
+                'slug' => $blogPost->slug,
+                'title_translation_key_id' => $this->duplicateTranslationKey($blogPost->titleTranslationKey)->id,
+                'type' => $blogPost->type,
+                'category_id' => $blogPost->category_id,
+                'cover_picture_id' => $blogPost->cover_picture_id,
+            ]);
+
+            // Duplicate all contents from published post to draft
+            $duplicatedContents = $this->contentDuplicationService->duplicateAllContents($blogPost->contents);
+
+            foreach ($duplicatedContents as $contentData) {
+                $draft->contents()->create([
+                    'content_type' => $contentData['content_type'],
+                    'content_id' => $contentData['content_id'],
+                    'order' => $contentData['order'],
+                ]);
+            }
+
+            // Duplicate game review if it exists
+            if ($blogPost->gameReview) {
+                $this->createGameReviewDraft($blogPost->gameReview, $draft);
+            }
+
+            return $draft;
+        });
+    }
+
+    /**
+     * Create a game review draft from a published game review
+     */
+    private function createGameReviewDraft(GameReview $gameReview, BlogPostDraft $draft): void
+    {
+        $gameReviewDraftData = [
+            'blog_post_draft_id' => $draft->id,
+            'game_title' => $gameReview->game_title,
+            'release_date' => $gameReview->release_date,
+            'genre' => $gameReview->genre,
+            'developer' => $gameReview->developer,
+            'publisher' => $gameReview->publisher,
+            'platforms' => $gameReview->platforms,
+            'cover_picture_id' => $gameReview->cover_picture_id,
+            'rating' => $gameReview->rating,
+        ];
+
+        // Duplicate translation keys for pros and cons if they exist
+        if ($gameReview->pros_translation_key_id) {
+            $gameReviewDraftData['pros_translation_key_id'] = $this->duplicateTranslationKey($gameReview->prosTranslationKey)->id;
+        }
+
+        if ($gameReview->cons_translation_key_id) {
+            $gameReviewDraftData['cons_translation_key_id'] = $this->duplicateTranslationKey($gameReview->consTranslationKey)->id;
+        }
+
+        $gameReviewDraft = GameReviewDraft::create($gameReviewDraftData);
+
+        // Duplicate game review links
+        foreach ($gameReview->links as $link) {
+            $gameReviewDraft->links()->create([
+                'type' => $link->type,
+                'url' => $link->url,
+                'label_translation_key_id' => $this->duplicateTranslationKey($link->labelTranslationKey)->id,
+                'order' => $link->order,
+            ]);
+        }
+    }
+
+    /**
+     * Duplicate a translation key with all its translations
+     */
+    private function duplicateTranslationKey(\App\Models\TranslationKey $originalTranslationKey): \App\Models\TranslationKey
+    {
+        // Create new translation key with a unique key
+        $newTranslationKey = \App\Models\TranslationKey::create([
+            'key' => $this->generateUniqueTranslationKey($originalTranslationKey->key),
+        ]);
+
+        // Duplicate all translations
+        foreach ($originalTranslationKey->translations as $translation) {
+            $newTranslationKey->translations()->create([
+                'locale' => $translation->locale,
+                'text' => $translation->text,
+            ]);
+        }
+
+        return $newTranslationKey;
+    }
+
+    /**
+     * Generate a unique translation key based on the original key
+     */
+    private function generateUniqueTranslationKey(string $originalKey): string
+    {
+        $baseKey = $originalKey.'_draft';
+        $key = $baseKey;
+        $counter = 1;
+
+        while (\App\Models\TranslationKey::where('key', $key)->exists()) {
+            $key = $baseKey.'_'.$counter;
+            $counter++;
+        }
+
+        return $key;
+    }
+
     /**
      * Convert a BlogPostDraft to a published BlogPost
      *
@@ -86,21 +204,68 @@ class BlogPostConversionService
     }
 
     /**
-     * Sync all blog post contents from draft to published
+     * Sync all blog post contents from draft to published by duplicating content
      */
     private function syncContents(BlogPostDraft $draft, BlogPost $blogPost): void
     {
-        // Delete existing contents
+        // Delete existing contents (this will not affect draft contents since we duplicate)
+        $existingContents = $blogPost->contents;
+
+        // Clean up old content records that are no longer needed
+        foreach ($existingContents as $existingContent) {
+            $this->deleteContentRecord($existingContent);
+        }
+
         $blogPost->contents()->delete();
 
-        // Create new contents from draft
-        foreach ($draft->contents as $draftContent) {
+        // Duplicate contents from draft to create independent published content
+        $duplicatedContents = $this->contentDuplicationService->duplicateAllContents($draft->contents);
+
+        foreach ($duplicatedContents as $contentData) {
             BlogPostContent::create([
                 'blog_post_id' => $blogPost->id,
-                'content_type' => $draftContent->content_type,
-                'content_id' => $draftContent->content_id,
-                'order' => $draftContent->order,
+                'content_type' => $contentData['content_type'],
+                'content_id' => $contentData['content_id'],
+                'order' => $contentData['order'],
             ]);
+        }
+    }
+
+    /**
+     * Delete the actual content record (markdown, gallery, video) when cleaning up
+     */
+    private function deleteContentRecord(BlogPostContent $blogContent): void
+    {
+        $content = $blogContent->content;
+
+        if ($content) {
+            // Handle specific cleanup based on content type
+            if ($content instanceof \App\Models\BlogContentMarkdown) {
+                // Delete translation key and its translations
+                $content->translationKey?->translations()?->delete();
+                $content->translationKey?->delete();
+            } elseif ($content instanceof \App\Models\BlogContentGallery) {
+                // Detach pictures and delete caption translation keys
+                foreach ($content->pictures as $picture) {
+                    if ($picture->pivot->caption_translation_key_id) {
+                        $captionTranslationKey = \App\Models\TranslationKey::find($picture->pivot->caption_translation_key_id);
+                        if ($captionTranslationKey) {
+                            $captionTranslationKey->translations()->delete();
+                            $captionTranslationKey->delete();
+                        }
+                    }
+                }
+                $content->pictures()->detach();
+            } elseif ($content instanceof \App\Models\BlogContentVideo) {
+                // Delete caption translation key if it exists
+                if ($content->caption_translation_key_id) {
+                    $content->captionTranslationKey?->translations()?->delete();
+                    $content->captionTranslationKey?->delete();
+                }
+            }
+
+            // Delete the content record itself
+            $content->delete();
         }
     }
 

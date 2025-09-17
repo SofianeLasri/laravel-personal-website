@@ -3,11 +3,11 @@
 namespace App\Providers;
 
 use App\Services\ImageTranscodingService;
+use App\Services\NotificationService;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use Intervention\Image\Drivers\Imagick\Driver;
 use League\Flysystem\Filesystem;
 use PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNAdapter;
 use PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNClient;
@@ -19,8 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(ImageTranscodingService::class, function () {
-            return new ImageTranscodingService(new Driver);
+        $this->app->singleton(ImageTranscodingService::class, function ($app) {
+            return new ImageTranscodingService($app->make(NotificationService::class));
         });
     }
 

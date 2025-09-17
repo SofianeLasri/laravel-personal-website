@@ -185,7 +185,41 @@ class Picture extends Model
 
         $dimensionToUse = $optimizedDimension >= $highestDimension ? null : $optimizedDimension;
 
-        return $imageTranscodingService->transcode($originalImage, $dimensionToUse, $format);
+        try {
+            return $imageTranscodingService->transcode($originalImage, $dimensionToUse, $format);
+        } catch (\App\Exceptions\ImageTranscodingException $e) {
+            Log::error('Image transcoding failed with specific error', [
+                'picture_id' => $this->id,
+                'error_code' => $e->getErrorCode()->value,
+                'driver_used' => $e->getDriverUsed(),
+                'fallback_attempted' => $e->getFallbackAttempted(),
+                'message' => $e->getMessage(),
+                'context' => $e->getContext(),
+            ]);
+
+            // Send notification for critical errors only
+            if ($e->getSeverity() === 'critical' || $e->getSeverity() === 'error') {
+                $notificationService = app(\App\Services\NotificationService::class);
+                $notificationService->error(
+                    'Échec critique d\'optimisation d\'image',
+                    'L\'image "' . $this->filename . '" n\'a pas pu être optimisée: ' . $e->getMessage(),
+                    [
+                        'picture_id' => $this->id,
+                        'error_details' => $e->toArray(),
+                    ]
+                );
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Unexpected error during image transcoding', [
+                'picture_id' => $this->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return null;
+        }
     }
 
     private function getOptimizedDimension(int $dimension, int $highestDimension): int

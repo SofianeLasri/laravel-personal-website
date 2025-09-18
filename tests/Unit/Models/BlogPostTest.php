@@ -120,4 +120,95 @@ class BlogPostTest extends TestCase
         $this->assertEquals($content2->id, $contents[1]->id);
         $this->assertEquals($content3->id, $contents[2]->id);
     }
+
+    #[Test]
+    public function it_has_fillable_fields(): void
+    {
+        $expectedFillable = [
+            'slug',
+            'title_translation_key_id',
+            'type',
+            'category_id',
+            'cover_picture_id',
+        ];
+
+        $blogPost = new BlogPost();
+
+        $this->assertEquals($expectedFillable, $blogPost->getFillable());
+    }
+
+    #[Test]
+    public function it_casts_type_to_blog_post_type_enum(): void
+    {
+        $blogPost = BlogPost::factory()->create(['type' => 'article']);
+
+        $this->assertInstanceOf(\App\Enums\BlogPostType::class, $blogPost->type);
+        $this->assertEquals(\App\Enums\BlogPostType::ARTICLE, $blogPost->type);
+
+        $blogPost2 = BlogPost::factory()->create(['type' => 'game_review']);
+        $this->assertEquals(\App\Enums\BlogPostType::GAME_REVIEW, $blogPost2->type);
+    }
+
+    #[Test]
+    public function it_can_have_nullable_cover_picture(): void
+    {
+        $blogPost = BlogPost::factory()->create(['cover_picture_id' => null]);
+
+        $this->assertNull($blogPost->cover_picture_id);
+        $this->assertNull($blogPost->coverPicture);
+    }
+
+    #[Test]
+    public function it_can_have_nullable_draft(): void
+    {
+        $blogPost = BlogPost::factory()->create();
+
+        $this->assertNull($blogPost->draft);
+    }
+
+    #[Test]
+    public function it_can_have_nullable_game_review(): void
+    {
+        $blogPost = BlogPost::factory()->create(['type' => 'article']);
+
+        $this->assertNull($blogPost->gameReview);
+    }
+
+    #[Test]
+    public function it_has_many_drafts(): void
+    {
+        $blogPost = BlogPost::factory()->create();
+        $draft1 = BlogPostDraft::factory()->create(['original_blog_post_id' => $blogPost->id]);
+        $draft2 = BlogPostDraft::factory()->create(['original_blog_post_id' => $blogPost->id]);
+        $draft3 = BlogPostDraft::factory()->create(['original_blog_post_id' => $blogPost->id]);
+
+        $this->assertCount(3, $blogPost->drafts);
+        $this->assertTrue($blogPost->drafts->contains($draft1));
+        $this->assertTrue($blogPost->drafts->contains($draft2));
+        $this->assertTrue($blogPost->drafts->contains($draft3));
+    }
+
+    #[Test]
+    public function it_has_timestamps(): void
+    {
+        $blogPost = BlogPost::factory()->create();
+
+        $this->assertNotNull($blogPost->created_at);
+        $this->assertNotNull($blogPost->updated_at);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $blogPost->created_at);
+        $this->assertInstanceOf(\Carbon\Carbon::class, $blogPost->updated_at);
+    }
+
+    #[Test]
+    public function it_stores_and_retrieves_slug_correctly(): void
+    {
+        $slug = 'test-blog-post-slug';
+        $blogPost = BlogPost::factory()->create(['slug' => $slug]);
+
+        $this->assertEquals($slug, $blogPost->slug);
+        $this->assertIsString($blogPost->slug);
+
+        $retrievedPost = BlogPost::find($blogPost->id);
+        $this->assertEquals($slug, $retrievedPost->slug);
+    }
 }

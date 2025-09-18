@@ -10,8 +10,10 @@ use App\Models\TranslationKey;
 use App\Models\Video;
 use App\Services\BlogContentDuplicationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
+#[CoversClass(BlogContentDuplicationService::class)]
 class BlogContentDuplicationServiceTest extends TestCase
 {
     use RefreshDatabase;
@@ -179,5 +181,189 @@ class BlogContentDuplicationServiceTest extends TestCase
 
         $this->assertStringContainsString('unique.key.original', $newKey->key);
         $this->assertStringContainsString('copy', $newKey->key);
+    }
+
+    public function test_duplicates_all_contents_with_mixed_types()
+    {
+        // Create markdown content
+        $markdownTranslationKey = TranslationKey::factory()->create(['key' => 'markdown.content']);
+        $markdownTranslationKey->translations()->create(['locale' => 'en', 'text' => 'Markdown text']);
+        $markdownContent = BlogContentMarkdown::factory()->create([
+            'translation_key_id' => $markdownTranslationKey->id,
+        ]);
+
+        // Create gallery content
+        $picture = Picture::factory()->create();
+        $galleryContent = BlogContentGallery::factory()->create([
+            'layout' => 'masonry',
+            'columns' => 2,
+        ]);
+        $galleryContent->pictures()->attach($picture->id, ['order' => 1]);
+
+        // Create video content
+        $video = Video::factory()->create();
+        $videoContent = BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        // Create blog post draft contents to simulate the structure
+        $blogPostDraft = \App\Models\BlogPostDraft::factory()->create();
+        $contents = collect([
+            (object) [
+                'content_type' => BlogContentMarkdown::class,
+                'content' => $markdownContent,
+                'order' => 1,
+            ],
+            (object) [
+                'content_type' => BlogContentGallery::class,
+                'content' => $galleryContent,
+                'order' => 2,
+            ],
+            (object) [
+                'content_type' => BlogContentVideo::class,
+                'content' => $videoContent,
+                'order' => 3,
+            ],
+        ]);
+
+        // Duplicate all contents
+        $newContents = $this->service->duplicateAllContents($contents);
+
+        // Assert we have 3 new contents
+        $this->assertCount(3, $newContents);
+
+        // Assert markdown content was duplicated correctly
+        $this->assertEquals(BlogContentMarkdown::class, $newContents[0]['content_type']);
+        $this->assertEquals(1, $newContents[0]['order']);
+        $markdownDuplicate = BlogContentMarkdown::find($newContents[0]['content_id']);
+        $this->assertNotNull($markdownDuplicate);
+        $this->assertNotEquals($markdownContent->id, $markdownDuplicate->id);
+
+        // Assert gallery content was duplicated correctly
+        $this->assertEquals(BlogContentGallery::class, $newContents[1]['content_type']);
+        $this->assertEquals(2, $newContents[1]['order']);
+        $galleryDuplicate = BlogContentGallery::find($newContents[1]['content_id']);
+        $this->assertNotNull($galleryDuplicate);
+        $this->assertNotEquals($galleryContent->id, $galleryDuplicate->id);
+
+        // Assert video content was duplicated correctly
+        $this->assertEquals(BlogContentVideo::class, $newContents[2]['content_type']);
+        $this->assertEquals(3, $newContents[2]['order']);
+        $videoDuplicate = BlogContentVideo::find($newContents[2]['content_id']);
+        $this->assertNotNull($videoDuplicate);
+        $this->assertNotEquals($videoContent->id, $videoDuplicate->id);
+    }
+
+    public function test_duplicates_all_contents_skips_unknown_content_type()
+    {
+        // Create markdown content
+        $markdownTranslationKey = TranslationKey::factory()->create(['key' => 'markdown.content']);
+        $markdownContent = BlogContentMarkdown::factory()->create([
+            'translation_key_id' => $markdownTranslationKey->id,
+        ]);
+
+        // Create contents collection with an unknown content type
+        $contents = collect([
+            (object) [
+                'content_type' => BlogContentMarkdown::class,
+                'content' => $markdownContent,
+                'order' => 1,
+            ],
+            (object) [
+                'content_type' => 'App\Models\UnknownContentType', // Unknown type
+                'content' => null,
+                'order' => 2,
+            ],
+        ]);
+
+        // Duplicate all contents
+        $newContents = $this->service->duplicateAllContents($contents);
+
+        // Assert only the markdown content was duplicated (unknown type skipped)
+        $this->assertCount(1, $newContents);
+        $this->assertEquals(BlogContentMarkdown::class, $newContents[0]['content_type']);
+        $this->assertEquals(1, $newContents[0]['order']);
+    }
+
+    public function test_duplicates_gallery_without_captions()
+    {
+        // Create pictures
+        $picture1 = Picture::factory()->create();
+        $picture2 = Picture::factory()->create();
+
+        // Create gallery without captions
+        $originalGallery = BlogContentGallery::factory()->create([
+            'layout' => 'grid',
+            'columns' => 2,
+        ]);
+
+        $originalGallery->pictures()->attach($picture1->id, [
+            'order' => 1,
+            'caption_translation_key_id' => null, // No caption
+        ]);
+
+        $originalGallery->pictures()->attach($picture2->id, [
+            'order' => 2,
+            'caption_translation_key_id' => null, // No caption
+        ]);
+
+        // Duplicate the gallery
+        $duplicatedGallery = $this->service->duplicateGalleryContent($originalGallery);
+
+        // Assert gallery was duplicated
+        $this->assertNotEquals($originalGallery->id, $duplicatedGallery->id);
+        $this->assertEquals('grid', $duplicatedGallery->layout);
+        $this->assertEquals(2, $duplicatedGallery->columns);
+
+        // Assert pictures are attached without captions
+        $this->assertCount(2, $duplicatedGallery->pictures);
+
+        $duplicatedPicture1 = $duplicatedGallery->pictures()->where('picture_id', $picture1->id)->first();
+        $duplicatedPicture2 = $duplicatedGallery->pictures()->where('picture_id', $picture2->id)->first();
+
+        $this->assertEquals(1, $duplicatedPicture1->pivot->order);
+        $this->assertEquals(2, $duplicatedPicture2->pivot->order);
+        $this->assertNull($duplicatedPicture1->pivot->caption_translation_key_id);
+        $this->assertNull($duplicatedPicture2->pivot->caption_translation_key_id);
+    }
+
+    public function test_duplicates_empty_gallery()
+    {
+        // Create empty gallery
+        $originalGallery = BlogContentGallery::factory()->create([
+            'layout' => 'carousel',
+            'columns' => 1,
+        ]);
+
+        // Duplicate the empty gallery
+        $duplicatedGallery = $this->service->duplicateGalleryContent($originalGallery);
+
+        // Assert gallery was duplicated
+        $this->assertNotEquals($originalGallery->id, $duplicatedGallery->id);
+        $this->assertEquals('carousel', $duplicatedGallery->layout);
+        $this->assertEquals(1, $duplicatedGallery->columns);
+
+        // Assert no pictures are attached
+        $this->assertCount(0, $duplicatedGallery->pictures);
+    }
+
+    public function test_generates_unique_translation_key_with_multiple_iterations()
+    {
+        // Create the original key and multiple copy variations
+        $originalKey = TranslationKey::factory()->create(['key' => 'test.key']);
+        TranslationKey::factory()->create(['key' => 'test.key_copy']);
+        TranslationKey::factory()->create(['key' => 'test.key_copy_1']);
+        TranslationKey::factory()->create(['key' => 'test.key_copy_2']);
+
+        // Create markdown with the original key
+        $originalMarkdown = BlogContentMarkdown::factory()->create([
+            'translation_key_id' => $originalKey->id,
+        ]);
+
+        // Duplicate should create test.key_copy_3
+        $duplicated = $this->service->duplicateMarkdownContent($originalMarkdown);
+        $newKey = $duplicated->translationKey;
+
+        $this->assertEquals('test.key_copy_3', $newKey->key);
     }
 }

@@ -10,11 +10,11 @@ use App\Enums\VideoVisibility;
 use App\Models\BlogCategory;
 use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
-use App\Models\GameReview;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
 use App\Models\Creation;
 use App\Models\Experience;
+use App\Models\GameReview;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
@@ -1600,7 +1600,7 @@ class PublicControllersServiceTest extends TestCase
         $result = $service->formatBlogPostForSSRShort($post);
 
         // When no space is found, it should truncate at maxLength
-        $this->assertEquals(str_repeat('a', 150) . '...', $result['excerpt']);
+        $this->assertEquals(str_repeat('a', 150).'...', $result['excerpt']);
     }
 
     #[Test]

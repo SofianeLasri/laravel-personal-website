@@ -11,9 +11,11 @@ use App\Models\BlogPostDraftContent;
 use App\Models\TranslationKey;
 use App\Services\BlogPostConversionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
 
-class BlogPostContentIsolationTest extends TestCase
+#[CoversClass(BlogPostConversionService::class)]
+class BlogPostConversionServiceTest extends TestCase
 {
     use RefreshDatabase;
 

@@ -9,10 +9,10 @@ use Imagick;
 use ImagickException;
 use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
+use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use Mockery;
 
 #[CoversClass(ImageTranscodingService::class)]
 class ImageTranscodingServiceTest extends TestCase
@@ -415,7 +415,7 @@ class ImageTranscodingServiceTest extends TestCase
         // Test the resource limit exception creation and properties
         $exception = \App\Exceptions\ImageTranscodingException::resourceLimitExceeded('imagick', 'memory', [
             'limit' => '256MB',
-            'actual' => '512MB'
+            'actual' => '512MB',
         ]);
 
         $this->assertInstanceOf(\App\Exceptions\ImageTranscodingException::class, $exception);

@@ -1180,6 +1180,4 @@ class PublicControllersService
 
         return $result;
     }
-
-
 }

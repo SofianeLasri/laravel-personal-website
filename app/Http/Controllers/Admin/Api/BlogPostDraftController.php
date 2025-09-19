@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Api;
 
-use App\Http\Controllers\Controller;
 use App\Enums\BlogPostType;
+use App\Http\Controllers\Controller;
 use App\Models\BlogPostDraft;
 use App\Models\TranslationKey;
 use Illuminate\Http\Request;

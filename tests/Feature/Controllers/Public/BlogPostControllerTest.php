@@ -12,7 +12,6 @@ use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -33,7 +32,7 @@ class BlogPostControllerTest extends TestCase
     private function createCompleteBlogPost(array $attributes = []): BlogPost
     {
         // Create blog category with translation if not provided
-        if (!isset($attributes['category_id'])) {
+        if (! isset($attributes['category_id'])) {
             $categoryNameKey = TranslationKey::factory()->create();
             Translation::factory()->create([
                 'translation_key_id' => $categoryNameKey->id,
@@ -56,7 +55,7 @@ class BlogPostControllerTest extends TestCase
         }
 
         // Create title translation if not provided
-        if (!isset($attributes['title_translation_key_id'])) {
+        if (! isset($attributes['title_translation_key_id'])) {
             $titleKey = TranslationKey::factory()->create();
             Translation::factory()->create([
                 'translation_key_id' => $titleKey->id,
@@ -72,13 +71,13 @@ class BlogPostControllerTest extends TestCase
         }
 
         // Create cover picture if not provided
-        if (!isset($attributes['cover_picture_id'])) {
+        if (! isset($attributes['cover_picture_id'])) {
             $coverPicture = Picture::factory()->create();
             $attributes['cover_picture_id'] = $coverPicture->id;
         }
 
         // Set default type if not provided
-        if (!isset($attributes['type'])) {
+        if (! isset($attributes['type'])) {
             $attributes['type'] = BlogPostType::ARTICLE;
         }
 
@@ -226,7 +225,7 @@ class BlogPostControllerTest extends TestCase
         $this->assertNotNull($foundPost, 'Should find blog post by slug in database');
 
         // Test the service directly
-        $service = new PublicControllersService();
+        $service = new PublicControllersService;
         $serviceResult = $service->getBlogPostBySlug($this->blogPost->slug);
         $this->assertNotNull($serviceResult, 'Service should find the blog post');
 
@@ -376,5 +375,4 @@ class BlogPostControllerTest extends TestCase
             ->where('blogPost.id', $blogPost->id)
         );
     }
-
 }

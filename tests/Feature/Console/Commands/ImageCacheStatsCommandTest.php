@@ -149,7 +149,7 @@ class ImageCacheStatsCommandTest extends TestCase
     #[DataProvider('formatBytesDataProvider')]
     public function it_formats_bytes_correctly(int $input, string $expected): void
     {
-        $command = new ImageCacheStatsCommand();
+        $command = new ImageCacheStatsCommand;
         $reflection = new ReflectionClass($command);
         $method = $reflection->getMethod('formatBytes');
         $method->setAccessible(true);

@@ -31,7 +31,7 @@ class BlogHomeControllerTest extends TestCase
     private function createCompleteBlogPost(array $attributes = []): BlogPost
     {
         // Create blog category with translation if not provided
-        if (!isset($attributes['category_id'])) {
+        if (! isset($attributes['category_id'])) {
             $categoryNameKey = TranslationKey::factory()->create();
             Translation::factory()->create([
                 'translation_key_id' => $categoryNameKey->id,
@@ -54,7 +54,7 @@ class BlogHomeControllerTest extends TestCase
         }
 
         // Create title translation if not provided
-        if (!isset($attributes['title_translation_key_id'])) {
+        if (! isset($attributes['title_translation_key_id'])) {
             $titleKey = TranslationKey::factory()->create();
             Translation::factory()->create([
                 'translation_key_id' => $titleKey->id,
@@ -70,13 +70,13 @@ class BlogHomeControllerTest extends TestCase
         }
 
         // Create cover picture if not provided
-        if (!isset($attributes['cover_picture_id'])) {
+        if (! isset($attributes['cover_picture_id'])) {
             $coverPicture = Picture::factory()->create();
             $attributes['cover_picture_id'] = $coverPicture->id;
         }
 
         // Set default type if not provided
-        if (!isset($attributes['type'])) {
+        if (! isset($attributes['type'])) {
             $attributes['type'] = BlogPostType::ARTICLE;
         }
 

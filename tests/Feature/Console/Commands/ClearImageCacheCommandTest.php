@@ -104,7 +104,7 @@ class ClearImageCacheCommandTest extends TestCase
         Config::set('images.cache.enabled', true);
 
         // Create a real instance to verify dependency injection works
-        $realService = new ImageCacheService();
+        $realService = new ImageCacheService;
         $this->app->instance(ImageCacheService::class, $realService);
 
         // Mock the config to ensure cache is disabled so we don't actually clear anything
@@ -148,7 +148,7 @@ class ClearImageCacheCommandTest extends TestCase
     #[Test]
     public function it_uses_correct_command_signature_and_description(): void
     {
-        $command = new ClearImageCacheCommand();
+        $command = new ClearImageCacheCommand;
 
         $this->assertEquals('images:cache-clear', $command->getName());
         $this->assertEquals('Clear all cached image optimizations', $command->getDescription());

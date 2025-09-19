@@ -65,7 +65,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'order' => 1,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?draft-id=' . $draft->id);
+        $response = $this->get('/dashboard/blog-posts/edit?draft-id='.$draft->id);
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -118,7 +118,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'order' => 1,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id=' . $blogPost->id);
+        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id='.$blogPost->id);
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -149,7 +149,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'slug' => $blogPost->slug,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id=' . $blogPost->id);
+        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id='.$blogPost->id);
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -217,7 +217,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'game_review_id' => $gameReview->id,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id=' . $blogPost->id);
+        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id='.$blogPost->id);
 
         $response->assertStatus(200);
 
@@ -252,7 +252,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'content_id' => $markdownContent->id,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?draft-id=' . $draft->id);
+        $response = $this->get('/dashboard/blog-posts/edit?draft-id='.$draft->id);
 
         $response->assertStatus(200);
         $response->assertStatus(200);
@@ -285,7 +285,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'content_id' => $videoContent->id,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?draft-id=' . $draft->id);
+        $response = $this->get('/dashboard/blog-posts/edit?draft-id='.$draft->id);
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -318,7 +318,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'content_id' => $gallery->id,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?draft-id=' . $draft->id);
+        $response = $this->get('/dashboard/blog-posts/edit?draft-id='.$draft->id);
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -341,7 +341,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'content_id' => 99999, // Non-existing ID
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?draft-id=' . $draft->id);
+        $response = $this->get('/dashboard/blog-posts/edit?draft-id='.$draft->id);
 
         // Should not fail, just skip loading relations for null content
         $response->assertStatus(200);
@@ -354,7 +354,7 @@ class BlogPostEditPageControllerTest extends TestCase
 
         $draft = BlogPostDraft::factory()->create();
 
-        $response = $this->get('/dashboard/blog-posts/edit?draft-id=' . $draft->id);
+        $response = $this->get('/dashboard/blog-posts/edit?draft-id='.$draft->id);
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -427,7 +427,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'blog_post_draft_id' => $draft->id,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?draft-id=' . $draft->id);
+        $response = $this->get('/dashboard/blog-posts/edit?draft-id='.$draft->id);
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -471,7 +471,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'order' => 3,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id=' . $blogPost->id);
+        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id='.$blogPost->id);
 
         $response->assertStatus(200);
 
@@ -493,7 +493,7 @@ class BlogPostEditPageControllerTest extends TestCase
         // Create a draft without any contents
         $draft = BlogPostDraft::factory()->create();
 
-        $response = $this->get('/dashboard/blog-posts/edit?draft-id=' . $draft->id);
+        $response = $this->get('/dashboard/blog-posts/edit?draft-id='.$draft->id);
 
         // Should handle gracefully without errors
         $response->assertStatus(200);
@@ -527,7 +527,7 @@ class BlogPostEditPageControllerTest extends TestCase
             'order' => 3,
         ]);
 
-        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id=' . $blogPost->id);
+        $response = $this->get('/dashboard/blog-posts/edit?blog-post-id='.$blogPost->id);
 
         $response->assertStatus(200);
 

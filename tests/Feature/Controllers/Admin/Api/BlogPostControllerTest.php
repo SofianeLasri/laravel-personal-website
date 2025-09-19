@@ -99,7 +99,7 @@ class BlogPostControllerTest extends TestCase
                     'cover_picture_id',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ]);
     }
 
@@ -121,8 +121,8 @@ class BlogPostControllerTest extends TestCase
             ->assertJson([
                 'message' => 'Validation failed',
                 'errors' => [
-                    'draft_id' => ['Le champ draft id est obligatoire.']
-                ]
+                    'draft_id' => ['Le champ draft id est obligatoire.'],
+                ],
             ]);
     }
 
@@ -130,15 +130,15 @@ class BlogPostControllerTest extends TestCase
     public function store_validates_draft_id_is_integer(): void
     {
         $response = $this->postJson('/dashboard/api/blog-posts', [
-            'draft_id' => 'not_an_integer'
+            'draft_id' => 'not_an_integer',
         ]);
 
         $response->assertStatus(422)
             ->assertJson([
                 'message' => 'Validation failed',
                 'errors' => [
-                    'draft_id' => ['Le champ draft id doit être un entier.']
-                ]
+                    'draft_id' => ['Le champ draft id doit être un entier.'],
+                ],
             ]);
     }
 
@@ -146,15 +146,15 @@ class BlogPostControllerTest extends TestCase
     public function store_validates_draft_id_exists(): void
     {
         $response = $this->postJson('/dashboard/api/blog-posts', [
-            'draft_id' => 9999
+            'draft_id' => 9999,
         ]);
 
         $response->assertStatus(422)
             ->assertJson([
                 'message' => 'Validation failed',
                 'errors' => [
-                    'draft_id' => ['La valeur sélectionnée pour draft id est invalide.']
-                ]
+                    'draft_id' => ['La valeur sélectionnée pour draft id est invalide.'],
+                ],
             ]);
     }
 
@@ -162,12 +162,12 @@ class BlogPostControllerTest extends TestCase
     public function store_converts_draft_successfully(): void
     {
         $response = $this->postJson('/dashboard/api/blog-posts', [
-            'draft_id' => $this->draft->id
+            'draft_id' => $this->draft->id,
         ]);
 
         $response->assertStatus(201)
             ->assertJson([
-                'message' => 'Blog post published successfully'
+                'message' => 'Blog post published successfully',
             ])
             ->assertJsonStructure([
                 'message',
@@ -184,7 +184,7 @@ class BlogPostControllerTest extends TestCase
                     'category',
                     'cover_picture',
                     'contents',
-                ]
+                ],
             ]);
 
         $this->assertDatabaseHas('blog_posts', [
@@ -200,7 +200,7 @@ class BlogPostControllerTest extends TestCase
     public function store_loads_correct_relationships(): void
     {
         $response = $this->postJson('/dashboard/api/blog-posts', [
-            'draft_id' => $this->draft->id
+            'draft_id' => $this->draft->id,
         ]);
 
         $response->assertStatus(201)
@@ -213,8 +213,8 @@ class BlogPostControllerTest extends TestCase
                                 'id',
                                 'locale',
                                 'text',
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'category' => [
                         'id',
@@ -226,7 +226,7 @@ class BlogPostControllerTest extends TestCase
                         'filename',
                     ],
                     'contents',
-                ]
+                ],
             ]);
     }
 
@@ -241,13 +241,13 @@ class BlogPostControllerTest extends TestCase
         });
 
         $response = $this->postJson('/dashboard/api/blog-posts', [
-            'draft_id' => $this->draft->id
+            'draft_id' => $this->draft->id,
         ]);
 
         $response->assertStatus(500)
             ->assertJson([
                 'message' => 'Failed to publish blog post',
-                'error' => 'Conversion failed'
+                'error' => 'Conversion failed',
             ]);
     }
 
@@ -262,7 +262,7 @@ class BlogPostControllerTest extends TestCase
         $anotherDraft->delete();
 
         $response = $this->postJson('/dashboard/api/blog-posts', [
-            'draft_id' => $draftId
+            'draft_id' => $draftId,
         ]);
 
         // This should now return 422 because validation fails
@@ -270,8 +270,8 @@ class BlogPostControllerTest extends TestCase
             ->assertJson([
                 'message' => 'Validation failed',
                 'errors' => [
-                    'draft_id' => ['La valeur sélectionnée pour draft id est invalide.']
-                ]
+                    'draft_id' => ['La valeur sélectionnée pour draft id est invalide.'],
+                ],
             ]);
     }
 

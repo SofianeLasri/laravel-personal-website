@@ -5,11 +5,9 @@ namespace Tests\Feature\Controllers\Admin\Api;
 use App\Http\Controllers\Admin\Api\BlogContentGalleryController;
 use App\Models\BlogContentGallery;
 use App\Models\Picture;
-use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -175,7 +173,7 @@ class BlogContentGalleryControllerTest extends TestCase
 
         // Attacher les anciennes images avec des captions
         foreach ($oldPictures as $index => $picture) {
-            $captionKey = TranslationKey::create(['key' => 'old_caption_' . $index]);
+            $captionKey = TranslationKey::create(['key' => 'old_caption_'.$index]);
             $captionKey->translations()->create(['locale' => 'fr', 'text' => 'Old caption']);
             $captionKey->translations()->create(['locale' => 'en', 'text' => '']);
 
@@ -263,7 +261,7 @@ class BlogContentGalleryControllerTest extends TestCase
     }
 
     #[Test]
-    public function updatePictures_updates_pictures_order_and_captions()
+    public function update_pictures_updates_pictures_order_and_captions()
     {
         $gallery = BlogContentGallery::create();
         $pictures = Picture::factory()->count(3)->create();
@@ -304,7 +302,7 @@ class BlogContentGalleryControllerTest extends TestCase
     }
 
     #[Test]
-    public function updatePictures_fails_with_validation_errors()
+    public function update_pictures_fails_with_validation_errors()
     {
         $gallery = BlogContentGallery::create();
 
@@ -320,7 +318,7 @@ class BlogContentGalleryControllerTest extends TestCase
     }
 
     #[Test]
-    public function updatePictures_requires_pictures_array()
+    public function update_pictures_requires_pictures_array()
     {
         $gallery = BlogContentGallery::create();
 
@@ -333,7 +331,7 @@ class BlogContentGalleryControllerTest extends TestCase
     }
 
     #[Test]
-    public function updatePictures_with_minimum_required_fields()
+    public function update_pictures_with_minimum_required_fields()
     {
         $gallery = BlogContentGallery::create();
         $picture = Picture::factory()->create();
@@ -363,9 +361,9 @@ class BlogContentGalleryControllerTest extends TestCase
         // Ajouter des images avec des captions
         $captionKeys = [];
         foreach ($pictures as $index => $picture) {
-            $captionKey = TranslationKey::create(['key' => 'caption_' . $index]);
-            $captionKey->translations()->create(['locale' => 'fr', 'text' => 'Caption ' . $index]);
-            $captionKey->translations()->create(['locale' => 'en', 'text' => 'Caption ' . $index]);
+            $captionKey = TranslationKey::create(['key' => 'caption_'.$index]);
+            $captionKey->translations()->create(['locale' => 'fr', 'text' => 'Caption '.$index]);
+            $captionKey->translations()->create(['locale' => 'en', 'text' => 'Caption '.$index]);
             $captionKeys[] = $captionKey->id;
 
             $gallery->pictures()->attach($picture->id, [
@@ -462,7 +460,7 @@ class BlogContentGalleryControllerTest extends TestCase
     }
 
     #[Test]
-    public function updatePictures_with_empty_caption_removes_translation_key()
+    public function update_pictures_with_empty_caption_removes_translation_key()
     {
         $gallery = BlogContentGallery::create();
         $picture = Picture::factory()->create();

@@ -21,6 +21,7 @@ class PictureJobTest extends TestCase
     use RefreshDatabase;
 
     private Picture $picture;
+
     private NotificationService $mockNotificationService;
 
     protected function setUp(): void

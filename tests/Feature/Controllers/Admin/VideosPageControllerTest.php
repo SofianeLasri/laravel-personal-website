@@ -45,9 +45,8 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 0)
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 0)
         );
     }
 
@@ -64,19 +63,16 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0', fn ($videoData) =>
-                    $videoData->where('id', $video->id)
-                        ->where('name', 'Test Video')
-                        ->has('cover_picture', fn ($cover) =>
-                            $cover->where('id', $coverPicture->id)
-                                ->has('path_small')
-                        )
-                        ->has('created_at')
-                        ->has('usages')
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0', fn ($videoData) => $videoData->where('id', $video->id)
+                ->where('name', 'Test Video')
+                ->has('cover_picture', fn ($cover) => $cover->where('id', $coverPicture->id)
+                    ->has('path_small')
                 )
+                ->has('created_at')
+                ->has('usages')
+            )
         );
     }
 
@@ -92,16 +88,14 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0', fn ($videoData) =>
-                    $videoData->where('id', $video->id)
-                        ->where('name', 'Video Without Cover')
-                        ->where('cover_picture', null)
-                        ->has('created_at')
-                        ->has('usages')
-                )
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0', fn ($videoData) => $videoData->where('id', $video->id)
+                ->where('name', 'Video Without Cover')
+                ->where('cover_picture', null)
+                ->has('created_at')
+                ->has('usages')
+            )
         );
     }
 
@@ -122,23 +116,20 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 2)
-                ->has('videos.0', fn ($videoData) =>
-                    $videoData->where('name', 'Newer Video')
-                        ->has('id')
-                        ->has('created_at')
-                        ->has('cover_picture')
-                        ->has('usages')
-                )
-                ->has('videos.1', fn ($videoData) =>
-                    $videoData->where('name', 'Older Video')
-                        ->has('id')
-                        ->has('created_at')
-                        ->has('cover_picture')
-                        ->has('usages')
-                )
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 2)
+            ->has('videos.0', fn ($videoData) => $videoData->where('name', 'Newer Video')
+                ->has('id')
+                ->has('created_at')
+                ->has('cover_picture')
+                ->has('usages')
+            )
+            ->has('videos.1', fn ($videoData) => $videoData->where('name', 'Older Video')
+                ->has('id')
+                ->has('created_at')
+                ->has('cover_picture')
+                ->has('usages')
+            )
         );
     }
 
@@ -157,17 +148,15 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0.usages', 1)
-                ->has('videos.0.usages.0', fn ($usage) =>
-                    $usage->where('id', $creation->id)
-                        ->where('type', 'creation')
-                        ->where('title', 'Test Creation')
-                        ->where('slug', 'test-creation')
-                        ->has('url')
-                )
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0.usages', 1)
+            ->has('videos.0.usages.0', fn ($usage) => $usage->where('id', $creation->id)
+                ->where('type', 'creation')
+                ->where('title', 'Test Creation')
+                ->where('slug', 'test-creation')
+                ->has('url')
+            )
         );
     }
 
@@ -191,17 +180,15 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0.usages', 1)
-                ->has('videos.0.usages.0', fn ($usage) =>
-                    $usage->where('id', $blogPostDraft->id)
-                        ->where('type', 'blog_post')
-                        ->has('title')
-                        ->where('slug', 'test-blog-post')
-                        ->has('url')
-                )
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0.usages', 1)
+            ->has('videos.0.usages.0', fn ($usage) => $usage->where('id', $blogPostDraft->id)
+                ->where('type', 'blog_post')
+                ->has('title')
+                ->where('slug', 'test-blog-post')
+                ->has('url')
+            )
         );
     }
 
@@ -236,10 +223,9 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0.usages', 2)
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0.usages', 2)
         );
     }
 
@@ -252,10 +238,9 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0.usages', 0)
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0.usages', 0)
         );
     }
 
@@ -271,22 +256,20 @@ class VideosPageControllerTest extends TestCase
         $video = Video::factory()->create();
         $video->creations()->attach($creation);
 
-        $expectedUrl = route('dashboard.creations.edit') . '?id=' . $creation->id;
+        $expectedUrl = route('dashboard.creations.edit').'?id='.$creation->id;
 
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0.usages', 1)
-                ->has('videos.0.usages.0', fn ($usage) =>
-                    $usage->where('url', $expectedUrl)
-                        ->where('type', 'creation')
-                        ->has('id')
-                        ->has('title')
-                        ->has('slug')
-                )
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0.usages', 1)
+            ->has('videos.0.usages.0', fn ($usage) => $usage->where('url', $expectedUrl)
+                ->where('type', 'creation')
+                ->has('id')
+                ->has('title')
+                ->has('slug')
+            )
         );
     }
 
@@ -307,22 +290,20 @@ class VideosPageControllerTest extends TestCase
             'content_id' => $blogContentVideo->id,
         ]);
 
-        $expectedUrl = route('dashboard.blog-posts.edit') . '?id=' . $blogPostDraft->id;
+        $expectedUrl = route('dashboard.blog-posts.edit').'?id='.$blogPostDraft->id;
 
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0.usages', 1)
-                ->has('videos.0.usages.0', fn ($usage) =>
-                    $usage->where('url', $expectedUrl)
-                        ->where('type', 'blog_post')
-                        ->has('id')
-                        ->has('title')
-                        ->has('slug')
-                )
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0.usages', 1)
+            ->has('videos.0.usages.0', fn ($usage) => $usage->where('url', $expectedUrl)
+                ->where('type', 'blog_post')
+                ->has('id')
+                ->has('title')
+                ->has('slug')
+            )
         );
     }
 
@@ -346,17 +327,15 @@ class VideosPageControllerTest extends TestCase
         $response = $this->get('/dashboard/videos');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) =>
-            $page->component('dashboard/videos/Index')
-                ->has('videos', 1)
-                ->has('videos.0.usages', 1)
-                ->has('videos.0.usages.0', fn ($usage) =>
-                    $usage->where('slug', '')
-                        ->has('id')
-                        ->has('type')
-                        ->has('title')
-                        ->has('url')
-                )
+        $response->assertInertia(fn ($page) => $page->component('dashboard/videos/Index')
+            ->has('videos', 1)
+            ->has('videos.0.usages', 1)
+            ->has('videos.0.usages.0', fn ($usage) => $usage->where('slug', '')
+                ->has('id')
+                ->has('type')
+                ->has('title')
+                ->has('url')
+            )
         );
     }
 }

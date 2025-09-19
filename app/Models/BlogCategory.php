@@ -55,4 +55,12 @@ class BlogCategory extends Model
     {
         return $this->hasMany(BlogPost::class, 'category_id');
     }
+
+    /**
+     * @return HasMany<BlogPostDraft, $this>
+     */
+    public function blogPostDrafts(): HasMany
+    {
+        return $this->hasMany(BlogPostDraft::class, 'category_id');
+    }
 }

@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogContentVideo;
 use App\Models\TranslationKey;
 use App\Models\Video;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class BlogContentVideoController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'video_id' => 'nullable|integer|exists:videos,id',
@@ -58,14 +59,14 @@ class BlogContentVideoController extends Controller
         return response()->json($videoContent, 201);
     }
 
-    public function show(BlogContentVideo $blogContentVideo)
+    public function show(BlogContentVideo $blogContentVideo): JsonResponse
     {
         $blogContentVideo->load(['video', 'captionTranslationKey.translations']);
 
         return response()->json($blogContentVideo);
     }
 
-    public function update(Request $request, BlogContentVideo $blogContentVideo)
+    public function update(Request $request, BlogContentVideo $blogContentVideo): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'video_id' => 'nullable|integer|exists:videos,id',
@@ -104,10 +105,13 @@ class BlogContentVideoController extends Controller
                 $blogContentVideo->update([
                     'caption_translation_key_id' => $captionTranslationKey->id,
                 ]);
+
+                // Reload the relation after updating the foreign key
+                $blogContentVideo->load('captionTranslationKey');
             }
 
             // Update the translation for the current locale
-            $blogContentVideo->captionTranslationKey->translations()->updateOrCreate(
+            $blogContentVideo->captionTranslationKey?->translations()->updateOrCreate(
                 ['locale' => $request->locale],
                 ['text' => $request->caption]
             );
@@ -129,7 +133,7 @@ class BlogContentVideoController extends Controller
         return response()->json($blogContentVideo);
     }
 
-    public function destroy(BlogContentVideo $blogContentVideo)
+    public function destroy(BlogContentVideo $blogContentVideo): JsonResponse
     {
         // Delete caption translation key if exists
         if ($blogContentVideo->captionTranslationKey) {

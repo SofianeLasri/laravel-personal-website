@@ -127,13 +127,15 @@ class BlogCategoryController extends Controller
             ], 422);
         }
 
-        // Delete translation key and its translations
+        // Get translation key before deleting category
         $nameTranslationKey = $blogCategory->nameTranslationKey;
+
+        // Delete category first to avoid foreign key constraint
+        $blogCategory->delete();
+
+        // Delete translation key and its translations
         $nameTranslationKey->translations()->delete();
         $nameTranslationKey->delete();
-
-        // Delete category
-        $blogCategory->delete();
 
         return response()->json(['message' => 'Category deleted successfully']);
     }

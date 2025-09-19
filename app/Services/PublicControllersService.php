@@ -915,7 +915,7 @@ class PublicControllersService
     /**
      * Get blog posts for index page with filters and pagination
      *
-     * @param  array{category?: string|null, type?: string|null, sort?: string|null, search?: string|null}  $filters
+     * @param  array{category?: string|array<string>|null, type?: string|null, sort?: string|null, search?: string|null}  $filters
      * @return array{
      *     data: array<int, array{
      *         id: int,
@@ -1180,4 +1180,6 @@ class PublicControllersService
 
         return $result;
     }
+
+
 }

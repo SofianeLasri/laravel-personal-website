@@ -68,7 +68,6 @@ class WebsiteExportService
      * @return string The path to the generated ZIP file
      *
      * @throws RuntimeException If export fails
-     * @throws FilesystemException
      */
     public function exportWebsite(): string
     {

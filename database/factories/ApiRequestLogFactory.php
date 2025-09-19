@@ -6,7 +6,7 @@ use App\Models\ApiRequestLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ApiRequestLog>
+ * @extends Factory<ApiRequestLog>
  */
 class ApiRequestLogFactory extends Factory
 {

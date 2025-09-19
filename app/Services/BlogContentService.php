@@ -12,6 +12,7 @@ use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
 use App\Models\BlogPostDraftContent;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class BlogContentService
 {
@@ -133,7 +134,9 @@ class BlogContentService
     /**
      * Reorder content blocks
      *
-     * @param  array<int>  $newOrder  Array of content IDs in new order
+     * @param BlogPostDraft|BlogPost $parent
+     * @param array<int> $newOrder Array of content IDs in new order
+     * @throws Throwable
      */
     public function reorderContent(BlogPostDraft|BlogPost $parent, array $newOrder): void
     {

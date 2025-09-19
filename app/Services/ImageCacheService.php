@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Psr\SimpleCache\InvalidArgumentException;
 use ReflectionClass;
 
 class ImageCacheService
@@ -39,7 +40,9 @@ class ImageCacheService
     /**
      * Get cached optimizations for a given checksum
      *
+     * @param string $checksum
      * @return array|null Array containing cached optimization data or null if not found
+     * @throws InvalidArgumentException
      */
     public function getCachedOptimizations(string $checksum): ?array
     {

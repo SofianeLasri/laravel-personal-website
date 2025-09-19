@@ -165,12 +165,12 @@ class PackagistService
                     }
 
                     // Get PHP version requirement
-                    if (isset($versionData['require']) && isset($versionData['require']['php'])) {
+                    if (isset($versionData['require']['php'])) {
                         $phpVersion = $versionData['require']['php'];
                     }
 
                     // Get Laravel version requirement
-                    if (isset($versionData['require']) && isset($versionData['require']['laravel/framework'])) {
+                    if (isset($versionData['require']['laravel/framework'])) {
                         $laravelVersion = $versionData['require']['laravel/framework'];
                     }
                 }

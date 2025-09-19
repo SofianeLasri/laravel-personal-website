@@ -773,7 +773,7 @@ class PublicControllersService
     /**
      * Get blog posts for public home page with latest article first
      *
-     * @return \Illuminate\Support\Collection<int, BlogPost>
+     * @return Collection<int, BlogPost>
      */
     public function getBlogPostsForPublicHome(): Collection
     {

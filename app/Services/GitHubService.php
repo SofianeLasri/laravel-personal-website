@@ -163,10 +163,9 @@ class GitHubService
                     return [];
                 }
 
-                $percentages = [];
-                foreach ($languages as $language => $bytes) {
-                    $percentages[$language] = round(($bytes / $total) * 100, 1);
-                }
+                $percentages = array_map(function ($bytes) use ($total) {
+                    return round(($bytes / $total) * 100, 1);
+                }, $languages);
 
                 arsort($percentages);
 

@@ -16,11 +16,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class BlogPostConversionService
 {
     public function __construct(
-        private readonly BlogContentDuplicationService $contentDuplicationService
+        private BlogContentDuplicationService $contentDuplicationService
     ) {}
 
     /**
@@ -140,7 +141,9 @@ class BlogPostConversionService
     /**
      * Convert a BlogPostDraft to a published BlogPost
      *
-     * @throws ValidationException
+     * @param BlogPostDraft $draft
+     * @return BlogPost
+     * @throws Throwable
      */
     public function convertDraftToBlogPost(BlogPostDraft $draft): BlogPost
     {

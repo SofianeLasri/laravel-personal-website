@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use JsonMachine\Items;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use RuntimeException;
 
 class AiProviderService
@@ -36,10 +38,11 @@ class AiProviderService
     /**
      * Prompt the AI provider with a text and pictures
      *
-     * @param  string  $systemRole  The system role to send to the AI provider. E.g. "You are a helpful assistant."
-     * @param  string  $prompt  The prompt to send to the AI provider
-     * @param  Picture  ...$pictures  The pictures to send to the AI provider
+     * @param string $systemRole The system role to send to the AI provider. E.g. "You are a helpful assistant."
+     * @param string $prompt The prompt to send to the AI provider
+     * @param Picture ...$pictures The pictures to send to the AI provider
      * @return array<string, mixed> The response from the AI provider.
+     * @throws ImageTranscodingException
      */
     public function promptWithPictures(string $systemRole, string $prompt, Picture ...$pictures): array
     {
@@ -108,9 +111,11 @@ class AiProviderService
     /**
      * Prompt the AI provider with text only
      *
-     * @param  string  $systemRole  The system role to send to the AI provider
-     * @param  string  $prompt  The prompt to send to the AI provider
+     * @param string $systemRole The system role to send to the AI provider
+     * @param string $prompt The prompt to send to the AI provider
      * @return array<string, mixed> The response from the AI provider
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function prompt(string $systemRole, string $prompt): array
     {
@@ -550,6 +555,7 @@ class AiProviderService
 
             // Convert the iterator to an array
             $result = [];
+            /** @noinspection PhpLoopCanBeConvertedToArrayMapInspection */
             foreach ($items as $key => $value) {
                 $result[$key] = $value;
             }

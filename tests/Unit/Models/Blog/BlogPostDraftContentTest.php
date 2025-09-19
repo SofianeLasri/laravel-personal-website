@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Models;
+namespace Tests\Unit\Models\Blog;
 
 use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;

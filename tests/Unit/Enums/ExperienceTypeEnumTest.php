@@ -1,17 +1,15 @@
 <?php
 
-namespace Tests\Feature\Models\Experience;
+namespace Tests\Unit\Enums;
 
 use App\Enums\ExperienceType;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ExperienceType::class)]
 class ExperienceTypeEnumTest extends TestCase
 {
-    use RefreshDatabase;
 
     #[Test]
     public function it_can_convert_enum_to_label()
@@ -27,5 +25,12 @@ class ExperienceTypeEnumTest extends TestCase
 
         $this->assertContains('formation', $values);
         $this->assertContains('emploi', $values);
+    }
+
+    #[Test]
+    public function it_has_correct_enum_values()
+    {
+        $this->assertEquals('formation', ExperienceType::FORMATION->value);
+        $this->assertEquals('emploi', ExperienceType::EMPLOI->value);
     }
 }

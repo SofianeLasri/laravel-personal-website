@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Models;
+namespace Tests\Unit\Models\Blog;
 
 use App\Enums\CategoryColor;
 use App\Models\BlogCategory;

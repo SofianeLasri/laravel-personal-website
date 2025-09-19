@@ -38,10 +38,11 @@ class AiProviderService
     /**
      * Prompt the AI provider with a text and pictures
      *
-     * @param string $systemRole The system role to send to the AI provider. E.g. "You are a helpful assistant."
-     * @param string $prompt The prompt to send to the AI provider
-     * @param Picture ...$pictures The pictures to send to the AI provider
+     * @param  string  $systemRole  The system role to send to the AI provider. E.g. "You are a helpful assistant."
+     * @param  string  $prompt  The prompt to send to the AI provider
+     * @param  Picture  ...$pictures  The pictures to send to the AI provider
      * @return array<string, mixed> The response from the AI provider.
+     *
      * @throws ImageTranscodingException
      */
     public function promptWithPictures(string $systemRole, string $prompt, Picture ...$pictures): array
@@ -111,9 +112,10 @@ class AiProviderService
     /**
      * Prompt the AI provider with text only
      *
-     * @param string $systemRole The system role to send to the AI provider
-     * @param string $prompt The prompt to send to the AI provider
+     * @param  string  $systemRole  The system role to send to the AI provider
+     * @param  string  $prompt  The prompt to send to the AI provider
      * @return array<string, mixed> The response from the AI provider
+     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */

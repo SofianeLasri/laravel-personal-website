@@ -141,8 +141,6 @@ class BlogPostConversionService
     /**
      * Convert a BlogPostDraft to a published BlogPost
      *
-     * @param BlogPostDraft $draft
-     * @return BlogPost
      * @throws Throwable
      */
     public function convertDraftToBlogPost(BlogPostDraft $draft): BlogPost

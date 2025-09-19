@@ -64,7 +64,7 @@ class WebsiteImportService
     /**
      * Import website data from a ZIP file.
      *
-     * @param string $zipPath Path to the export ZIP file
+     * @param  string  $zipPath  Path to the export ZIP file
      * @return array<string, mixed> Import statistics
      *
      * @throws Throwable

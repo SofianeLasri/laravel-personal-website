@@ -134,8 +134,8 @@ class BlogContentService
     /**
      * Reorder content blocks
      *
-     * @param BlogPostDraft|BlogPost $parent
-     * @param array<int> $newOrder Array of content IDs in new order
+     * @param  array<int>  $newOrder  Array of content IDs in new order
+     *
      * @throws Throwable
      */
     public function reorderContent(BlogPostDraft|BlogPost $parent, array $newOrder): void

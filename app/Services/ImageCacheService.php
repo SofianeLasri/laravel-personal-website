@@ -40,8 +40,8 @@ class ImageCacheService
     /**
      * Get cached optimizations for a given checksum
      *
-     * @param string $checksum
      * @return array|null Array containing cached optimization data or null if not found
+     *
      * @throws InvalidArgumentException
      */
     public function getCachedOptimizations(string $checksum): ?array

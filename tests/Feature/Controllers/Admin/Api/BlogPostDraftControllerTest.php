@@ -180,7 +180,7 @@ class BlogPostDraftControllerTest extends TestCase
         $this->assertNotNull($draft->title_translation_key_id);
 
         $translationKey = $draft->titleTranslationKey;
-        $this->assertStringContains('blog_post_draft_title_', $translationKey->key);
+        $this->assertStringContainsString('blog_post_draft_title_', $translationKey->key);
 
         // Verify both locale translations were created
         $this->assertDatabaseHas('translations', [

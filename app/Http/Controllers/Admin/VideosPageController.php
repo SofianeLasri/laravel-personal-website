@@ -9,18 +9,17 @@ class VideosPageController extends Controller
 {
     public function __invoke()
     {
-        $videos = Video::with(['cover_picture'])
+        $videos = Video::with(['coverPicture'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($video) {
                 return [
                     'id' => $video->id,
                     'name' => $video->name,
-                    'file_size' => $video->file_size,
                     'created_at' => $video->created_at,
-                    'cover_picture' => $video->cover_picture ? [
-                        'id' => $video->cover_picture->id,
-                        'path_small' => $video->cover_picture->path_small,
+                    'cover_picture' => $video->coverPicture ? [
+                        'id' => $video->coverPicture->id,
+                        'path_small' => $video->coverPicture->path_small,
                     ] : null,
                     'usages' => $this->getVideoUsages($video),
                 ];
@@ -41,7 +40,7 @@ class VideosPageController extends Controller
             $usages[] = [
                 'id' => $creation->id,
                 'type' => 'creation',
-                'title' => $creation->title,
+                'title' => $creation->name,
                 'slug' => $creation->slug,
                 'url' => route('dashboard.creations.edit').'?id='.$creation->id,
             ];

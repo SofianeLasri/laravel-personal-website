@@ -153,7 +153,7 @@ class GameReviewDraftController extends Controller
 
         try {
             // Handle pros translation
-            if ($request->pros && ! empty($request->pros)) {
+            if ($request->has('pros') && $request->pros && ! empty($request->pros)) {
                 if (! $gameReviewDraft->prosTranslationKey) {
                     $prosTranslationKey = TranslationKey::create([
                         'key' => 'game_review_pros_'.uniqid(),
@@ -165,14 +165,15 @@ class GameReviewDraftController extends Controller
                     ]);
 
                     $gameReviewDraft->update(['pros_translation_key_id' => $prosTranslationKey->id]);
+                    $gameReviewDraft->refresh();
                 }
 
                 $gameReviewDraft->prosTranslationKey->translations()->updateOrCreate(
                     ['locale' => $request->locale],
                     ['text' => $request->pros]
                 );
-            } else {
-                // Remove pros if empty
+            } elseif ($request->has('pros') && (empty($request->pros) || $request->pros === '' || $request->pros === null)) {
+                // Remove pros only if explicitly provided as empty
                 if ($gameReviewDraft->prosTranslationKey) {
                     $translationKey = $gameReviewDraft->prosTranslationKey;
                     $translationKey->translations()->delete();
@@ -182,7 +183,7 @@ class GameReviewDraftController extends Controller
             }
 
             // Handle cons translation
-            if ($request->cons && ! empty($request->cons)) {
+            if ($request->has('cons') && $request->cons && ! empty($request->cons)) {
                 if (! $gameReviewDraft->consTranslationKey) {
                     $consTranslationKey = TranslationKey::create([
                         'key' => 'game_review_cons_'.uniqid(),
@@ -194,14 +195,15 @@ class GameReviewDraftController extends Controller
                     ]);
 
                     $gameReviewDraft->update(['cons_translation_key_id' => $consTranslationKey->id]);
+                    $gameReviewDraft->refresh();
                 }
 
                 $gameReviewDraft->consTranslationKey->translations()->updateOrCreate(
                     ['locale' => $request->locale],
                     ['text' => $request->cons]
                 );
-            } else {
-                // Remove cons if empty
+            } elseif ($request->has('cons') && (empty($request->cons) || $request->cons === '' || $request->cons === null)) {
+                // Remove cons only if explicitly provided as empty
                 if ($gameReviewDraft->consTranslationKey) {
                     $translationKey = $gameReviewDraft->consTranslationKey;
                     $translationKey->translations()->delete();

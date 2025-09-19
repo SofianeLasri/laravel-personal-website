@@ -133,7 +133,7 @@ class BlogPostEditPageController extends Controller
                 'cover_picture_id' => $blogPost->gameReview->cover_picture_id,
                 'pros_translation_key_id' => $blogPost->gameReview->pros_translation_key_id,
                 'cons_translation_key_id' => $blogPost->gameReview->cons_translation_key_id,
-                'score' => $blogPost->gameReview->score,
+                'rating' => $blogPost->gameReview->rating,
             ]);
 
             // Copy game review links
@@ -165,6 +165,8 @@ class BlogPostEditPageController extends Controller
 
     /**
      * Load content-specific relations based on the content type
+     *
+     * @param  BlogPost|BlogPostDraft  $entity
      */
     private function loadContentSpecificRelations($entity): void
     {
@@ -196,7 +198,9 @@ class BlogPostEditPageController extends Controller
                     if ($picture->pivot && $picture->pivot->caption_translation_key_id) {
                         $captionKey = \App\Models\TranslationKey::with('translations')
                             ->find($picture->pivot->caption_translation_key_id);
-                        $picture->pivot->caption_translation_key = $captionKey;
+                        if ($captionKey) {
+                            $picture->pivot->caption_translation_key = $captionKey;
+                        }
                     }
                 }
             }

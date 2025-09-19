@@ -3,11 +3,15 @@
 namespace App\Services;
 
 use App\Enums\BlogPostType;
+use App\Models\BlogContentGallery;
+use App\Models\BlogContentMarkdown;
+use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
 use App\Models\GameReview;
 use App\Models\GameReviewDraft;
+use App\Models\TranslationKey;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -98,10 +102,10 @@ class BlogPostConversionService
     /**
      * Duplicate a translation key with all its translations
      */
-    private function duplicateTranslationKey(\App\Models\TranslationKey $originalTranslationKey): \App\Models\TranslationKey
+    private function duplicateTranslationKey(TranslationKey $originalTranslationKey): TranslationKey
     {
         // Create new translation key with a unique key
-        $newTranslationKey = \App\Models\TranslationKey::create([
+        $newTranslationKey = TranslationKey::create([
             'key' => $this->generateUniqueTranslationKey($originalTranslationKey->key),
         ]);
 
@@ -125,7 +129,7 @@ class BlogPostConversionService
         $key = $baseKey;
         $counter = 1;
 
-        while (\App\Models\TranslationKey::where('key', $key)->exists()) {
+        while (TranslationKey::where('key', $key)->exists()) {
             $key = $baseKey.'_'.$counter;
             $counter++;
         }
@@ -240,15 +244,15 @@ class BlogPostConversionService
 
         if ($content) {
             // Handle specific cleanup based on content type
-            if ($content instanceof \App\Models\BlogContentMarkdown) {
+            if ($content instanceof BlogContentMarkdown) {
                 // Delete translation key and its translations
                 $content->translationKey?->translations()?->delete();
                 $content->translationKey?->delete();
-            } elseif ($content instanceof \App\Models\BlogContentGallery) {
+            } elseif ($content instanceof BlogContentGallery) {
                 // Detach pictures and delete caption translation keys
                 foreach ($content->pictures as $picture) {
                     if ($picture->pivot->caption_translation_key_id) {
-                        $captionTranslationKey = \App\Models\TranslationKey::find($picture->pivot->caption_translation_key_id);
+                        $captionTranslationKey = TranslationKey::find($picture->pivot->caption_translation_key_id);
                         if ($captionTranslationKey) {
                             $captionTranslationKey->translations()->delete();
                             $captionTranslationKey->delete();
@@ -256,7 +260,7 @@ class BlogPostConversionService
                     }
                 }
                 $content->pictures()->detach();
-            } elseif ($content instanceof \App\Models\BlogContentVideo) {
+            } elseif ($content instanceof BlogContentVideo) {
                 // Delete caption translation key if it exists
                 if ($content->caption_translation_key_id) {
                     $content->captionTranslationKey?->translations()?->delete();

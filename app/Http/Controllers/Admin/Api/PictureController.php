@@ -8,6 +8,7 @@ use App\Models\Picture;
 use App\Services\UploadedFilesService;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class PictureController extends Controller
@@ -63,7 +64,7 @@ class PictureController extends Controller
             $picture = Picture::findOrFail($pictureId);
 
             // Check if original file exists
-            if (! $picture->hasValidOriginalPath() || ! \Storage::disk('public')->exists($picture->path_original)) {
+            if (! $picture->hasValidOriginalPath() || ! Storage::disk('public')->exists($picture->path_original)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Le fichier original n\'existe pas',
@@ -97,8 +98,8 @@ class PictureController extends Controller
             $invalidFiles = [];
             if ($hasInvalidFiles) {
                 foreach ($picture->optimizedPictures as $optimized) {
-                    if (\Storage::disk('public')->exists($optimized->path)) {
-                        $size = \Storage::disk('public')->size($optimized->path);
+                    if (Storage::disk('public')->exists($optimized->path)) {
+                        $size = Storage::disk('public')->size($optimized->path);
                         if ($size === 0) {
                             $invalidFiles[] = [
                                 'variant' => $optimized->variant,

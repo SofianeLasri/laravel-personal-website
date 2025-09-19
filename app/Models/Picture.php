@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
+use App\Exceptions\ImageTranscodingException;
+use App\Jobs\PictureJob;
+use App\Services\ImageCacheService;
 use App\Services\ImageTranscodingService;
+use App\Services\NotificationService;
 use Database\Factories\PictureFactory;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -78,7 +83,7 @@ class Picture extends Model
 
         $originalImage = Storage::disk('public')->get($this->path_original);
         $imageTranscodingService = app(ImageTranscodingService::class);
-        $imageCacheService = app(\App\Services\ImageCacheService::class);
+        $imageCacheService = app(ImageCacheService::class);
 
         // Try to use cache if enabled
         if (config('images.cache.enabled', false)) {
@@ -104,7 +109,7 @@ class Picture extends Model
     /**
      * Perform optimization without using cache (or when cache miss occurs)
      */
-    private function optimizeWithoutCache(ImageTranscodingService $imageTranscodingService, string $originalImage, ?\App\Services\ImageCacheService $imageCacheService = null): void
+    private function optimizeWithoutCache(ImageTranscodingService $imageTranscodingService, string $originalImage, ?ImageCacheService $imageCacheService = null): void
     {
         $dimensions = $imageTranscodingService->getDimensions($originalImage);
         $highestDimension = max($dimensions['width'], $dimensions['height']);
@@ -195,7 +200,7 @@ class Picture extends Model
 
         try {
             return $imageTranscodingService->transcode($originalImage, $dimensionToUse, $format);
-        } catch (\App\Exceptions\ImageTranscodingException $e) {
+        } catch (ImageTranscodingException $e) {
             Log::error('Image transcoding failed with specific error', [
                 'picture_id' => $this->id,
                 'error_code' => $e->getErrorCode()->value,
@@ -207,7 +212,7 @@ class Picture extends Model
 
             // Send notification for critical errors only
             if ($e->getSeverity() === 'critical' || $e->getSeverity() === 'error') {
-                $notificationService = app(\App\Services\NotificationService::class);
+                $notificationService = app(NotificationService::class);
                 $notificationService->error(
                     'Échec critique d\'optimisation d\'image',
                     'L\'image "'.$this->filename.'" n\'a pas pu être optimisée: '.$e->getMessage(),
@@ -219,7 +224,7 @@ class Picture extends Model
             }
 
             return null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Unexpected error during image transcoding', [
                 'picture_id' => $this->id,
                 'error' => $e->getMessage(),
@@ -300,7 +305,7 @@ class Picture extends Model
 
         // Send notification if there were failures
         if (! empty($failedVariants)) {
-            $notificationService = app(\App\Services\NotificationService::class);
+            $notificationService = app(NotificationService::class);
             $notificationService->error(
                 'Échec d\'optimisation d\'image',
                 'Certaines variantes n\'ont pas pu être créées pour l\'image "'.$this->filename.'": '.implode(', ', $failedVariants),
@@ -355,7 +360,7 @@ class Picture extends Model
         $this->deleteOptimized();
 
         // Dispatch new optimization job
-        \App\Jobs\PictureJob::dispatch($this);
+        PictureJob::dispatch($this);
 
         Log::info('Picture reoptimization initiated', [
             'picture_id' => $this->id,

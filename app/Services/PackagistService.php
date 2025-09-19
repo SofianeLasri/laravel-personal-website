@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -209,7 +210,7 @@ class PackagistService
                     'php_version' => $phpVersion,
                     'laravel_version' => $laravelVersion,
                 ];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to fetch Packagist package data', [
                     'error' => $e->getMessage(),
                     'package' => $packageName,
@@ -256,7 +257,7 @@ class PackagistService
                     'monthly' => $data['values']['monthly'] ?? [],
                     'total' => array_sum($data['values']['monthly'] ?? []),
                 ];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to fetch Packagist package statistics', [
                     'error' => $e->getMessage(),
                     'package' => $packageName,

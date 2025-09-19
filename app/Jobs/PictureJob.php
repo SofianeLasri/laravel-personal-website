@@ -2,14 +2,18 @@
 
 namespace App\Jobs;
 
+use App\Enums\ImageTranscodingError;
+use App\Exceptions\ImageTranscodingException;
 use App\Models\Picture;
 use App\Services\NotificationService;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class PictureJob implements ShouldQueue
 {
@@ -44,7 +48,7 @@ class PictureJob implements ShouldQueue
 
             // Check if optimization was successful
             if ($this->picture->hasInvalidOptimizedPictures()) {
-                throw new \Exception('Optimization resulted in invalid files with 0 bytes');
+                throw new Exception('Optimization resulted in invalid files with 0 bytes');
             }
 
             Log::info('Picture optimization completed successfully', [
@@ -52,7 +56,7 @@ class PictureJob implements ShouldQueue
                 'filename' => $this->picture->filename,
             ]);
 
-        } catch (\App\Exceptions\ImageTranscodingException $e) {
+        } catch (ImageTranscodingException $e) {
             Log::error('Picture optimization job failed with transcoding error', [
                 'picture_id' => $this->picture->id,
                 'filename' => $this->picture->filename,
@@ -68,7 +72,7 @@ class PictureJob implements ShouldQueue
 
             // Re-throw the exception to mark job as failed
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Picture optimization job failed with general error', [
                 'picture_id' => $this->picture->id,
                 'filename' => $this->picture->filename,
@@ -99,13 +103,13 @@ class PictureJob implements ShouldQueue
     /**
      * Handle specific transcoding errors with tailored responses
      */
-    protected function handleTranscodingError(\App\Exceptions\ImageTranscodingException $e): void
+    protected function handleTranscodingError(ImageTranscodingException $e): void
     {
         $notificationService = app(NotificationService::class);
 
         // Handle different error types with appropriate severity and actions
         switch ($e->getErrorCode()) {
-            case \App\Enums\ImageTranscodingError::ALL_DRIVERS_FAILED:
+            case ImageTranscodingError::ALL_DRIVERS_FAILED:
                 if ($this->attempts() >= $this->tries) {
                     $notificationService->error(
                         'Tous les drivers d\'image ont échoué',
@@ -118,9 +122,9 @@ class PictureJob implements ShouldQueue
                 }
                 break;
 
-            case \App\Enums\ImageTranscodingError::RESOURCE_LIMIT_EXCEEDED:
-            case \App\Enums\ImageTranscodingError::MEMORY_LIMIT_EXCEEDED:
-            case \App\Enums\ImageTranscodingError::IMAGE_TOO_LARGE:
+            case ImageTranscodingError::RESOURCE_LIMIT_EXCEEDED:
+            case ImageTranscodingError::MEMORY_LIMIT_EXCEEDED:
+            case ImageTranscodingError::IMAGE_TOO_LARGE:
                 // Critical errors - notify immediately
                 $notificationService->error(
                     'Limites système dépassées',
@@ -133,7 +137,7 @@ class PictureJob implements ShouldQueue
                 );
                 break;
 
-            case \App\Enums\ImageTranscodingError::IMAGICK_ENCODING_FAILED:
+            case ImageTranscodingError::IMAGICK_ENCODING_FAILED:
                 if ($e->getFallbackAttempted()) {
                     // Fallback was attempted - less critical
                     if ($this->attempts() >= $this->tries) {
@@ -161,7 +165,7 @@ class PictureJob implements ShouldQueue
                 }
                 break;
 
-            case \App\Enums\ImageTranscodingError::UNSUPPORTED_FORMAT:
+            case ImageTranscodingError::UNSUPPORTED_FORMAT:
                 $notificationService->warning(
                     'Format d\'image non supporté',
                     'Le format demandé n\'est pas supporté pour l\'image "'.$this->picture->filename.'": '.$e->getMessage(),
@@ -191,7 +195,7 @@ class PictureJob implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         Log::error('Picture optimization job permanently failed', [
             'picture_id' => $this->picture->id,
@@ -202,7 +206,7 @@ class PictureJob implements ShouldQueue
 
         // Send a final failure notification if it's not a transcoding exception
         // (transcoding exceptions are handled in handleTranscodingError)
-        if (! $exception instanceof \App\Exceptions\ImageTranscodingException) {
+        if (! $exception instanceof ImageTranscodingException) {
             $notificationService = app(NotificationService::class);
             $notificationService->error(
                 'Échec définitif d\'optimisation d\'image',

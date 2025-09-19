@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -118,7 +119,7 @@ class GitHubService
                     'url' => $data['html_url'],
                     'homepage' => $data['homepage'],
                 ];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to fetch GitHub repository data', [
                     'error' => $e->getMessage(),
                     'owner' => $parsed['owner'],
@@ -170,7 +171,7 @@ class GitHubService
                 arsort($percentages);
 
                 return $percentages;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to fetch GitHub repository languages', [
                     'error' => $e->getMessage(),
                     'owner' => $parsed['owner'],
@@ -250,7 +251,7 @@ class GitHubService
                     'reset' => $data['rate']['reset'],
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to fetch GitHub rate limit status', [
                 'error' => $e->getMessage(),
             ]);

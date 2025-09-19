@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
 use App\Services\BlogPostConversionService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -52,7 +53,7 @@ class BlogPostController extends Controller
                     'gameReview.links',
                 ]),
             ], 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to publish blog post',
                 'error' => $e->getMessage(),

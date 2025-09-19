@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\Picture;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use ReflectionClass;
 
 class ImageCacheService
 {
@@ -183,7 +185,7 @@ class ImageCacheService
             ]);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to copy cached files', [
                 'picture_id' => $targetPicture->id,
                 'error' => $e->getMessage(),
@@ -221,7 +223,7 @@ class ImageCacheService
 
             // For testing purposes with array cache, we'll use reflection to access the storage
             if (get_class($store->getStore()) === 'Illuminate\Cache\ArrayStore') {
-                $reflection = new \ReflectionClass($store->getStore());
+                $reflection = new ReflectionClass($store->getStore());
                 $storage = $reflection->getProperty('storage');
                 $storage->setAccessible(true);
                 $storageArray = $storage->getValue($store->getStore());
@@ -273,7 +275,7 @@ class ImageCacheService
             $pattern = $this->keyPrefix.':';
 
             if (get_class($store->getStore()) === 'Illuminate\Cache\ArrayStore') {
-                $reflection = new \ReflectionClass($store->getStore());
+                $reflection = new ReflectionClass($store->getStore());
                 $storage = $reflection->getProperty('storage');
                 $storage->setAccessible(true);
                 $storageArray = $storage->getValue($store->getStore());

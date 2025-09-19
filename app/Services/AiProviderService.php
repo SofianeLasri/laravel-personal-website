@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\ImageTranscodingException;
 use App\Models\Notification;
 use App\Models\OptimizedPicture;
 use App\Models\Picture;
@@ -68,7 +69,7 @@ class AiProviderService
 
                 try {
                     $transcodedPicture = $transcodingService->transcode($picturePath, OptimizedPicture::MEDIUM_SIZE, 'jpeg');
-                } catch (\App\Exceptions\ImageTranscodingException $e) {
+                } catch (ImageTranscodingException $e) {
                     Log::error('Failed to transcode picture', [
                         'picture' => $picture,
                         'error' => $e->getMessage(),

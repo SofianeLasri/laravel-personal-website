@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BlogContentGallery;
 use App\Models\TranslationKey;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -70,7 +71,7 @@ class BlogContentGalleryController extends Controller
             $gallery->load('pictures');
 
             return response()->json($gallery, 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json([
@@ -162,7 +163,7 @@ class BlogContentGalleryController extends Controller
             $blogContentGallery->load('pictures');
 
             return response()->json($blogContentGallery);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json([
@@ -243,7 +244,7 @@ class BlogContentGalleryController extends Controller
             $blogContentGallery->load('pictures');
 
             return response()->json($blogContentGallery);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json([
@@ -278,7 +279,7 @@ class BlogContentGalleryController extends Controller
             DB::commit();
 
             return response()->json(['message' => 'Gallery deleted successfully']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json([

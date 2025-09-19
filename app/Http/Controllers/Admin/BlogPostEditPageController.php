@@ -11,6 +11,7 @@ use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
 use App\Models\Picture;
+use App\Models\TranslationKey;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -196,7 +197,7 @@ class BlogPostEditPageController extends Controller
                 // Load caption translations for each picture pivot
                 foreach ($content->content->pictures as $picture) {
                     if ($picture->pivot && $picture->pivot->caption_translation_key_id) {
-                        $captionKey = \App\Models\TranslationKey::with('translations')
+                        $captionKey = TranslationKey::with('translations')
                             ->find($picture->pivot->caption_translation_key_id);
                         if ($captionKey) {
                             $picture->pivot->caption_translation_key = $captionKey;

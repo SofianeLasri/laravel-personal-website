@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Models\GameReviewDraft;
 use App\Models\TranslationKey;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -102,7 +103,7 @@ class GameReviewDraftController extends Controller
             ]);
 
             return response()->json($gameReviewDraft, 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json([
@@ -235,7 +236,7 @@ class GameReviewDraftController extends Controller
             ]);
 
             return response()->json($gameReviewDraft);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json([
@@ -273,7 +274,7 @@ class GameReviewDraftController extends Controller
             DB::commit();
 
             return response()->json(['message' => 'Game review draft deleted successfully']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json([

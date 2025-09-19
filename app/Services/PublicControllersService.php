@@ -9,6 +9,8 @@ use App\Enums\ExperienceType;
 use App\Enums\TechnologyType;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
+use App\Models\BlogCategory;
+use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
 use App\Models\BlogPost;
 use App\Models\Certification;
@@ -21,6 +23,7 @@ use App\Models\Screenshot;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
+use App\Models\TranslationKey;
 use App\Models\Video;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -1018,7 +1021,7 @@ class PublicControllersService
      */
     public function getBlogCategories(): array
     {
-        $categories = \App\Models\BlogCategory::with('nameTranslationKey.translations')
+        $categories = BlogCategory::with('nameTranslationKey.translations')
             ->orderBy('order')
             ->get();
 
@@ -1042,7 +1045,7 @@ class PublicControllersService
      */
     public function getBlogCategoriesWithCounts(): array
     {
-        $categories = \App\Models\BlogCategory::with(['nameTranslationKey.translations', 'blogPosts'])
+        $categories = BlogCategory::with(['nameTranslationKey.translations', 'blogPosts'])
             ->orderBy('order')
             ->get();
 
@@ -1090,7 +1093,7 @@ class PublicControllersService
                 // Load different relations based on content type
                 $query->morphWith([
                     BlogContentMarkdown::class => ['translationKey.translations'],
-                    \App\Models\BlogContentGallery::class => ['pictures'],
+                    BlogContentGallery::class => ['pictures'],
                 ]);
             },
             'gameReview.coverPicture',
@@ -1122,7 +1125,7 @@ class PublicControllersService
                 $markdownContent = $content->content->translationKey ?
                     $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
                 $result['markdown'] = $markdownContent;
-            } elseif ($content->content_type === \App\Models\BlogContentGallery::class && $content->content instanceof \App\Models\BlogContentGallery) {
+            } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
                 // Get caption translation keys from the pivot data
                 $captionTranslationKeyIds = $content->content->pictures
                     ->pluck('pivot.caption_translation_key_id')
@@ -1132,7 +1135,7 @@ class PublicControllersService
                 // Load translation keys with their translations if any captions exist
                 $captionTranslations = [];
                 if ($captionTranslationKeyIds->isNotEmpty()) {
-                    $translationKeys = \App\Models\TranslationKey::with('translations')
+                    $translationKeys = TranslationKey::with('translations')
                         ->whereIn('id', $captionTranslationKeyIds)
                         ->get()
                         ->keyBy('id');

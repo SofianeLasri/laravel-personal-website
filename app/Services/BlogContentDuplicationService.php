@@ -6,6 +6,7 @@ use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
 use App\Models\BlogContentVideo;
 use App\Models\TranslationKey;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class BlogContentDuplicationService
@@ -85,7 +86,7 @@ class BlogContentDuplicationService
     /**
      * Duplicate all contents from one blog post to another
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $originalContents
+     * @param  Collection  $originalContents
      * @return array Array of new content data with ['content_type', 'content_id', 'order']
      */
     public function duplicateAllContents($originalContents): array

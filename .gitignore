@@ -2,6 +2,7 @@
 /node_modules
 /public/storage
 /storage/*.key
+/storage/coverage
 /vendor
 Homestead.yaml
 Homestead.json
@@ -111,6 +112,7 @@ com_crashlytics_export_strings.xml
 /.idea/jsonSchemas.xml
 /tests/Browser/screenshots
 /tests/Browser/console
+/.idea/copilot.data.*
 
 .phpunit.*
 /public/sitemap.xml

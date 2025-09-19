@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\BlogPostType;
+use App\Enums\CategoryColor;
 use App\Enums\CreationType;
 use App\Enums\ExperienceType;
 use App\Enums\TechnologyType;
@@ -204,7 +205,8 @@ class PublicControllersService
      */
     public function formatCreationForSSRShort(Creation $creation): array
     {
-        $shortDescription = $this->getTranslationWithFallback($creation->shortDescriptionTranslationKey->translations);
+        $shortDescription = $creation->shortDescriptionTranslationKey ?
+            $this->getTranslationWithFallback($creation->shortDescriptionTranslationKey->translations) : null;
 
         return [
             'id' => $creation->id,
@@ -233,7 +235,7 @@ class PublicControllersService
      *     name: string,
      *     slug: string,
      *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     startedAt: string,
      *     endedAt: string|null,
      *     startedAtFormatted: string|null,
@@ -253,7 +255,8 @@ class PublicControllersService
     {
         $response = $this->formatCreationForSSRShort($creation);
 
-        $fullDescription = $this->getTranslationWithFallback($creation->fullDescriptionTranslationKey->translations);
+        $fullDescription = $creation->fullDescriptionTranslationKey ?
+            $this->getTranslationWithFallback($creation->fullDescriptionTranslationKey->translations) : null;
 
         $response['fullDescription'] = $fullDescription;
         $response['externalUrl'] = $creation->external_url;
@@ -438,7 +441,8 @@ class PublicControllersService
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
-        $description = $this->getTranslationWithFallback($technology->descriptionTranslationKey->translations);
+        $description = $technology->descriptionTranslationKey ?
+            $this->getTranslationWithFallback($technology->descriptionTranslationKey->translations) : '';
 
         return [
             'id' => $technology->id,
@@ -625,7 +629,8 @@ class PublicControllersService
      *     id: int,
      *     title: string,
      *     organizationName: string,
-     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     location: string,
      *     websiteUrl: string|null,
      *     shortDescription: string,
@@ -792,17 +797,19 @@ class PublicControllersService
      *     title: string,
      *     slug: string,
      *     type: BlogPostType,
-     *     category: array{name: string, color: string},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
-     *     publishedAt: string,
-     *     publishedAtFormatted: string,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
      *     excerpt: string
      * }
      */
     public function formatBlogPostForSSRShort(BlogPost $blogPost): array
     {
-        $title = $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations);
-        $categoryName = $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations);
+        $title = $blogPost->titleTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
         $excerpt = $this->extractExcerptFromFirstTextBlock($blogPost, 150);
 
         return [
@@ -814,7 +821,7 @@ class PublicControllersService
                 'name' => $categoryName,
                 'color' => $blogPost->category->color,
             ],
-            'coverImage' => $this->formatPictureForSSR($blogPost->coverPicture),
+            'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
             'publishedAt' => $blogPost->created_at,
             'publishedAtFormatted' => $this->formatDate($blogPost->created_at),
             'excerpt' => $excerpt,
@@ -831,17 +838,19 @@ class PublicControllersService
      *     title: string,
      *     slug: string,
      *     type: BlogPostType,
-     *     category: array{name: string, color: string},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
-     *     publishedAt: string,
-     *     publishedAtFormatted: string,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
      *     excerpt: string
      * }
      */
     public function formatBlogPostForSSRHero(BlogPost $blogPost): array
     {
-        $title = $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations);
-        $categoryName = $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations);
+        $title = $blogPost->titleTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
         $excerpt = $this->extractExcerptFromFirstTextBlock($blogPost, 300);
 
         return [
@@ -853,7 +862,7 @@ class PublicControllersService
                 'name' => $categoryName,
                 'color' => $blogPost->category->color,
             ],
-            'coverImage' => $this->formatPictureForSSR($blogPost->coverPicture),
+            'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
             'publishedAt' => $blogPost->created_at,
             'publishedAtFormatted' => $this->formatDate($blogPost->created_at),
             'excerpt' => $excerpt,
@@ -895,7 +904,7 @@ class PublicControllersService
         $plainText = strip_tags(str_replace(['#', '*', '_', '`'], '', $text));
 
         // Clean up whitespace
-        $plainText = preg_replace('/\s+/', ' ', trim($plainText));
+        $plainText = preg_replace('/\s+/', ' ', trim($plainText)) ?? '';
 
         if (strlen($plainText) <= $maxLength) {
             return $plainText;
@@ -1005,7 +1014,7 @@ class PublicControllersService
     /**
      * Get all blog categories for filters
      *
-     * @return array<int, array{id: int, name: string, slug: string, color: string}>
+     * @return array<int, array{id: int, name: string, slug: string, color: CategoryColor}>
      */
     public function getBlogCategories(): array
     {
@@ -1014,7 +1023,8 @@ class PublicControllersService
             ->get();
 
         return $categories->map(function ($category) {
-            $name = $this->getTranslationWithFallback($category->nameTranslationKey->translations);
+            $name = $category->nameTranslationKey ?
+                $this->getTranslationWithFallback($category->nameTranslationKey->translations) : '';
 
             return [
                 'id' => $category->id,
@@ -1028,7 +1038,7 @@ class PublicControllersService
     /**
      * Get all blog categories with post counts for filters
      *
-     * @return array<int, array{id: int, name: string, slug: string, color: string, postCount: int}>
+     * @return array<int, array{id: int, name: string, slug: string, color: CategoryColor, postCount: int}>
      */
     public function getBlogCategoriesWithCounts(): array
     {
@@ -1037,7 +1047,8 @@ class PublicControllersService
             ->get();
 
         return $categories->map(function ($category) {
-            $name = $this->getTranslationWithFallback($category->nameTranslationKey->translations);
+            $name = $category->nameTranslationKey ?
+                $this->getTranslationWithFallback($category->nameTranslationKey->translations) : '';
 
             return [
                 'id' => $category->id,
@@ -1051,6 +1062,20 @@ class PublicControllersService
 
     /**
      * Get a blog post by slug with all its content
+     *
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
+     *     excerpt: string,
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
+     *     gameReview?: array{gameTitle: string, releaseDate: string, genre: string, developer: string, publisher: string, platforms: string, rating: int, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
+     * }|null
      */
     public function getBlogPostBySlug(string $slug): ?array
     {
@@ -1079,8 +1104,10 @@ class PublicControllersService
             return null;
         }
 
-        $title = $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations);
-        $categoryName = $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations);
+        $title = $blogPost->titleTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
 
         // Format contents
         $contents = $blogPost->contents->map(function ($content) {
@@ -1091,10 +1118,11 @@ class PublicControllersService
             ];
 
             // Handle different content types
-            if ($content->content_type === BlogContentMarkdown::class) {
-                $markdownContent = $this->getTranslationWithFallback($content->content->translationKey->translations);
+            if ($content->content_type === BlogContentMarkdown::class && $content->content instanceof BlogContentMarkdown) {
+                $markdownContent = $content->content->translationKey ?
+                    $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
                 $result['markdown'] = $markdownContent;
-            } elseif ($content->content_type === \App\Models\BlogContentGallery::class) {
+            } elseif ($content->content_type === \App\Models\BlogContentGallery::class && $content->content instanceof \App\Models\BlogContentGallery) {
                 // Get caption translation keys from the pivot data
                 $captionTranslationKeyIds = $content->content->pictures
                     ->pluck('pivot.caption_translation_key_id')
@@ -1120,8 +1148,9 @@ class PublicControllersService
                         $formattedPicture = $this->formatPictureForSSR($picture);
 
                         // Add caption if it exists in the pivot data
-                        if ($picture->pivot->caption_translation_key_id && isset($captionTranslations[$picture->pivot->caption_translation_key_id])) {
-                            $formattedPicture['caption'] = $captionTranslations[$picture->pivot->caption_translation_key_id];
+                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
+                        if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
+                            $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
                         }
 
                         return $formattedPicture;
@@ -1152,8 +1181,8 @@ class PublicControllersService
                 'color' => $blogPost->category->color,
             ],
             'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
-            'publishedAt' => $blogPost->published_at,
-            'publishedAtFormatted' => Carbon::parse($blogPost->published_at)->locale($this->locale)->translatedFormat('j F Y'),
+            'publishedAt' => $blogPost->created_at,
+            'publishedAtFormatted' => $blogPost->created_at instanceof Carbon ? $blogPost->created_at->locale($this->locale)->translatedFormat('j F Y') : '',
             'excerpt' => $excerpt,
             'contents' => $contents->toArray(),
         ];

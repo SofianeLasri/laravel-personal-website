@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+
 #[CoversClass(BlogPostDraftContent::class)]
 class BlogPostDraftContentTest extends TestCase
 {
@@ -78,7 +79,7 @@ class BlogPostDraftContentTest extends TestCase
             'order',
         ];
 
-        $content = new BlogPostDraftContent();
+        $content = new BlogPostDraftContent;
 
         $this->assertEquals($expectedFillable, $content->getFillable());
     }

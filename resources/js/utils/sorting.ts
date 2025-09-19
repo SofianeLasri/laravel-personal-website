@@ -46,9 +46,7 @@ export const compareValues = (a: unknown, b: unknown, direction: SortDirection):
     }
 
     // Fallback to string comparison for primitive values only
-    const aStr = (a === null || a === undefined) ? '' :
-                 (typeof a === 'string' || typeof a === 'number' || typeof a === 'boolean') ? String(a) : '';
-    const bStr = (b === null || b === undefined) ? '' :
-                 (typeof b === 'string' || typeof b === 'number' || typeof b === 'boolean') ? String(b) : '';
+    const aStr = a === null || a === undefined ? '' : typeof a === 'string' || typeof a === 'number' || typeof a === 'boolean' ? String(a) : '';
+    const bStr = b === null || b === undefined ? '' : typeof b === 'string' || typeof b === 'number' || typeof b === 'boolean' ? String(b) : '';
     return multiplier * aStr.localeCompare(bStr);
 };

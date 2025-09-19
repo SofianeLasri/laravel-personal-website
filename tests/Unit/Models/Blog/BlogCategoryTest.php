@@ -30,7 +30,7 @@ class BlogCategoryTest extends TestCase
             'order',
         ];
 
-        $blogCategory = new BlogCategory();
+        $blogCategory = new BlogCategory;
 
         $this->assertEquals($fillable, $blogCategory->getFillable());
     }
@@ -38,7 +38,7 @@ class BlogCategoryTest extends TestCase
     #[Test]
     public function it_has_correct_casts(): void
     {
-        $blogCategory = new BlogCategory();
+        $blogCategory = new BlogCategory;
         $casts = $blogCategory->getCasts();
 
         $this->assertEquals('int', $casts['id']);
@@ -62,7 +62,7 @@ class BlogCategoryTest extends TestCase
     #[Test]
     public function it_has_name_translation_key_relationship_defined(): void
     {
-        $blogCategory = new BlogCategory();
+        $blogCategory = new BlogCategory;
         $relation = $blogCategory->nameTranslationKey();
 
         $this->assertInstanceOf(BelongsTo::class, $relation);
@@ -88,7 +88,7 @@ class BlogCategoryTest extends TestCase
     #[Test]
     public function it_has_blog_posts_relationship_defined(): void
     {
-        $blogCategory = new BlogCategory();
+        $blogCategory = new BlogCategory;
         $relation = $blogCategory->blogPosts();
 
         $this->assertInstanceOf(HasMany::class, $relation);
@@ -263,7 +263,7 @@ class BlogCategoryTest extends TestCase
     #[Test]
     public function it_uses_correct_table_name(): void
     {
-        $category = new BlogCategory();
+        $category = new BlogCategory;
 
         $this->assertEquals('blog_categories', $category->getTable());
     }

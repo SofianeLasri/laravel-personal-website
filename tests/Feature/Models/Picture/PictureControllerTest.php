@@ -343,5 +343,4 @@ class PictureControllerTest extends TestCase
                 'optimized_count' => 2,
             ]);
     }
-
 }

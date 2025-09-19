@@ -5,7 +5,6 @@ namespace Tests\Feature\Controllers\Admin\Api;
 use App\Http\Controllers\Admin\Api\BlogContentMarkdownController;
 use App\Models\BlogContentMarkdown;
 use App\Models\Translation;
-use App\Models\TranslationKey;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -302,5 +301,4 @@ class BlogContentMarkdownControllerTest extends TestCase
 
         $response->assertNotFound();
     }
-
 }

@@ -24,6 +24,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BlogPostDraftWithAllRelations, BreadcrumbItem, TranslationKey } from '@/types';
+import { compareValues, type SortDirection } from '@/utils/sorting';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -31,7 +32,6 @@ import { fr } from 'date-fns/locale';
 import { ArrowDown, ArrowUp, Clock, Edit, Eye, MoreHorizontal, Send, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
-import { compareValues, type SortDirection } from '@/utils/sorting';
 
 interface Props {
     blogPostDrafts: BlogPostDraftWithAllRelations[];

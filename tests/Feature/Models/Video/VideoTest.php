@@ -287,7 +287,6 @@ class VideoTest extends TestCase
         ]);
     }
 
-
     #[Test]
     public function test_video_cover_picture_relationship_with_null()
     {

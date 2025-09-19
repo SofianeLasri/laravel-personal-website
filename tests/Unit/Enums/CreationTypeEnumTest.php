@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CreationType::class)]
 class CreationTypeEnumTest extends TestCase
 {
-
     #[Test]
     public function it_can_convert_enum_to_label()
     {

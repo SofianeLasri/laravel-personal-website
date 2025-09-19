@@ -132,7 +132,7 @@ class BlogPostTest extends TestCase
             'cover_picture_id',
         ];
 
-        $blogPost = new BlogPost();
+        $blogPost = new BlogPost;
 
         $this->assertEquals($expectedFillable, $blogPost->getFillable());
     }

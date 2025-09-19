@@ -259,7 +259,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function createDraftFromBlogPostWithGameReview(): void
+    public function create_draft_from_blog_post_with_game_review(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'original.title']);
@@ -327,7 +327,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostWithGameReview(): void
+    public function convert_draft_to_blog_post_with_game_review(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'draft.title']);
@@ -383,7 +383,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostRemovesExistingGameReviewWhenDraftHasNone(): void
+    public function convert_draft_to_blog_post_removes_existing_game_review_when_draft_has_none(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'existing.title']);
@@ -417,7 +417,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostUpdatesExistingGameReview(): void
+    public function convert_draft_to_blog_post_updates_existing_game_review(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'existing.title']);
@@ -487,7 +487,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostFailsValidationWithMissingTitle(): void
+    public function convert_draft_to_blog_post_fails_validation_with_missing_title(): void
     {
         $category = BlogCategory::factory()->create();
         $draft = new BlogPostDraft([
@@ -502,7 +502,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostFailsValidationWithMissingSlug(): void
+    public function convert_draft_to_blog_post_fails_validation_with_missing_slug(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create();
@@ -518,7 +518,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostFailsValidationWithMissingType(): void
+    public function convert_draft_to_blog_post_fails_validation_with_missing_type(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create();
@@ -534,7 +534,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostFailsValidationWithMissingCategory(): void
+    public function convert_draft_to_blog_post_fails_validation_with_missing_category(): void
     {
         $titleKey = TranslationKey::factory()->create();
         $draft = new BlogPostDraft([
@@ -549,7 +549,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostFailsValidationWithNonExistentTitleTranslationKey(): void
+    public function convert_draft_to_blog_post_fails_validation_with_non_existent_title_translation_key(): void
     {
         $category = BlogCategory::factory()->create();
         $draft = new BlogPostDraft([
@@ -564,7 +564,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostFailsValidationWithNonExistentCategory(): void
+    public function convert_draft_to_blog_post_fails_validation_with_non_existent_category(): void
     {
         $titleKey = TranslationKey::factory()->create();
         $draft = new BlogPostDraft([
@@ -579,7 +579,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function createDraftFromBlogPostWithGalleryContent(): void
+    public function create_draft_from_blog_post_with_gallery_content(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'original.title']);
@@ -633,7 +633,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function createDraftFromBlogPostWithVideoContent(): void
+    public function create_draft_from_blog_post_with_video_content(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'original.title']);
@@ -682,7 +682,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostCleansUpGalleryContentProperly(): void
+    public function convert_draft_to_blog_post_cleans_up_gallery_content_properly(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'existing.title']);
@@ -758,7 +758,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostCleansUpVideoContentProperly(): void
+    public function convert_draft_to_blog_post_cleans_up_video_content_properly(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'existing.title']);
@@ -830,7 +830,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostWithMixedContentTypes(): void
+    public function convert_draft_to_blog_post_with_mixed_content_types(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'draft.title']);
@@ -915,7 +915,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function generateUniqueTranslationKeyHandlesCollisions(): void
+    public function generate_unique_translation_key_handles_collisions(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'collision.test']);
@@ -941,7 +941,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function duplicateTranslationKeyWithMultipleLocales(): void
+    public function duplicate_translation_key_with_multiple_locales(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'multilang.title']);
@@ -967,7 +967,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function createDraftFromBlogPostWithGameReviewWithoutTranslationKeys(): void
+    public function create_draft_from_blog_post_with_game_review_without_translation_keys(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'original.title']);
@@ -998,7 +998,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function createDraftFromBlogPostWithoutContent(): void
+    public function create_draft_from_blog_post_without_content(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'empty.title']);
@@ -1028,7 +1028,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostWithoutGameReviewDraft(): void
+    public function convert_draft_to_blog_post_without_game_review_draft(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'draft.title']);
@@ -1055,7 +1055,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function createDraftFromBlogPostWithVideoContentWithoutCaption(): void
+    public function create_draft_from_blog_post_with_video_content_without_caption(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'original.title']);
@@ -1091,7 +1091,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostCleansUpVideoContentWithoutCaption(): void
+    public function convert_draft_to_blog_post_cleans_up_video_content_without_caption(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'existing.title']);
@@ -1135,7 +1135,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function createDraftFromBlogPostWithGalleryWithoutCaptions(): void
+    public function create_draft_from_blog_post_with_gallery_without_captions(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'original.title']);
@@ -1176,7 +1176,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function convertDraftToBlogPostHandlesEmptyExistingContent(): void
+    public function convert_draft_to_blog_post_handles_empty_existing_content(): void
     {
         $category = BlogCategory::factory()->create();
         $titleKey = TranslationKey::factory()->create(['key' => 'existing.title']);
@@ -1206,7 +1206,7 @@ class BlogPostConversionServiceTest extends TestCase
     }
 
     #[Test]
-    public function mapDraftAttributesCopiesAllRequiredFields(): void
+    public function map_draft_attributes_copies_all_required_fields(): void
     {
         $category = BlogCategory::factory()->create();
         $picture = Picture::factory()->create();

@@ -149,11 +149,7 @@ const getTechnologies = (technologies: SSRTechnology[]) => {
 
                     <div class="flex flex-col items-start justify-start gap-3 self-stretch">
                         <template v-for="exp in yearGroup.experiences" :key="exp.id">
-                            <CareerActiveButton
-                                v-if="selectedExperienceId === exp.id"
-                                :experience="exp"
-                                @click="selectExperience(exp.id)"
-                            />
+                            <CareerActiveButton v-if="selectedExperienceId === exp.id" :experience="exp" @click="selectExperience(exp.id)" />
                             <CareerInactiveButton v-else :experience="exp" @click="selectExperience(exp.id)" />
                         </template>
                     </div>

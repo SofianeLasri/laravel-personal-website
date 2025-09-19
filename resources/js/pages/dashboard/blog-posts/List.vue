@@ -27,11 +27,11 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BlogPostWithAllRelations, BreadcrumbItem, TranslationKey } from '@/types';
+import { compareValues, type SortDirection } from '@/utils/sorting';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { ArrowDown, ArrowUp, Edit, MoreHorizontal, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
-import { compareValues, type SortDirection } from '@/utils/sorting';
 
 interface Props {
     blogPosts: BlogPostWithAllRelations[];

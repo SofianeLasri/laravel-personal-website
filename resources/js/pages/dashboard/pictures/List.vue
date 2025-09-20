@@ -32,7 +32,19 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { AlertTriangle, ArrowUpDown, Download, Eye, Image as ImageIcon, Loader2, MoreHorizontal, RefreshCw, Search, Trash2 } from 'lucide-vue-next';
+import {
+    AlertTriangle,
+    ArrowUpDown,
+    Download,
+    Eye,
+    Image as ImageIcon,
+    Loader2,
+    MoreHorizontal,
+    RefreshCw,
+    RotateCw,
+    Search,
+    Trash2,
+} from 'lucide-vue-next';
 import { onMounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -88,12 +100,15 @@ const route = useRoute();
 const isLoading = ref(false);
 const isDeleteDialogOpen = ref(false);
 const isDetailDialogOpen = ref(false);
+const isRotateDialogOpen = ref(false);
 const currentPicture = ref<Picture | null>(null);
+const rotationAngle = ref<90 | 180 | 270>(90);
 const searchTerm = ref(props.filters.search);
 const sortBy = ref(props.filters.sort_by);
 const sortDirection = ref(props.filters.sort_direction);
 const pictureHealthStatus = ref<Record<number, { hasInvalidFiles: boolean; checking: boolean }>>({});
 const reoptimizingPictures = ref<Set<number>>(new Set());
+const rotatingPictures = ref<Set<number>>(new Set());
 
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
@@ -271,6 +286,43 @@ const reoptimizePicture = async (picture: Picture) => {
     }
 };
 
+const showRotateDialog = (picture: Picture, angle: 90 | 180 | 270) => {
+    currentPicture.value = picture;
+    rotationAngle.value = angle;
+    isRotateDialogOpen.value = true;
+};
+
+const rotatePicture = async () => {
+    if (!currentPicture.value) return;
+
+    const pictureId = currentPicture.value.id;
+    rotatingPictures.value.add(pictureId);
+    isRotateDialogOpen.value = false;
+
+    try {
+        const response = await axios.post(route('dashboard.api.pictures.rotate', { picture: pictureId }), {
+            angle: rotationAngle.value,
+        });
+
+        if (response.data.success) {
+            toast.success(response.data.message || `Image tournée de ${rotationAngle.value}° avec succès`);
+
+            // Refresh the page to show rotated images
+            setTimeout(() => {
+                router.reload({ only: ['pictures'] });
+            }, 500);
+        } else {
+            toast.error(response.data.message || 'Erreur lors de la rotation');
+        }
+    } catch (error: unknown) {
+        console.error('Erreur lors de la rotation:', error);
+        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Erreur lors de la rotation de l'image";
+        toast.error(message);
+    } finally {
+        rotatingPictures.value.delete(pictureId);
+    }
+};
+
 // Check health of all visible pictures on mount
 onMounted(() => {
     props.pictures.data.forEach((picture) => {
@@ -361,6 +413,17 @@ onMounted(() => {
                                     </div>
                                 </div>
 
+                                <!-- Indicateur de rotation en cours -->
+                                <div
+                                    v-if="rotatingPictures.has(picture.id)"
+                                    class="absolute inset-0 z-20 flex items-center justify-center bg-black/50"
+                                >
+                                    <div class="flex flex-col items-center gap-2 text-white">
+                                        <RotateCw class="h-8 w-8 animate-spin" />
+                                        <span class="text-sm">Rotation...</span>
+                                    </div>
+                                </div>
+
                                 <!-- Overlay avec actions -->
                                 <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20">
                                     <div class="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100">
@@ -378,6 +441,18 @@ onMounted(() => {
                                                 <DropdownMenuItem v-if="picture.path_original" @click="downloadOriginal(picture)">
                                                     <Download class="mr-2 h-4 w-4" />
                                                     Télécharger
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem @click="showRotateDialog(picture, 90)">
+                                                    <RotateCw class="mr-2 h-4 w-4" />
+                                                    Tourner 90°
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem @click="showRotateDialog(picture, 180)">
+                                                    <RotateCw class="mr-2 h-4 w-4" />
+                                                    Tourner 180°
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem @click="showRotateDialog(picture, 270)">
+                                                    <RotateCw class="mr-2 h-4 w-4" />
+                                                    Tourner 270°
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     :class="{
@@ -539,6 +614,46 @@ onMounted(() => {
                                 {{ optimized.variant }} ({{ optimized.format }})
                             </Badge>
                         </div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+
+        <!-- Dialog de rotation avec prévisualisation -->
+        <Dialog v-model:open="isRotateDialogOpen">
+            <DialogContent class="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Rotation de l'image</DialogTitle>
+                </DialogHeader>
+
+                <div v-if="currentPicture" class="space-y-4">
+                    <!-- Prévisualisation -->
+                    <div class="flex justify-center">
+                        <div class="relative">
+                            <img
+                                v-if="getThumbnailUrl(currentPicture)"
+                                :src="getThumbnailUrl(currentPicture)"
+                                :alt="currentPicture.filename"
+                                class="max-h-64 rounded-lg object-contain transition-transform duration-300"
+                                :style="`transform: rotate(${rotationAngle}deg)`"
+                            />
+                            <Badge class="absolute top-2 right-2" variant="secondary"> {{ rotationAngle }}° </Badge>
+                        </div>
+                    </div>
+
+                    <div class="text-muted-foreground text-center text-sm">
+                        L'image sera tournée de {{ rotationAngle }}° dans le sens horaire.
+                        <br />
+                        Cette opération modifiera l'image originale et toutes ses variantes optimisées.
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-end gap-2">
+                        <Button variant="outline" @click="isRotateDialogOpen = false"> Annuler </Button>
+                        <Button @click="rotatePicture">
+                            <RotateCw class="mr-2 h-4 w-4" />
+                            Confirmer la rotation
+                        </Button>
                     </div>
                 </div>
             </DialogContent>

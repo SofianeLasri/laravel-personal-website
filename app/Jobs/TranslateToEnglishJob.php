@@ -16,7 +16,8 @@ class TranslateToEnglishJob implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        public int $translationKeyId
+        public int $translationKeyId,
+        public bool $overwrite = false
     ) {}
 
     public function handle(AiProviderService $aiService): void
@@ -33,7 +34,7 @@ class TranslateToEnglishJob implements ShouldQueue
             ->where('locale', 'en')
             ->first();
 
-        if ($existingEnglishTranslation) {
+        if ($existingEnglishTranslation && ! $this->overwrite) {
             Log::info('English translation already exists', [
                 'key' => $translationKey->key,
                 'id' => $this->translationKeyId,
@@ -65,17 +66,32 @@ class TranslateToEnglishJob implements ShouldQueue
                 throw new RuntimeException('Invalid response format from AI service');
             }
 
-            Translation::create([
-                'translation_key_id' => $translationKey->id,
-                'locale' => 'en',
-                'text' => $response['message'],
-            ]);
+            if ($existingEnglishTranslation && $this->overwrite) {
+                // Update existing translation
+                $existingEnglishTranslation->update([
+                    'text' => $response['message'],
+                ]);
 
-            Log::info('Successfully translated to English', [
-                'key' => $translationKey->key,
-                'french_text' => $frenchTranslation->text,
-                'english_text' => $response['message'],
-            ]);
+                Log::info('Successfully retranslated to English', [
+                    'key' => $translationKey->key,
+                    'french_text' => $frenchTranslation->text,
+                    'old_english_text' => $existingEnglishTranslation->text,
+                    'new_english_text' => $response['message'],
+                ]);
+            } else {
+                // Create new translation
+                Translation::create([
+                    'translation_key_id' => $translationKey->id,
+                    'locale' => 'en',
+                    'text' => $response['message'],
+                ]);
+
+                Log::info('Successfully translated to English', [
+                    'key' => $translationKey->key,
+                    'french_text' => $frenchTranslation->text,
+                    'english_text' => $response['message'],
+                ]);
+            }
 
         } catch (Exception $e) {
             Log::error('Failed to translate to English', [

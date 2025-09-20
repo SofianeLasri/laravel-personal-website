@@ -4,10 +4,8 @@ namespace Tests\Feature\Jobs;
 
 use App\Jobs\TranslateToEnglishJob;
 use App\Models\TranslationKey;
-use App\Models\User;
 use App\Services\AiProviderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -95,98 +93,89 @@ class TranslateToEnglishJobTest extends TestCase
     }
 
     #[Test]
-    public function test_translate_single_endpoint_queues_job()
+    public function test_job_constructor_sets_properties()
     {
-        Queue::fake();
-        $user = User::factory()->create();
+        $job = new TranslateToEnglishJob(123, true);
 
+        $this->assertEquals(123, $job->translationKeyId);
+        $this->assertTrue($job->overwrite);
+
+        $job2 = new TranslateToEnglishJob(456);
+        $this->assertEquals(456, $job2->translationKeyId);
+        $this->assertFalse($job2->overwrite);
+    }
+
+    #[Test]
+    public function test_job_overwrites_existing_english_translation_when_overwrite_is_true()
+    {
+        $key = TranslationKey::factory()->create(['key' => 'test.hello']);
+        $frenchTranslation = $key->translations()->create([
+            'locale' => 'fr',
+            'text' => 'Bonjour le monde',
+        ]);
+        $existingEnglish = $key->translations()->create([
+            'locale' => 'en',
+            'text' => 'Old Hello World',
+        ]);
+
+        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService->shouldReceive('prompt')
+            ->once()
+            ->with(
+                'You are a helpful assistant that translates french markdown text in english and that outputs JSON in the format {message:string}. Markdown is supported.',
+                'Translate this French text to English: Bonjour le monde'
+            )
+            ->andReturn(['message' => 'New Hello World']);
+
+        $job = new TranslateToEnglishJob($key->id, true);
+        $job->handle($mockAiService);
+
+        $this->assertDatabaseHas('translations', [
+            'id' => $existingEnglish->id,
+            'translation_key_id' => $key->id,
+            'locale' => 'en',
+            'text' => 'New Hello World',
+        ]);
+
+        // Should still have only one English translation
+        $this->assertCount(1, $key->translations()->where('locale', 'en')->get());
+    }
+
+    #[Test]
+    public function test_job_throws_exception_when_ai_service_returns_invalid_response()
+    {
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
         $key->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
 
-        $response = $this->actingAs($user)
-            ->postJson(route('dashboard.api.translations.translate-single', $key));
+        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService->shouldReceive('prompt')
+            ->once()
+            ->andReturn(['invalid' => 'response']);
 
-        $response->assertOk()
-            ->assertJson([
-                'success' => true,
-                'message' => 'Translation job queued successfully',
-            ]);
+        $job = new TranslateToEnglishJob($key->id);
 
-        Queue::assertPushed(TranslateToEnglishJob::class, function ($job) use ($key) {
-            return $job->translationKeyId === $key->id;
-        });
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid response format from AI service');
+
+        $job->handle($mockAiService);
     }
 
     #[Test]
-    public function test_translate_single_fails_if_english_already_exists()
+    public function test_job_rethrows_ai_service_exceptions()
     {
-        $user = User::factory()->create();
-
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
         $key->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
-        $key->translations()->create(['locale' => 'en', 'text' => 'Hello']);
 
-        $response = $this->actingAs($user)
-            ->postJson(route('dashboard.api.translations.translate-single', $key));
+        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService->shouldReceive('prompt')
+            ->once()
+            ->andThrow(new \Exception('AI service error'));
 
-        $response->assertStatus(400)
-            ->assertJson([
-                'success' => false,
-                'message' => 'English translation already exists',
-            ]);
-    }
+        $job = new TranslateToEnglishJob($key->id);
 
-    #[Test]
-    public function test_translate_batch_missing_mode()
-    {
-        Queue::fake();
-        $user = User::factory()->create();
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('AI service error');
 
-        $key1 = TranslationKey::factory()->create(['key' => 'test.hello']);
-        $key1->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
-
-        $key2 = TranslationKey::factory()->create(['key' => 'test.goodbye']);
-        $key2->translations()->create(['locale' => 'fr', 'text' => 'Au revoir']);
-        $key2->translations()->create(['locale' => 'en', 'text' => 'Goodbye']);
-
-        $response = $this->actingAs($user)
-            ->postJson(route('dashboard.api.translations.translate-batch'), [
-                'mode' => 'missing',
-            ]);
-
-        $response->assertOk()
-            ->assertJson([
-                'success' => true,
-                'jobs_dispatched' => 1,
-            ]);
-
-        Queue::assertPushed(TranslateToEnglishJob::class, 1);
-    }
-
-    #[Test]
-    public function test_translate_batch_all_mode()
-    {
-        Queue::fake();
-        $user = User::factory()->create();
-
-        $key1 = TranslationKey::factory()->create(['key' => 'test.hello']);
-        $key1->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
-
-        $key2 = TranslationKey::factory()->create(['key' => 'test.goodbye']);
-        $key2->translations()->create(['locale' => 'fr', 'text' => 'Au revoir']);
-        $key2->translations()->create(['locale' => 'en', 'text' => 'Goodbye']);
-
-        $response = $this->actingAs($user)
-            ->postJson(route('dashboard.api.translations.translate-batch'), [
-                'mode' => 'all',
-            ]);
-
-        $response->assertOk()
-            ->assertJson([
-                'success' => true,
-                'jobs_dispatched' => 2,
-            ]);
-
-        Queue::assertPushed(TranslateToEnglishJob::class, 2);
+        $job->handle($mockAiService);
     }
 }

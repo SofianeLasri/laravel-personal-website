@@ -158,7 +158,30 @@ async function translateSingle(translationKey: TranslationKey) {
     }
 }
 
-async function translateBatch(mode: 'missing' | 'all') {
+async function retranslateSingle(translationKey: TranslationKey) {
+    isTranslating.value = true;
+
+    try {
+        const response = await axios.post(route('dashboard.api.translations.retranslate-single', translationKey.id), {});
+
+        if (response.data.success) {
+            alert("Tâche de re-traduction mise en file d'attente avec succès");
+        } else {
+            alert(response.data.message || "Échec de la mise en file d'attente de la re-traduction");
+        }
+    } catch (error) {
+        console.error('Failed to retranslate:', error);
+        if (axios.isAxiosError(error) && error.response?.data?.message) {
+            alert(error.response.data.message);
+        } else {
+            alert("Échec de la mise en file d'attente de la re-traduction");
+        }
+    } finally {
+        isTranslating.value = false;
+    }
+}
+
+async function translateBatch(mode: 'missing' | 'all' | 'retranslate') {
     isTranslating.value = true;
 
     try {
@@ -242,9 +265,13 @@ function goToApiLogs() {
                                 <LanguagesIcon class="mr-2 h-4 w-4" />
                                 Traduire manquantes
                             </Button>
+                            <Button variant="outline" :disabled="isTranslating" @click="translateBatch('retranslate')">
+                                <RefreshCwIcon class="mr-2 h-4 w-4" />
+                                Re-traduire existantes
+                            </Button>
                             <Button variant="outline" :disabled="isTranslating" @click="translateBatch('all')">
                                 <RefreshCwIcon class="mr-2 h-4 w-4" />
-                                Retraduire toutes
+                                Retraduire toutes (supprime)
                             </Button>
                             <Button variant="outline" @click="goToApiLogs">
                                 <ActivityIcon class="mr-2 h-4 w-4" />
@@ -280,9 +307,10 @@ function goToApiLogs() {
                                         <TranslationCell
                                             :translation="getEnglishTranslation(translationKey)"
                                             locale="en"
-                                            :can-translate="!getEnglishTranslation(translationKey) && !!getFrenchTranslation(translationKey)"
+                                            :can-translate="!!getFrenchTranslation(translationKey)"
                                             @save="updateTranslation"
                                             @translate="translateSingle(translationKey)"
+                                            @retranslate="retranslateSingle(translationKey)"
                                         />
                                     </div>
                                 </TableCell>

@@ -99,9 +99,31 @@ class TranslationPageController extends Controller
         ]);
     }
 
+    public function retranslateSingle(TranslationKey $translationKey): JsonResponse
+    {
+        $frenchTranslation = $translationKey->translations()
+            ->where('locale', 'fr')
+            ->first();
+
+        if (! $frenchTranslation) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No French translation found to translate from',
+            ], 400);
+        }
+
+        // Pass 'overwrite' flag to indicate this is a retranslation
+        TranslateToEnglishJob::dispatch($translationKey->id, true);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Retranslation job queued successfully',
+        ]);
+    }
+
     public function translateBatch(Request $request): JsonResponse
     {
-        $mode = $request->get('mode', 'missing'); // 'missing' or 'all'
+        $mode = $request->get('mode', 'missing'); // 'missing', 'all', or 'retranslate'
 
         $query = TranslationKey::whereHas('translations', function ($q) {
             // @phpstan-ignore-next-line
@@ -113,6 +135,12 @@ class TranslationPageController extends Controller
                 // @phpstan-ignore-next-line
                 $q->where('locale', 'en');
             });
+        } elseif ($mode === 'retranslate') {
+            // For retranslate mode, get keys that have both French and English translations
+            $query->whereHas('translations', function ($q) {
+                // @phpstan-ignore-next-line
+                $q->where('locale', 'en');
+            });
         }
 
         $translationKeys = $query->get();
@@ -120,10 +148,16 @@ class TranslationPageController extends Controller
 
         foreach ($translationKeys as $translationKey) {
             if ($mode === 'all') {
+                // Legacy mode: delete before retranslating all
                 $translationKey->translations()->where('locale', 'en')->delete();
+                TranslateToEnglishJob::dispatch($translationKey->id);
+            } elseif ($mode === 'retranslate') {
+                // New mode: retranslate without deleting
+                TranslateToEnglishJob::dispatch($translationKey->id, true);
+            } else {
+                // Missing mode: translate only missing
+                TranslateToEnglishJob::dispatch($translationKey->id);
             }
-
-            TranslateToEnglishJob::dispatch($translationKey->id);
             $jobsDispatched++;
         }
 

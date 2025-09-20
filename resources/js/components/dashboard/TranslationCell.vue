@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckIcon, EditIcon, LanguagesIcon, XIcon } from 'lucide-vue-next';
+import { CheckIcon, EditIcon, LanguagesIcon, RefreshCwIcon, XIcon } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 interface Translation {
@@ -19,6 +19,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     save: [translation: Translation, newText: string];
     translate: [];
+    retranslate: [];
 }>();
 
 const isEditing = ref(false);
@@ -55,14 +56,25 @@ function saveEdit() {
                 >
                     {{ translation.text }}
                 </div>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    class="absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100"
-                    @click="startEditing"
-                >
-                    <EditIcon class="h-3 w-3" />
-                </Button>
+                <div class="absolute top-1 right-1 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Button
+                        v-if="canTranslate && locale === 'en'"
+                        variant="ghost"
+                        size="sm"
+                        title="Re-traduire"
+                        @click.stop="$emit('retranslate')"
+                    >
+                        <RefreshCwIcon class="h-3 w-3" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        title="Modifier"
+                        @click="startEditing"
+                    >
+                        <EditIcon class="h-3 w-3" />
+                    </Button>
+                </div>
             </div>
         </div>
 

@@ -291,6 +291,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('translations.update');
         Route::post('translations/{translationKey}/translate', [TranslationPageController::class, 'translateSingle'])
             ->name('translations.translate-single');
+        Route::post('translations/{translationKey}/retranslate', [TranslationPageController::class, 'retranslateSingle'])
+            ->name('translations.retranslate-single');
         Route::post('translations/translate-batch', [TranslationPageController::class, 'translateBatch'])
             ->name('translations.translate-batch');
     });

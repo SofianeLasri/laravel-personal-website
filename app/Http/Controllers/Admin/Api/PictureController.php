@@ -69,7 +69,7 @@ class PictureController extends Controller
             $picture = Picture::findOrFail($pictureId);
 
             // Check if original file exists
-            if (! $picture->hasValidOriginalPath() || ! Storage::disk('public')->exists($picture->path_original)) {
+            if (! $picture->hasValidOriginalPath() || $picture->path_original === null || ! Storage::disk('public')->exists($picture->path_original)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Le fichier original n\'existe pas',
@@ -143,10 +143,12 @@ class PictureController extends Controller
 
         try {
             $picture = Picture::with('optimizedPictures')->findOrFail($pictureId);
-            $angle = (int) $request->input('angle');
+
+            /** @var int $angle */
+            $angle = $request->input('angle');
 
             // Check if original file exists
-            if (! $picture->hasValidOriginalPath() || ! Storage::disk('public')->exists($picture->path_original)) {
+            if (! $picture->hasValidOriginalPath() || $picture->path_original === null || ! Storage::disk('public')->exists($picture->path_original)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Le fichier original n\'existe pas',
@@ -158,6 +160,7 @@ class PictureController extends Controller
             $manager = new ImageManager($driver);
 
             // Rotate original image
+            // At this point, we've already checked that path_original is not null
             $originalPath = Storage::disk('public')->path($picture->path_original);
             $image = $manager->read($originalPath);
 
@@ -193,17 +196,24 @@ class PictureController extends Controller
             ]);
 
             // If CDN is configured, sync the rotated files
-            if (config('app.cdn_disk')) {
+            $cdnDisk = config('app.cdn_disk');
+            if ($cdnDisk && is_string($cdnDisk)) {
                 try {
                     // Upload rotated original to CDN
+                    // path_original is guaranteed to be non-null here
                     $content = Storage::disk('public')->get($picture->path_original);
-                    Storage::disk(config('app.cdn_disk'))->put($picture->path_original, $content);
+
+                    if ($content !== null) {
+                        Storage::disk($cdnDisk)->put($picture->path_original, $content);
+                    }
 
                     // Upload rotated optimized versions to CDN
                     foreach ($picture->optimizedPictures as $optimized) {
                         if (Storage::disk('public')->exists($optimized->path)) {
                             $optimizedContent = Storage::disk('public')->get($optimized->path);
-                            Storage::disk(config('app.cdn_disk'))->put($optimized->path, $optimizedContent);
+                            if ($optimizedContent !== null) {
+                                Storage::disk($cdnDisk)->put($optimized->path, $optimizedContent);
+                            }
                         }
                     }
                 } catch (Exception $e) {

@@ -231,6 +231,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('pictures.reoptimize');
         Route::get('pictures/{picture}/health', [PictureController::class, 'checkHealth'])
             ->name('pictures.health');
+        Route::post('pictures/{picture}/rotate', [PictureController::class, 'rotate'])
+            ->name('pictures.rotate');
         Route::apiResources([
             'blog-posts' => AdminBlogPostController::class,
             'certifications' => CertificationController::class,

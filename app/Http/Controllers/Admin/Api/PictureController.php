@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\ImageManager;
+use Log;
 use Storage;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -173,16 +174,15 @@ class PictureController extends Controller
             // Rotate all optimized versions
             foreach ($picture->optimizedPictures as $optimized) {
                 if (Storage::disk('public')->exists($optimized->path)) {
-                    $optimizedPath = Storage::disk('public')->path($optimized->path);
-                    $optimizedImage = $manager->read($optimizedPath);
-                    $optimizedImage->rotate(-$angle);
-                    $optimizedImage->save($optimizedPath);
-
-                    // Update dimensions for optimized picture
-                    $optimized->update([
-                        'width' => $optimizedImage->width(),
-                        'height' => $optimizedImage->height(),
-                    ]);
+                    try {
+                        $optimizedPath = Storage::disk('public')->path($optimized->path);
+                        $optimizedImage = $manager->read($optimizedPath);
+                        $optimizedImage->rotate(-$angle);
+                        $optimizedImage->save($optimizedPath);
+                    } catch (Exception $e) {
+                        // Log error but continue with other optimized versions
+                        Log::error("Failed to rotate optimized picture {$optimized->id}: ".$e->getMessage());
+                    }
                 }
             }
 
@@ -194,16 +194,21 @@ class PictureController extends Controller
 
             // If CDN is configured, sync the rotated files
             if (config('app.cdn_disk')) {
-                // Upload rotated original to CDN
-                $content = Storage::disk('public')->get($picture->path_original);
-                Storage::disk(config('app.cdn_disk'))->put($picture->path_original, $content);
+                try {
+                    // Upload rotated original to CDN
+                    $content = Storage::disk('public')->get($picture->path_original);
+                    Storage::disk(config('app.cdn_disk'))->put($picture->path_original, $content);
 
-                // Upload rotated optimized versions to CDN
-                foreach ($picture->optimizedPictures as $optimized) {
-                    if (Storage::disk('public')->exists($optimized->path)) {
-                        $optimizedContent = Storage::disk('public')->get($optimized->path);
-                        Storage::disk(config('app.cdn_disk'))->put($optimized->path, $optimizedContent);
+                    // Upload rotated optimized versions to CDN
+                    foreach ($picture->optimizedPictures as $optimized) {
+                        if (Storage::disk('public')->exists($optimized->path)) {
+                            $optimizedContent = Storage::disk('public')->get($optimized->path);
+                            Storage::disk(config('app.cdn_disk'))->put($optimized->path, $optimizedContent);
+                        }
                     }
+                } catch (Exception $e) {
+                    // Log CDN sync error but don't fail the entire operation
+                    Log::error('Failed to sync rotated images to CDN: '.$e->getMessage());
                 }
             }
 

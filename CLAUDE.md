@@ -177,10 +177,36 @@ Complex business logic is extracted into services rather than controllers or mod
 - **Ziggy**: Type-safe route generation from PHP to TypeScript
 
 ### Testing Strategy
-- **Feature Tests**: Test HTTP routes and business logic
-- **Unit Tests**: Test individual classes and methods
+- **Feature Tests**: Test HTTP routes, workflows, and business logic integration
+- **Unit Tests**: Test individual classes, methods, and isolated components
 - **Browser Tests**: End-to-end testing with Laravel Dusk
 - **Service Tests**: Dedicated tests for service classes
+
+#### Test Organization
+Tests are organized into a clear directory structure:
+
+```
+tests/
+├── Browser/           # End-to-end browser tests
+├── Feature/           # Integration and workflow tests
+│   ├── Controllers/   # HTTP controller tests
+│   ├── Models/        # Model integration tests (organized by domain)
+│   ├── Services/      # Service integration tests
+│   └── ...
+├── Unit/              # Pure unit tests
+│   ├── Enums/         # Enum tests (logic only, no database)
+│   ├── Models/        # Model unit tests (organized by domain)
+│   │   ├── Blog/      # Blog-related model tests
+│   │   └── Metadata/  # Metadata model tests
+│   └── Services/      # Service unit tests
+└── Traits/            # Shared test traits
+```
+
+**Test Separation Guidelines:**
+- **Enums**: All enum tests in `tests/Unit/Enums/` - test only enum logic, no database interactions
+- **Models**: Unit tests for model methods/attributes, Feature tests for model integration/workflows
+- **Services**: Unit tests for isolated logic, Feature tests for service integration with external dependencies
+- **Controllers**: Feature tests only (HTTP workflows)
 
 ## Production Features
 

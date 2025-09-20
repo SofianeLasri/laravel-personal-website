@@ -1,132 +1,3 @@
-<template>
-    <Head title="Translations" />
-
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <!-- Stats Cards -->
-            <div class="grid auto-rows-min gap-4 md:grid-cols-4">
-                <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
-                    <h3 class="text-muted-foreground text-sm font-medium">Total des clés</h3>
-                    <p class="text-2xl font-bold">{{ stats.total_keys }}</p>
-                </div>
-                <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
-                    <h3 class="text-muted-foreground text-sm font-medium">Traductions françaises</h3>
-                    <p class="text-2xl font-bold text-blue-600">{{ stats.french_translations }}</p>
-                </div>
-                <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
-                    <h3 class="text-muted-foreground text-sm font-medium">Traductions anglaises</h3>
-                    <p class="text-2xl font-bold text-green-600">{{ stats.english_translations }}</p>
-                </div>
-                <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
-                    <h3 class="text-muted-foreground text-sm font-medium">Anglaises manquantes</h3>
-                    <p class="text-destructive text-2xl font-bold">{{ stats.missing_english }}</p>
-                </div>
-            </div>
-
-            <!-- Main Content -->
-            <div class="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 rounded-xl border">
-                <div class="border-sidebar-border/70 border-b px-6 py-4">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex flex-1 flex-col gap-4 sm:flex-row">
-                            <!-- Search -->
-                            <div class="max-w-md flex-1">
-                                <Input v-model="searchQuery" placeholder="Rechercher des traductions..." @input="debouncedSearch" />
-                            </div>
-
-                            <!-- Locale Filter -->
-                            <Select v-model="localeFilter">
-                                <SelectTrigger class="w-40">
-                                    <SelectValue placeholder="Toutes les langues" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Toutes les langues</SelectItem>
-                                    <SelectItem value="fr">Français uniquement</SelectItem>
-                                    <SelectItem value="en">Anglais uniquement</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <!-- Batch Actions -->
-                        <div class="flex gap-2">
-                            <Button variant="outline" @click="translateBatch('missing')" :disabled="isTranslating">
-                                <LanguagesIcon class="mr-2 h-4 w-4" />
-                                Traduire manquantes
-                            </Button>
-                            <Button variant="outline" @click="translateBatch('all')" :disabled="isTranslating">
-                                <RefreshCwIcon class="mr-2 h-4 w-4" />
-                                Retraduire toutes
-                            </Button>
-                            <Button variant="outline" @click="goToApiLogs">
-                                <ActivityIcon class="mr-2 h-4 w-4" />
-                                Logs API
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Table -->
-                <div class="overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead class="w-64">Clé</TableHead>
-                                <TableHead>Texte français</TableHead>
-                                <TableHead>Texte anglais</TableHead>
-                                <TableHead class="w-32">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow v-for="translationKey in translationKeys.data" :key="translationKey.id">
-                                <TableCell class="font-mono text-sm">
-                                    {{ translationKey.key }}
-                                </TableCell>
-                                <TableCell>
-                                    <div class="max-w-md">
-                                        <TranslationCell :translation="getFrenchTranslation(translationKey)" locale="fr" @save="updateTranslation" />
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div class="max-w-md">
-                                        <TranslationCell
-                                            :translation="getEnglishTranslation(translationKey)"
-                                            locale="en"
-                                            @save="updateTranslation"
-                                            :can-translate="!getEnglishTranslation(translationKey) && !!getFrenchTranslation(translationKey)"
-                                            @translate="translateSingle(translationKey)"
-                                        />
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <Button
-                                        v-if="!getEnglishTranslation(translationKey) && !!getFrenchTranslation(translationKey)"
-                                        variant="ghost"
-                                        size="sm"
-                                        @click="translateSingle(translationKey)"
-                                        :disabled="isTranslating"
-                                    >
-                                        <LanguagesIcon class="h-4 w-4" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </div>
-
-                <!-- Pagination -->
-                <div v-if="translationKeys.data.length > 0" class="border-sidebar-border/70 border-t px-6 py-4">
-                    <Pagination
-                        :current-page="translationKeys.current_page"
-                        :last-page="translationKeys.last_page"
-                        :per-page="translationKeys.per_page"
-                        :total="translationKeys.total"
-                        @navigate="navigateToPage"
-                    />
-                </div>
-            </div>
-        </div>
-    </AppLayout>
-</template>
-
 <script setup lang="ts">
 import Pagination from '@/components/dashboard/Pagination.vue';
 import TranslationCell from '@/components/dashboard/TranslationCell.vue';
@@ -316,3 +187,132 @@ function goToApiLogs() {
     router.get(route('dashboard.api-logs.index'));
 }
 </script>
+
+<template>
+    <Head title="Translations" />
+
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <!-- Stats Cards -->
+            <div class="grid auto-rows-min gap-4 md:grid-cols-4">
+                <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <h3 class="text-muted-foreground text-sm font-medium">Total des clés</h3>
+                    <p class="text-2xl font-bold">{{ stats.total_keys }}</p>
+                </div>
+                <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <h3 class="text-muted-foreground text-sm font-medium">Traductions françaises</h3>
+                    <p class="text-2xl font-bold text-blue-600">{{ stats.french_translations }}</p>
+                </div>
+                <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <h3 class="text-muted-foreground text-sm font-medium">Traductions anglaises</h3>
+                    <p class="text-2xl font-bold text-green-600">{{ stats.english_translations }}</p>
+                </div>
+                <div class="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <h3 class="text-muted-foreground text-sm font-medium">Anglaises manquantes</h3>
+                    <p class="text-destructive text-2xl font-bold">{{ stats.missing_english }}</p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 rounded-xl border">
+                <div class="border-sidebar-border/70 border-b px-6 py-4">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex flex-1 flex-col gap-4 sm:flex-row">
+                            <!-- Search -->
+                            <div class="max-w-md flex-1">
+                                <Input v-model="searchQuery" placeholder="Rechercher des traductions..." @input="debouncedSearch" />
+                            </div>
+
+                            <!-- Locale Filter -->
+                            <Select v-model="localeFilter">
+                                <SelectTrigger class="w-40">
+                                    <SelectValue placeholder="Toutes les langues" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Toutes les langues</SelectItem>
+                                    <SelectItem value="fr">Français uniquement</SelectItem>
+                                    <SelectItem value="en">Anglais uniquement</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <!-- Batch Actions -->
+                        <div class="flex gap-2">
+                            <Button variant="outline" :disabled="isTranslating" @click="translateBatch('missing')">
+                                <LanguagesIcon class="mr-2 h-4 w-4" />
+                                Traduire manquantes
+                            </Button>
+                            <Button variant="outline" :disabled="isTranslating" @click="translateBatch('all')">
+                                <RefreshCwIcon class="mr-2 h-4 w-4" />
+                                Retraduire toutes
+                            </Button>
+                            <Button variant="outline" @click="goToApiLogs">
+                                <ActivityIcon class="mr-2 h-4 w-4" />
+                                Logs API
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead class="w-64">Clé</TableHead>
+                                <TableHead>Texte français</TableHead>
+                                <TableHead>Texte anglais</TableHead>
+                                <TableHead class="w-32">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow v-for="translationKey in translationKeys.data" :key="translationKey.id">
+                                <TableCell class="font-mono text-sm">
+                                    {{ translationKey.key }}
+                                </TableCell>
+                                <TableCell>
+                                    <div class="max-w-md">
+                                        <TranslationCell :translation="getFrenchTranslation(translationKey)" locale="fr" @save="updateTranslation" />
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <div class="max-w-md">
+                                        <TranslationCell
+                                            :translation="getEnglishTranslation(translationKey)"
+                                            locale="en"
+                                            :can-translate="!getEnglishTranslation(translationKey) && !!getFrenchTranslation(translationKey)"
+                                            @save="updateTranslation"
+                                            @translate="translateSingle(translationKey)"
+                                        />
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <Button
+                                        v-if="!getEnglishTranslation(translationKey) && !!getFrenchTranslation(translationKey)"
+                                        variant="ghost"
+                                        size="sm"
+                                        :disabled="isTranslating"
+                                        @click="translateSingle(translationKey)"
+                                    >
+                                        <LanguagesIcon class="h-4 w-4" />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="translationKeys.data.length > 0" class="border-sidebar-border/70 border-t px-6 py-4">
+                    <Pagination
+                        :current-page="translationKeys.current_page"
+                        :last-page="translationKeys.last_page"
+                        :per-page="translationKeys.per_page"
+                        :total="translationKeys.total"
+                        @navigate="navigateToPage"
+                    />
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>

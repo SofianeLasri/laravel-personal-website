@@ -25,6 +25,7 @@ import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { BreadcrumbItem, CreationDraftWithTranslations, TranslationKey } from '@/types';
 import { getTypeLabel } from '@/utils/creationTypes';
+import { compareValues, type SortDirection } from '@/utils/sorting';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -55,7 +56,6 @@ const itemsPerPage = 25;
 const currentPage = ref(1);
 
 type SortColumn = 'id' | 'name' | 'type' | 'started_at' | 'updated_at' | 'original_creation_id';
-type SortDirection = 'asc' | 'desc';
 
 const sortColumn = ref<SortColumn>('updated_at');
 const sortDirection = ref<SortDirection>('desc');
@@ -92,34 +92,7 @@ const getFrenchDescription = (translationKey: TranslationKey): string => {
     return frTranslation ? frTranslation.text : '';
 };
 
-const compareValues = (a: any, b: any, direction: SortDirection) => {
-    const multiplier = direction === 'asc' ? 1 : -1;
-
-    if (a === null || a === undefined) return multiplier;
-    if (b === null || b === undefined) return -multiplier;
-
-    if (typeof a === 'string' && typeof b === 'string') {
-        return multiplier * a.localeCompare(b, 'fr', { sensitivity: 'base' });
-    }
-
-    if (typeof a === 'number' && typeof b === 'number') {
-        return multiplier * (a - b);
-    }
-
-    if (typeof a === 'boolean' && typeof b === 'boolean') {
-        return multiplier * (a === b ? 0 : a ? -1 : 1);
-    }
-
-    if (a instanceof Date && b instanceof Date) {
-        return multiplier * (a.getTime() - b.getTime());
-    }
-
-    if (typeof a === 'string' && !isNaN(Date.parse(a)) && typeof b === 'string' && !isNaN(Date.parse(b))) {
-        return multiplier * (new Date(a).getTime() - new Date(b).getTime());
-    }
-
-    return multiplier * String(a).localeCompare(String(b));
-};
+// Function moved to @/utils/sorting
 
 const sortedDrafts = computed(() => {
     return [...props.creationDrafts].sort((a, b) => {
@@ -277,7 +250,7 @@ const publishDraft = async (id: number) => {
                             </TableCell>
                             <TableCell class="text-right">
                                 <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
+                                    <DropdownMenuTrigger as-child>
                                         <Button variant="ghost" class="h-8 w-8 p-0">
                                             <span class="sr-only">Ouvrir menu</span>
                                             <MoreHorizontal class="h-4 w-4" />
@@ -327,13 +300,13 @@ const publishDraft = async (id: number) => {
                 <div class="mt-6 flex justify-center">
                     <Pagination
                         v-if="props.creationDrafts.length > 0"
+                        v-slot="{ page }"
                         :total="props.creationDrafts.length"
                         :items-per-page="itemsPerPage"
                         :default-page="1"
                         show-edges
                         :sibling-count="1"
                         @update:page="handlePageChange"
-                        v-slot="{ page }"
                     >
                         <PaginationContent v-slot="{ items }" class="flex items-center gap-1">
                             <PaginationFirst />

@@ -20,26 +20,43 @@ const currentPath = computed(() => currentUrl.value.href);
 
 const isMenuOpen = ref(false);
 const isSearchModalOpen = ref(false);
-const hoveredItemIndex = ref(null);
+const hoveredItemIndex = ref<number | null>(null);
 const indicatorPosition = ref(0);
 const indicatorVisible = ref(false);
 const linkHeight = ref(48);
 const linkGap = 12;
 
-const routes = [
+const portfolioRoutes = [
     { path: route('public.home'), name: t('navigation.home'), index: 0 },
     { path: route('public.projects'), name: t('navigation.projects'), index: 1 },
     { path: route('public.certifications-career'), name: t('navigation.certifications-career'), index: 2 },
-    { path: route('public.about'), name: t('navigation.about'), index: 2 },
+    { path: route('public.about'), name: t('navigation.about'), index: 3 },
 ];
+
+const blogRoutes = [
+    { path: route('public.blog.home'), name: t('navigation.blog_home'), index: 4 },
+    { path: route('public.blog.index'), name: t('navigation.blog_all_articles'), index: 5 },
+];
+
+const allRoutes = [...portfolioRoutes, ...blogRoutes];
 
 const activeIndex = computed(() => {
     const cleanedPath = currentPath.value.endsWith('/') ? currentPath.value.slice(0, -1) : currentPath.value;
-    const matchingRoute = routes.find((r) => r.path === cleanedPath);
+    const matchingRoute = allRoutes.find((r) => r.path === cleanedPath);
     return matchingRoute ? matchingRoute.index : null;
 });
 
-const isItemActive = (index: any) => {
+const activeSection = computed(() => {
+    if (activeIndex.value === null) return null;
+    return activeIndex.value <= 3 ? 'portfolio' : 'blog';
+});
+
+const getRelativeIndex = (absoluteIndex: number) => {
+    if (absoluteIndex <= 3) return absoluteIndex;
+    return absoluteIndex - 4;
+};
+
+const isItemActive = (index: number | null) => {
     return index === activeIndex.value;
 };
 
@@ -66,14 +83,15 @@ const handleEscKey = (event: KeyboardEvent) => {
     }
 };
 
-const updateIndicatorPosition = (index: any) => {
+const updateIndicatorPosition = (index: number) => {
     hoveredItemIndex.value = index;
     indicatorVisible.value = true;
 
-    if (index === 0) {
+    const relativeIndex = getRelativeIndex(index);
+    if (relativeIndex === 0) {
         indicatorPosition.value = 0;
     } else {
-        indicatorPosition.value = index * (linkHeight.value + linkGap);
+        indicatorPosition.value = relativeIndex * (linkHeight.value + linkGap);
     }
 };
 
@@ -81,7 +99,12 @@ const resetIndicator = () => {
     hoveredItemIndex.value = null;
 
     if (activeIndex.value !== null) {
-        indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+        const relativeIndex = getRelativeIndex(activeIndex.value);
+        if (relativeIndex === 0) {
+            indicatorPosition.value = 0;
+        } else {
+            indicatorPosition.value = relativeIndex * (linkHeight.value + linkGap);
+        }
         indicatorVisible.value = true;
     } else {
         indicatorVisible.value = false;
@@ -92,7 +115,12 @@ watch(isMenuOpen, (value) => {
     document.body.style.overflow = value ? 'hidden' : '';
     if (value) {
         if (activeIndex.value !== null) {
-            indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+            const relativeIndex = getRelativeIndex(activeIndex.value);
+            if (relativeIndex === 0) {
+                indicatorPosition.value = 0;
+            } else {
+                indicatorPosition.value = relativeIndex * (linkHeight.value + linkGap);
+            }
             indicatorVisible.value = true;
         } else {
             indicatorPosition.value = 0;
@@ -105,7 +133,12 @@ onMounted(() => {
     document.addEventListener('keydown', handleEscKey);
 
     if (activeIndex.value !== null) {
-        indicatorPosition.value = activeIndex.value * (linkHeight.value + linkGap);
+        const relativeIndex = getRelativeIndex(activeIndex.value);
+        if (relativeIndex === 0) {
+            indicatorPosition.value = 0;
+        } else {
+            indicatorPosition.value = relativeIndex * (linkHeight.value + linkGap);
+        }
         indicatorVisible.value = true;
     } else {
         indicatorPosition.value = 0;
@@ -123,8 +156,8 @@ onUnmounted(() => {
     <div class="navbar z-10 container flex content-center justify-between px-4 py-16">
         <NavBrand />
         <div class="flex flex-nowrap items-center justify-center gap-4">
-            <NavSearchBar class="hidden md:flex" @click="openSearchModal" :placeholder="t('navigation.search_placeholder')" />
-            <BaseButton variant="black" @click="toggleMenu" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12">
+            <NavSearchBar class="hidden md:flex" :placeholder="t('navigation.search_placeholder')" @click="openSearchModal" />
+            <BaseButton variant="black" :aria-expanded="isMenuOpen" aria-controls="fullscreen-menu" class="xs:w-auto w-12" @click="toggleMenu">
                 <span class="xs:block hidden">{{ t('navigation.menu') }}</span>
                 <BarStaggeredRegular class="xs:relative dark:fill-gray-990 absolute size-4 fill-white" />
             </BaseButton>
@@ -142,20 +175,20 @@ onUnmounted(() => {
         >
             <div class="flex-grow-1 cursor-pointer" @click="closeMenu"></div>
             <div
-                class="bg-background motion-preset-slide-left flex w-full max-w-lg flex-shrink-0 flex-col items-start border-l py-16 pr-8 dark:border-gray-800 dark:bg-gray-900"
+                class="bg-background motion-preset-slide-left flex h-screen w-full max-w-lg flex-shrink-0 flex-col items-start overflow-y-auto border-l py-16 pr-8 dark:border-gray-800 dark:bg-gray-900"
             >
                 <div class="flex w-full flex-col gap-12">
                     <div class="flex items-center justify-end gap-4">
-                        <BaseButton variant="black" class="md:hidden" @click="openSearchModal" :aria-label="t('navigation.open_search')">
+                        <BaseButton variant="black" class="md:hidden" :aria-label="t('navigation.open_search')" @click="openSearchModal">
                             <span>{{ t('navigation.search') }}</span>
                             <MagnifyingGlassRegular class="dark:fill-gray-990 size-4 fill-white" />
                         </BaseButton>
                         <BaseButton
                             variant="black"
-                            @click="closeMenu"
                             :aria-expanded="isMenuOpen"
                             aria-controls="fullscreen-menu"
                             :aria-label="t('navigation.close_menu')"
+                            @click="closeMenu"
                         >
                             <span>{{ t('navigation.close') }}</span>
                             <BarStaggeredRegular class="dark:fill-gray-990 size-4 fill-white" />
@@ -163,11 +196,13 @@ onUnmounted(() => {
                     </div>
 
                     <div class="flex flex-col gap-8">
+                        <!-- Portfolio Section -->
                         <div class="pl-12">
                             <h2 class="text-4xl font-bold dark:text-white">{{ t('navigation.portfolio') }}</h2>
                         </div>
                         <div class="relative flex flex-col gap-3">
                             <div
+                                v-if="activeSection === 'portfolio'"
                                 class="bg-primary dark:bg-primary-400 absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
                                 :style="{
                                     transform: `translateY(${indicatorPosition}px)`,
@@ -176,12 +211,36 @@ onUnmounted(() => {
                             ></div>
 
                             <div
-                                v-for="(item, index) in routes"
-                                :key="index"
-                                @mouseenter="updateIndicatorPosition(index)"
+                                v-for="(item, index) in portfolioRoutes"
+                                :key="`portfolio-${index}`"
+                                @mouseenter="updateIndicatorPosition(item.index)"
                                 @mouseleave="resetIndicator"
                             >
-                                <NavMenuItem :text="item.name" :active="isItemActive(index)" :to="item.path" />
+                                <NavMenuItem :text="item.name" :active="isItemActive(item.index)" :to="item.path" />
+                            </div>
+                        </div>
+
+                        <!-- Blog Section -->
+                        <div class="pl-12">
+                            <h2 class="text-4xl font-bold dark:text-white">{{ t('navigation.blog') }}</h2>
+                        </div>
+                        <div class="relative flex flex-col gap-3">
+                            <div
+                                v-if="activeSection === 'blog'"
+                                class="bg-primary dark:bg-primary-400 absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
+                                :style="{
+                                    transform: `translateY(${indicatorPosition}px)`,
+                                    opacity: indicatorVisible ? 1 : 0,
+                                }"
+                            ></div>
+
+                            <div
+                                v-for="(item, index) in blogRoutes"
+                                :key="`blog-${index}`"
+                                @mouseenter="updateIndicatorPosition(item.index)"
+                                @mouseleave="resetIndicator"
+                            >
+                                <NavMenuItem :text="item.name" :active="isItemActive(item.index)" :to="item.path" />
                             </div>
                         </div>
 
@@ -199,5 +258,5 @@ onUnmounted(() => {
     </Transition>
 
     <!-- Search Modal -->
-    <SearchModal :isOpen="isSearchModalOpen" @close="closeSearchModal" />
+    <SearchModal :is-open="isSearchModalOpen" @close="closeSearchModal" />
 </template>

@@ -1,6 +1,40 @@
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
 
+export interface GameReview {
+    id: number;
+    blog_post_id: number;
+    game_title: string;
+    release_date: string | null;
+    genre: string | null;
+    developer: string | null;
+    publisher: string | null;
+    platforms: string[] | null;
+    cover_picture_id: number | null;
+    pros_translation_key_id: number | null;
+    cons_translation_key_id: number | null;
+    rating: 'positive' | 'negative' | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GameReviewDraft {
+    id: number;
+    blog_post_draft_id: number;
+    game_title: string;
+    release_date: string | null;
+    genre: string | null;
+    developer: string | null;
+    publisher: string | null;
+    platforms: string[] | null;
+    cover_picture_id: number | null;
+    pros_translation_key_id: number | null;
+    cons_translation_key_id: number | null;
+    rating: 'positive' | 'negative' | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Auth {
     user: User;
 }
@@ -53,6 +87,8 @@ interface TranslationKey {
 
 type CreationType = 'portfolio' | 'game' | 'library' | 'website' | 'tool' | 'map' | 'other';
 
+type BlogPostType = 'article' | 'game_review';
+
 interface CreationWithTranslationsAndDrafts {
     id: number;
     name: string;
@@ -72,6 +108,91 @@ interface CreationWithTranslationsAndDrafts {
     short_description_translation_key: TranslationKey;
     full_description_translation_key: TranslationKey;
     drafts: CreationDraft[];
+}
+
+interface BlogPost {
+    id: number;
+    slug: string;
+    title_translation_key_id: number;
+    type: BlogPostType;
+    category_id: number;
+    cover_picture_id: number | null;
+    published_at: string;
+    created_at: string;
+    updated_at: string;
+}
+
+interface BlogCategory {
+    id: number;
+    slug: string;
+    name_translation_key_id: number;
+    color: string; // TODO: Use predefined set of colors
+    order: number;
+    created_at: string;
+    updated_at: string;
+    name_translation_key: TranslationKey;
+}
+
+interface BlogContentMarkdown {
+    id: number;
+    translation_key_id: number;
+    created_at: string;
+    updated_at: string;
+    translation_key?: TranslationKey;
+}
+
+interface BlogContentGallery {
+    id: number;
+    layout?: string;
+    columns?: number;
+    created_at: string;
+    updated_at: string;
+    pictures?: Picture[];
+}
+
+interface BlogContentVideo {
+    id: number;
+    video_id: number | null;
+    caption_translation_key_id: number | null;
+    created_at: string;
+    updated_at: string;
+    video?: Video;
+    caption_translation_key?: TranslationKey;
+}
+
+type BlogContent = BlogContentMarkdown | BlogContentGallery | BlogContentVideo;
+
+interface BlogPostDraftWithAllRelations {
+    id: number;
+    original_blog_post_id: number | null;
+    slug: string;
+    title_translation_key_id: number;
+    type: BlogPostType;
+    category_id: number;
+    cover_picture_id: number | null;
+    published_at: string | null;
+    created_at: string;
+    updated_at: string;
+    title_translation_key: TranslationKey;
+    category: BlogCategory;
+    cover_picture: Picture | null;
+    original_blog_post: BlogPost | null;
+}
+
+interface BlogPostWithAllRelations {
+    id: number;
+    slug: string;
+    title_translation_key_id: number;
+    type: BlogPostType;
+    category_id: number;
+    cover_picture_id: number | null;
+    published_at: string;
+    created_at: string;
+    updated_at: string;
+    title_translation_key: TranslationKey;
+    category: BlogCategory;
+    cover_picture: Picture | null;
+    drafts: BlogPostDraftWithAllRelations[];
 }
 
 interface CreationDraft {
@@ -371,6 +492,52 @@ interface SSRCertificationsCareerData {
     certifications: SSRCertification[];
     educationExperiences: SSRExperience[];
     workExperiences: SSRExperience[];
+}
+
+// Blog SSR types for public pages
+interface SSRBlogPost {
+    id: number;
+    title: string;
+    slug: string;
+    type: BlogPostType;
+    category: {
+        name: string;
+        color: string;
+    };
+    coverImage: SSRPicture;
+    publishedAt: string;
+    publishedAtFormatted: string;
+    excerpt: string;
+}
+
+interface SSRBlogPostDetailed extends SSRBlogPost {
+    contents: Array<{
+        id: number;
+        order: number;
+        content_type: string;
+        markdown?: string;
+        gallery?: {
+            id: number;
+            pictures: SSRPicture[];
+        };
+    }>;
+    gameReview?: {
+        gameTitle: string;
+        releaseDate: string | null;
+        genre: string | null;
+        developer: string | null;
+        publisher: string | null;
+        platforms: string[] | null;
+        rating: 'positive' | 'negative' | null;
+        pros: string | null;
+        cons: string | null;
+        coverPicture: SSRPicture | null;
+    };
+}
+
+interface SSRBlogCategory {
+    name: string;
+    color: string;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

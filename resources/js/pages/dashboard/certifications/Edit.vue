@@ -47,7 +47,7 @@ const props = defineProps<Props>();
 const isSubmitting = ref(false);
 
 // Mode édition ou création
-const isEditing = computed(() => !!props.certification);
+const isEditing = computed(() => Boolean(props.certification));
 
 // Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
@@ -98,7 +98,10 @@ const onSubmit = form.handleSubmit(async (values) => {
     try {
         if (isEditing.value) {
             // Mise à jour
-            await axios.put(route('dashboard.api.certifications.update', { certification: props.certification!.id }), values);
+            if (!props.certification?.id) {
+                throw new Error('Certification ID is required for update');
+            }
+            await axios.put(route('dashboard.api.certifications.update', { certification: props.certification.id }), values);
             toast.success('Certification mise à jour avec succès');
         } else {
             // Création
@@ -108,10 +111,10 @@ const onSubmit = form.handleSubmit(async (values) => {
 
         // Redirection vers la liste
         router.visit(route('dashboard.certifications.index'));
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la sauvegarde :', error);
 
-        if (error.response?.status === 422) {
+        if ((error as { response?: { status?: number } }).response?.status === 422) {
             // Erreurs de validation
             const errors = error.response.data.errors;
             Object.keys(errors).forEach((field) => {
@@ -140,7 +143,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                 :description="isEditing ? 'Modifiez les informations de votre certification.' : 'Ajoutez une nouvelle certification à votre profil.'"
             />
 
-            <form @submit="onSubmit" class="mt-8 max-w-2xl space-y-6">
+            <form class="mt-8 max-w-2xl space-y-6" @submit="onSubmit">
                 <!-- Nom de la certification -->
                 <FormField v-slot="{ componentField }" name="name">
                     <FormItem>

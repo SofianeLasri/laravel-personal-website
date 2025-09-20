@@ -17,7 +17,7 @@ onMounted(() => {
         children: 'a',
         pswpModule: () => import('photoswipe'),
     });
-    new PhotoSwipeDynamicCaption(lightbox, {
+    void new PhotoSwipeDynamicCaption(lightbox, {
         type: 'auto',
     });
 

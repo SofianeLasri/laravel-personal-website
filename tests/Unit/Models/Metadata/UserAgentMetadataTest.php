@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Unit\Models\Metadata;
 
 use App\Models\UserAgentMetadata;
 use Illuminate\Database\QueryException;

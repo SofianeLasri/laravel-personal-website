@@ -1,43 +1,3 @@
-<template>
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
-            <div class="space-y-6">
-                <!-- Header -->
-                <div>
-                    <h1 class="text-2xl font-bold">Notifications</h1>
-                    <p class="text-muted-foreground">Manage and view all your notifications</p>
-                </div>
-
-                <!-- Actions -->
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <Button variant="outline" @click="notificationStore.markAllAsRead" :disabled="unreadCount === 0"> Mark all as read </Button>
-                        <Button variant="outline" @click="notificationStore.clearAll" :disabled="notifications.length === 0"> Clear all </Button>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <Button variant="default" @click="testNotification('success')"> Test Success </Button>
-                        <Button variant="destructive" @click="testNotification('error')"> Test Error </Button>
-                        <Button variant="outline" @click="testNotification('warning')"> Test Warning </Button>
-                        <Button variant="secondary" @click="testNotification('info')"> Test Info </Button>
-                    </div>
-                </div>
-
-                <!-- Notifications List -->
-                <Card>
-                    <CardHeader>
-                        <CardTitle>All Notifications</CardTitle>
-                        <CardDescription> You have {{ unreadCount }} unread notification{{ unreadCount !== 1 ? 's' : '' }} </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <NotificationList :notifications="notifications" @mark-as-read="handleMarkAsRead" @dismiss="handleDismiss" />
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    </AppLayout>
-</template>
-
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,7 +15,7 @@ const notifications = computed(() => notificationStore.notifications);
 const unreadCount = computed(() => notificationStore.unreadCount);
 
 onMounted(() => {
-    notificationStore.fetchNotifications();
+    void notificationStore.fetchNotifications();
 });
 
 const handleMarkAsRead = async (id: number) => {
@@ -88,3 +48,43 @@ const testNotification = async (type: string) => {
     }
 };
 </script>
+
+<template>
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+            <div class="space-y-6">
+                <!-- Header -->
+                <div>
+                    <h1 class="text-2xl font-bold">Notifications</h1>
+                    <p class="text-muted-foreground">Manage and view all your notifications</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <Button variant="outline" :disabled="unreadCount === 0" @click="notificationStore.markAllAsRead"> Mark all as read </Button>
+                        <Button variant="outline" :disabled="notifications.length === 0" @click="notificationStore.clearAll"> Clear all </Button>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <Button variant="default" @click="testNotification('success')"> Test Success </Button>
+                        <Button variant="destructive" @click="testNotification('error')"> Test Error </Button>
+                        <Button variant="outline" @click="testNotification('warning')"> Test Warning </Button>
+                        <Button variant="secondary" @click="testNotification('info')"> Test Info </Button>
+                    </div>
+                </div>
+
+                <!-- Notifications List -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle>All Notifications</CardTitle>
+                        <CardDescription> You have {{ unreadCount }} unread notification{{ unreadCount !== 1 ? 's' : '' }} </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <NotificationList :notifications="notifications" @mark-as-read="handleMarkAsRead" @dismiss="handleDismiss" />
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    </AppLayout>
+</template>

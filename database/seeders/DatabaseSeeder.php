@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Enums\CategoryColor;
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\Experience;
@@ -102,10 +105,71 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('-- Created technology experiences');
 
-        $this->command->info('6. Seeding complete!');
+        $this->command->info('6. Creating Blog Content');
+
+        // Create blog categories with specific names and colors
+        $technologyCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Technologie', 'en' => 'Technology'], CategoryColor::BLUE)
+            ->create();
+
+        $gamingCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Gaming', 'en' => 'Gaming'], CategoryColor::GREEN)
+            ->create();
+
+        $tutorialsCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Tutoriels', 'en' => 'Tutorials'], CategoryColor::PURPLE)
+            ->create();
+
+        $newsCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Actualités', 'en' => 'News'], CategoryColor::ORANGE)
+            ->create();
+
+        $reviewsCategory = BlogCategory::factory()
+            ->withNames(['fr' => 'Critiques', 'en' => 'Reviews'], CategoryColor::RED)
+            ->create();
+
+        $categories = collect([$technologyCategory, $gamingCategory, $tutorialsCategory, $newsCategory, $reviewsCategory]);
+
+        $this->command->info('-- Created '.$categories->count().' blog categories');
+
+        // Create complete blog posts with multiple content sections
+        $blogPosts = BlogPost::factory()
+            ->count(10)
+            ->withCompleteContent()
+            ->create()
+            ->each(function ($blogPost) use ($categories) {
+                // Assign random category based on content type
+                $category = $categories->random();
+                $blogPost->update(['category_id' => $category->id]);
+
+                // Create optimized pictures for cover images
+                $this->createOptimizedPicturesFor($blogPost->coverPicture);
+            });
+
+        $this->command->info('-- Created '.$blogPosts->count().' complete blog posts with content');
+
+        // Create some specific game review posts
+        $gameReviews = BlogPost::factory()
+            ->count(3)
+            ->gameReview()
+            ->withCompleteContent()
+            ->create()
+            ->each(function ($blogPost) use ($gamingCategory, $reviewsCategory) {
+                // Assign to gaming or reviews category
+                $gameCategory = collect([$gamingCategory, $reviewsCategory])->random();
+                $blogPost->update(['category_id' => $gameCategory->id]);
+
+                $this->createOptimizedPicturesFor($blogPost->coverPicture);
+            });
+
+        $this->command->info('-- Created '.$gameReviews->count().' game review posts');
+
+        $this->command->info('7. Seeding complete!');
         $this->command->info('-- Total technologies: '.Technology::count());
         $this->command->info('-- Total creations: '.Creation::count());
         $this->command->info('-- Total drafts: '.CreationDraft::count());
+        $this->command->info('-- Total blog posts: '.BlogPost::count());
+        $this->command->info('-- Total blog categories: '.BlogCategory::count());
         $this->command->info('-- Technologies with creations: '.
             Technology::whereHas('creations')->count());
     }

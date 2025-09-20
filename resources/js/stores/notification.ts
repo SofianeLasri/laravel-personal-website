@@ -132,7 +132,7 @@ export const useNotificationStore = defineStore('notification', () => {
     // WebSocket / Polling support
     const startPolling = (interval = 30000) => {
         setInterval(() => {
-            fetchNotifications();
+            void fetchNotifications();
         }, interval);
     };
 

@@ -37,6 +37,9 @@ const projectsUrl = computed(() => {
             params.tab = 'games';
             params.gameEngines = props.experience.technologyId.toString();
             break;
+        default:
+            // Other technology types don't have specific filtering
+            break;
     }
 
     return route('public.projects', params);
@@ -79,7 +82,7 @@ const projectsUrl = computed(() => {
                     </div>
                 </div>
                 <div class="text-design-system-paragraph dark:text-gray-300">
-                    <vue-markdown class="markdown-view" :source="experience.description" />
+                    <VueMarkdown class="markdown-view" :source="experience.description" />
                 </div>
             </div>
             <BaseButton variant="black" size="sm" as="link" :href="projectsUrl">

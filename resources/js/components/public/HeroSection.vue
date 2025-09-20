@@ -77,10 +77,10 @@ onMounted(() => {
                         {{ t('home.hero.download_cv') }}
                     </BaseButton>
                     <BaseButton
-                        variant="light"
-                        as="link"
                         v-for="link in socialMediaLinks"
                         :key="link.name"
+                        variant="light"
+                        as="link"
                         :href="link.url"
                         :title="link.name"
                         target="_blank"

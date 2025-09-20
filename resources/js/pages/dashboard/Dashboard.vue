@@ -63,12 +63,12 @@ const handlePeriodChange = (period: string) => {
     if (period === 'custom') return;
 
     const today = new Date().toISOString().split('T')[0];
-    loadStats(period, today);
+    void loadStats(period, today);
 };
 
 const applyCustomPeriod = () => {
     if (customStartDate.value && customEndDate.value) {
-        loadStats(customStartDate.value, customEndDate.value);
+        void loadStats(customStartDate.value, customEndDate.value);
     }
 };
 
@@ -92,7 +92,7 @@ const totalVisitsForPeriod = computed(() => {
 });
 
 onMounted(() => {
-    loadStats();
+    void loadStats();
 });
 </script>
 
@@ -141,7 +141,7 @@ onMounted(() => {
                                     class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
                                 />
                             </div>
-                            <Button @click="applyCustomPeriod" class="mt-7"> Appliquer </Button>
+                            <Button class="mt-7" @click="applyCustomPeriod"> Appliquer </Button>
                         </div>
                     </div>
                 </CardContent>

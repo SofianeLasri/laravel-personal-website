@@ -35,7 +35,7 @@ const page = usePage<SharedData>();
                 <SidebarMenuItem>
                     <CollapsibleTrigger as-child>
                         <SidebarMenuButton as-child :tooltip="item.title" :is-active="item.href === page.url">
-                            <Link :href="item.href" v-if="!item.items || item.items.length === 0">
+                            <Link v-if="!item.items || item.items.length === 0" :href="item.href">
                                 <component :is="item.icon" v-if="item.icon" />
                                 <span>{{ item.title }}</span>
                             </Link>

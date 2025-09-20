@@ -98,9 +98,9 @@ const formatDate = (dateString: string) => {
     return format(new Date(dateString), 'MMMM yyyy', { locale: fr });
 };
 
-const getTranslation = (translationKey: any, locale: string) => {
-    if (!translationKey || !translationKey.translations) return '';
-    const translation = translationKey.translations.find((t: any) => t.locale === locale);
+const getTranslation = (translationKey: { translations: { locale: string; text: string }[] }, locale: string) => {
+    if (!translationKey?.translations) return '';
+    const translation = translationKey.translations.find((t) => t.locale === locale);
     return translation ? translation.text : '';
 };
 
@@ -350,7 +350,7 @@ const deleteExperience = async () => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel @click="deleteConfirmationOpen = false"> Annuler </AlertDialogCancel>
-                    <AlertDialogAction @click="deleteExperience" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deleteExperience">
                         Supprimer
                     </AlertDialogAction>
                 </AlertDialogFooter>

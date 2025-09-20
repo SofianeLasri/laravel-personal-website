@@ -4,31 +4,14 @@ import TechnologyCard from '@/components/public/Technology/TechnologyCard.vue';
 import ContentSectionTitle from '@/components/public/Ui/ContentSectionTitle.vue';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
-import { SocialMediaLink } from '@/types';
+import { SocialMediaLink, SSRExperience } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 import { Building, CalendarDays, MapPin } from 'lucide-vue-next';
 import VueMarkdown from 'vue-markdown-render';
 
-interface Experience {
-    id: number;
-    title: string;
-    organizationName: string;
-    logo: any;
-    location: string;
-    websiteUrl: string | null;
-    shortDescription: string;
-    fullDescription: string;
-    technologies: any[];
-    type: string;
-    startedAt: string;
-    endedAt: string | null;
-    startedAtFormatted: string;
-    endedAtFormatted: string | null;
-}
-
 const props = defineProps<{
     socialMediaLinks: SocialMediaLink[];
-    experience: Experience;
+    experience: SSRExperience;
 }>();
 
 const page = usePage();
@@ -65,7 +48,7 @@ const formatPeriod = () => {
         <meta name="twitter:title" :content="pageTitle" />
         <meta name="twitter:description" :content="pageDescription" />
     </Head>
-    <PublicAppLayout :socialMediaLinks="socialMediaLinks">
+    <PublicAppLayout :social-media-links="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
         </div>
@@ -136,7 +119,7 @@ const formatPeriod = () => {
                 <!-- Description Section -->
                 <section class="flex flex-col">
                     <ContentSectionTitle>{{ t('experience.description') }}</ContentSectionTitle>
-                    <vue-markdown class="markdown-view" :source="experience.fullDescription" />
+                    <VueMarkdown class="markdown-view" :source="experience.fullDescription" />
                 </section>
 
                 <!-- Technologies Section -->
@@ -148,7 +131,7 @@ const formatPeriod = () => {
                             :key="tech.name"
                             :name="tech.name"
                             :description="tech.description"
-                            :iconPicture="tech.iconPicture"
+                            :icon-picture="tech.iconPicture"
                             class="bg-gray-100"
                         />
                     </div>

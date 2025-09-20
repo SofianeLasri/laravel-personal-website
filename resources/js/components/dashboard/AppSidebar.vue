@@ -12,6 +12,7 @@ import {
     Briefcase,
     Brush,
     Code,
+    FileVideo,
     Folder,
     FolderOutput,
     Image as ImageIcon,
@@ -19,6 +20,7 @@ import {
     LayoutGrid,
     LinkIcon,
     Logs,
+    NotebookPenIcon,
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
@@ -50,6 +52,25 @@ const mainNavItems: NavItem[] = [
         ],
     },
     {
+        title: 'Articles',
+        href: '#',
+        icon: NotebookPenIcon,
+        items: [
+            {
+                title: 'Liste',
+                href: route('dashboard.blog-posts.index', undefined, false),
+            },
+            {
+                title: 'Brouillons',
+                href: route('dashboard.blog-posts.drafts.index', undefined, false),
+            },
+            {
+                title: 'Éditeur',
+                href: route('dashboard.blog-posts.edit', undefined, false),
+            },
+        ],
+    },
+    {
         title: 'Technologies',
         href: route('dashboard.technology-experiences.index', undefined, false),
         icon: Code,
@@ -73,6 +94,11 @@ const mainNavItems: NavItem[] = [
         title: 'Images',
         href: route('dashboard.pictures.index', undefined, false),
         icon: ImageIcon,
+    },
+    {
+        title: 'Vidéos',
+        href: route('dashboard.videos.index', undefined, false),
+        icon: FileVideo,
     },
     {
         title: 'Traductions',

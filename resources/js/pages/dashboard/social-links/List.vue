@@ -101,7 +101,7 @@ const saveLink = async () => {
             );
 
             // Mettre à jour dans le tableau local
-            const index = links.value.findIndex((link) => link.id === currentLink.value!.id);
+            const index = links.value.findIndex((link) => link.id === currentLink.value?.id);
             if (index !== -1) {
                 links.value[index] = response.data;
             }
@@ -142,7 +142,7 @@ const deleteLink = async () => {
         await axios.delete(route('dashboard.api.social-media-links.destroy', { social_media_link: currentLink.value.id }));
 
         // Supprimer du tableau local
-        links.value = links.value.filter((link) => link.id !== currentLink.value!.id);
+        links.value = links.value.filter((link) => link.id !== currentLink.value?.id);
 
         toast.success('Lien supprimé avec succès');
         isDeleteDialogOpen.value = false;
@@ -189,7 +189,7 @@ const deleteLink = async () => {
                             <TableCell class="max-w-xs truncate">{{ link.url }}</TableCell>
                             <TableCell class="text-right">
                                 <div class="flex justify-end space-x-2">
-                                    <Button variant="ghost" size="icon" type="button" @click="openEditDialog(link)" title="Modifier">
+                                    <Button variant="ghost" size="icon" type="button" title="Modifier" @click="openEditDialog(link)">
                                         <Edit class="h-4 w-4" />
                                     </Button>
                                     <Button variant="ghost" size="icon" as-child title="Visiter">
@@ -197,7 +197,7 @@ const deleteLink = async () => {
                                             <ExternalLink class="h-4 w-4" />
                                         </a>
                                     </Button>
-                                    <Button variant="ghost" size="icon" type="button" @click="confirmDelete(link)" title="Supprimer">
+                                    <Button variant="ghost" size="icon" type="button" title="Supprimer" @click="confirmDelete(link)">
                                         <Trash2 class="h-4 w-4" />
                                     </Button>
                                 </div>
@@ -246,8 +246,8 @@ const deleteLink = async () => {
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" type="button" @click="isDialogOpen = false" :disabled="isLoading"> Annuler </Button>
-                    <Button type="button" @click="saveLink" :disabled="isLoading">
+                    <Button variant="outline" type="button" :disabled="isLoading" @click="isDialogOpen = false"> Annuler </Button>
+                    <Button type="button" :disabled="isLoading" @click="saveLink">
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         {{ currentLink ? 'Mettre à jour' : 'Ajouter' }}
                     </Button>
@@ -263,11 +263,11 @@ const deleteLink = async () => {
                     <AlertDialogDescription> Êtes-vous sûr de vouloir supprimer ce lien ? Cette action est irréversible. </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel @click="isDeleteDialogOpen = false" :disabled="isLoading"> Annuler </AlertDialogCancel>
+                    <AlertDialogCancel :disabled="isLoading" @click="isDeleteDialogOpen = false"> Annuler </AlertDialogCancel>
                     <AlertDialogAction
-                        @click="deleteLink"
                         class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         :disabled="isLoading"
+                        @click="deleteLink"
                     >
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Supprimer

@@ -7,6 +7,9 @@ return [
     'about' => 'À propos',
     'certifications-career' => 'Certifications  & Parcours',
     'portfolio' => 'Portfolio.',
+    'blog' => 'Blog.',
+    'blog_home' => 'Accueil',
+    'blog_all_articles' => 'Tous les articles',
 
     // Mobile menu
     'menu' => 'Menu',

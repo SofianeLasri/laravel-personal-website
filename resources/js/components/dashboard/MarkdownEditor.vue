@@ -52,11 +52,11 @@ const editor = useEditor({
 watch(
     () => props.modelValue,
     (newValue) => {
-        newValue = newValue || '';
+        const sanitizedValue = newValue ?? '';
 
-        if (newValue !== content.value) {
-            content.value = newValue;
-            rawContent.value = newValue;
+        if (sanitizedValue !== content.value) {
+            content.value = sanitizedValue;
+            rawContent.value = sanitizedValue;
 
             if (editor.value && editor.value.storage.markdown.getMarkdown() !== newValue) {
                 editor.value.commands.setContent(newValue, false);
@@ -140,9 +140,9 @@ const isActive = (type: string, options = {}) => {
                 size="sm"
                 variant="outline"
                 type="button"
-                @click="toggleBold"
                 :class="{ 'is-active': isActive('bold') }"
                 title="Gras (** texte **)"
+                @click="toggleBold"
             >
                 <Bold />
             </Button>
@@ -152,9 +152,9 @@ const isActive = (type: string, options = {}) => {
                 size="sm"
                 variant="outline"
                 type="button"
-                @click="toggleItalic"
                 :class="{ 'is-active': isActive('italic') }"
                 title="Italique (* texte *)"
+                @click="toggleItalic"
             >
                 <Italic />
             </Button>
@@ -164,9 +164,9 @@ const isActive = (type: string, options = {}) => {
                 size="sm"
                 variant="outline"
                 type="button"
-                @click="toggleStrike"
                 :class="{ 'is-active': isActive('strike') }"
                 title="Barré (~~ texte ~~)"
+                @click="toggleStrike"
             >
                 <Strikethrough />
             </Button>
@@ -176,9 +176,9 @@ const isActive = (type: string, options = {}) => {
                 size="sm"
                 variant="outline"
                 type="button"
-                @click="toggleUnderline"
                 :class="{ 'is-active': isActive('underline') }"
                 title="Souligné"
+                @click="toggleUnderline"
             >
                 <LucideUnderline />
             </Button>
@@ -192,8 +192,8 @@ const isActive = (type: string, options = {}) => {
                         size="sm"
                         variant="ghost"
                         type="button"
-                        @click="toggleHeading(level as 1 | 2 | 3 | 4 | 5 | 6)"
                         :class="{ 'is-active': isActive('heading', { level }) }"
+                        @click="toggleHeading(level as 1 | 2 | 3 | 4 | 5 | 6)"
                     >
                         H{{ level }}
                     </Button>
@@ -205,9 +205,9 @@ const isActive = (type: string, options = {}) => {
                 size="sm"
                 variant="outline"
                 type="button"
-                @click="setLink"
                 :class="{ 'is-active': isActive('link') }"
                 title="Lien ([texte](url))"
+                @click="setLink"
             >
                 <LucideLink />
             </Button>
@@ -217,9 +217,9 @@ const isActive = (type: string, options = {}) => {
                 size="sm"
                 variant="outline"
                 type="button"
-                @click="toggleCode"
                 :class="{ 'is-active': isActive('code') }"
                 title="Code inline (`code`)"
+                @click="toggleCode"
             >
                 <Code />
             </Button>
@@ -229,9 +229,9 @@ const isActive = (type: string, options = {}) => {
                 size="sm"
                 variant="outline"
                 type="button"
-                @click="toggleCodeBlock"
                 :class="{ 'is-active': isActive('codeBlock') }"
                 title="Bloc de code (```code```)"
+                @click="toggleCodeBlock"
             >
                 <span class="font-mono">```</span>
                 <Code />
@@ -241,9 +241,9 @@ const isActive = (type: string, options = {}) => {
                 size="sm"
                 :variant="rawMode ? 'default' : 'outline'"
                 type="button"
-                @click="toggleRawMode"
                 :title="rawMode ? 'Mode visuel' : 'Mode Markdown brut'"
                 class="ml-auto"
+                @click="toggleRawMode"
             >
                 <FileCode />
                 <span class="ml-1">{{ rawMode ? 'Visuel' : 'Markdown' }}</span>

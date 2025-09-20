@@ -42,8 +42,8 @@ const isImporting = ref(false);
 const importProgress = ref(0);
 const importFile = ref<File | null>(null);
 const uploadedFilePath = ref<string | null>(null);
-const importMetadata = ref<any>(null);
-const importStats = ref<any>(null);
+const importMetadata = ref<Record<string, unknown> | null>(null);
+const importStats = ref<Record<string, unknown> | null>(null);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
 
@@ -74,8 +74,8 @@ const handleExport = async () => {
             error.value = response.data.message;
             isExporting.value = false;
         }
-    } catch (err: any) {
-        error.value = err.response?.data?.message || 'Failed to start export. Please try again.';
+    } catch (err: unknown) {
+        error.value = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to start export. Please try again.';
         isExporting.value = false;
     }
 };
@@ -112,8 +112,11 @@ const startExportStatusPolling = () => {
                     stopExportStatusPolling();
                     isExporting.value = false;
                     break;
+                default:
+                    // Unknown status, continue polling
+                    break;
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             error.value = 'Failed to check export status. Please refresh the page.';
             stopExportStatusPolling();
             isExporting.value = false;
@@ -166,7 +169,7 @@ const uploadImportFile = async () => {
         uploadedFilePath.value = response.data.file_path;
         importMetadata.value = response.data.metadata;
         success.value = 'File uploaded and validated successfully!';
-    } catch (err: any) {
+    } catch (err: unknown) {
         error.value = err.response?.data?.message || 'Upload failed. Please check your file and try again.';
         if (err.response?.data?.errors?.import_file) {
             error.value = err.response.data.errors.import_file.join(', ');
@@ -208,7 +211,7 @@ const handleImport = async () => {
         if (fileInput.value) {
             fileInput.value.value = '';
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         clearInterval(progressInterval);
         error.value = err.response?.data?.message || 'Import failed. Please try again.';
     } finally {
@@ -234,7 +237,7 @@ const cancelImport = async () => {
         }
 
         success.value = 'Import cancelled successfully.';
-    } catch (err: any) {
+    } catch (err: unknown) {
         error.value = 'Failed to cancel import.';
         console.error(err);
     }
@@ -248,7 +251,7 @@ const formatFileSize = (bytes: number) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     if (bytes === 0) return '0 Bytes';
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i];
+    return `${Math.round((bytes / Math.pow(1024, i)) * 100) / 100} ${sizes[i]}`;
 };
 
 // Cleanup on component unmount
@@ -323,12 +326,12 @@ onUnmounted(() => {
                         </div>
 
                         <div class="space-y-2">
-                            <Button @click="handleExport" :disabled="isExporting" class="w-full">
+                            <Button :disabled="isExporting" class="w-full" @click="handleExport">
                                 <Download class="mr-2 h-4 w-4" />
                                 {{ isExporting ? 'Exporting...' : 'Export Website Data' }}
                             </Button>
 
-                            <Button v-if="exportDownloadUrl" @click="downloadExport" variant="outline" class="w-full">
+                            <Button v-if="exportDownloadUrl" variant="outline" class="w-full" @click="downloadExport">
                                 <Download class="mr-2 h-4 w-4" />
                                 Download Export File
                             </Button>
@@ -351,12 +354,12 @@ onUnmounted(() => {
                         <!-- File Selection -->
                         <div class="space-y-2">
                             <Label for="import-file">Select import file</Label>
-                            <Input ref="fileInput" id="import-file" type="file" accept=".zip" @change="handleFileSelect" :disabled="isImporting" />
+                            <Input id="import-file" ref="fileInput" type="file" accept=".zip" :disabled="isImporting" @change="handleFileSelect" />
                             <p class="text-muted-foreground text-sm">Select a ZIP file exported from this website.</p>
                         </div>
 
                         <!-- Upload Button -->
-                        <Button v-if="hasImportFile && !uploadedFilePath" @click="uploadImportFile" variant="outline" class="w-full">
+                        <Button v-if="hasImportFile && !uploadedFilePath" variant="outline" class="w-full" @click="uploadImportFile">
                             <Upload class="mr-2 h-4 w-4" />
                             Upload and Validate File
                         </Button>
@@ -402,12 +405,12 @@ onUnmounted(() => {
 
                             <!-- Import Actions -->
                             <div class="flex gap-2">
-                                <Button @click="handleImport" :disabled="!canImport || isImporting" variant="destructive" class="flex-1">
+                                <Button :disabled="!canImport || isImporting" variant="destructive" class="flex-1" @click="handleImport">
                                     <Upload class="mr-2 h-4 w-4" />
                                     {{ isImporting ? 'Importing...' : 'Import Data' }}
                                 </Button>
 
-                                <Button @click="cancelImport" :disabled="isImporting" variant="outline">
+                                <Button :disabled="isImporting" variant="outline" @click="cancelImport">
                                     <Trash2 class="h-4 w-4" />
                                 </Button>
                             </div>

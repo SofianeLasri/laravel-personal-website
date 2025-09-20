@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
+use App\Exceptions\ImageTranscodingException;
+use App\Jobs\PictureJob;
+use App\Services\ImageCacheService;
 use App\Services\ImageTranscodingService;
+use App\Services\NotificationService;
 use Database\Factories\PictureFactory;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -77,11 +82,45 @@ class Picture extends Model
         }
 
         $originalImage = Storage::disk('public')->get($this->path_original);
-        // $imageTranscodingService = new ImageTranscodingService(new Driver);
         $imageTranscodingService = app(ImageTranscodingService::class);
+        $imageCacheService = app(ImageCacheService::class);
 
+        // Try to use cache if enabled
+        if (config('images.cache.enabled', false)) {
+            $checksum = $imageCacheService->calculateChecksum($originalImage);
+            $cachedOptimizations = $imageCacheService->getCachedOptimizations($checksum);
+
+            if ($cachedOptimizations) {
+                if ($imageCacheService->copyCachedFiles($cachedOptimizations, $this)) {
+                    Log::info('Used cached optimizations for picture', [
+                        'picture_id' => $this->id,
+                        'checksum' => $checksum,
+                    ]);
+
+                    return;
+                }
+            }
+        }
+
+        // Fallback to normal optimization
+        $this->optimizeWithoutCache($imageTranscodingService, $originalImage, $imageCacheService);
+    }
+
+    /**
+     * Perform optimization without using cache (or when cache miss occurs)
+     */
+    private function optimizeWithoutCache(ImageTranscodingService $imageTranscodingService, string $originalImage, ?ImageCacheService $imageCacheService = null): void
+    {
         $dimensions = $imageTranscodingService->getDimensions($originalImage);
         $highestDimension = max($dimensions['width'], $dimensions['height']);
+
+        // Update picture dimensions if not already set
+        if ($this->width === null || $this->height === null) {
+            $this->update([
+                'width' => $dimensions['width'],
+                'height' => $dimensions['height'],
+            ]);
+        }
 
         $variants = [
             'thumbnail' => OptimizedPicture::THUMBNAIL_SIZE,
@@ -90,6 +129,8 @@ class Picture extends Model
             'large' => OptimizedPicture::LARGE_SIZE,
             'full' => $highestDimension,
         ];
+
+        $allOptimizedImages = [];
 
         foreach (OptimizedPicture::FORMATS as $format) {
             $optimizedImages = [];
@@ -110,12 +151,24 @@ class Picture extends Model
             }
 
             $this->storeOptimizedImages($optimizedImages, $format);
+            $allOptimizedImages[$format] = $optimizedImages;
         }
 
         $this->update([
             'width' => $dimensions['width'],
             'height' => $dimensions['height'],
         ]);
+
+        // Store in cache if enabled and cache service is available
+        if ($imageCacheService && config('images.cache.enabled', false)) {
+            $checksum = $imageCacheService->calculateChecksum($originalImage);
+            $imageCacheService->storeCachedOptimizations(
+                $checksum,
+                $allOptimizedImages,
+                $dimensions['width'],
+                $dimensions['height']
+            );
+        }
 
         // $this->deleteOriginal();
     }
@@ -145,7 +198,41 @@ class Picture extends Model
 
         $dimensionToUse = $optimizedDimension >= $highestDimension ? null : $optimizedDimension;
 
-        return $imageTranscodingService->transcode($originalImage, $dimensionToUse, $format);
+        try {
+            return $imageTranscodingService->transcode($originalImage, $dimensionToUse, $format);
+        } catch (ImageTranscodingException $e) {
+            Log::error('Image transcoding failed with specific error', [
+                'picture_id' => $this->id,
+                'error_code' => $e->getErrorCode()->value,
+                'driver_used' => $e->getDriverUsed(),
+                'fallback_attempted' => $e->getFallbackAttempted(),
+                'message' => $e->getMessage(),
+                'context' => $e->getContext(),
+            ]);
+
+            // Send notification for critical errors only
+            if ($e->getSeverity() === 'critical' || $e->getSeverity() === 'error') {
+                $notificationService = app(NotificationService::class);
+                $notificationService->error(
+                    'Échec critique d\'optimisation d\'image',
+                    'L\'image "'.$this->filename.'" n\'a pas pu être optimisée: '.$e->getMessage(),
+                    [
+                        'picture_id' => $this->id,
+                        'error_details' => $e->toArray(),
+                    ]
+                );
+            }
+
+            return null;
+        } catch (Exception $e) {
+            Log::error('Unexpected error during image transcoding', [
+                'picture_id' => $this->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return null;
+        }
     }
 
     private function getOptimizedDimension(int $dimension, int $highestDimension): int
@@ -169,9 +256,41 @@ class Picture extends Model
             return;
         }
 
+        $failedVariants = [];
+
         foreach ($optimizedImages as $variantName => $image) {
+            // Validate image content
+            if (empty($image) || strlen($image) === 0) {
+                Log::error('Optimized image is empty, skipping storage', [
+                    'picture_id' => $this->id,
+                    'variant' => $variantName,
+                    'format' => $format,
+                    'filename' => $this->filename,
+                ]);
+                $failedVariants[] = "$variantName.$format";
+
+                continue;
+            }
+
             $path = Str::beforeLast($this->path_original, '.')."_$variantName.$format";
             Storage::disk('public')->put($path, $image);
+
+            // Verify the file was written correctly
+            if (! Storage::disk('public')->exists($path) || Storage::disk('public')->size($path) === 0) {
+                Log::error('Failed to store optimized image or file has 0 bytes', [
+                    'picture_id' => $this->id,
+                    'variant' => $variantName,
+                    'format' => $format,
+                    'path' => $path,
+                ]);
+                // Delete the empty file if it exists
+                if (Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
+                $failedVariants[] = "$variantName.$format";
+
+                continue;
+            }
 
             if (config('app.cdn_disk')) {
                 Storage::disk(config('app.cdn_disk'))->put($path, $image);
@@ -182,6 +301,20 @@ class Picture extends Model
                 'path' => $path,
                 'format' => $format,
             ]);
+        }
+
+        // Send notification if there were failures
+        if (! empty($failedVariants)) {
+            $notificationService = app(NotificationService::class);
+            $notificationService->error(
+                'Échec d\'optimisation d\'image',
+                'Certaines variantes n\'ont pas pu être créées pour l\'image "'.$this->filename.'": '.implode(', ', $failedVariants),
+                [
+                    'picture_id' => $this->id,
+                    'failed_variants' => $failedVariants,
+                    'filename' => $this->filename,
+                ]
+            );
         }
     }
 
@@ -215,5 +348,39 @@ class Picture extends Model
     public function hasValidOriginalPath(): bool
     {
         return ! is_null($this->path_original) && ! empty($this->path_original);
+    }
+
+    /**
+     * Force reoptimization of the picture by deleting existing optimized versions
+     * and dispatching a new optimization job
+     */
+    public function reoptimize(): void
+    {
+        // Delete existing optimized pictures
+        $this->deleteOptimized();
+
+        // Dispatch new optimization job
+        PictureJob::dispatch($this);
+
+        Log::info('Picture reoptimization initiated', [
+            'picture_id' => $this->id,
+            'filename' => $this->filename,
+        ]);
+    }
+
+    /**
+     * Check if any optimized picture has invalid size (0 bytes)
+     */
+    public function hasInvalidOptimizedPictures(): bool
+    {
+        foreach ($this->optimizedPictures as $optimized) {
+            if (Storage::disk('public')->exists($optimized->path)) {
+                if (Storage::disk('public')->size($optimized->path) === 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

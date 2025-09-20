@@ -1,36 +1,3 @@
-<template>
-    <div class="flex items-center justify-between">
-        <div class="text-muted-foreground text-sm">Affichage de {{ startItem }} à {{ endItem }} sur {{ total }} résultats</div>
-
-        <div class="flex items-center space-x-2">
-            <Button variant="outline" size="sm" :disabled="currentPage <= 1" @click="$emit('navigate', currentPage - 1)">
-                <ChevronLeftIcon class="h-4 w-4" />
-                Précédent
-            </Button>
-
-            <div class="flex items-center space-x-1">
-                <template v-for="page in visiblePages" :key="page">
-                    <Button
-                        v-if="page !== '...'"
-                        variant="outline"
-                        size="sm"
-                        :class="{ 'bg-primary text-primary-foreground': page === currentPage }"
-                        @click="$emit('navigate', page)"
-                    >
-                        {{ page }}
-                    </Button>
-                    <span v-else class="text-muted-foreground px-2">...</span>
-                </template>
-            </div>
-
-            <Button variant="outline" size="sm" :disabled="currentPage >= lastPage" @click="$emit('navigate', currentPage + 1)">
-                Suivant
-                <ChevronRightIcon class="h-4 w-4" />
-            </Button>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next';
@@ -91,3 +58,36 @@ const visiblePages = computed(() => {
     return pages;
 });
 </script>
+
+<template>
+    <div class="flex items-center justify-between">
+        <div class="text-muted-foreground text-sm">Affichage de {{ startItem }} à {{ endItem }} sur {{ total }} résultats</div>
+
+        <div class="flex items-center space-x-2">
+            <Button variant="outline" size="sm" :disabled="currentPage <= 1" @click="$emit('navigate', currentPage - 1)">
+                <ChevronLeftIcon class="h-4 w-4" />
+                Précédent
+            </Button>
+
+            <div class="flex items-center space-x-1">
+                <template v-for="page in visiblePages" :key="page">
+                    <Button
+                        v-if="page !== '...'"
+                        variant="outline"
+                        size="sm"
+                        :class="{ 'bg-primary text-primary-foreground': page === currentPage }"
+                        @click="$emit('navigate', page)"
+                    >
+                        {{ page }}
+                    </Button>
+                    <span v-else class="text-muted-foreground px-2">...</span>
+                </template>
+            </div>
+
+            <Button variant="outline" size="sm" :disabled="currentPage >= lastPage" @click="$emit('navigate', currentPage + 1)">
+                Suivant
+                <ChevronRightIcon class="h-4 w-4" />
+            </Button>
+        </div>
+    </div>
+</template>

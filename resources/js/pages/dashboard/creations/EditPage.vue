@@ -78,7 +78,7 @@ const getOriginalCreationId = (): number | null => {
     }
 
     const creationId = url.searchParams.get('creation-id');
-    return creationId ? parseInt(creationId) : null;
+    return creationId ? parseInt(creationId, 10) : null;
 };
 
 const originalCreationId = ref(getOriginalCreationId());
@@ -162,7 +162,7 @@ watch(nameField, (newName) => {
     }
 });
 
-const updateContentForLocale = (newLocale: any) => {
+const updateContentForLocale = (newLocale: string) => {
     if (currentCreationDraft.value) {
         const newShortDesc = getContentForLocale(currentCreationDraft.value.short_description_translation_key, newLocale);
 
@@ -176,7 +176,7 @@ const updateContentForLocale = (newLocale: any) => {
     locale.value = newLocale;
 };
 
-const handleLocaleChange = (newLocale: any) => {
+const handleLocaleChange = (newLocale: string) => {
     if (hasUnsavedChanges.value) {
         pendingLocale.value = newLocale;
         showLocaleChangeDialog.value = true;
@@ -317,7 +317,7 @@ onMounted(() => {
                     <FormItem v-bind="componentField">
                         <FormLabel>Langue</FormLabel>
 
-                        <Select v-model="locale" @update:modelValue="handleLocaleChange">
+                        <Select v-model="locale" @update:model-value="handleLocaleChange">
                             <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sélectionner une langue" />

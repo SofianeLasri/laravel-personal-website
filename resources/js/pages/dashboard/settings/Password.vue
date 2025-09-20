@@ -33,7 +33,7 @@ const updatePassword = () => {
     form.put(route('dashboard.password.update'), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
-        onError: (errors: any) => {
+        onError: (errors: Record<string, string>) => {
             if (errors.password) {
                 form.reset('password', 'password_confirmation');
                 if (passwordInput.value instanceof HTMLInputElement) {
@@ -60,7 +60,7 @@ const updatePassword = () => {
             <div class="space-y-6">
                 <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
 
-                <form @submit.prevent="updatePassword" class="space-y-6">
+                <form class="space-y-6" @submit.prevent="updatePassword">
                     <div class="grid gap-2">
                         <Label for="current_password">Current password</Label>
                         <Input

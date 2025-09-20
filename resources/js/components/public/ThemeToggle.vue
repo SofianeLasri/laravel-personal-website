@@ -48,10 +48,10 @@ onMounted(() => {
 
 <template>
     <button
-        @click="cycleTheme"
         class="group relative inline-flex items-center justify-center rounded-lg p-2 transition-all hover:bg-gray-200 dark:hover:bg-gray-800"
         :aria-label="`Current theme: ${appearance}. Click to change theme`"
         type="button"
+        @click="cycleTheme"
     >
         <component :is="currentIcon" class="h-5 w-5 text-gray-700 transition-transform group-hover:scale-110 dark:text-gray-300" />
 

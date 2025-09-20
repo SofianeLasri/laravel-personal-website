@@ -6,10 +6,15 @@ export function useTranslation() {
 
     function t(key: string, replacements?: Record<string, string | number>): string {
         const keys = key.split('.');
-        let result: any = page.props.translations || {};
+        let result: unknown = page.props.translations || {};
 
         for (const k of keys) {
-            result = result[k as keyof typeof result] || null;
+            if (result && typeof result === 'object' && k in result) {
+                result = (result as Record<string, unknown>)[k];
+            } else {
+                result = null;
+                break;
+            }
 
             if (result === null) {
                 return key;

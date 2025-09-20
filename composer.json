@@ -10,14 +10,17 @@
   "require": {
     "php": "^8.2",
     "ext-curl": "*",
+    "ext-gd": "*",
     "ext-imagick": "*",
-    "ext-zip": "*",
     "ext-intl": "*",
+    "ext-pdo": "*",
+    "ext-zip": "*",
     "corbpie/bunny-cdn-api": "^1.9",
     "foroco/php-browser-detection": "^2.8",
     "halaxa/json-machine": "^1.2",
     "inertiajs/inertia-laravel": "^2.0",
     "intervention/image": "^3.11",
+    "itsgoingd/clockwork": "^5.3",
     "laravel/framework": "^12.0",
     "laravel/octane": "^2.8",
     "laravel/tinker": "^2.10.1",
@@ -28,8 +31,7 @@
     "spatie/laravel-backup": "^9.3",
     "spatie/laravel-sitemap": "^7.3",
     "tightenco/ziggy": "^2.4",
-    "verschuur/laravel-robotstxt": "^5.2",
-    "ext-pdo": "*"
+    "verschuur/laravel-robotstxt": "^5.2"
   },
   "require-dev": {
     "brianium/paratest": "^7.8",

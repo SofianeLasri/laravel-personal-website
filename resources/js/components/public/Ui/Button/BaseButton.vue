@@ -18,6 +18,7 @@ const props = withDefaults(defineProps<BaseButtonProps>(), {
     size: 'md',
     as: 'button',
     type: 'button',
+    href: undefined,
     target: '_self',
     title: '',
     disabled: false,

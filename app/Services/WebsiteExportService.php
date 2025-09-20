@@ -7,7 +7,6 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\FilesystemException;
 use RuntimeException;
 use ZipArchive;
 
@@ -68,7 +67,6 @@ class WebsiteExportService
      * @return string The path to the generated ZIP file
      *
      * @throws RuntimeException If export fails
-     * @throws FilesystemException
      */
     public function exportWebsite(): string
     {

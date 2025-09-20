@@ -19,12 +19,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem, TechnologyExperience, TechnologyWithCreationsCount } from '@/types';
+import { BreadcrumbItem, TechnologyExperience, TechnologyType, TechnologyWithCreationsCount } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import { Code, Edit, Loader2, Plus, Search, Trash2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
+
+interface TechnologyUpdateData {
+    name: string;
+    type: TechnologyType;
+    locale: string;
+    description: string;
+    icon_picture_id?: number;
+}
 
 const props = defineProps<{
     technologies: TechnologyWithCreationsCount[];
@@ -82,7 +90,7 @@ const getTechnologyDescription = (technology: TechnologyWithCreationsCount): str
 
     const translation = technology.description_translation_key.translations.find((t) => t.locale === locale.value);
 
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 const getExperienceDescription = (experience: TechnologyExperience): string => {
@@ -90,7 +98,7 @@ const getExperienceDescription = (experience: TechnologyExperience): string => {
 
     const translation = experience.description_translation_key.translations.find((t) => t.locale === locale.value);
 
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 const getTechnologyTypeLabel = (type: string): string => {
@@ -143,7 +151,7 @@ const updateTechnology = async () => {
     isLoading.value = true;
 
     try {
-        const updateData: any = {
+        const updateData: TechnologyUpdateData = {
             name: editTechnologyName.value.trim(),
             type: editTechnologyType.value,
             locale: locale.value,
@@ -220,7 +228,7 @@ const openEditTechnologyForm = (technology: TechnologyWithCreationsCount) => {
     editTechnologyId.value = technology.id;
     editTechnologyName.value = technology.name;
     editTechnologyType.value = technology.type;
-    editTechnologyIconPictureId.value = technology.icon_picture?.id || undefined;
+    editTechnologyIconPictureId.value = technology.icon_picture?.id ?? undefined;
     editTechnologyDescription.value = getTechnologyDescription(technology);
     isEditTechnologyDialogOpen.value = true;
 };
@@ -550,7 +558,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isAddTechnologyDialogOpen = false" :disabled="isLoading"> Annuler </Button>
+                    <Button variant="outline" :disabled="isLoading" @click="isAddTechnologyDialogOpen = false"> Annuler </Button>
                     <Button
                         :disabled="!newTechnologyName || !newTechnologyIconPictureId || !newTechnologyDescription || isLoading"
                         @click="createTechnology"
@@ -602,7 +610,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isEditTechnologyDialogOpen = false" :disabled="isLoading"> Annuler </Button>
+                    <Button variant="outline" :disabled="isLoading" @click="isEditTechnologyDialogOpen = false"> Annuler </Button>
                     <Button :disabled="!editTechnologyName || !editTechnologyDescription || isLoading" @click="updateTechnology">
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Enregistrer
@@ -641,7 +649,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isAddExperienceDialogOpen = false" :disabled="isLoading"> Annuler </Button>
+                    <Button variant="outline" :disabled="isLoading" @click="isAddExperienceDialogOpen = false"> Annuler </Button>
                     <Button :disabled="!newExperienceTechnologyId || !newExperienceDescription || isLoading" @click="createExperience">
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Ajouter
@@ -680,7 +688,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" @click="isEditExperienceDialogOpen = false" :disabled="isLoading"> Annuler </Button>
+                    <Button variant="outline" :disabled="isLoading" @click="isEditExperienceDialogOpen = false"> Annuler </Button>
                     <Button :disabled="!editExperienceTechnologyId || !editExperienceDescription || isLoading" @click="updateExperience">
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Enregistrer
@@ -699,11 +707,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel @click="isDeleteTechnologyDialogOpen = false" :disabled="isLoading"> Annuler </AlertDialogCancel>
+                    <AlertDialogCancel :disabled="isLoading" @click="isDeleteTechnologyDialogOpen = false"> Annuler </AlertDialogCancel>
                     <AlertDialogAction
-                        @click="deleteTechnology"
                         class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         :disabled="isLoading"
+                        @click="deleteTechnology"
                     >
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Supprimer
@@ -722,11 +730,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel @click="isDeleteExperienceDialogOpen = false" :disabled="isLoading"> Annuler </AlertDialogCancel>
+                    <AlertDialogCancel :disabled="isLoading" @click="isDeleteExperienceDialogOpen = false"> Annuler </AlertDialogCancel>
                     <AlertDialogAction
-                        @click="deleteExperience"
                         class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         :disabled="isLoading"
+                        @click="deleteExperience"
                     >
                         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
                         Supprimer

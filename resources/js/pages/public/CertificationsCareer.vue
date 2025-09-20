@@ -49,7 +49,7 @@ const pageImage = '/opengraph-image-1200-630.jpg';
         <meta name="twitter:description" :content="pageDescription" />
         <meta name="twitter:image" :content="pageImage" />
     </Head>
-    <PublicAppLayout :socialMediaLinks="socialMediaLinks">
+    <PublicAppLayout :social-media-links="socialMediaLinks">
         <div class="absolute top-0 left-0 z-0 h-full w-full overflow-hidden">
             <LightShape class="absolute top-0 left-[-27rem] xl:left-[-15rem]" />
         </div>

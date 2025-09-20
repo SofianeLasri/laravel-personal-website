@@ -186,7 +186,7 @@ const deleteCertification = async () => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel @click="deleteConfirmationOpen = false"> Annuler </AlertDialogCancel>
-                    <AlertDialogAction @click="deleteCertification" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deleteCertification">
                         Supprimer
                     </AlertDialogAction>
                 </AlertDialogFooter>

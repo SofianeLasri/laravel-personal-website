@@ -59,8 +59,8 @@ const handleProjectClick = (project: SSRSimplifiedCreation) => {
                 <button
                     v-for="project in results"
                     :key="project.id"
-                    @click="handleProjectClick(project)"
                     class="group dark:hover:bg-gray-750 flex cursor-pointer items-start gap-4 rounded-lg border bg-white p-4 text-left transition-all hover:bg-gray-50 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                    @click="handleProjectClick(project)"
                 >
                     <!-- Project logo -->
                     <div

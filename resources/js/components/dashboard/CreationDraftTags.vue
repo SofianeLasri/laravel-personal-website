@@ -303,9 +303,9 @@ const resetEditForm = () => {
 };
 
 onMounted(() => {
-    fetchAllTags();
+    void fetchAllTags();
     if (props.creationDraftId) {
-        fetchAssociatedTags();
+        void fetchAssociatedTags();
     }
 });
 
@@ -313,7 +313,7 @@ watch(
     () => props.creationDraftId,
     (newVal) => {
         if (newVal) {
-            fetchAssociatedTags();
+            void fetchAssociatedTags();
         } else {
             associatedTags.value = [];
         }
@@ -353,7 +353,7 @@ watch(
                     <div v-for="tag in associatedTags" :key="tag.id" class="bg-muted flex items-center space-x-1 rounded-full px-2 py-1 text-sm">
                         <TagIcon class="text-muted-foreground h-3 w-3" />
                         <span>{{ tag.name }}</span>
-                        <Button variant="ghost" size="icon" class="h-5 w-5 rounded-full" @click="dissociateTag(tag.id)" title="Dissocier">
+                        <Button variant="ghost" size="icon" class="h-5 w-5 rounded-full" title="Dissocier" @click="dissociateTag(tag.id)">
                             <Minus class="h-3 w-3" />
                         </Button>
                     </div>
@@ -405,18 +405,18 @@ watch(
                                             v-if="isTagAssociated(tag.id)"
                                             variant="outline"
                                             size="sm"
-                                            @click="dissociateTag(tag.id)"
                                             title="Dissocier"
+                                            @click="dissociateTag(tag.id)"
                                         >
                                             Dissocier
                                         </Button>
-                                        <Button v-else variant="outline" size="sm" @click="associateTag(tag.id)" title="Ajouter"> Ajouter </Button>
+                                        <Button v-else variant="outline" size="sm" title="Ajouter" @click="associateTag(tag.id)"> Ajouter </Button>
 
-                                        <Button variant="ghost" size="icon" @click="openEditForm(tag)" title="Modifier">
+                                        <Button variant="ghost" size="icon" title="Modifier" @click="openEditForm(tag)">
                                             <Pencil class="h-4 w-4" />
                                         </Button>
 
-                                        <Button variant="ghost" size="icon" @click="confirmDeleteTag(tag)" title="Supprimer">
+                                        <Button variant="ghost" size="icon" title="Supprimer" @click="confirmDeleteTag(tag)">
                                             <Trash2 class="h-4 w-4" />
                                         </Button>
                                     </div>
@@ -446,7 +446,7 @@ watch(
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" @click="isAddTagDialogOpen = false" :disabled="loading">Annuler</Button>
+                        <Button variant="outline" :disabled="loading" @click="isAddTagDialogOpen = false">Annuler</Button>
                         <Button :disabled="!newTagName || loading" @click="createTag">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Créer
@@ -470,7 +470,7 @@ watch(
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" @click="isEditTagDialogOpen = false" :disabled="loading">Annuler</Button>
+                        <Button variant="outline" :disabled="loading" @click="isEditTagDialogOpen = false">Annuler</Button>
                         <Button :disabled="!editTagName || loading" @click="updateTag">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Enregistrer
@@ -493,7 +493,7 @@ watch(
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction @click="deleteTag" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deleteTag">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Supprimer
                         </AlertDialogAction>

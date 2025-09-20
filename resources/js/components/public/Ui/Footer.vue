@@ -56,7 +56,7 @@ const { t } = useTranslation();
                         <div class="flex flex-col justify-start gap-4">
                             <div class="text-xl font-bold text-black dark:text-gray-100">{{ t('footer.find_me') }}</div>
                             <ul class="text-design-system-paragraph text-base font-normal">
-                                <li class="mb-2 list-none" v-for="link in socialMediaLinks" :key="link.id">
+                                <li v-for="link in socialMediaLinks" :key="link.id" class="mb-2 list-none">
                                     <a :href="link.url" :title="link.name" target="_blank">
                                         <div class="flex items-center justify-start gap-2">
                                             <SvgIcon :svg="link.icon_svg" class="flex h-4 fill-black dark:fill-gray-100" />

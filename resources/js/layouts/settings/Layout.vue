@@ -38,7 +38,8 @@ const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.locati
                         v-for="item in sidebarNavItems"
                         :key="item.href"
                         variant="ghost"
-                        :class="['w-full justify-start', { 'bg-muted': currentPath === item.href }]"
+                        class="w-full justify-start"
+                        :class="[{ 'bg-muted': currentPath === item.href }]"
                         as-child
                     >
                         <Link :href="item.href">

@@ -30,8 +30,8 @@ defineProps<{
         <div class="lg:p-8">
             <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                 <div class="flex flex-col space-y-2 text-center">
-                    <h1 class="text-xl font-medium tracking-tight" v-if="title">{{ title }}</h1>
-                    <p class="text-muted-foreground text-sm" v-if="description">{{ description }}</p>
+                    <h1 v-if="title" class="text-xl font-medium tracking-tight">{{ title }}</h1>
+                    <p v-if="description" class="text-muted-foreground text-sm">{{ description }}</p>
                 </div>
                 <slot />
             </div>

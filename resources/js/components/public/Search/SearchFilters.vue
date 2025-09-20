@@ -54,8 +54,8 @@ const handleClearFilters = () => {
 <template>
     <div class="flex flex-col gap-4">
         <button
-            @click="toggleFilters"
             class="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+            @click="toggleFilters"
         >
             <Filter class="h-4 w-4" />
             <span>{{ t('search.filters') }}</span>
@@ -74,21 +74,21 @@ const handleClearFilters = () => {
                         <button
                             v-for="tag in visibleTags"
                             :key="tag.id"
-                            @click="handleTagToggle(tag.id)"
                             class="rounded-full px-3 py-1 text-sm transition-colors"
                             :class="
                                 selectedTags.includes(tag.id)
                                     ? 'bg-atomic-tangerine-400 hover:bg-atomic-tangerine-500 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                             "
+                            @click="handleTagToggle(tag.id)"
                         >
                             {{ tag.name }}
                         </button>
                     </div>
                     <button
                         v-if="availableTags.length > 5"
-                        @click="showAllTags = !showAllTags"
                         class="text-atomic-tangerine-400 hover:text-atomic-tangerine-500 self-start text-sm"
+                        @click="showAllTags = !showAllTags"
                     >
                         {{ showAllTags ? t('search.show_less') : t('search.show_more') }}
                     </button>
@@ -101,13 +101,13 @@ const handleClearFilters = () => {
                         <button
                             v-for="tech in visibleTechnologies"
                             :key="tech.id"
-                            @click="handleTechnologyToggle(tech.id)"
                             class="flex items-center gap-2 rounded-full px-3 py-1 text-sm transition-colors"
                             :class="
                                 selectedTechnologies.includes(tech.id)
                                     ? 'bg-atomic-tangerine-400 hover:bg-atomic-tangerine-500 text-white'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                             "
+                            @click="handleTechnologyToggle(tech.id)"
                         >
                             <img v-if="tech.iconPicture" :src="tech.iconPicture.webp.thumbnail" :alt="tech.name" class="h-4 w-4 object-contain" />
                             {{ tech.name }}
@@ -115,15 +115,15 @@ const handleClearFilters = () => {
                     </div>
                     <button
                         v-if="availableTechnologies.length > 5"
-                        @click="showAllTechnologies = !showAllTechnologies"
                         class="text-atomic-tangerine-400 hover:text-atomic-tangerine-500 self-start text-sm"
+                        @click="showAllTechnologies = !showAllTechnologies"
                     >
                         {{ showAllTechnologies ? t('search.show_less') : t('search.show_more') }}
                     </button>
                 </div>
 
                 <!-- Clear Filters -->
-                <button v-if="hasActiveFilters" @click="handleClearFilters" class="self-start text-sm text-red-500 hover:text-red-600">
+                <button v-if="hasActiveFilters" class="self-start text-sm text-red-500 hover:text-red-600" @click="handleClearFilters">
                     {{ t('search.clear_filters') }}
                 </button>
             </div>

@@ -67,7 +67,7 @@ class WebsiteImportService
      * @param  string  $zipPath  Path to the export ZIP file
      * @return array<string, mixed> Import statistics
      *
-     * @throws RuntimeException If import fails
+     * @throws Throwable
      */
     public function importWebsite(string $zipPath): array
     {

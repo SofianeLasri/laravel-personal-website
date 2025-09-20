@@ -2,11 +2,17 @@
 
 namespace App\Services;
 
+use App\Enums\BlogPostType;
+use App\Enums\CategoryColor;
 use App\Enums\CreationType;
 use App\Enums\ExperienceType;
 use App\Enums\TechnologyType;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
+use App\Models\BlogCategory;
+use App\Models\BlogContentGallery;
+use App\Models\BlogContentMarkdown;
+use App\Models\BlogPost;
 use App\Models\Certification;
 use App\Models\Creation;
 use App\Models\Experience;
@@ -17,6 +23,7 @@ use App\Models\Screenshot;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
+use App\Models\TranslationKey;
 use App\Models\Video;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -201,7 +208,8 @@ class PublicControllersService
      */
     public function formatCreationForSSRShort(Creation $creation): array
     {
-        $shortDescription = $this->getTranslationWithFallback($creation->shortDescriptionTranslationKey->translations);
+        $shortDescription = $creation->shortDescriptionTranslationKey ?
+            $this->getTranslationWithFallback($creation->shortDescriptionTranslationKey->translations) : null;
 
         return [
             'id' => $creation->id,
@@ -230,7 +238,7 @@ class PublicControllersService
      *     name: string,
      *     slug: string,
      *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     startedAt: string,
      *     endedAt: string|null,
      *     startedAtFormatted: string|null,
@@ -250,7 +258,8 @@ class PublicControllersService
     {
         $response = $this->formatCreationForSSRShort($creation);
 
-        $fullDescription = $this->getTranslationWithFallback($creation->fullDescriptionTranslationKey->translations);
+        $fullDescription = $creation->fullDescriptionTranslationKey ?
+            $this->getTranslationWithFallback($creation->fullDescriptionTranslationKey->translations) : null;
 
         $response['fullDescription'] = $fullDescription;
         $response['externalUrl'] = $creation->external_url;
@@ -435,7 +444,8 @@ class PublicControllersService
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
-        $description = $this->getTranslationWithFallback($technology->descriptionTranslationKey->translations);
+        $description = $technology->descriptionTranslationKey ?
+            $this->getTranslationWithFallback($technology->descriptionTranslationKey->translations) : '';
 
         return [
             'id' => $technology->id,
@@ -622,7 +632,8 @@ class PublicControllersService
      *     id: int,
      *     title: string,
      *     organizationName: string,
-     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     location: string,
      *     websiteUrl: string|null,
      *     shortDescription: string,
@@ -757,5 +768,448 @@ class PublicControllersService
             'startedAtFormatted' => $startedAtFormatted ?? '',
             'endedAtFormatted' => $endedAtFormatted,
         ];
+    }
+
+    /**
+     * Get blog posts for public home page with latest article first
+     *
+     * @return Collection<int, BlogPost>
+     */
+    public function getBlogPostsForPublicHome(): Collection
+    {
+        return BlogPost::with([
+            'titleTranslationKey.translations',
+            'category.nameTranslationKey.translations',
+            'coverPicture',
+            'contents' => function ($query) {
+                $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
+            },
+            'contents.content.translationKey.translations',
+        ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * Format the BlogPost model for Server-Side Rendering (SSR) with short excerpt.
+     * Returns a SSRBlogPost TypeScript type compatible array.
+     *
+     * @param  BlogPost  $blogPost  The blog post to format
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
+     *     excerpt: string
+     * }
+     */
+    public function formatBlogPostForSSRShort(BlogPost $blogPost): array
+    {
+        $title = $blogPost->titleTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
+        $excerpt = $this->extractExcerptFromFirstTextBlock($blogPost, 150);
+
+        return [
+            'id' => $blogPost->id,
+            'title' => $title,
+            'slug' => $blogPost->slug,
+            'type' => $blogPost->type,
+            'category' => [
+                'name' => $categoryName,
+                'color' => $blogPost->category->color,
+            ],
+            'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
+            'publishedAt' => $blogPost->created_at,
+            'publishedAtFormatted' => $this->formatDate($blogPost->created_at),
+            'excerpt' => $excerpt,
+        ];
+    }
+
+    /**
+     * Format the BlogPost model for Server-Side Rendering (SSR) with long excerpt for hero.
+     * Returns a SSRBlogPost TypeScript type compatible array.
+     *
+     * @param  BlogPost  $blogPost  The blog post to format
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
+     *     excerpt: string
+     * }
+     */
+    public function formatBlogPostForSSRHero(BlogPost $blogPost): array
+    {
+        $title = $blogPost->titleTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
+        $excerpt = $this->extractExcerptFromFirstTextBlock($blogPost, 300);
+
+        return [
+            'id' => $blogPost->id,
+            'title' => $title,
+            'slug' => $blogPost->slug,
+            'type' => $blogPost->type,
+            'category' => [
+                'name' => $categoryName,
+                'color' => $blogPost->category->color,
+            ],
+            'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
+            'publishedAt' => $blogPost->created_at,
+            'publishedAtFormatted' => $this->formatDate($blogPost->created_at),
+            'excerpt' => $excerpt,
+        ];
+    }
+
+    /**
+     * Extract excerpt from the first text block of a blog post
+     *
+     * @param  BlogPost  $blogPost  The blog post
+     * @param  int  $maxLength  Maximum length of excerpt
+     */
+    private function extractExcerptFromFirstTextBlock(BlogPost $blogPost, int $maxLength = 200): string
+    {
+        // Get first markdown content ordered by position
+        $firstTextContent = $blogPost->contents
+            ->where('content_type', BlogContentMarkdown::class)
+            ->sortBy('order')
+            ->first();
+
+        if (! $firstTextContent || ! $firstTextContent->content) {
+            return '';
+        }
+
+        $markdownContent = $firstTextContent->content;
+
+        if (! $markdownContent->translationKey || ! $markdownContent->translationKey->translations) {
+            return '';
+        }
+
+        // Get text content with fallback
+        $text = $this->getTranslationWithFallback($markdownContent->translationKey->translations);
+
+        if (empty($text)) {
+            return '';
+        }
+
+        // Remove markdown formatting
+        $plainText = strip_tags(str_replace(['#', '*', '_', '`'], '', $text));
+
+        // Clean up whitespace
+        $plainText = preg_replace('/\s+/', ' ', trim($plainText)) ?? '';
+
+        if (strlen($plainText) <= $maxLength) {
+            return $plainText;
+        }
+
+        // Truncate at word boundary
+        $truncated = substr($plainText, 0, $maxLength);
+        $lastSpace = strrpos($truncated, ' ');
+
+        if ($lastSpace !== false) {
+            $truncated = substr($truncated, 0, $lastSpace);
+        }
+
+        return $truncated.'...';
+    }
+
+    /**
+     * Get blog posts for index page with filters and pagination
+     *
+     * @param  array{category?: string|array<string>|null, type?: string|null, sort?: string|null, search?: string|null}  $filters
+     * @return array{
+     *     data: array<int, array{
+     *         id: int,
+     *         title: string,
+     *         slug: string,
+     *         type: BlogPostType,
+     *         category: array{name: string, color: string},
+     *         coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *         publishedAt: string,
+     *         publishedAtFormatted: string,
+     *         excerpt: string
+     *     }>,
+     *     current_page: int,
+     *     last_page: int,
+     *     per_page: int,
+     *     total: int,
+     *     from: int|null,
+     *     to: int|null
+     * }
+     */
+    public function getBlogPostsForIndex(array $filters, int $perPage = 12): array
+    {
+        $query = BlogPost::with([
+            'titleTranslationKey.translations',
+            'category.nameTranslationKey.translations',
+            'coverPicture',
+            'contents' => function ($query) {
+                $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
+            },
+            'contents.content.translationKey.translations',
+        ]);
+
+        // Apply category filter (handle array)
+        if (! empty($filters['category'])) {
+            $categories = is_array($filters['category']) ? $filters['category'] : [$filters['category']];
+            $query->whereHas('category', function ($q) use ($categories) {
+                $q->whereIn('slug', $categories);
+            });
+        }
+
+        // Apply search filter
+        if (! empty($filters['search'])) {
+            $searchTerm = $filters['search'];
+            $query->whereHas('titleTranslationKey.translations', function ($q) use ($searchTerm) {
+                $q->where('text', 'like', '%'.$searchTerm.'%');
+            });
+        }
+
+        // Apply sorting
+        $sort = $filters['sort'] ?? 'newest';
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'alphabetical':
+                $query->join('translation_keys', 'blog_posts.title_translation_key_id', '=', 'translation_keys.id')
+                    ->join('translations', function ($join) {
+                        $join->on('translation_keys.id', '=', 'translations.translation_key_id')
+                            ->where('translations.locale', '=', $this->locale);
+                    })
+                    ->orderBy('translations.text', 'asc')
+                    ->select('blog_posts.*');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        // Paginate results
+        $paginator = $query->paginate($perPage);
+
+        // Format posts for SSR
+        $formattedPosts = $paginator->map(fn ($post) => $this->formatBlogPostForSSRShort($post));
+
+        return [
+            'data' => $formattedPosts->toArray(),
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'per_page' => $paginator->perPage(),
+            'total' => $paginator->total(),
+            'from' => $paginator->firstItem(),
+            'to' => $paginator->lastItem(),
+        ];
+    }
+
+    /**
+     * Get all blog categories for filters
+     *
+     * @return array<int, array{id: int, name: string, slug: string, color: CategoryColor}>
+     */
+    public function getBlogCategories(): array
+    {
+        $categories = BlogCategory::with('nameTranslationKey.translations')
+            ->orderBy('order')
+            ->get();
+
+        return $categories->map(function ($category) {
+            $name = $category->nameTranslationKey ?
+                $this->getTranslationWithFallback($category->nameTranslationKey->translations) : '';
+
+            return [
+                'id' => $category->id,
+                'name' => $name,
+                'slug' => $category->slug,
+                'color' => $category->color,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get all blog categories with post counts for filters
+     *
+     * @return array<int, array{id: int, name: string, slug: string, color: CategoryColor, postCount: int}>
+     */
+    public function getBlogCategoriesWithCounts(): array
+    {
+        $categories = BlogCategory::with(['nameTranslationKey.translations', 'blogPosts'])
+            ->orderBy('order')
+            ->get();
+
+        return $categories->map(function ($category) {
+            $name = $category->nameTranslationKey ?
+                $this->getTranslationWithFallback($category->nameTranslationKey->translations) : '';
+
+            return [
+                'id' => $category->id,
+                'name' => $name,
+                'slug' => $category->slug,
+                'color' => $category->color,
+                'postCount' => $category->blogPosts->count(),
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get a blog post by slug with all its content
+     *
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
+     *     excerpt: string,
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
+     *     gameReview?: array{gameTitle: string, releaseDate: string, genre: string, developer: string, publisher: string, platforms: string, rating: int, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
+     * }|null
+     */
+    public function getBlogPostBySlug(string $slug): ?array
+    {
+        $blogPost = BlogPost::with([
+            'titleTranslationKey.translations',
+            'category.nameTranslationKey.translations',
+            'coverPicture',
+            'contents' => function ($query) {
+                $query->orderBy('order');
+            },
+            'contents.content' => function ($query) {
+                // Load different relations based on content type
+                $query->morphWith([
+                    BlogContentMarkdown::class => ['translationKey.translations'],
+                    BlogContentGallery::class => ['pictures'],
+                ]);
+            },
+            'gameReview.coverPicture',
+            'gameReview.prosTranslationKey.translations',
+            'gameReview.consTranslationKey.translations',
+        ])
+            ->where('slug', $slug)
+            ->first();
+
+        if (! $blogPost) {
+            return null;
+        }
+
+        $title = $blogPost->titleTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey ?
+            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
+
+        // Format contents
+        $contents = $blogPost->contents->map(function ($content) {
+            $result = [
+                'id' => $content->id,
+                'order' => $content->order,
+                'content_type' => $content->content_type,
+            ];
+
+            // Handle different content types
+            if ($content->content_type === BlogContentMarkdown::class && $content->content instanceof BlogContentMarkdown) {
+                $markdownContent = $content->content->translationKey ?
+                    $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
+                $result['markdown'] = $markdownContent;
+            } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
+                // Get caption translation keys from the pivot data
+                $captionTranslationKeyIds = $content->content->pictures
+                    ->pluck('pivot.caption_translation_key_id')
+                    ->filter()
+                    ->unique();
+
+                // Load translation keys with their translations if any captions exist
+                $captionTranslations = [];
+                if ($captionTranslationKeyIds->isNotEmpty()) {
+                    $translationKeys = TranslationKey::with('translations')
+                        ->whereIn('id', $captionTranslationKeyIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    foreach ($translationKeys as $key => $translationKey) {
+                        $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
+                    }
+                }
+
+                $result['gallery'] = [
+                    'id' => $content->content->id,
+                    'pictures' => $content->content->pictures->map(function ($picture) use ($captionTranslations) {
+                        $formattedPicture = $this->formatPictureForSSR($picture);
+
+                        // Add caption if it exists in the pivot data
+                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
+                        if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
+                            $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
+                        }
+
+                        return $formattedPicture;
+                    })->toArray(),
+                ];
+            }
+
+            return $result;
+        });
+
+        // Generate excerpt from first markdown content
+        $excerpt = '';
+        $firstMarkdownContent = $contents->first(function ($content) {
+            return $content['content_type'] === BlogContentMarkdown::class;
+        });
+
+        if ($firstMarkdownContent && isset($firstMarkdownContent['markdown'])) {
+            $excerpt = Str::limit(strip_tags($firstMarkdownContent['markdown']), 200);
+        }
+
+        $result = [
+            'id' => $blogPost->id,
+            'title' => $title,
+            'slug' => $blogPost->slug,
+            'type' => $blogPost->type,
+            'category' => [
+                'name' => $categoryName,
+                'color' => $blogPost->category->color,
+            ],
+            'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
+            'publishedAt' => $blogPost->created_at,
+            'publishedAtFormatted' => $blogPost->created_at instanceof Carbon ? $blogPost->created_at->locale($this->locale)->translatedFormat('j F Y') : '',
+            'excerpt' => $excerpt,
+            'contents' => $contents->toArray(),
+        ];
+
+        // Add game review data if it's a game review
+        if ($blogPost->type === BlogPostType::GAME_REVIEW && $blogPost->gameReview) {
+            $gameReview = $blogPost->gameReview;
+            $pros = $gameReview->prosTranslationKey ? $this->getTranslationWithFallback($gameReview->prosTranslationKey->translations) : null;
+            $cons = $gameReview->consTranslationKey ? $this->getTranslationWithFallback($gameReview->consTranslationKey->translations) : null;
+
+            $result['gameReview'] = [
+                'gameTitle' => $gameReview->game_title,
+                'releaseDate' => $gameReview->release_date,
+                'genre' => $gameReview->genre,
+                'developer' => $gameReview->developer,
+                'publisher' => $gameReview->publisher,
+                'platforms' => $gameReview->platforms,
+                'rating' => $gameReview->rating,
+                'pros' => $pros,
+                'cons' => $cons,
+                'coverPicture' => $gameReview->coverPicture ? $this->formatPictureForSSR($gameReview->coverPicture) : null,
+            ];
+        }
+
+        return $result;
     }
 }

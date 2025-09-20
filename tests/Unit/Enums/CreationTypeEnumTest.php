@@ -1,19 +1,15 @@
 <?php
 
-namespace Tests\Feature\Models\Creation;
+namespace Tests\Unit\Enums;
 
 use App\Enums\CreationType;
-use App\Models\Creation;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CreationType::class)]
 class CreationTypeEnumTest extends TestCase
 {
-    use RefreshDatabase;
-
     #[Test]
     public function it_can_convert_enum_to_label()
     {
@@ -40,26 +36,14 @@ class CreationTypeEnumTest extends TestCase
     }
 
     #[Test]
-    public function it_can_filter_creations_by_type()
+    public function it_has_correct_enum_values()
     {
-        Creation::factory()->create(['type' => CreationType::WEBSITE]);
-        Creation::factory()->create(['type' => CreationType::WEBSITE]);
-        Creation::factory()->create(['type' => CreationType::GAME]);
-
-        $websites = Creation::where('type', CreationType::WEBSITE->value)->get();
-        $games = Creation::where('type', CreationType::GAME->value)->get();
-
-        $this->assertCount(2, $websites);
-        $this->assertCount(1, $games);
-    }
-
-    #[Test]
-    public function creation_accepts_valid_enum_type()
-    {
-        $creation = Creation::factory()->create(['type' => CreationType::TOOL]);
-        $this->assertEquals(CreationType::TOOL, $creation->type);
-
-        $creationFromDb = Creation::find($creation->id);
-        $this->assertEquals(CreationType::TOOL, $creationFromDb->type);
+        $this->assertEquals('portfolio', CreationType::PORTFOLIO->value);
+        $this->assertEquals('website', CreationType::WEBSITE->value);
+        $this->assertEquals('game', CreationType::GAME->value);
+        $this->assertEquals('library', CreationType::LIBRARY->value);
+        $this->assertEquals('tool', CreationType::TOOL->value);
+        $this->assertEquals('map', CreationType::MAP->value);
+        $this->assertEquals('other', CreationType::OTHER->value);
     }
 }

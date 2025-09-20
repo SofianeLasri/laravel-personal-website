@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlogPost;
 use App\Models\Creation;
 use App\Models\Experience;
 use Spatie\Sitemap\Sitemap;
@@ -47,6 +48,26 @@ class SitemapController extends Controller
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
                 ->setPriority(0.5));
         });
+
+        // Add blog routes if there are published blog posts
+        if (BlogPost::exists()) {
+            $sitemap->add(Url::create(route('public.blog.home'))
+                ->setLastModificationDate(now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                ->setPriority(0.7));
+
+            $sitemap->add(Url::create(route('public.blog.index'))
+                ->setLastModificationDate(now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                ->setPriority(0.65));
+
+            BlogPost::all()->each(function (BlogPost $blogPost) use ($sitemap) {
+                $sitemap->add(Url::create(route('public.blog.post', $blogPost->slug))
+                    ->setLastModificationDate($blogPost->updated_at)
+                    ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+                    ->setPriority(0.6));
+            });
+        }
 
         return $sitemap->toResponse(request());
     }

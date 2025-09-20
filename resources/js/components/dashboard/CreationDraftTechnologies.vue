@@ -215,7 +215,7 @@ const updateTechnology = async () => {
     error.value = null;
 
     try {
-        const updateData: any = {
+        const updateData: Record<string, unknown> = {
             name: editTechnologyName.value.trim(),
             type: editTechnologyType.value,
             locale: props.locale,
@@ -362,9 +362,9 @@ const resetEditForm = () => {
 };
 
 onMounted(() => {
-    fetchAllTechnologies();
+    void fetchAllTechnologies();
     if (props.creationDraftId) {
-        fetchAssociatedTechnologies();
+        void fetchAssociatedTechnologies();
     }
 });
 
@@ -372,7 +372,7 @@ watch(
     () => props.creationDraftId,
     (newVal) => {
         if (newVal) {
-            fetchAssociatedTechnologies();
+            void fetchAssociatedTechnologies();
         } else {
             associatedTechnologies.value = [];
         }
@@ -428,7 +428,7 @@ watch(
                             <p class="text-muted-foreground text-xs">{{ getTechnologyTypeLabel(technology.type) }}</p>
                         </div>
 
-                        <Button variant="ghost" size="icon" @click="dissociateTechnology(technology.id)" title="Dissocier">
+                        <Button variant="ghost" size="icon" title="Dissocier" @click="dissociateTechnology(technology.id)">
                             <Minus class="h-4 w-4" />
                         </Button>
                     </div>
@@ -486,20 +486,20 @@ watch(
                                             v-if="isTechnologyAssociated(technology.id)"
                                             variant="outline"
                                             size="sm"
-                                            @click="dissociateTechnology(technology.id)"
                                             title="Dissocier"
+                                            @click="dissociateTechnology(technology.id)"
                                         >
                                             Dissocier
                                         </Button>
-                                        <Button v-else variant="outline" size="sm" @click="associateTechnology(technology.id)" title="Ajouter">
+                                        <Button v-else variant="outline" size="sm" title="Ajouter" @click="associateTechnology(technology.id)">
                                             Ajouter
                                         </Button>
 
-                                        <Button variant="ghost" size="icon" @click="openEditForm(technology)" title="Modifier">
+                                        <Button variant="ghost" size="icon" title="Modifier" @click="openEditForm(technology)">
                                             <Pencil class="h-4 w-4" />
                                         </Button>
 
-                                        <Button variant="ghost" size="icon" @click="confirmDeleteTechnology(technology)" title="Supprimer">
+                                        <Button variant="ghost" size="icon" title="Supprimer" @click="confirmDeleteTechnology(technology)">
                                             <Trash2 class="h-4 w-4" />
                                         </Button>
                                     </div>
@@ -552,7 +552,7 @@ watch(
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" @click="isAddTechnologyDialogOpen = false" :disabled="loading">Annuler</Button>
+                        <Button variant="outline" :disabled="loading" @click="isAddTechnologyDialogOpen = false">Annuler</Button>
                         <Button
                             :disabled="!newTechnologyName || !newTechnologyIconPictureId || !newTechnologyDescription || loading"
                             @click="createTechnology"
@@ -602,7 +602,7 @@ watch(
                     </div>
 
                     <DialogFooter>
-                        <Button variant="outline" @click="isEditTechnologyDialogOpen = false" :disabled="loading">Annuler</Button>
+                        <Button variant="outline" :disabled="loading" @click="isEditTechnologyDialogOpen = false">Annuler</Button>
                         <Button :disabled="!editTechnologyName || !editTechnologyDescription || loading" @click="updateTechnology">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Enregistrer
@@ -625,7 +625,7 @@ watch(
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction @click="deleteTechnology" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deleteTechnology">
                             <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                             Supprimer
                         </AlertDialogAction>

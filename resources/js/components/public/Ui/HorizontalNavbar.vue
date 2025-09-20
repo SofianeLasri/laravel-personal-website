@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
         if (props.showArrows && navScrollContainer.value) {
             navScrollContainer.value.removeEventListener('scroll', checkNavArrows);
         }
-        window.removeEventListener('resize', () => {});
+        // Note: No specific resize handler to remove in this implementation
     }
 });
 </script>
@@ -194,10 +194,10 @@ onBeforeUnmount(() => {
     >
         <div class="relative container mx-auto px-4">
             <BaseButton
-                variant="black"
                 v-if="showArrows && showLeftArrow"
-                @click="scrollNavLeft"
+                variant="black"
                 class="absolute! top-1/2 left-0 z-10 w-12 -translate-y-1/2 transition-all"
+                @click="scrollNavLeft"
             >
                 <ArrowLeftRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
             </BaseButton>
@@ -223,10 +223,10 @@ onBeforeUnmount(() => {
             </div>
 
             <BaseButton
-                variant="black"
                 v-if="showArrows && showRightArrow"
-                @click="scrollNavRight"
+                variant="black"
                 class="absolute! top-1/2 right-0 z-10 w-12 -translate-y-1/2 transition-all"
+                @click="scrollNavRight"
             >
                 <ArrowRightRegular class="dark:fill-gray-990 absolute size-5 fill-white" />
             </BaseButton>

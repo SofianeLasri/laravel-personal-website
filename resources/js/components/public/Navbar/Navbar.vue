@@ -17,6 +17,7 @@ const route = useRoute();
 const { t } = useTranslation();
 const currentUrl = computed(() => new URL(page.props.ziggy.location));
 const currentPath = computed(() => currentUrl.value.href);
+const hasBlogPosts = computed(() => page.props.hasBlogPosts as boolean);
 
 const isMenuOpen = ref(false);
 const isSearchModalOpen = ref(false);
@@ -33,10 +34,12 @@ const portfolioRoutes = [
     { path: route('public.about'), name: t('navigation.about'), index: 3 },
 ];
 
-const blogRoutes = [
-    { path: route('public.blog.home'), name: t('navigation.blog_home'), index: 4 },
-    { path: route('public.blog.index'), name: t('navigation.blog_all_articles'), index: 5 },
-];
+const blogRoutes = hasBlogPosts.value
+    ? [
+          { path: route('public.blog.home'), name: t('navigation.blog_home'), index: 4 },
+          { path: route('public.blog.index'), name: t('navigation.blog_all_articles'), index: 5 },
+      ]
+    : [];
 
 const allRoutes = [...portfolioRoutes, ...blogRoutes];
 
@@ -221,28 +224,30 @@ onUnmounted(() => {
                         </div>
 
                         <!-- Blog Section -->
-                        <div class="pl-12">
-                            <h2 class="text-4xl font-bold dark:text-white">{{ t('navigation.blog') }}</h2>
-                        </div>
-                        <div class="relative flex flex-col gap-3">
-                            <div
-                                v-if="activeSection === 'blog'"
-                                class="bg-primary dark:bg-primary-400 absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
-                                :style="{
-                                    transform: `translateY(${indicatorPosition}px)`,
-                                    opacity: indicatorVisible ? 1 : 0,
-                                }"
-                            ></div>
-
-                            <div
-                                v-for="(item, index) in blogRoutes"
-                                :key="`blog-${index}`"
-                                @mouseenter="updateIndicatorPosition(item.index)"
-                                @mouseleave="resetIndicator"
-                            >
-                                <NavMenuItem :text="item.name" :active="isItemActive(item.index)" :to="item.path" />
+                        <template v-if="hasBlogPosts">
+                            <div class="pl-12">
+                                <h2 class="text-4xl font-bold dark:text-white">{{ t('navigation.blog') }}</h2>
                             </div>
-                        </div>
+                            <div class="relative flex flex-col gap-3">
+                                <div
+                                    v-if="activeSection === 'blog'"
+                                    class="bg-primary dark:bg-primary-400 absolute left-0 h-12 w-1 transition-all duration-300 ease-in-out"
+                                    :style="{
+                                        transform: `translateY(${indicatorPosition}px)`,
+                                        opacity: indicatorVisible ? 1 : 0,
+                                    }"
+                                ></div>
+
+                                <div
+                                    v-for="(item, index) in blogRoutes"
+                                    :key="`blog-${index}`"
+                                    @mouseenter="updateIndicatorPosition(item.index)"
+                                    @mouseleave="resetIndicator"
+                                >
+                                    <NavMenuItem :text="item.name" :active="isItemActive(item.index)" :to="item.path" />
+                                </div>
+                            </div>
+                        </template>
 
                         <!-- Theme Toggle Section -->
                         <div class="mt-8 pl-12">

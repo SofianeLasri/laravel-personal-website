@@ -187,6 +187,53 @@ class TranslationPageTest extends TestCase
             );
     }
 
+    #[Test]
+    public function test_translate_single_success_when_french_exists_and_no_english()
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+
+        $key = TranslationKey::factory()->create(['key' => 'test.hello']);
+        $key->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
+        // No English translation exists
+
+        $response = $this->actingAs($user)
+            ->postJson(route('dashboard.api.translations.translate-single', $key));
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'message' => 'Translation job queued successfully',
+            ]);
+
+        Queue::assertPushed(TranslateToEnglishJob::class, function ($job) use ($key) {
+            return $job->translationKeyId === $key->id;
+        });
+    }
+
+    #[Test]
+    public function test_translate_single_fails_when_english_already_exists()
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+
+        $key = TranslationKey::factory()->create(['key' => 'test.hello']);
+        $key->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
+        $key->translations()->create(['locale' => 'en', 'text' => 'Hello']);
+
+        $response = $this->actingAs($user)
+            ->postJson(route('dashboard.api.translations.translate-single', $key));
+
+        $response->assertStatus(400)
+            ->assertJson([
+                'success' => false,
+                'message' => 'English translation already exists',
+            ]);
+
+        Queue::assertNothingPushed();
+    }
+
+    #[Test]
     public function test_translate_single_fails_when_no_french_translation()
     {
         Queue::fake();
@@ -197,6 +244,52 @@ class TranslationPageTest extends TestCase
 
         $response = $this->actingAs($user)
             ->postJson(route('dashboard.api.translations.translate-single', $key));
+
+        $response->assertStatus(400)
+            ->assertJson([
+                'success' => false,
+                'message' => 'No French translation found to translate from',
+            ]);
+
+        Queue::assertNothingPushed();
+    }
+
+    #[Test]
+    public function test_retranslate_single_success()
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+
+        $key = TranslationKey::factory()->create(['key' => 'test.hello']);
+        $key->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
+        $key->translations()->create(['locale' => 'en', 'text' => 'Hello']);
+
+        $response = $this->actingAs($user)
+            ->postJson(route('dashboard.api.translations.retranslate-single', $key));
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'message' => 'Retranslation job queued successfully',
+            ]);
+
+        Queue::assertPushed(TranslateToEnglishJob::class, function ($job) use ($key) {
+            return $job->translationKeyId === $key->id && $job->overwrite === true;
+        });
+    }
+
+    #[Test]
+    public function test_retranslate_single_fails_when_no_french_translation()
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+
+        $key = TranslationKey::factory()->create(['key' => 'test.hello']);
+        $key->translations()->create(['locale' => 'en', 'text' => 'Hello']);
+        // No French translation
+
+        $response = $this->actingAs($user)
+            ->postJson(route('dashboard.api.translations.retranslate-single', $key));
 
         $response->assertStatus(400)
             ->assertJson([
@@ -229,6 +322,73 @@ class TranslationPageTest extends TestCase
             ]);
 
         Queue::assertNothingPushed();
+    }
+
+    #[Test]
+    public function test_translate_batch_missing_mode_with_actual_missing()
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+
+        // Create keys with French but no English
+        $key1 = TranslationKey::factory()->create(['key' => 'test.item1']);
+        $key1->translations()->create(['locale' => 'fr', 'text' => 'Texte 1']);
+
+        $key2 = TranslationKey::factory()->create(['key' => 'test.item2']);
+        $key2->translations()->create(['locale' => 'fr', 'text' => 'Texte 2']);
+
+        // Create one with both French and English (should be ignored in missing mode)
+        $key3 = TranslationKey::factory()->create(['key' => 'test.item3']);
+        $key3->translations()->create(['locale' => 'fr', 'text' => 'Texte 3']);
+        $key3->translations()->create(['locale' => 'en', 'text' => 'Text 3']);
+
+        $response = $this->actingAs($user)
+            ->postJson(route('dashboard.api.translations.translate-batch'), [
+                'mode' => 'missing',
+            ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'jobs_dispatched' => 2,
+            ]);
+
+        Queue::assertPushed(TranslateToEnglishJob::class, 2);
+    }
+
+    #[Test]
+    public function test_translate_batch_retranslate_mode()
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+
+        // Create keys with both French and English for retranslation
+        $key1 = TranslationKey::factory()->create(['key' => 'test.item1']);
+        $key1->translations()->create(['locale' => 'fr', 'text' => 'Texte 1']);
+        $key1->translations()->create(['locale' => 'en', 'text' => 'Text 1']);
+
+        $key2 = TranslationKey::factory()->create(['key' => 'test.item2']);
+        $key2->translations()->create(['locale' => 'fr', 'text' => 'Texte 2']);
+        $key2->translations()->create(['locale' => 'en', 'text' => 'Text 2']);
+
+        // Create one with only French (should be ignored in retranslate mode)
+        $key3 = TranslationKey::factory()->create(['key' => 'test.item3']);
+        $key3->translations()->create(['locale' => 'fr', 'text' => 'Texte 3']);
+
+        $response = $this->actingAs($user)
+            ->postJson(route('dashboard.api.translations.translate-batch'), [
+                'mode' => 'retranslate',
+            ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'jobs_dispatched' => 2,
+            ]);
+
+        Queue::assertPushed(TranslateToEnglishJob::class, function ($job) {
+            return $job->overwrite === true;
+        });
     }
 
     #[Test]

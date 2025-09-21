@@ -44,6 +44,9 @@ services:
       - DB_HOST=app
       - DB_PORT=3306
     mem_limit: 512m
+    cap_add:
+      - SETGID
+      - SETUID
 
 networks:
   app-network:

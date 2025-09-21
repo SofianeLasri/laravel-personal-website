@@ -8,8 +8,7 @@ RUN apk update && apk add --no-cache \
     gzip \
     busybox-extras \
     tzdata \
-    dcron \
-    rsyslog
+    supervisor
 
 # Create backup user and directories
 RUN addgroup -g 1000 backup && \
@@ -22,9 +21,8 @@ COPY docker-backup/scripts/ /app/scripts/
 RUN chmod +x /app/scripts/*.sh && \
     chown -R backup:backup /app/scripts
 
-# Copy and install cron job
-COPY docker-backup/backup-cron /etc/cron.d/backup
-RUN chmod 0644 /etc/cron.d/backup
+# Copy and install supervisor configuration
+COPY docker-backup/supervisord.conf /etc/supervisor/conf.d/backup.conf
 
 # Set timezone
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
@@ -43,4 +41,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD [ -f /var/log/backup/healthcheck ] && [ $(($(date +%s) - $(stat -c %Y /var/log/backup/healthcheck 2>/dev/null || echo 0))) -lt 7200 ] || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["crond", "-f", "-l", "2"]
+CMD ["supervisord", "-n"]

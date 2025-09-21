@@ -5,6 +5,14 @@
 
 set -euo pipefail
 
+BACKUP_DIR="/app/backups"
+LOG_FILE="/var/log/backup/backup.log"
+
+# Function to log messages
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - FTP UPLOAD: $1" | tee -a "$LOG_FILE"
+}
+
 # Configuration from environment variables
 FTP_HOST="${BACKUP_FTP_HOST:-}"
 FTP_USERNAME="${BACKUP_FTP_USERNAME:-}"
@@ -19,14 +27,6 @@ log_message "  Port: $FTP_PORT"
 log_message "  Username: $FTP_USERNAME"
 log_message "  Path: $FTP_PATH"
 log_message "  Timeout: ${FTP_TIMEOUT}s"
-
-BACKUP_DIR="/app/backups"
-LOG_FILE="/var/log/backup/backup.log"
-
-# Function to log messages
-log_message() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - FTP UPLOAD: $1" | tee -a "$LOG_FILE"
-}
 
 # Function to handle errors
 handle_error() {

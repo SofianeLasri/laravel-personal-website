@@ -27,6 +27,24 @@ services:
     volumes:
       - redis-data:/data
 
+  backup:
+    build:
+      context: .
+      dockerfile: backup.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - stack.env
+    volumes:
+      - backup-data:/app/backups
+    depends_on:
+      - app
+    networks:
+      - app-network
+    environment:
+      - DB_HOST=app
+      - DB_PORT=3306
+    mem_limit: 512m
+
 networks:
   app-network:
     driver: bridge
@@ -34,3 +52,4 @@ networks:
 volumes:
   app-data:
   redis-data:
+  backup-data:

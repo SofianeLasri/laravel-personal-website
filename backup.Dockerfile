@@ -41,4 +41,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD [ -f /var/log/backup/healthcheck ] && [ $(($(date +%s) - $(stat -c %Y /var/log/backup/healthcheck 2>/dev/null || echo 0))) -lt 7200 ] || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["supervisord", "-n"]
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/backup.conf"]

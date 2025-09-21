@@ -38,13 +38,13 @@ log_message "Backup path: $BACKUP_PATH"
 
 # Wait for database to be ready
 log_message "Waiting for database connection..."
-for i in {1..30}; do
+for i in {1..60}; do
     if mysqladmin ping -h"$DB_HOST" -P"$DB_PORT" -u"$DB_USERNAME" -p"$DB_PASSWORD" --silent; then
         log_message "Database connection established"
         break
     fi
-    if [ $i -eq 30 ]; then
-        handle_error "Database connection timeout after 30 attempts"
+    if [ $i -eq 60 ]; then
+        handle_error "Database connection timeout after 60 attempts"
     fi
     sleep 2
 done
@@ -74,6 +74,11 @@ gzip "$DUMP_FILE" || handle_error "Failed to compress database dump"
 COMPRESSED_FILE="$DUMP_FILE.gz"
 if [ ! -f "$COMPRESSED_FILE" ]; then
     handle_error "Compressed dump file not found"
+fi
+
+# Verify file integrity
+if ! gzip -t "$COMPRESSED_FILE"; then
+    handle_error "Compressed dump file is corrupted"
 fi
 
 # Get file size for logging

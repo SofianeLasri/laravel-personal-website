@@ -53,8 +53,9 @@ if ! echo "quit" | ftp -n "$FTP_HOST" "$FTP_PORT" >/dev/null 2>&1; then
     handle_error "Cannot connect to FTP server"
 fi
 
-# Create FTP script
-FTP_SCRIPT="/tmp/ftp_upload.txt"
+# Create FTP script with secure permissions
+FTP_SCRIPT=$(mktemp)
+chmod 600 "$FTP_SCRIPT"
 cat > "$FTP_SCRIPT" << EOF
 open $FTP_HOST $FTP_PORT
 user $FTP_USERNAME $FTP_PASSWORD
@@ -112,7 +113,8 @@ fi
 
 # Verify upload by listing remote directory
 log_message "Verifying upload..."
-VERIFY_SCRIPT="/tmp/ftp_verify.txt"
+VERIFY_SCRIPT=$(mktemp)
+chmod 600 "$VERIFY_SCRIPT"
 cat > "$VERIFY_SCRIPT" << EOF
 open $FTP_HOST $FTP_PORT
 user $FTP_USERNAME $FTP_PASSWORD

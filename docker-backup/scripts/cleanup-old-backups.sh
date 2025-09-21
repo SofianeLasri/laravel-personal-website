@@ -70,7 +70,8 @@ if [ -n "$FTP_HOST" ] && [ -n "$FTP_USERNAME" ] && [ -n "$FTP_PASSWORD" ]; then
         log_message "WARNING: Cannot connect to FTP server for cleanup"
     else
         # Get list of remote backup directories
-        FTP_LIST_SCRIPT="/tmp/ftp_list.txt"
+        FTP_LIST_SCRIPT=$(mktemp)
+        chmod 600 "$FTP_LIST_SCRIPT"
         cat > "$FTP_LIST_SCRIPT" << EOF
 open $FTP_HOST $FTP_PORT
 user $FTP_USERNAME $FTP_PASSWORD
@@ -99,7 +100,8 @@ EOF
                             log_message "Removing remote backup: $backup_name"
 
                             # Create FTP script to remove directory
-                            FTP_REMOVE_SCRIPT="/tmp/ftp_remove_$backup_name.txt"
+                            FTP_REMOVE_SCRIPT=$(mktemp)
+                            chmod 600 "$FTP_REMOVE_SCRIPT"
                             cat > "$FTP_REMOVE_SCRIPT" << EOF
 open $FTP_HOST $FTP_PORT
 user $FTP_USERNAME $FTP_PASSWORD

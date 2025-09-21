@@ -27,7 +27,6 @@ RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
     echo "Europe/Paris" > /etc/timezone
 
 # Setup cron for backup user
-RUN echo "backup ALL=(ALL) NOPASSWD: /usr/sbin/crond" >> /etc/sudoers
 
 # Copy entrypoint
 COPY docker-backup/entrypoint.sh /entrypoint.sh
@@ -38,8 +37,8 @@ USER backup
 WORKDIR /app
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD [ -f /var/log/backup/healthcheck ] || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD [ -f /var/log/backup/healthcheck ] && [ $(($(date +%s) - $(stat -c %Y /var/log/backup/healthcheck 2>/dev/null || echo 0))) -lt 7200 ] || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["crond", "-f", "-l", "2"]

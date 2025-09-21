@@ -42,7 +42,7 @@ if [ -d "$BACKUP_DIR" ]; then
         if [[ $backup_name =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}$ ]]; then
             backup_date=$(echo "$backup_name" | cut -d'_' -f1)
             backup_timestamp=$(date -d "$backup_date" +%s 2>/dev/null || echo "0")
-            cutoff_timestamp=$(date -d "$RETENTION_DAYS days ago" +%s)
+            cutoff_timestamp=$(($(date +%s) - RETENTION_DAYS * 86400))
 
             if [ "$backup_timestamp" -lt "$cutoff_timestamp" ] && [ "$backup_timestamp" -gt "0" ]; then
                 backup_size=$(du -sh "$backup_dir" 2>/dev/null | cut -f1 || echo "unknown")
@@ -94,7 +94,7 @@ EOF
                     if [[ $backup_name =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}$ ]]; then
                         backup_date=$(echo "$backup_name" | cut -d'_' -f1)
                         backup_timestamp=$(date -d "$backup_date" +%s 2>/dev/null || echo "0")
-                        cutoff_timestamp=$(date -d "$RETENTION_DAYS days ago" +%s)
+                        cutoff_timestamp=$(($(date +%s) - RETENTION_DAYS * 86400))
 
                         if [ "$backup_timestamp" -lt "$cutoff_timestamp" ] && [ "$backup_timestamp" -gt "0" ]; then
                             log_message "Removing remote backup: $backup_name"

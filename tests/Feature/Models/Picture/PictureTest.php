@@ -684,7 +684,7 @@ class PictureTest extends TestCase
     }
 
     #[Test]
-    #[TestDox('reoptimize deletes existing optimized pictures and dispatches new job')]
+    #[TestDox('reoptimize dispatches job with deletion flag')]
     public function test_reoptimize_deletes_optimized_pictures_and_dispatches_job()
     {
         \Queue::fake();
@@ -695,10 +695,14 @@ class PictureTest extends TestCase
 
         $picture->reoptimize();
 
+        // Optimized pictures should still exist until the job runs
         $picture->refresh();
-        $this->assertCount(0, $picture->optimizedPictures);
+        $this->assertGreaterThan(0, $picture->optimizedPictures->count());
 
-        \Queue::assertPushed(\App\Jobs\PictureJob::class);
+        // Verify the job was dispatched with the deletion flag
+        \Queue::assertPushed(\App\Jobs\PictureJob::class, function ($job) use ($picture) {
+            return $job->picture->id === $picture->id && $job->shouldDeleteExisting === true;
+        });
     }
 
     #[Test]

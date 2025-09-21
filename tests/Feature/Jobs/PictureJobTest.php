@@ -61,6 +61,7 @@ class PictureJobTest extends TestCase
                 'picture_id' => $this->picture->id,
                 'filename' => $this->picture->filename,
                 'attempt' => 1,
+                'should_delete_existing' => false,
             ])
             ->once();
 
@@ -72,6 +73,57 @@ class PictureJobTest extends TestCase
             ->once();
 
         $job = new PictureJob($pictureMock);
+        $job->handle();
+    }
+
+    #[Test]
+    public function it_deletes_existing_optimized_pictures_when_reoptimizing()
+    {
+        // Mock the picture to simulate reoptimization
+        $pictureMock = Mockery::mock(Picture::class)->makePartial();
+        $pictureMock->id = $this->picture->id;
+        $pictureMock->filename = $this->picture->filename;
+
+        $pictureMock->shouldReceive('optimizedPictures->count')
+            ->once()
+            ->andReturn(15);
+
+        $pictureMock->shouldReceive('deleteOptimized')
+            ->once()
+            ->andReturnNull();
+
+        $pictureMock->shouldReceive('optimize')
+            ->once()
+            ->andReturnNull();
+
+        $pictureMock->shouldReceive('hasInvalidOptimizedPictures')
+            ->once()
+            ->andReturnFalse();
+
+        Log::shouldReceive('info')
+            ->with('Starting picture optimization', [
+                'picture_id' => $this->picture->id,
+                'filename' => $this->picture->filename,
+                'attempt' => 1,
+                'should_delete_existing' => true,
+            ])
+            ->once();
+
+        Log::shouldReceive('info')
+            ->with('Deleting existing optimized pictures for reoptimization', [
+                'picture_id' => $this->picture->id,
+                'existing_count' => 15,
+            ])
+            ->once();
+
+        Log::shouldReceive('info')
+            ->with('Picture optimization completed successfully', [
+                'picture_id' => $this->picture->id,
+                'filename' => $this->picture->filename,
+            ])
+            ->once();
+
+        $job = new PictureJob($pictureMock, shouldDeleteExisting: true);
         $job->handle();
     }
 

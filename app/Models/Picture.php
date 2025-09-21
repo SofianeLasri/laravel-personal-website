@@ -8,7 +8,6 @@ use App\Services\ImageCacheService;
 use App\Services\ImageTranscodingService;
 use App\Services\NotificationService;
 use Database\Factories\PictureFactory;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +16,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * @property int $id
@@ -73,6 +73,9 @@ class Picture extends Model
             return;
         }
 
+        // Assert that path_original is not null after validation
+        assert($this->path_original !== null);
+
         if (! Storage::disk('public')->exists($this->path_original)) {
             Log::warning('UploadedPicture optimization failed: file does not exist', [
                 'path' => $this->path_original,
@@ -82,6 +85,15 @@ class Picture extends Model
         }
 
         $originalImage = Storage::disk('public')->get($this->path_original);
+
+        if ($originalImage === null) {
+            Log::warning('UploadedPicture optimization failed: could not read original image', [
+                'path' => $this->path_original,
+            ]);
+
+            return;
+        }
+
         $imageTranscodingService = app(ImageTranscodingService::class);
         $imageCacheService = app(ImageCacheService::class);
 
@@ -186,6 +198,9 @@ class Picture extends Model
             return null;
         }
 
+        // Assert that path_original is not null after validation
+        assert($this->path_original !== null);
+
         $originalImage = Storage::disk('public')->get($this->path_original);
 
         if ($originalImage === null || $originalImage === '') {
@@ -224,7 +239,8 @@ class Picture extends Model
             }
 
             return null;
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
+            // Catch any other unexpected errors that might occur
             Log::error('Unexpected error during image transcoding', [
                 'picture_id' => $this->id,
                 'error' => $e->getMessage(),
@@ -256,11 +272,14 @@ class Picture extends Model
             return;
         }
 
+        // Assert that path_original is not null after validation
+        assert($this->path_original !== null);
+
         $failedVariants = [];
 
         foreach ($optimizedImages as $variantName => $image) {
             // Validate image content
-            if (empty($image) || strlen($image) === 0) {
+            if (empty($image)) {
                 Log::error('Optimized image is empty, skipping storage', [
                     'picture_id' => $this->id,
                     'variant' => $variantName,
@@ -351,16 +370,13 @@ class Picture extends Model
     }
 
     /**
-     * Force reoptimization of the picture by deleting existing optimized versions
-     * and dispatching a new optimization job
+     * Force reoptimization of the picture by dispatching a job that will handle
+     * both cleanup of old optimized versions and creation of new ones
      */
     public function reoptimize(): void
     {
-        // Delete existing optimized pictures
-        $this->deleteOptimized();
-
-        // Dispatch new optimization job
-        PictureJob::dispatch($this);
+        // Dispatch optimization job which will handle cleanup and recreation
+        PictureJob::dispatch($this, true);
 
         Log::info('Picture reoptimization initiated', [
             'picture_id' => $this->id,

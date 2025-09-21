@@ -110,45 +110,53 @@ upload_with_curl() {
     fi
 }
 
+# Function to upload file directly to FTP path
+upload_with_curl_direct() {
+    local file="$1"
+    local remote_filename="$2"
+    local remote_url="ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/$remote_filename"
+
+    log_message "Uploading to: $remote_url"
+    if curl --connect-timeout "$FTP_TIMEOUT" \
+           --ftp-pasv \
+           --user "$FTP_USERNAME:$FTP_PASSWORD" \
+           --upload-file "$file" \
+           "$remote_url" \
+           --silent \
+           --show-error 2>/tmp/curl_error.log; then
+        return 0
+    else
+        if [ -f /tmp/curl_error.log ]; then
+            cat /tmp/curl_error.log | while read -r line; do
+                log_message "CURL ERROR: $line"
+            done
+        fi
+        return 1
+    fi
+}
+
 # Upload backup using curl
 log_message "Uploading backup to FTP server using curl..."
 START_TIME=$(date +%s)
 
-# First, create the backup directory
-log_message "Creating remote backup directory: $BACKUP_NAME"
-if curl --connect-timeout "$FTP_TIMEOUT" \
-       --ftp-pasv \
-       --user "$FTP_USERNAME:$FTP_PASSWORD" \
-       "ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/" \
-       --quote "MKD $BACKUP_NAME" \
-       --silent \
-       --show-error 2>/tmp/curl_mkdir.log; then
-    log_message "Directory created successfully"
-else
-    log_message "Directory creation failed (may already exist)"
-    if [ -f /tmp/curl_mkdir.log ]; then
-        cat /tmp/curl_mkdir.log | while read -r line; do
-            log_message "CURL MKDIR: $line"
-        done
-    fi
-fi
-
-# Upload all files in the backup directory
-log_message "Uploading backup files..."
+# Upload all files directly to the FTP_PATH with timestamp prefix
+log_message "Uploading backup files directly to: $FTP_PATH"
 upload_success=true
 uploaded_files=0
 
 for file in "$LATEST_BACKUP"/*; do
     if [ -f "$file" ]; then
         filename=$(basename "$file")
-        log_message "Uploading: $filename"
+        # Add timestamp prefix to make files unique
+        remote_filename="${BACKUP_NAME}_${filename}"
+        log_message "Uploading: $filename as $remote_filename"
 
-        if upload_with_curl "$file"; then
+        if upload_with_curl_direct "$file" "$remote_filename"; then
             uploaded_files=$((uploaded_files + 1))
-            log_message "Successfully uploaded: $filename"
+            log_message "Successfully uploaded: $remote_filename"
         else
             upload_success=false
-            log_message "Failed to upload: $filename"
+            log_message "Failed to upload: $remote_filename"
             break
         fi
     fi
@@ -170,11 +178,12 @@ FTP Upload Summary
 ==================
 Upload Date: $(date '+%Y-%m-%d %H:%M:%S %Z')
 FTP Server: $FTP_HOST:$FTP_PORT
-Remote Path: $FTP_PATH/$BACKUP_NAME
+Remote Path: $FTP_PATH
+Remote File Prefix: $BACKUP_NAME
 Total Size: $TOTAL_SIZE
 Files Uploaded: $uploaded_files
 Duration: ${DURATION}s
-Method: Curl
+Method: Curl (Direct Upload)
 Status: SUCCESS
 EOF
 else
@@ -186,24 +195,33 @@ log_message "Verifying upload..."
 if curl --connect-timeout "$FTP_TIMEOUT" \
        --ftp-pasv \
        --user "$FTP_USERNAME:$FTP_PASSWORD" \
-       "ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/$BACKUP_NAME/" \
+       "ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/" \
        --list-only \
        --silent \
        --show-error >/tmp/verify_upload.log 2>&1; then
 
-    files_on_server=$(wc -l < /tmp/verify_upload.log)
-    log_message "Upload verification successful - found $files_on_server files on server"
-
-    if [ "$files_on_server" -ge "$uploaded_files" ]; then
-        log_message "All files verified on server"
-    else
-        log_message "WARNING: Only $files_on_server files found on server, expected $uploaded_files"
-    fi
-
-    log_message "Remote files:"
-    cat /tmp/verify_upload.log | while read -r line; do
-        log_message "REMOTE FILE: $line"
+    # Check if our backup files are in the listing
+    backup_files_found=0
+    for file in "$LATEST_BACKUP"/*; do
+        if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            remote_filename="${BACKUP_NAME}_${filename}"
+            if grep -q "$remote_filename" /tmp/verify_upload.log; then
+                backup_files_found=$((backup_files_found + 1))
+                log_message "VERIFIED: $remote_filename found on server"
+            else
+                log_message "WARNING: $remote_filename not found on server"
+            fi
+        fi
     done
+
+    log_message "Upload verification: $backup_files_found/$uploaded_files files verified"
+
+    if [ "$backup_files_found" -eq "$uploaded_files" ]; then
+        log_message "All uploaded files verified on server"
+    else
+        log_message "WARNING: Only $backup_files_found files verified, expected $uploaded_files"
+    fi
 else
     log_message "WARNING: Upload verification failed - could not list remote directory"
     if [ -f /tmp/verify_upload.log ]; then

@@ -33,7 +33,10 @@ class PictureJob implements ShouldQueue
      */
     public $backoff = 60;
 
-    public function __construct(private readonly Picture $picture) {}
+    public function __construct(
+        public readonly Picture $picture,
+        public readonly bool $shouldDeleteExisting = false
+    ) {}
 
     public function handle(): void
     {
@@ -42,7 +45,18 @@ class PictureJob implements ShouldQueue
                 'picture_id' => $this->picture->id,
                 'filename' => $this->picture->filename,
                 'attempt' => $this->attempts(),
+                'should_delete_existing' => $this->shouldDeleteExisting,
             ]);
+
+            // Delete existing optimized pictures if this is a reoptimization
+            if ($this->shouldDeleteExisting) {
+                Log::info('Deleting existing optimized pictures for reoptimization', [
+                    'picture_id' => $this->picture->id,
+                    'existing_count' => $this->picture->optimizedPictures()->count(),
+                ]);
+
+                $this->picture->deleteOptimized();
+            }
 
             $this->picture->optimize();
 

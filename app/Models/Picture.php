@@ -351,16 +351,13 @@ class Picture extends Model
     }
 
     /**
-     * Force reoptimization of the picture by deleting existing optimized versions
-     * and dispatching a new optimization job
+     * Force reoptimization of the picture by dispatching a job that will handle
+     * both cleanup of old optimized versions and creation of new ones
      */
     public function reoptimize(): void
     {
-        // Delete existing optimized pictures
-        $this->deleteOptimized();
-
-        // Dispatch new optimization job
-        PictureJob::dispatch($this);
+        // Dispatch optimization job which will handle cleanup and recreation
+        PictureJob::dispatch($this, shouldDeleteExisting: true);
 
         Log::info('Picture reoptimization initiated', [
             'picture_id' => $this->id,

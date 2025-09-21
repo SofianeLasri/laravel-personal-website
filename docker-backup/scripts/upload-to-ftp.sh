@@ -17,9 +17,17 @@ log_message() {
 FTP_HOST="${BACKUP_FTP_HOST:-}"
 FTP_USERNAME="${BACKUP_FTP_USERNAME:-}"
 FTP_PASSWORD="${BACKUP_FTP_PASSWORD:-}"
-FTP_PATH="${BACKUP_FTP_PATH:-/backups}"
+FTP_PATH="${BACKUP_FTP_PATH:-/}"
 FTP_PORT="${BACKUP_FTP_PORT:-21}"
 FTP_TIMEOUT="${BACKUP_FTP_TIMEOUT:-30}"
+
+# Remove leading slash if present and ensure path is clean
+FTP_PATH=$(echo "$FTP_PATH" | sed 's|^/*||' | sed 's|/*$||')
+if [ -n "$FTP_PATH" ]; then
+    FTP_PATH="/$FTP_PATH"
+else
+    FTP_PATH=""
+fi
 
 log_message "FTP Configuration:"
 log_message "  Host: $FTP_HOST"

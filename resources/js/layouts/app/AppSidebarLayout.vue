@@ -5,9 +5,7 @@ import AppSidebar from '@/components/dashboard/AppSidebar.vue';
 import AppSidebarHeader from '@/components/dashboard/AppSidebarHeader.vue';
 import NotificationToast from '@/components/ui/notification/NotificationToast.vue';
 import { Toaster } from '@/components/ui/sonner';
-import { useNotificationStore } from '@/stores/notification';
 import type { BreadcrumbItemType } from '@/types';
-import { onMounted } from 'vue';
 
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];
@@ -15,16 +13,6 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
-});
-
-const notificationStore = useNotificationStore();
-
-onMounted(() => {
-    // Fetch initial notifications
-    void notificationStore.fetchNotifications();
-
-    // Start polling for new notifications
-    void notificationStore.startPolling(30000); // Poll every 30 seconds
 });
 </script>
 

@@ -129,61 +129,7 @@ export const useNotificationStore = defineStore('notification', () => {
         toastNotifications.value = toastNotifications.value.filter((n) => n.id !== id);
     };
 
-    // WebSocket / Polling support
-    const startPolling = (interval = 30000) => {
-        setInterval(() => {
-            void fetchNotifications();
-        }, interval);
-    };
 
-    // SSE (Server-Sent Events) support
-    const connectSSE = () => {
-        const eventSource = new EventSource('/dashboard/api/notifications/stream');
-
-        eventSource.onmessage = (event) => {
-            const notification = JSON.parse(event.data);
-            addNotification(notification);
-        };
-
-        eventSource.onerror = (error) => {
-            console.error('SSE connection error:', error);
-            eventSource.close();
-            // Fallback to polling
-            startPolling();
-        };
-
-        return eventSource;
-    };
-
-    const addNotification = (notification: Notification) => {
-        // Check if notification already exists
-        const exists = notifications.value.find((n) => n.id === notification.id);
-        if (!exists) {
-            notifications.value.unshift(notification);
-
-            // Show as toast if it's new and unread
-            if (!notification.is_read) {
-                toastNotifications.value.push(notification);
-
-                // Auto-dismiss toast after 5 seconds
-                setTimeout(() => {
-                    dismissToast(notification.id);
-                }, 5000);
-            }
-        }
-    };
-
-    const updateNotification = (notification: Notification) => {
-        const index = notifications.value.findIndex((n) => n.id === notification.id);
-        if (index !== -1) {
-            notifications.value[index] = notification;
-        }
-    };
-
-    const removeNotification = (id: number) => {
-        notifications.value = notifications.value.filter((n) => n.id !== id);
-        toastNotifications.value = toastNotifications.value.filter((n) => n.id !== id);
-    };
 
     return {
         // State
@@ -205,10 +151,5 @@ export const useNotificationStore = defineStore('notification', () => {
         clearAll,
         showToast,
         dismissToast,
-        startPolling,
-        connectSSE,
-        addNotification,
-        updateNotification,
-        removeNotification,
     };
 });

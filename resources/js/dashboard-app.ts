@@ -27,7 +27,6 @@ void createInertiaApp({
         // Initialize notification store after mounting
         const notificationStore = useNotificationStore();
         void notificationStore.fetchNotifications();
-        void notificationStore.startPolling();
     },
     progress: {
         color: '#4B5563',

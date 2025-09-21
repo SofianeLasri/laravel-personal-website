@@ -55,41 +55,33 @@ log_message "Starting FTP upload for backup: $BACKUP_NAME"
 log_message "FTP Host: $FTP_HOST:$FTP_PORT"
 log_message "Remote path: $FTP_PATH"
 
-# Test FTP connection with proper authentication
-log_message "Testing FTP connection..."
-TEST_SCRIPT=$(mktemp)
-chmod 600 "$TEST_SCRIPT"
-cat > "$TEST_SCRIPT" << EOF
-open $FTP_HOST $FTP_PORT
-user $FTP_USERNAME $FTP_PASSWORD
-binary
-passive
-pwd
-quit
-EOF
-
+# Test FTP connection using curl
+log_message "Testing FTP connection with curl..."
 log_message "Attempting connection to $FTP_HOST:$FTP_PORT with user $FTP_USERNAME"
-if ! ftp -n < "$TEST_SCRIPT" >/tmp/ftp_test.log 2>&1; then
+
+# Test connection by listing the root directory
+if curl --connect-timeout "$FTP_TIMEOUT" \
+       --ftp-pasv \
+       --user "$FTP_USERNAME:$FTP_PASSWORD" \
+       "ftp://$FTP_HOST:$FTP_PORT/" \
+       --list-only \
+       --silent \
+       --show-error >/tmp/curl_test.log 2>&1; then
+    log_message "FTP connection and authentication successful"
+    log_message "Remote directory listing:"
+    cat /tmp/curl_test.log | head -5 | while read -r line; do
+        log_message "REMOTE: $line"
+    done
+else
     log_message "FTP connection test failed. Output:"
-    cat /tmp/ftp_test.log | while read -r line; do
-        log_message "FTP TEST: $line"
+    cat /tmp/curl_test.log | while read -r line; do
+        log_message "CURL TEST: $line"
     done
-    rm -f "$TEST_SCRIPT" /tmp/ftp_test.log
-    handle_error "Cannot connect to FTP server"
+    rm -f /tmp/curl_test.log
+    handle_error "Cannot connect to FTP server with curl"
 fi
 
-# Check for successful login in output
-if ! grep -q "230\|logged in\|Login successful" /tmp/ftp_test.log; then
-    log_message "FTP authentication failed. Output:"
-    cat /tmp/ftp_test.log | while read -r line; do
-        log_message "FTP AUTH: $line"
-    done
-    rm -f "$TEST_SCRIPT" /tmp/ftp_test.log
-    handle_error "FTP authentication failed"
-fi
-
-log_message "FTP connection and authentication successful"
-rm -f "$TEST_SCRIPT" /tmp/ftp_test.log
+rm -f /tmp/curl_test.log
 
 # Function to upload file via curl (fallback method)
 upload_with_curl() {
@@ -118,47 +110,55 @@ upload_with_curl() {
     fi
 }
 
-# Create FTP script with secure permissions
-FTP_SCRIPT=$(mktemp)
-chmod 600 "$FTP_SCRIPT"
-cat > "$FTP_SCRIPT" << EOF
-open $FTP_HOST $FTP_PORT
-user $FTP_USERNAME $FTP_PASSWORD
-binary
-passive
-cd $FTP_PATH
-mkdir $BACKUP_NAME
-cd $BACKUP_NAME
-EOF
+# Upload backup using curl
+log_message "Uploading backup to FTP server using curl..."
+START_TIME=$(date +%s)
 
-# Add database backup upload commands
+# First, create the backup directory
+log_message "Creating remote backup directory: $BACKUP_NAME"
+if curl --connect-timeout "$FTP_TIMEOUT" \
+       --ftp-pasv \
+       --user "$FTP_USERNAME:$FTP_PASSWORD" \
+       "ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/" \
+       --quote "MKD $BACKUP_NAME" \
+       --silent \
+       --show-error 2>/tmp/curl_mkdir.log; then
+    log_message "Directory created successfully"
+else
+    log_message "Directory creation failed (may already exist)"
+    if [ -f /tmp/curl_mkdir.log ]; then
+        cat /tmp/curl_mkdir.log | while read -r line; do
+            log_message "CURL MKDIR: $line"
+        done
+    fi
+fi
+
+# Upload all files in the backup directory
+log_message "Uploading backup files..."
+upload_success=true
+uploaded_files=0
+
 for file in "$LATEST_BACKUP"/*; do
     if [ -f "$file" ]; then
         filename=$(basename "$file")
-        echo "put \"$file\" \"$filename\"" >> "$FTP_SCRIPT"
-        log_message "Queued file: $filename"
+        log_message "Uploading: $filename"
+
+        if upload_with_curl "$file"; then
+            uploaded_files=$((uploaded_files + 1))
+            log_message "Successfully uploaded: $filename"
+        else
+            upload_success=false
+            log_message "Failed to upload: $filename"
+            break
+        fi
     fi
 done
 
-echo "quit" >> "$FTP_SCRIPT"
-
-# Execute FTP upload
-log_message "Uploading backup to FTP server..."
-log_message "DEBUG: FTP script contents:"
-cat "$FTP_SCRIPT" | while read -r line; do
-    log_message "SCRIPT: $line"
-done
-
-START_TIME=$(date +%s)
-
-log_message "Executing FTP upload..."
-if ftp -n < "$FTP_SCRIPT" >/tmp/ftp_output.log 2>&1; then
-    # Check for success indicators in the output
-    if grep -q "Transfer complete\|226\|200\|sent\|bytes" /tmp/ftp_output.log; then
+if [ "$upload_success" = "true" ] && [ "$uploaded_files" -gt 0 ]; then
     END_TIME=$(date +%s)
     DURATION=$((END_TIME - START_TIME))
-
-    log_message "FTP upload completed successfully in ${DURATION}s"
+    log_message "Upload completed successfully in ${DURATION}s"
+    log_message "Total files uploaded: $uploaded_files"
 
     # Calculate total uploaded size
     TOTAL_SIZE=$(du -sh "$LATEST_BACKUP" | cut -f1)
@@ -172,102 +172,48 @@ Upload Date: $(date '+%Y-%m-%d %H:%M:%S %Z')
 FTP Server: $FTP_HOST:$FTP_PORT
 Remote Path: $FTP_PATH/$BACKUP_NAME
 Total Size: $TOTAL_SIZE
+Files Uploaded: $uploaded_files
 Duration: ${DURATION}s
+Method: Curl
 Status: SUCCESS
 EOF
-
-    else
-        log_message "FTP upload completed but no success indicators found"
-        log_message "Full FTP output:"
-        cat /tmp/ftp_output.log | while read -r line; do
-            log_message "FTP: $line"
-        done
-        handle_error "FTP upload may have failed - no success indicators"
-    fi
 else
-    log_message "FTP command failed with exit code $?"
-    log_message "Full FTP output:"
-    cat /tmp/ftp_output.log | while read -r line; do
-        log_message "FTP: $line"
-    done
-
-    # Try fallback with curl
-    log_message "Attempting fallback upload with curl..."
-
-    # First, create the directory via curl
-    if curl --connect-timeout "$FTP_TIMEOUT" \
-           --ftp-pasv \
-           --user "$FTP_USERNAME:$FTP_PASSWORD" \
-           "ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/" \
-           --quote "MKD $BACKUP_NAME" \
-           --silent \
-           --show-error 2>/tmp/curl_mkdir.log; then
-        log_message "Directory created successfully with curl"
-    else
-        log_message "Directory creation failed (may already exist)"
-        if [ -f /tmp/curl_mkdir.log ]; then
-            cat /tmp/curl_mkdir.log | while read -r line; do
-                log_message "CURL MKDIR: $line"
-            done
-        fi
-    fi
-
-    # Upload files with curl
-    curl_success=true
-    for file in "$LATEST_BACKUP"/*; do
-        if [ -f "$file" ]; then
-            if ! upload_with_curl "$file"; then
-                curl_success=false
-                break
-            fi
-        fi
-    done
-
-    if [ "$curl_success" = "true" ]; then
-        END_TIME=$(date +%s)
-        DURATION=$((END_TIME - START_TIME))
-        log_message "Curl fallback upload completed successfully in ${DURATION}s"
-
-        # Calculate total uploaded size
-        TOTAL_SIZE=$(du -sh "$LATEST_BACKUP" | cut -f1)
-        log_message "Total backup size uploaded: $TOTAL_SIZE"
-
-        # Create upload summary
-        cat > "$LATEST_BACKUP/upload_summary.txt" << EOF
-FTP Upload Summary (Curl Fallback)
-==================================
-Upload Date: $(date '+%Y-%m-%d %H:%M:%S %Z')
-FTP Server: $FTP_HOST:$FTP_PORT
-Remote Path: $FTP_PATH/$BACKUP_NAME
-Total Size: $TOTAL_SIZE
-Duration: ${DURATION}s
-Method: Curl Fallback
-Status: SUCCESS
-EOF
-    else
-        handle_error "Both FTP and curl upload methods failed"
-    fi
+    handle_error "Upload failed - $uploaded_files files uploaded successfully"
 fi
 
 # Verify upload by listing remote directory
 log_message "Verifying upload..."
-VERIFY_SCRIPT=$(mktemp)
-chmod 600 "$VERIFY_SCRIPT"
-cat > "$VERIFY_SCRIPT" << EOF
-open $FTP_HOST $FTP_PORT
-user $FTP_USERNAME $FTP_PASSWORD
-cd $FTP_PATH
-ls $BACKUP_NAME
-quit
-EOF
+if curl --connect-timeout "$FTP_TIMEOUT" \
+       --ftp-pasv \
+       --user "$FTP_USERNAME:$FTP_PASSWORD" \
+       "ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/$BACKUP_NAME/" \
+       --list-only \
+       --silent \
+       --show-error >/tmp/verify_upload.log 2>&1; then
 
-if ftp -n < "$VERIFY_SCRIPT" 2>&1 | grep -q "$BACKUP_NAME"; then
-    log_message "Upload verification successful"
+    files_on_server=$(wc -l < /tmp/verify_upload.log)
+    log_message "Upload verification successful - found $files_on_server files on server"
+
+    if [ "$files_on_server" -ge "$uploaded_files" ]; then
+        log_message "All files verified on server"
+    else
+        log_message "WARNING: Only $files_on_server files found on server, expected $uploaded_files"
+    fi
+
+    log_message "Remote files:"
+    cat /tmp/verify_upload.log | while read -r line; do
+        log_message "REMOTE FILE: $line"
+    done
 else
-    log_message "WARNING: Upload verification failed - backup may be incomplete"
+    log_message "WARNING: Upload verification failed - could not list remote directory"
+    if [ -f /tmp/verify_upload.log ]; then
+        cat /tmp/verify_upload.log | while read -r line; do
+            log_message "VERIFY ERROR: $line"
+        done
+    fi
 fi
 
 # Cleanup temporary files
-rm -f "$FTP_SCRIPT" "$VERIFY_SCRIPT" /tmp/ftp_output.log
+rm -f /tmp/curl_mkdir.log /tmp/curl_error.log /tmp/verify_upload.log
 
 log_message "FTP upload process completed"

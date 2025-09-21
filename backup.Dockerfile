@@ -36,8 +36,6 @@ RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
 COPY docker-backup/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Switch to backup user
-USER backup
 WORKDIR /app
 
 # Health check

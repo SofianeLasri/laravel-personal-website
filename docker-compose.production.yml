@@ -40,9 +40,6 @@ services:
       - app
     networks:
       - app-network
-    environment:
-      - DB_HOST=app
-      - DB_PORT=3306
     mem_limit: 512m
 
 networks:

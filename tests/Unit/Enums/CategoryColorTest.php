@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Enums;
 
 use App\Enums\CategoryColor;
 use PHPUnit\Framework\Attributes\CoversClass;

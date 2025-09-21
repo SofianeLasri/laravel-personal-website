@@ -22,6 +22,10 @@ COPY docker-backup/scripts/ /app/scripts/
 RUN chmod +x /app/scripts/*.sh && \
     chown -R backup:backup /app/scripts
 
+# Copy and install cron job
+COPY docker-backup/backup-cron /etc/cron.d/backup
+RUN chmod 0644 /etc/cron.d/backup
+
 # Set timezone
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
     echo "Europe/Paris" > /etc/timezone

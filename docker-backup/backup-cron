@@ -1,0 +1,13 @@
+# Backup system cron jobs
+# Format: minute hour day month weekday user command
+
+# Main backup job - daily at 2 AM
+0 2 * * * backup /app/scripts/run-backup.sh >> /var/log/backup/backup.log 2>&1
+
+# Cleanup job - weekly on Sunday at 3 AM
+0 3 * * 0 backup /app/scripts/cleanup-old-backups.sh >> /var/log/backup/backup.log 2>&1
+
+# Health check update - every 5 minutes
+*/5 * * * * backup touch /var/log/backup/healthcheck
+
+# Empty line required at end of cron file

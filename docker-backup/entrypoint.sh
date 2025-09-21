@@ -33,29 +33,15 @@ fi
 
 log_message "Retention period: ${BACKUP_RETENTION_DAYS:-30} days"
 
-# Setup cron job for backup
-CRON_FILE="/tmp/backup.cron"
-cat > "$CRON_FILE" << EOF
-# Backup cron job
-$CRON_SCHEDULE /app/scripts/run-backup.sh >> /var/log/backup/backup.log 2>&1
-
-# Cleanup cron job (weekly cleanup at 3 AM on Sundays)
-0 3 * * 0 /app/scripts/cleanup-old-backups.sh >> /var/log/backup/backup.log 2>&1
-
-# Health check update (every 5 minutes)
-*/5 * * * * touch /var/log/backup/healthcheck
-EOF
-
-# Install cron job
-crontab "$CRON_FILE"
-rm "$CRON_FILE"
-
-log_message "Cron jobs installed:"
-crontab -l | while read -r line; do
-    if [[ $line != \#* ]] && [[ -n $line ]]; then
+# Cron jobs are pre-installed in /etc/cron.d/backup
+log_message "Cron jobs configured:"
+if [ -f /etc/cron.d/backup ]; then
+    grep -v '^#' /etc/cron.d/backup | grep -v '^$' | while read -r line; do
         log_message "  $line"
-    fi
-done
+    done
+else
+    log_message "  WARNING: No cron jobs found in /etc/cron.d/backup"
+fi
 
 # Initial health check
 touch /var/log/backup/healthcheck

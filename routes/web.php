@@ -58,7 +58,8 @@ if (config('app.env') !== 'production') {
 
 Route::name('public.')->group(function () {
     Route::get('/cv-pdf', function () {
-        return redirect('https://cloud.sl-projects.com/index.php/s/zCdQQKSEoGSSE8X');
+        // return redirect('https://cloud.sl-projects.com/index.php/s/zCdQQKSEoGSSE8X'); // CV Simple
+        return redirect('https://cloud.sl-projects.com/index.php/s/pp6dYsdnAAt6exb'); // CV Recto-Verso
     })->name('cv');
 
     Route::get('/', HomeController::class)->name('home');

@@ -1,0 +1,121 @@
+name: Deploy to Staging
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup VPN config
+        run: |
+          echo "${{ secrets.STAGING_VPN_CONFIG }}" > staging.ovpn
+
+      - name: Connect to VPN
+        uses: kota65535/github-openvpn-connect-action@v3
+        with:
+          config_file: staging.ovpn
+
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.STAGING_ENV_FILE }}" > .env
+
+      - name: Copy production database to staging
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          script: |
+            set -e
+            
+            echo "Dumping production database..."
+            mysqldump \
+              --single-transaction \
+              --quick \
+              --lock-tables=false \
+              --skip-comments \
+              --add-drop-table \
+              --no-create-db \
+              sofianelasri-production \
+              -u ${{ secrets.DB_STAGING_USER }} \
+              -p'${{ secrets.DB_STAGING_PASSWORD }}' \
+              > /tmp/prod_dump.sql
+            
+            echo "Cleaning staging database..."
+            mysql -u ${{ secrets.DB_STAGING_USER }} \
+                  -p'${{ secrets.DB_STAGING_PASSWORD }}' \
+                  sofianelasri-staging <<'SQL'
+            SET FOREIGN_KEY_CHECKS = 0;
+            
+            SET @tables = NULL;
+            SELECT GROUP_CONCAT('`', table_name, '`') INTO @tables
+              FROM information_schema.tables
+              WHERE table_schema = 'sofianelasri-staging';
+            
+            SET @tables = CONCAT('DROP TABLE IF EXISTS ', @tables);
+            PREPARE stmt FROM @tables;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+            
+            SET FOREIGN_KEY_CHECKS = 1;
+            SQL
+            
+            echo "Importing production data to staging..."
+            mysql -u ${{ secrets.DB_STAGING_USER }} \
+                  -p'${{ secrets.DB_STAGING_PASSWORD }}' \
+                  sofianelasri-staging \
+                  < /tmp/prod_dump.sql
+            
+            rm -f /tmp/prod_dump.sql
+            
+            echo "Database copy completed!"
+
+      - name: Create .env file
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          script: |
+            set -e
+            cd ${{ secrets.STAGING_PATH }}
+            
+            # Delete existing .env if it exists
+            if [ -f .env ]; then
+              rm .env
+            fi
+            
+            cat > .env << 'EOL'
+            ${{ secrets.STAGING_ENV_FILE }}
+            EOL
+            
+            echo ".env file created"
+
+      - name: Deploy application
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          command_timeout: 30m
+          script: |
+            set -e
+            cd ${{ secrets.STAGING_PATH }}
+            
+            echo "Pulling latest code..."
+            git fetch origin
+            git reset --hard origin/${{ github.ref_name }}
+            
+            echo "Building and starting containers..."
+            docker-compose -f docker-compose.staging.yml down
+            docker-compose -f docker-compose.staging.yml up -d --no-deps --build
+            
+            echo "Deployment completed!"

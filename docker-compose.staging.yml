@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     working_dir: /app
     ports:
-      - "${DOCKER_APP_PORT:-80}:8001" # Changed host port to 8001 for staging
+      - "${DOCKER_APP_PORT:-80}:8000"
     env_file:
       - stack.env
     volumes:

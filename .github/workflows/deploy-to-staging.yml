@@ -11,6 +11,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install OpenVPN
+        run: |
+          sudo apt update
+          sudo apt install -y openvpn openvpn-systemd-resolved
+
       - name: Setup VPN config
         run: |
           echo "${{ secrets.STAGING_VPN_CONFIG }}" > staging.ovpn

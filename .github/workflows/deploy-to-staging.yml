@@ -25,9 +25,9 @@ jobs:
         with:
           config_file: staging.ovpn
 
-      - name: Create .env file
+      - name: Create stack.env file
         run: |
-          echo "${{ secrets.STAGING_ENV_FILE }}" > .env
+          echo "${{ secrets.STAGING_ENV_FILE }}" > stack.env
 
       - name: Copy production database to staging
         uses: appleboy/ssh-action@master
@@ -81,7 +81,7 @@ jobs:
             
             echo "Database copy completed!"
 
-      - name: Create .env file
+      - name: Create stack.env file
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -92,16 +92,16 @@ jobs:
             set -e
             cd ${{ secrets.STAGING_PATH }}
             
-            # Delete existing .env if it exists
-            if [ -f .env ]; then
-              rm .env
+            # Delete existing stack.env if it exists
+            if [ -f stack.env ]; then
+              rm stack.env
             fi
             
-            cat > .env << 'EOL'
+            cat > stack.env << 'EOL'
             ${{ secrets.STAGING_ENV_FILE }}
             EOL
             
-            echo ".env file created"
+            echo "stack.env file created"
 
       - name: Deploy application
         uses: appleboy/ssh-action@master

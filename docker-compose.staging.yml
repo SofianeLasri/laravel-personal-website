@@ -9,6 +9,8 @@ services:
     working_dir: /app
     ports:
       - "${DOCKER_APP_PORT:-80}:8000"
+    env_file:
+      - stack.env
     volumes:
       - app-data:/app/storage
     depends_on:

@@ -1,0 +1,36 @@
+name: laravel-personal-website-staging
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: production.Dockerfile
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "${DOCKER_APP_PORT:-80}:8000"
+    env_file:
+      - stack.env
+    volumes:
+      - app-data:/app/storage
+    depends_on:
+      - redis
+    networks:
+      - app-network
+    mem_limit: 4g
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    networks:
+      - app-network
+    volumes:
+      - redis-data:/data
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  app-data:
+  redis-data:

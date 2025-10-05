@@ -121,6 +121,6 @@ jobs:
             
             echo "Building and starting containers..."
             docker-compose -f docker-compose.staging.yml down
-            docker-compose -f docker-compose.staging.yml up -d --no-deps --build
+            docker-compose -f docker-compose.staging.yml --env-file stack.env up -d --no-deps --build
             
             echo "Deployment completed!"

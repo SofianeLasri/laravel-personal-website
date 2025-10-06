@@ -129,8 +129,6 @@ export const useNotificationStore = defineStore('notification', () => {
         toastNotifications.value = toastNotifications.value.filter((n) => n.id !== id);
     };
 
-
-
     return {
         // State
         notifications,

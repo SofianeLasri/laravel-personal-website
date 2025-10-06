@@ -57,21 +57,10 @@ function saveEdit() {
                     {{ translation.text }}
                 </div>
                 <div class="absolute top-1 right-1 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <Button
-                        v-if="canTranslate && locale === 'en'"
-                        variant="ghost"
-                        size="sm"
-                        title="Re-traduire"
-                        @click.stop="$emit('retranslate')"
-                    >
+                    <Button v-if="canTranslate && locale === 'en'" variant="ghost" size="sm" title="Re-traduire" @click.stop="$emit('retranslate')">
                         <RefreshCwIcon class="h-3 w-3" />
                     </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        title="Modifier"
-                        @click="startEditing"
-                    >
+                    <Button variant="ghost" size="sm" title="Modifier" @click="startEditing">
                         <EditIcon class="h-3 w-3" />
                     </Button>
                 </div>

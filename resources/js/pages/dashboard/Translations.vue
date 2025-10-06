@@ -243,7 +243,12 @@ function goToApiLogs() {
                         <div class="flex flex-1 flex-col gap-4 sm:flex-row">
                             <!-- Search -->
                             <div class="max-w-md flex-1">
-                                <Input v-model="searchQuery" placeholder="Rechercher des traductions..." data-form-type="other" @input="debouncedSearch" />
+                                <Input
+                                    v-model="searchQuery"
+                                    placeholder="Rechercher des traductions..."
+                                    data-form-type="other"
+                                    @input="debouncedSearch"
+                                />
                             </div>
 
                             <!-- Locale Filter -->

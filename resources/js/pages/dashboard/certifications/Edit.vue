@@ -149,7 +149,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                     <FormItem>
                         <FormLabel>Nom de la certification</FormLabel>
                         <FormControl>
-                            <Input type="text" placeholder="Ex: Laravel Certified Developer" v-bind="componentField" />
+                            <Input type="text" placeholder="Ex: Laravel Certified Developer" v-bind="componentField" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -160,7 +160,12 @@ const onSubmit = form.handleSubmit(async (values) => {
                     <FormItem>
                         <FormLabel>Niveau</FormLabel>
                         <FormControl>
-                            <Input type="text" placeholder="Ex: Beginner, Intermediate, Advanced, Expert" v-bind="componentField" />
+                            <Input
+                                type="text"
+                                placeholder="Ex: Beginner, Intermediate, Advanced, Expert"
+                                v-bind="componentField"
+                                data-form-type="other"
+                            />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -171,7 +176,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                     <FormItem>
                         <FormLabel>Score</FormLabel>
                         <FormControl>
-                            <Input type="text" placeholder="Ex: 850/1000 ou 95%" v-bind="componentField" />
+                            <Input type="text" placeholder="Ex: 850/1000 ou 95%" v-bind="componentField" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -182,7 +187,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                     <FormItem>
                         <FormLabel>Date d'obtention</FormLabel>
                         <FormControl>
-                            <Input type="date" v-bind="componentField" />
+                            <Input type="date" v-bind="componentField" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -193,7 +198,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                     <FormItem>
                         <FormLabel>Lien vers la certification</FormLabel>
                         <FormControl>
-                            <Input type="url" placeholder="https://..." v-bind="componentField" />
+                            <Input type="url" placeholder="https://..." v-bind="componentField" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

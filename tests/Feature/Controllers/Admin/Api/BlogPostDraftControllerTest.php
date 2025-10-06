@@ -182,17 +182,17 @@ class BlogPostDraftControllerTest extends TestCase
         $translationKey = $draft->titleTranslationKey;
         $this->assertStringContainsString('blog_post_draft_title_', $translationKey->key);
 
-        // Verify both locale translations were created
+        // Verify only the requested locale translation was created (new behavior)
         $this->assertDatabaseHas('translations', [
             'translation_key_id' => $translationKey->id,
             'locale' => 'en',
             'text' => 'New Translation Key Title',
         ]);
 
-        $this->assertDatabaseHas('translations', [
+        // Verify French translation was NOT created (new behavior - no empty translations)
+        $this->assertDatabaseMissing('translations', [
             'translation_key_id' => $translationKey->id,
             'locale' => 'fr',
-            'text' => '',
         ]);
     }
 
@@ -225,12 +225,12 @@ class BlogPostDraftControllerTest extends TestCase
     }
 
     #[Test]
-    public function store_creates_translations_for_both_locales()
+    public function store_creates_only_requested_locale_translation()
     {
         $category = BlogCategory::factory()->create();
 
         $response = $this->postJson(route('dashboard.api.blog-post-drafts.store'), [
-            'slug' => 'both-locales',
+            'slug' => 'single-locale',
             'title_content' => 'English Title',
             'type' => BlogPostType::ARTICLE->value,
             'category_id' => $category->id,
@@ -242,14 +242,16 @@ class BlogPostDraftControllerTest extends TestCase
         $draft = BlogPostDraft::latest()->first();
         $translationKey = $draft->titleTranslationKey;
 
-        // Check that both locales exist
-        $this->assertEquals(2, $translationKey->translations()->count());
+        // Check that only one locale exists (new behavior)
+        $this->assertEquals(1, $translationKey->translations()->count());
 
         $enTranslation = $translationKey->translations()->where('locale', 'en')->first();
-        $frTranslation = $translationKey->translations()->where('locale', 'fr')->first();
-
+        $this->assertNotNull($enTranslation);
         $this->assertEquals('English Title', $enTranslation->text);
-        $this->assertEquals('', $frTranslation->text);
+
+        // Verify French translation was NOT created
+        $frTranslation = $translationKey->translations()->where('locale', 'fr')->first();
+        $this->assertNull($frTranslation);
     }
 
     #[Test]

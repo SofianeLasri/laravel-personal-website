@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Enums\BlogPostType;
 use App\Http\Controllers\Controller;
 use App\Models\BlogPostDraft;
+use App\Models\Translation;
 use App\Models\TranslationKey;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -43,34 +44,22 @@ class BlogPostDraftController extends Controller
             ], 422);
         }
 
-        // Create or update translation key for title
-        $titleTranslationKey = null;
+        // Create or update translation using the same pattern as CreationDraft
+        $translationKey = null;
         if ($request->title_translation_key_id) {
-            $titleTranslationKey = TranslationKey::find($request->title_translation_key_id);
+            $translationKey = TranslationKey::find($request->title_translation_key_id);
         }
 
-        if (! $titleTranslationKey) {
-            $titleTranslationKey = TranslationKey::create([
-                'key' => 'blog_post_draft_title_'.uniqid(),
-            ]);
-
-            // Create empty translations
-            $titleTranslationKey->translations()->createMany([
-                ['locale' => 'fr', 'text' => ''],
-                ['locale' => 'en', 'text' => ''],
-            ]);
-        }
-
-        // Update the translation for the current locale
-        $titleTranslationKey->translations()->updateOrCreate(
-            ['locale' => $request->locale],
-            ['text' => $request->title_content]
+        $titleTranslation = Translation::createOrUpdate(
+            $translationKey ?? 'blog_post_draft_title_'.uniqid(),
+            $request->locale,
+            $request->title_content
         );
 
         // Create the draft
         $draft = BlogPostDraft::create([
             'slug' => $request->slug,
-            'title_translation_key_id' => $titleTranslationKey->id,
+            'title_translation_key_id' => $titleTranslation->translation_key_id,
             'type' => $request->type,
             'category_id' => $request->category_id,
             'cover_picture_id' => $request->cover_picture_id,
@@ -120,11 +109,20 @@ class BlogPostDraftController extends Controller
             ], 422);
         }
 
-        // Update translation
+        // Update translation using the same pattern as CreationDraft
         $titleTranslationKey = $blogPostDraft->titleTranslationKey;
-        $titleTranslationKey->translations()->updateOrCreate(
-            ['locale' => $request->locale],
-            ['text' => $request->title_content]
+
+        if (! $titleTranslationKey) {
+            return response()->json([
+                'message' => 'Translation key not found',
+                'errors' => ['title_translation_key_id' => ['The translation key is missing']],
+            ], 422);
+        }
+
+        Translation::createOrUpdate(
+            $titleTranslationKey,
+            $request->locale,
+            $request->title_content
         );
 
         // Update draft

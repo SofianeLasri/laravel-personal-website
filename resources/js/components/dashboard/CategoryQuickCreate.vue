@@ -132,6 +132,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
                                 type="text"
                                 placeholder="Ex: Technologie"
                                 v-bind="componentField"
+                                data-form-type="other"
                                 @input="(e: any) => handleNameFrChange(e.target.value)"
                             />
                         </FormControl>
@@ -143,7 +144,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
                     <FormItem>
                         <FormLabel>Nom (Anglais)</FormLabel>
                         <FormControl>
-                            <Input type="text" placeholder="Ex: Technology" v-bind="componentField" />
+                            <Input type="text" placeholder="Ex: Technology" v-bind="componentField" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -153,7 +154,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
                     <FormItem>
                         <FormLabel>Slug</FormLabel>
                         <FormControl>
-                            <Input type="text" placeholder="technologie" v-bind="componentField" />
+                            <Input type="text" placeholder="technologie" v-bind="componentField" data-form-type="other" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

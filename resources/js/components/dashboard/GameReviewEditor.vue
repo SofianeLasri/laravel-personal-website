@@ -203,17 +203,22 @@ const handleCoverChange = (pictureId: number | null) => {
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <Label>Titre du jeu</Label>
-                <Input v-model="gameData.game_title" placeholder="Ex: The Legend of Zelda: Tears of the Kingdom" @blur="saveGameReview" />
+                <Input
+                    v-model="gameData.game_title"
+                    placeholder="Ex: The Legend of Zelda: Tears of the Kingdom"
+                    data-form-type="other"
+                    @blur="saveGameReview"
+                />
             </div>
 
             <div>
                 <Label>Date de sortie</Label>
-                <Input v-model="gameData.release_date" type="date" @blur="saveGameReview" />
+                <Input v-model="gameData.release_date" type="date" data-form-type="other" @blur="saveGameReview" />
             </div>
 
             <div>
                 <Label>Genre</Label>
-                <Input v-model="gameData.genre" placeholder="Ex: Action-RPG, FPS, Stratégie..." @blur="saveGameReview" />
+                <Input v-model="gameData.genre" placeholder="Ex: Action-RPG, FPS, Stratégie..." data-form-type="other" @blur="saveGameReview" />
             </div>
 
             <div>
@@ -236,12 +241,12 @@ const handleCoverChange = (pictureId: number | null) => {
 
             <div>
                 <Label>Développeur</Label>
-                <Input v-model="gameData.developer" placeholder="Ex: Nintendo EPD" @blur="saveGameReview" />
+                <Input v-model="gameData.developer" placeholder="Ex: Nintendo EPD" data-form-type="other" @blur="saveGameReview" />
             </div>
 
             <div>
                 <Label>Éditeur</Label>
-                <Input v-model="gameData.publisher" placeholder="Ex: Nintendo" @blur="saveGameReview" />
+                <Input v-model="gameData.publisher" placeholder="Ex: Nintendo" data-form-type="other" @blur="saveGameReview" />
             </div>
 
             <div class="col-span-2">
@@ -249,6 +254,7 @@ const handleCoverChange = (pictureId: number | null) => {
                 <Input
                     v-model="gameData.platforms"
                     placeholder="Ex: Nintendo Switch, PC, PlayStation 5 (séparées par des virgules)"
+                    data-form-type="other"
                     @blur="saveGameReview"
                 />
             </div>
@@ -302,12 +308,12 @@ const handleCoverChange = (pictureId: number | null) => {
 
                 <div class="flex-[2]">
                     <Label>URL</Label>
-                    <Input v-model="link.url" placeholder="https://..." @blur="saveLink(link)" />
+                    <Input v-model="link.url" placeholder="https://..." data-form-type="other" @blur="saveLink(link)" />
                 </div>
 
                 <div class="flex-1">
                     <Label>Label (optionnel)</Label>
-                    <Input v-model="link.label" placeholder="Texte du lien" @blur="saveLink(link)" />
+                    <Input v-model="link.label" placeholder="Texte du lien" data-form-type="other" @blur="saveLink(link)" />
                 </div>
 
                 <Button type="button" size="icon" variant="ghost" @click="removeLink(index)">

@@ -262,7 +262,13 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                         <FormItem>
                             <FormLabel>Titre</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="Titre de l'article" v-bind="componentField" data-testid="blog-title-input" />
+                                <Input
+                                    type="text"
+                                    placeholder="Titre de l'article"
+                                    v-bind="componentField"
+                                    data-testid="blog-title-input"
+                                    data-form-type="other"
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -272,7 +278,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                         <FormItem>
                             <FormLabel>Slug</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="slug-de-l-article" v-bind="componentField" />
+                                <Input type="text" placeholder="slug-de-l-article" v-bind="componentField" data-form-type="other" />
                             </FormControl>
                             <FormDescription> L'URL de l'article : /blog/{{ form.values.slug || 'slug-de-l-article' }} </FormDescription>
                             <FormMessage />

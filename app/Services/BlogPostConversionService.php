@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\BlogPostType;
+use App\Jobs\TranslateToEnglishJob;
 use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
 use App\Models\BlogContentVideo;
@@ -13,6 +14,7 @@ use App\Models\GameReview;
 use App\Models\GameReviewDraft;
 use App\Models\TranslationKey;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -165,6 +167,9 @@ class BlogPostConversionService
                 // Link the draft to the created blog post
                 $draft->update(['original_blog_post_id' => $blogPost->id]);
             }
+
+            // Auto-translate title to English if missing or empty
+            $this->autoTranslateIfNeeded($blogPost->titleTranslationKey);
 
             return $blogPost->fresh();
         });
@@ -328,6 +333,38 @@ class BlogPostConversionService
                 'url' => $draftLink->url,
                 'label_translation_key_id' => $draftLink->label_translation_key_id,
                 'order' => $draftLink->order,
+            ]);
+        }
+    }
+
+    /**
+     * Auto-translate to English if the translation is missing or empty
+     */
+    private function autoTranslateIfNeeded(TranslationKey $translationKey): void
+    {
+        $frenchTranslation = $translationKey->translations()
+            ->where('locale', 'fr')
+            ->first();
+
+        if (! $frenchTranslation || empty(trim($frenchTranslation->text))) {
+            Log::info('No French translation found or empty, skipping auto-translation', [
+                'translation_key_id' => $translationKey->id,
+            ]);
+
+            return;
+        }
+
+        $englishTranslation = $translationKey->translations()
+            ->where('locale', 'en')
+            ->first();
+
+        // If English translation doesn't exist or is empty, queue translation job
+        if (! $englishTranslation || empty(trim($englishTranslation->text))) {
+            TranslateToEnglishJob::dispatch($translationKey->id);
+
+            Log::info('Auto-translation job dispatched for blog post title', [
+                'translation_key_id' => $translationKey->id,
+                'french_text' => $frenchTranslation->text,
             ]);
         }
     }

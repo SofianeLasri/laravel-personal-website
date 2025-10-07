@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\TranslationKey;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class BlogCategoryController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $categories = BlogCategory::with('nameTranslationKey.translations')
             ->orderBy('order')
@@ -19,7 +20,7 @@ class BlogCategoryController extends Controller
         return response()->json($categories);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string|unique:blog_categories,slug',
@@ -63,14 +64,14 @@ class BlogCategoryController extends Controller
         return response()->json($category, 201);
     }
 
-    public function show(BlogCategory $blogCategory)
+    public function show(BlogCategory $blogCategory): JsonResponse
     {
         $blogCategory->load('nameTranslationKey.translations');
 
         return response()->json($blogCategory);
     }
 
-    public function update(Request $request, BlogCategory $blogCategory)
+    public function update(Request $request, BlogCategory $blogCategory): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string|unique:blog_categories,slug,'.$blogCategory->id,
@@ -90,15 +91,17 @@ class BlogCategoryController extends Controller
         // Update translations
         $nameTranslationKey = $blogCategory->nameTranslationKey;
 
-        $nameTranslationKey->translations()->updateOrCreate(
-            ['locale' => 'fr'],
-            ['text' => $request->name_fr]
-        );
+        if ($nameTranslationKey) {
+            $nameTranslationKey->translations()->updateOrCreate(
+                ['locale' => 'fr'],
+                ['text' => $request->name_fr]
+            );
 
-        $nameTranslationKey->translations()->updateOrCreate(
-            ['locale' => 'en'],
-            ['text' => $request->name_en]
-        );
+            $nameTranslationKey->translations()->updateOrCreate(
+                ['locale' => 'en'],
+                ['text' => $request->name_en]
+            );
+        }
 
         // Update category
         $blogCategory->update([
@@ -113,7 +116,7 @@ class BlogCategoryController extends Controller
         return response()->json($blogCategory);
     }
 
-    public function destroy(BlogCategory $blogCategory)
+    public function destroy(BlogCategory $blogCategory): JsonResponse
     {
         // Check if category is used by any blog posts or drafts
         $postsCount = $blogCategory->blogPosts()->count();
@@ -134,13 +137,15 @@ class BlogCategoryController extends Controller
         $blogCategory->delete();
 
         // Delete translation key and its translations
-        $nameTranslationKey->translations()->delete();
-        $nameTranslationKey->delete();
+        if ($nameTranslationKey) {
+            $nameTranslationKey->translations()->delete();
+            $nameTranslationKey->delete();
+        }
 
         return response()->json(['message' => 'Category deleted successfully']);
     }
 
-    public function reorder(Request $request)
+    public function reorder(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'categories' => 'required|array',

@@ -79,7 +79,8 @@ class NotificationsMarkReadCommand extends Command
             $this->info('Breakdown by Type and Severity:');
             $this->table(
                 ['Type', 'Severity', 'Count'],
-                $typeBreakdown->map(function ($item) {
+                $typeBreakdown->map(function (object $item) {
+                    /** @var object{type: string, severity: string, count: int} $item */
                     return [
                         $item->type,
                         ucfirst($item->severity),
@@ -107,7 +108,7 @@ class NotificationsMarkReadCommand extends Command
                             $notification->type,
                             ucfirst($notification->severity),
                             substr($notification->title, 0, 40).(strlen($notification->title) > 40 ? '...' : ''),
-                            $notification->created_at->format('Y-m-d H:i:s'),
+                            $notification->created_at?->format('Y-m-d H:i:s') ?? 'N/A',
                         ];
                     })
                 );
@@ -146,7 +147,8 @@ class NotificationsMarkReadCommand extends Command
             if ($remainingBreakdown->isNotEmpty()) {
                 $this->table(
                     ['Severity', 'Count'],
-                    $remainingBreakdown->map(function ($item) {
+                    $remainingBreakdown->map(function (object $item) {
+                        /** @var object{severity: string, count: int} $item */
                         return [
                             ucfirst($item->severity),
                             $item->count,
@@ -165,8 +167,13 @@ class NotificationsMarkReadCommand extends Command
     /**
      * Parse the period option into a Carbon date
      */
-    private function parsePeriod(string $period): Carbon
+    private function parsePeriod(?string $period): Carbon
     {
+        // Default to 7 days if period is null
+        if ($period === null) {
+            return Carbon::now()->subDays(7);
+        }
+
         // Handle common formats
         if (preg_match('/^(\d+)(hours?|days?|weeks?|months?)$/', $period, $matches)) {
             $value = (int) $matches[1];

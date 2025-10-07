@@ -117,7 +117,7 @@ class WebsiteImportService
             $zip->close();
 
             return $stats;
-        } catch (Exception|Throwable $e) {
+        } catch (Throwable $e) {
             $zip->close();
             Log::error('Import failed');
             Log::error($e->getMessage(), $e->getTrace());

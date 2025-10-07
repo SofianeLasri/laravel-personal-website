@@ -43,9 +43,10 @@ class OptimizePicturesCommand extends Command
         $chunkSize = max(1, (int) $this->option('chunk'));
 
         $pictureIdsToOptimize->chunk($chunkSize)->each(function ($ids) use ($bar) {
+            /** @var \Illuminate\Support\Collection<int, int|string> $ids */
             foreach ($ids as $id) {
                 $picture = Picture::find($id);
-                if ($picture) {
+                if ($picture instanceof Picture) {
                     PictureJob::dispatch($picture);
                 }
                 $bar->advance();

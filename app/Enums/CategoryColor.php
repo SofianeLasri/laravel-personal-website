@@ -77,6 +77,8 @@ enum CategoryColor: string
 
     /**
      * Get all available values as array
+     *
+     * @return array<string>
      */
     public static function values(): array
     {
@@ -85,6 +87,8 @@ enum CategoryColor: string
 
     /**
      * Get all labels as array
+     *
+     * @return array<string>
      */
     public static function labels(): array
     {
@@ -113,6 +117,8 @@ enum CategoryColor: string
 
     /**
      * Get all enum values with their hex colors as array
+     *
+     * @return array<array{value: string, label: string, labelEn: string, hexColor: string, badgeClass: string}>
      */
     public static function all(): array
     {

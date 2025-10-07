@@ -594,6 +594,8 @@ class PublicControllersService
             $date = Carbon::parse($date);
         }
 
+        assert($date instanceof Carbon);
+
         $month = Str::ucfirst($date->translatedFormat('F'));
 
         return $month.' '.$date->format('Y');
@@ -892,6 +894,11 @@ class PublicControllersService
 
         $markdownContent = $firstTextContent->content;
 
+        // Ensure content is BlogContentMarkdown type
+        if (! $markdownContent instanceof BlogContentMarkdown) {
+            return '';
+        }
+
         if (! $markdownContent->translationKey || ! $markdownContent->translationKey->translations) {
             return '';
         }
@@ -971,7 +978,8 @@ class PublicControllersService
         // Apply search filter
         if (! empty($filters['search'])) {
             $searchTerm = $filters['search'];
-            $query->whereHas('titleTranslationKey.translations', function ($q) use ($searchTerm) {
+            $query->whereHas('titleTranslationKey.translations', function (\Illuminate\Database\Eloquent\Builder $q) use ($searchTerm) {
+                /** @var \Illuminate\Database\Eloquent\Builder<Translation> $q */
                 $q->where('text', 'like', '%'.$searchTerm.'%');
             });
         }
@@ -1072,12 +1080,12 @@ class PublicControllersService
      *     slug: string,
      *     type: BlogPostType,
      *     category: array{name: string, color: CategoryColor},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     publishedAt: Carbon|null,
-     *     publishedAtFormatted: string|null,
+     *     publishedAtFormatted: string,
      *     excerpt: string,
-     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
-     *     gameReview?: array{gameTitle: string, releaseDate: string, genre: string, developer: string, publisher: string, platforms: string, rating: int, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
+     *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array|null, rating: \App\Enums\GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
      * }|null
      */
     public function getBlogPostBySlug(string $slug): ?array
@@ -1147,10 +1155,11 @@ class PublicControllersService
 
                 $result['gallery'] = [
                     'id' => $content->content->id,
-                    'pictures' => $content->content->pictures->map(function ($picture) use ($captionTranslations) {
+                    'pictures' => $content->content->pictures->map(function (Picture $picture) use ($captionTranslations) {
                         $formattedPicture = $this->formatPictureForSSR($picture);
 
                         // Add caption if it exists in the pivot data
+                        /** @phpstan-ignore-next-line Property pivot exists on Picture when loaded through BelongsToMany */
                         $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
                         if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
                             $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];

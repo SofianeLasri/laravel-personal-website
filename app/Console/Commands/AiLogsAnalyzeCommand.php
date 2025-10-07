@@ -65,11 +65,13 @@ class AiLogsAnalyzeCommand extends Command
         }
 
         // Status breakdown
+        /** @var \Illuminate\Support\Collection<int, object{status: string, count: int}> $statusBreakdown */
         $statusBreakdown = $query->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->get();
 
         // Provider breakdown
+        /** @var \Illuminate\Support\Collection<int, object{provider: string, count: int}> $providerBreakdown */
         $providerBreakdown = $query->select('provider', DB::raw('count(*) as count'))
             ->groupBy('provider')
             ->get();
@@ -153,6 +155,7 @@ class AiLogsAnalyzeCommand extends Command
         );
 
         // Get top errors
+        /** @var \Illuminate\Support\Collection<int, object{error_message: string, count: int}> $errors */
         $errors = $query->where('status', 'error')
             ->select('error_message', DB::raw('count(*) as count'))
             ->whereNotNull('error_message')
@@ -176,6 +179,7 @@ class AiLogsAnalyzeCommand extends Command
         }
 
         // Daily breakdown
+        /** @var \Illuminate\Support\Collection<int, object{date: string, count: int, daily_cost: float|null}> $dailyBreakdown */
         $dailyBreakdown = $query->select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('count(*) as count'),
@@ -207,8 +211,13 @@ class AiLogsAnalyzeCommand extends Command
     /**
      * Parse the period option into a Carbon date
      */
-    private function parsePeriod(string $period): Carbon
+    private function parsePeriod(?string $period): Carbon
     {
+        // Default to 7 days if period is null
+        if ($period === null) {
+            return Carbon::now()->subDays(7);
+        }
+
         // Handle common formats
         if (preg_match('/^(\d+)(hours?|days?|weeks?|months?)$/', $period, $matches)) {
             $value = (int) $matches[1];

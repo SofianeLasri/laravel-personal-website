@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BlogContentMarkdown;
 use App\Models\TranslationKey;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class BlogContentMarkdownController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'content' => 'nullable|string',
@@ -53,14 +54,14 @@ class BlogContentMarkdownController extends Controller
         return response()->json($markdownContent, 201);
     }
 
-    public function show(BlogContentMarkdown $blogContentMarkdown)
+    public function show(BlogContentMarkdown $blogContentMarkdown): JsonResponse
     {
         $blogContentMarkdown->load('translationKey.translations');
 
         return response()->json($blogContentMarkdown);
     }
 
-    public function update(Request $request, BlogContentMarkdown $blogContentMarkdown)
+    public function update(Request $request, BlogContentMarkdown $blogContentMarkdown): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|string',
@@ -76,22 +77,26 @@ class BlogContentMarkdownController extends Controller
 
         // Update the translation for the current locale
         $translationKey = $blogContentMarkdown->translationKey;
-        $translationKey->translations()->updateOrCreate(
-            ['locale' => $request->locale],
-            ['text' => $request->content]
-        );
+        if ($translationKey) {
+            $translationKey->translations()->updateOrCreate(
+                ['locale' => $request->locale],
+                ['text' => $request->content]
+            );
+        }
 
         $blogContentMarkdown->load('translationKey.translations');
 
         return response()->json($blogContentMarkdown);
     }
 
-    public function destroy(BlogContentMarkdown $blogContentMarkdown)
+    public function destroy(BlogContentMarkdown $blogContentMarkdown): JsonResponse
     {
         // Delete translation key and its translations
         $translationKey = $blogContentMarkdown->translationKey;
-        $translationKey->translations()->delete();
-        $translationKey->delete();
+        if ($translationKey) {
+            $translationKey->translations()->delete();
+            $translationKey->delete();
+        }
 
         // Delete the markdown content
         $blogContentMarkdown->delete();

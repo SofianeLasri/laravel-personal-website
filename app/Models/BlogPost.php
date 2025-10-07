@@ -178,8 +178,8 @@ class BlogPost extends Model implements Feedable
             ->summary($excerpt)
             ->updated($this->updated_at ?? $this->created_at ?? now())
             ->link(route('public.blog.post', ['slug' => $this->slug]))
-            ->authorName("Sofiane Lasri")
-            ->authorEmail("sofianelasri@sl-projects.com");
+            ->authorName('Sofiane Lasri')
+            ->authorEmail('sofianelasri@sl-projects.com');
 
         // Add category
         $categoryName = $this->getTranslatedText($this->category->nameTranslationKey);

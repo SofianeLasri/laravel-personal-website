@@ -54,7 +54,7 @@ const popups = computed(() => [
 
 <template>
     <Head>
-        <link rel="alternate" type="application/atom+xml" :href="route('feeds.blog')">
+        <link rel="alternate" type="application/atom+xml" :href="route('feeds.blog')" />
     </Head>
     <div class="dots-background dark:bg-gray-990 relative flex min-h-screen flex-col items-center">
         <DotMatrixMask />

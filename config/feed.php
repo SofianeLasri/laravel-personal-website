@@ -18,7 +18,7 @@ return [
              */
             'url' => '/feed',
 
-            'title' => config('app.name') . ' - Blog',
+            'title' => config('app.name').' - Blog',
             'description' => 'Derniers articles de blog',
             'language' => 'fr-FR',
 

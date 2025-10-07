@@ -23,7 +23,7 @@ const pageTitle = t('errors.404.page_name');
 
     <PublicAppLayout :social-media-links="socialMediaLinks">
         <div class="flex min-h-[80vh] items-center justify-center py-8">
-            <div class="container z-10 flex flex-col items-center justify-center gap-12 lg:flex-row">
+            <div class="z-10 container flex flex-col items-center justify-center gap-12 lg:flex-row">
                 <div>
                     <h1 class="text-primary text-9xl font-bold md:text-[16rem]">404</h1>
                 </div>

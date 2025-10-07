@@ -51,7 +51,7 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
         </div>
 
         <div class="relative z-10 container flex w-full min-w-0 flex-col items-center px-4 pt-16 pb-8">
-            <div class="flex w-full min-w-0 max-w-5xl flex-col gap-8">
+            <div class="flex w-full max-w-5xl min-w-0 flex-col gap-8">
                 <div class="flex flex-col gap-2">
                     <!-- Category and Date -->
                     <div class="flex gap-4">

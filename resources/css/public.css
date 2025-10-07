@@ -285,6 +285,18 @@
         & pre::-webkit-scrollbar-thumb:hover {
             @apply bg-gray-500;
         }
+
+        & .table-wrapper::-webkit-scrollbar-track {
+            @apply bg-gray-800;
+        }
+
+        & .table-wrapper::-webkit-scrollbar-thumb {
+            @apply bg-gray-600;
+        }
+
+        & .table-wrapper::-webkit-scrollbar-thumb:hover {
+            @apply bg-gray-500;
+        }
     }
 }
 
@@ -315,7 +327,7 @@ body * {
 }
 
 @utility markdown-view {
-    @apply min-w-0 w-full text-gray-800 dark:text-gray-300;
+    @apply w-full min-w-0 text-gray-800 dark:text-gray-300;
 
     /* Headings */
     & h1,
@@ -410,7 +422,7 @@ body * {
 
     /* Tables */
     & table {
-        @apply my-4 w-full border-collapse;
+        @apply w-full border-collapse;
     }
 
     & th,
@@ -434,7 +446,7 @@ body * {
 
     /* Code blocks */
     & pre {
-        @apply relative my-4 min-w-0 w-full overflow-x-auto rounded-lg border border-gray-200 bg-gray-50;
+        @apply relative my-4 w-full min-w-0 overflow-x-auto rounded-lg border border-gray-200 bg-gray-50;
     }
 
     & pre code {
@@ -469,6 +481,23 @@ body * {
     }
 
     & pre::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-500;
+    }
+
+    /* Scrollbar styling for table wrappers */
+    & .table-wrapper::-webkit-scrollbar {
+        @apply h-2;
+    }
+
+    & .table-wrapper::-webkit-scrollbar-track {
+        @apply rounded bg-gray-100;
+    }
+
+    & .table-wrapper::-webkit-scrollbar-thumb {
+        @apply rounded bg-gray-400;
+    }
+
+    & .table-wrapper::-webkit-scrollbar-thumb:hover {
         @apply bg-gray-500;
     }
 }

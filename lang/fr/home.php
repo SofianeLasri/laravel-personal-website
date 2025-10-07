@@ -31,8 +31,8 @@ return [
         'description' => 'Bien souvent, c\'est au travers de mes projets personnels que j\'apprends le plus. Mais mon parcours scolaire et professionnel m\'ont permis d\'obtenir de solides bases dans plusieurs domaines.',
     ],
     'blog_notification' => [
-        'title' => 'Nouveau sur le blog',
-        'discover_blog' => 'Découvrir le blog',
+        'title' => 'Nouvel article de blog !',
+        'discover_blog' => 'Lire l\'article',
         'dismiss' => 'Fermer',
     ],
 ];

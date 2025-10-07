@@ -2,11 +2,12 @@
 import Logo from '@/components/public/Logo.vue';
 import SvgIcon from '@/components/public/SvgIcon.vue';
 import { useTranslation } from '@/composables/useTranslation';
-import { SocialMediaLink } from '@/types';
+import { SocialMediaLink, SSRBlogPost } from '@/types';
 import { Link } from '@inertiajs/vue3';
 
 defineProps<{
     socialMediaLinks: SocialMediaLink[];
+    latestBlogPost?: SSRBlogPost | null;
 }>();
 
 const { t } = useTranslation();
@@ -48,6 +49,24 @@ const { t } = useTranslation();
                                 </li>
                                 <li class="mb-2 list-none">
                                     <Link :href="route('public.about')" :title="t('navigation.about')">{{ t('navigation.about') }}</Link>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Colonne Blog -->
+                        <div class="flex flex-col justify-start gap-4">
+                            <div class="text-xl font-bold text-black dark:text-gray-100">{{ t('footer.blog') }}</div>
+                            <ul class="text-design-system-paragraph text-base font-normal">
+                                <li class="mb-2 list-none">
+                                    <Link :href="route('public.blog.home')" :title="t('footer.blog_home')">{{ t('footer.blog_home') }}</Link>
+                                </li>
+                                <li class="mb-2 list-none">
+                                    <Link :href="route('public.blog.index')" :title="t('footer.blog_articles')">{{ t('footer.blog_articles') }}</Link>
+                                </li>
+                                <li v-if="latestBlogPost" class="mb-2 list-none">
+                                    <Link :href="route('public.blog.post', { slug: latestBlogPost.slug })" :title="t('footer.blog_latest')">{{
+                                        t('footer.blog_latest')
+                                    }}</Link>
                                 </li>
                             </ul>
                         </div>

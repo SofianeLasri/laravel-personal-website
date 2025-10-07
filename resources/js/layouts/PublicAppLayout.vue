@@ -60,7 +60,7 @@ const popups = computed(() => [
         <slot />
         <PopupCarousel :popups="popups" />
     </div>
-    <Footer :social-media-links="socialMediaLinks" />
+    <Footer :social-media-links="socialMediaLinks" :latest-blog-post="page.props.latestBlogPost as any" />
 </template>
 
 <style>

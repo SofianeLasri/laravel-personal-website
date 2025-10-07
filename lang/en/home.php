@@ -31,8 +31,8 @@ return [
         'description' => 'Often, it\'s through my personal projects that I learn the most. But my educational and professional background has allowed me to build solid foundations in several areas.',
     ],
     'blog_notification' => [
-        'title' => 'New on the blog',
-        'discover_blog' => 'Discover the blog',
+        'title' => 'New blog post!',
+        'discover_blog' => 'Read the article',
         'dismiss' => 'Close',
     ],
 ];

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import BlogCategoryBadge from '@/components/public/Blog/BlogCategoryBadge.vue';
+import PopupButton from '@/components/public/Ui/Button/PopupButton.vue';
 import { useRoute } from '@/composables/useRoute';
 import { useTranslation } from '@/composables/useTranslation';
 import { SSRBlogPost } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Newspaper, X } from 'lucide-vue-next';
+import { Newspaper } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
 const page = usePage();
@@ -61,19 +62,11 @@ onMounted(() => {
         >
             <div class="action-container-inner-shadow flex flex-col gap-3 rounded-2xl border bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
                 <!-- Header -->
-                <div class="flex items-start justify-between gap-2">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-atomic-tangerine-100 dark:bg-atomic-tangerine-900 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full">
-                            <Newspaper class="text-atomic-tangerine-600 dark:text-atomic-tangerine-400 h-4 w-4" />
-                        </div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ t('home.blog_notification.title') }}</p>
+                <div class="flex items-center gap-3">
+                    <div class="bg-atomic-tangerine-100 dark:bg-atomic-tangerine-900 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full">
+                        <Newspaper class="text-atomic-tangerine-600 dark:text-atomic-tangerine-400 h-4 w-4" />
                     </div>
-                    <button
-                        class="no-glow hover:text-atomic-tangerine-600 dark:hover:text-atomic-tangerine-400 h-6 w-6 flex-shrink-0 text-gray-400 transition-colors duration-200"
-                        @click="dismissPopup"
-                    >
-                        <X class="h-4 w-4" />
-                    </button>
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ t('home.blog_notification.title') }}</p>
                 </div>
 
                 <!-- Blog Post Card -->
@@ -112,19 +105,18 @@ onMounted(() => {
 
                 <!-- Action Button -->
                 <div class="flex gap-2">
-                    <Link
+                    <PopupButton
+                        as="inertia-link"
+                        variant="primary"
                         :href="route('public.blog.home')"
-                        class="no-glow bg-atomic-tangerine-400 hover:bg-atomic-tangerine-500 flex-1 rounded-md px-3 py-1.5 text-center text-xs font-medium text-white shadow-sm transition-colors duration-200"
+                        class="flex-1 text-center"
                         @click="dismissPopup"
                     >
                         {{ t('home.blog_notification.discover_blog') }}
-                    </Link>
-                    <button
-                        class="no-glow px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors duration-200 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
-                        @click="dismissPopup"
-                    >
+                    </PopupButton>
+                    <PopupButton variant="ghost" @click="dismissPopup">
                         {{ t('home.blog_notification.dismiss') }}
-                    </button>
+                    </PopupButton>
                 </div>
             </div>
         </div>

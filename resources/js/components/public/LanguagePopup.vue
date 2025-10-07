@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import PopupButton from '@/components/public/Ui/Button/PopupButton.vue';
 import { usePage } from '@inertiajs/vue3';
 import axios from 'axios';
-import { Globe, X } from 'lucide-vue-next';
+import { Globe } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
 const page = usePage();
@@ -79,27 +80,14 @@ onMounted(() => {
                     <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">The website is also available in english, would you like to switch?</p>
 
                     <div class="flex gap-2">
-                        <button
-                            class="no-glow bg-atomic-tangerine-400 hover:bg-atomic-tangerine-500 rounded-md px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors duration-200"
-                            @click="acceptTranslation"
-                        >
+                        <PopupButton variant="primary" @click="acceptTranslation">
                             Yes, English
-                        </button>
-                        <button
-                            class="no-glow px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors duration-200 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
-                            @click="dismissPopup"
-                        >
+                        </PopupButton>
+                        <PopupButton variant="ghost" @click="dismissPopup">
                             No, thanks
-                        </button>
+                        </PopupButton>
                     </div>
                 </div>
-
-                <button
-                    class="no-glow hover:text-atomic-tangerine-600 dark:hover:text-atomic-tangerine-400 h-6 w-6 flex-shrink-0 text-gray-400 transition-colors duration-200"
-                    @click="dismissPopup"
-                >
-                    <X class="h-4 w-4" />
-                </button>
             </div>
         </div>
     </Transition>

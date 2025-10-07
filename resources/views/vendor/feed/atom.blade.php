@@ -39,7 +39,7 @@
                 {!! \Spatie\Feed\Helpers\Cdata::out($item->summary) !!}
             </summary>
             @if($item->__isset('enclosure'))
-                <link href="{{ url($item->enclosure) }}" length="{{ $item->enclosureLength }}"
+                <link rel="enclosure" href="{{ url($item->enclosure) }}" length="{{ $item->enclosureLength }}"
                       type="{{ $item->enclosureType }}" />
             @endif
             @foreach($item->category as $category)

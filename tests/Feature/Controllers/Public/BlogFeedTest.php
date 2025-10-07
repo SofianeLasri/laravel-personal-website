@@ -17,7 +17,7 @@ class BlogFeedTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Test that the RSS feed is accessible and returns valid XML
+     * Test that the Atom feed is accessible and returns valid XML
      */
     public function test_feed_is_accessible_and_returns_valid_xml(): void
     {
@@ -27,11 +27,11 @@ class BlogFeedTest extends TestCase
         $response = $this->get('/feed');
 
         $response->assertStatus(200);
-        // Accept both application/rss+xml and application/xml as valid content types
+        // Accept both application/atom+xml and application/xml as valid content types
         $contentType = $response->headers->get('Content-Type');
         $this->assertTrue(
-            str_contains($contentType, 'application/xml') || str_contains($contentType, 'application/rss+xml'),
-            "Expected XML content type, got: {$contentType}"
+            str_contains($contentType, 'application/xml') || str_contains($contentType, 'application/atom+xml'),
+            "Expected Atom XML content type, got: {$contentType}"
         );
 
         // Verify that the response is valid XML
@@ -64,14 +64,14 @@ class BlogFeedTest extends TestCase
         $xml = simplexml_load_string($response->content());
         $this->assertNotFalse($xml);
 
-        // Get all items from the feed
-        $items = $xml->channel->item;
-        $this->assertCount(3, $items);
+        // Get all entries from the Atom feed
+        $entries = $xml->entry;
+        $this->assertCount(3, $entries);
 
         // Verify order (newest first)
-        $this->assertStringContainsString('Latest Post', (string) $items[0]->title);
-        $this->assertStringContainsString('New Post', (string) $items[1]->title);
-        $this->assertStringContainsString('Old Post', (string) $items[2]->title);
+        $this->assertStringContainsString('Latest Post', (string) $entries[0]->title);
+        $this->assertStringContainsString('New Post', (string) $entries[1]->title);
+        $this->assertStringContainsString('Old Post', (string) $entries[2]->title);
     }
 
     /**
@@ -85,10 +85,10 @@ class BlogFeedTest extends TestCase
 
         $xml = simplexml_load_string($response->content());
 
-        // Verify channel metadata
-        $this->assertStringContainsString('Blog', (string) $xml->channel->title);
-        $this->assertStringContainsString('articles de blog', (string) $xml->channel->description);
-        $this->assertEquals('fr-FR', (string) $xml->channel->language);
+        // Verify feed metadata (Atom uses <title> and <subtitle> instead of channel)
+        $this->assertStringContainsString('Blog', (string) $xml->title);
+        $this->assertStringContainsString('articles de blog', (string) $xml->subtitle);
+        $this->assertEquals('fr-FR', (string) $xml->attributes('xml', true)->lang);
     }
 
     /**
@@ -101,15 +101,19 @@ class BlogFeedTest extends TestCase
         $response = $this->get('/feed');
 
         $xml = simplexml_load_string($response->content());
-        $item = $xml->channel->item[0];
+        $entry = $xml->entry[0];
 
-        // Verify item contains required fields
-        $this->assertNotEmpty((string) $item->title);
-        $this->assertStringContainsString('Test Post Title', (string) $item->title);
-        $this->assertNotEmpty((string) $item->link);
-        $this->assertStringContainsString('/blog/articles/test-post', (string) $item->link);
-        $this->assertNotEmpty((string) $item->description);
-        $this->assertNotEmpty((string) $item->pubDate);
+        // Verify entry contains required fields
+        $this->assertNotEmpty((string) $entry->title);
+        $this->assertStringContainsString('Test Post Title', (string) $entry->title);
+
+        // In Atom, link is an attribute
+        $link = $entry->link[0];
+        $this->assertNotEmpty((string) $link['href']);
+        $this->assertStringContainsString('/blog/articles/test-post', (string) $link['href']);
+
+        $this->assertNotEmpty((string) $entry->summary);
+        $this->assertNotEmpty((string) $entry->updated);
     }
 
     /**
@@ -125,7 +129,7 @@ class BlogFeedTest extends TestCase
 
         $xml = simplexml_load_string($response->content());
         $this->assertNotFalse($xml);
-        $this->assertCount(1, $xml->channel->item);
+        $this->assertCount(1, $xml->entry);
     }
 
     /**
@@ -139,7 +143,7 @@ class BlogFeedTest extends TestCase
 
         $xml = simplexml_load_string($response->content());
         $this->assertNotFalse($xml);
-        $this->assertCount(0, $xml->channel->item);
+        $this->assertCount(0, $xml->entry);
     }
 
     /**
@@ -160,7 +164,7 @@ class BlogFeedTest extends TestCase
 
         $xml = simplexml_load_string($response->content());
         $this->assertNotFalse($xml);
-        $this->assertCount(50, $xml->channel->item);
+        $this->assertCount(50, $xml->entry);
     }
 
     /**
@@ -181,21 +185,30 @@ class BlogFeedTest extends TestCase
         $xml = simplexml_load_string($response->content());
         $this->assertNotFalse($xml, 'Response is not valid XML');
 
-        // Get the first item
-        $item = $xml->channel->item[0];
+        // Get the first entry
+        $entry = $xml->entry[0];
 
-        // Verify enclosure tag exists
-        $this->assertNotEmpty($item->enclosure, 'Enclosure tag should be present');
+        // In Atom, enclosure is a <link> element with rel="enclosure"
+        // Find the link with rel="enclosure"
+        $enclosureLink = null;
+        foreach ($entry->link as $link) {
+            if ((string) $link['rel'] === 'enclosure') {
+                $enclosureLink = $link;
+                break;
+            }
+        }
+
+        // Verify enclosure link exists
+        $this->assertNotNull($enclosureLink, 'Enclosure link should be present');
 
         // Verify enclosure attributes
-        $enclosure = $item->enclosure;
-        $this->assertNotEmpty((string) $enclosure['url'], 'Enclosure URL should not be empty');
-        $this->assertNotEmpty((string) $enclosure['type'], 'Enclosure type should not be empty');
-        $this->assertEquals('image/jpeg', (string) $enclosure['type'], 'Enclosure type should be image/jpeg');
-        $this->assertGreaterThan(0, (int) $enclosure['length'], 'Enclosure length should be greater than 0');
+        $this->assertNotEmpty((string) $enclosureLink['href'], 'Enclosure href should not be empty');
+        $this->assertNotEmpty((string) $enclosureLink['type'], 'Enclosure type should not be empty');
+        $this->assertEquals('image/jpeg', (string) $enclosureLink['type'], 'Enclosure type should be image/jpeg');
+        $this->assertGreaterThan(0, (int) $enclosureLink['length'], 'Enclosure length should be greater than 0');
 
         // Verify the URL contains the full variant
-        $url = (string) $enclosure['url'];
+        $url = (string) $enclosureLink['href'];
         $this->assertStringContainsString('/storage/', $url, 'URL should contain storage path');
     }
 
@@ -217,11 +230,20 @@ class BlogFeedTest extends TestCase
         $xml = simplexml_load_string($response->content());
         $this->assertNotFalse($xml, 'Response is not valid XML');
 
-        // Get the first item
-        $item = $xml->channel->item[0];
+        // Get the first entry
+        $entry = $xml->entry[0];
 
-        // Verify enclosure tag does NOT exist
-        $this->assertEmpty($item->enclosure, 'Enclosure tag should not be present when no optimized variants exist');
+        // In Atom, check that no link with rel="enclosure" exists
+        $hasEnclosure = false;
+        foreach ($entry->link as $link) {
+            if ((string) $link['rel'] === 'enclosure') {
+                $hasEnclosure = true;
+                break;
+            }
+        }
+
+        // Verify enclosure link does NOT exist
+        $this->assertFalse($hasEnclosure, 'Enclosure link should not be present when no optimized variants exist');
     }
 
     /**

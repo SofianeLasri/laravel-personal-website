@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BarStaggeredRegular from '@/components/font-awesome/BarStaggeredRegular.vue';
 import MagnifyingGlassRegular from '@/components/font-awesome/MagnifyingGlassRegular.vue';
+import LanguageToggle from '@/components/public/LanguageToggle.vue';
 import NavBrand from '@/components/public/Navbar/NavBrand.vue';
 import NavMenuItem from '@/components/public/Navbar/NavMenuItem.vue';
 import NavSearchBar from '@/components/public/Navbar/NavSearchBar.vue';
@@ -249,11 +250,17 @@ onUnmounted(() => {
                             </div>
                         </template>
 
-                        <!-- Theme Toggle Section -->
+                        <!-- Theme and Language Section -->
                         <div class="mt-8 pl-12">
-                            <div class="flex items-center gap-4">
-                                <span class="text-lg text-gray-600 dark:text-gray-400">{{ t('navigation.theme') || 'Theme' }}</span>
-                                <ThemeToggle />
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-lg text-gray-600 dark:text-gray-400">{{ t('navigation.theme') }}</span>
+                                    <ThemeToggle />
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="text-lg text-gray-600 dark:text-gray-400">{{ t('navigation.language') }}</span>
+                                    <LanguageToggle />
+                                </div>
                             </div>
                         </div>
                     </div>

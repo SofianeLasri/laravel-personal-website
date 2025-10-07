@@ -41,7 +41,7 @@ onMounted(() => {
 <template>
     <div class="space-y-4">
         <!-- Galerie PhotoSwipe - Structure simplifiée -->
-        <div :id="galleryId" class="grid w-full gap-4" :class="[pictures.length === 1 ? 'grid-cols-1' : gridClasses]">
+        <div :id="galleryId" class="w-full gap-4" :class="[pictures.length === 1 ? 'flex justify-center' : 'grid ' + gridClasses]">
             <a
                 v-for="picture in pictures"
                 :key="picture.id"
@@ -51,17 +51,16 @@ onMounted(() => {
                 :data-pswp-caption="picture.caption"
                 target="_blank"
                 class="group relative block overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] focus:ring-2"
-                :class="[pictures.length === 1 ? 'w-full' : 'aspect-square']"
+                :class="[pictures.length === 1 ? 'max-w-full min-w-[300px] sm:min-w-[400px]' : 'aspect-square']"
             >
-                <picture class="h-full w-full">
+                <picture :class="[pictures.length === 1 ? 'block' : 'h-full w-full']">
                     <source :srcset="pictures.length === 1 ? picture.avif.large : picture.avif.medium" type="image/avif" />
                     <source :srcset="pictures.length === 1 ? picture.webp.large : picture.webp.medium" type="image/webp" />
                     <img
                         :src="pictures.length === 1 ? picture.webp.large : picture.webp.medium"
                         :alt="picture.caption"
                         loading="lazy"
-                        class="object-cover"
-                        :class="[pictures.length === 1 ? 'h-auto w-full' : 'h-full w-full']"
+                        :class="[pictures.length === 1 ? 'h-auto w-auto max-w-full' : 'h-full w-full object-cover']"
                     />
                 </picture>
 

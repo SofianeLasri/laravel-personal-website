@@ -72,12 +72,7 @@ class BlogPostEditTest extends DuskTestCase
         $this->assertEquals('Article de test', $frenchTitle);
     }
 
-    // TODO: À corriger - Le contenu markdown est écrasé par la factory
-    // Problème: Quand on crée un BlogContentMarkdown via l'API, la factory génère automatiquement
-    // du texte Lorem Ipsum via TranslationKey::withTranslations(). L'événement input déclenché
-    // par JavaScript ne semble pas remplacer correctement ce contenu.
-    // Pour l'instant, ce test est commenté mais le test principal (test_can_create_new_blog_post_draft) fonctionne.
-    /*public function test_can_add_markdown_content_to_draft(): void
+    public function test_can_add_markdown_content_to_draft(): void
     {
         $user = User::factory()->create();
         $category = BlogCategory::factory()->withNames(['fr' => 'Technologie', 'en' => 'Technology'])->create();
@@ -104,14 +99,20 @@ class BlogPostEditTest extends DuskTestCase
                 // Add markdown content
                 ->assertVisible('[data-testid="content-builder"]')
                 ->click('[data-testid="add-text-button"]')
-                ->pause(2000); // Wait for content block to be added
+                ->pause(2000)
+                // Wait for textarea and fill it with JavaScript to properly trigger Vue events
+                ->waitFor('[data-slot="textarea"]', 10);
 
-            // Target the textarea using JavaScript (testid is dynamic: markdown-textarea-{id})
+            // Use JavaScript to set value and trigger proper Vue events
             $browser->script("
-                const textarea = document.querySelector('[data-testid^=\"markdown-textarea-\"]');
+                const textarea = document.querySelector('[data-slot=\"textarea\"]');
                 if (textarea) {
                     textarea.value = 'Test content';
-                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    textarea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                    textarea.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+                    textarea.blur();
+                    textarea.focus();
+                    textarea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
                 }
             ");
 
@@ -132,5 +133,5 @@ class BlogPostEditTest extends DuskTestCase
             'locale' => 'fr',
             'text' => 'Test content',
         ]);
-    }*/
+    }
 }

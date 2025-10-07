@@ -87,10 +87,10 @@ if (props.creation.screenshots.length > 0) {
             <LightShape class="absolute bottom-[40rem] left-[-27rem] xl:left-[-15rem]" />
         </div>
 
-        <div class="z-10 container mb-16 flex flex-col gap-16 px-4">
+        <div class="z-10 container mb-16 flex w-full min-w-0 flex-col gap-16 px-4">
             <ProjectHead :creation="creation" data-testid="project-head" />
 
-            <div ref="contentContainer" class="flex flex-col">
+            <div ref="contentContainer" class="flex w-full min-w-0 flex-col">
                 <HorizontalNavbar
                     v-model:active-item="activeSection"
                     :items="sections"
@@ -101,7 +101,7 @@ if (props.creation.screenshots.length > 0) {
                 />
 
                 <div class="content-sections mt-8" data-testid="project-content">
-                    <section id="description" class="flex flex-col" data-testid="description-section">
+                    <section id="description" class="flex w-full min-w-0 flex-col" data-testid="description-section">
                         <ContentSectionTitle>{{ t('project.description') }}</ContentSectionTitle>
                         <MarkdownViewer :source="creation.fullDescription" data-testid="project-description" />
                     </section>

@@ -315,7 +315,7 @@ body * {
 }
 
 @utility markdown-view {
-    @apply text-gray-800 dark:text-gray-300;
+    @apply min-w-0 w-full text-gray-800 dark:text-gray-300;
 
     /* Headings */
     & h1,
@@ -434,7 +434,7 @@ body * {
 
     /* Code blocks */
     & pre {
-        @apply relative my-4 max-w-full overflow-x-auto rounded-lg border border-gray-200 bg-gray-50;
+        @apply relative my-4 min-w-0 w-full overflow-x-auto rounded-lg border border-gray-200 bg-gray-50;
     }
 
     & pre code {

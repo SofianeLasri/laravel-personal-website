@@ -50,8 +50,8 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
             <LightShape class="absolute top-[80rem] left-[-27rem] xl:left-[-15rem]" />
         </div>
 
-        <div class="relative z-10 container flex flex-col items-center px-4 pt-16 pb-8">
-            <div class="flex max-w-5xl flex-col gap-8">
+        <div class="relative z-10 container flex w-full min-w-0 flex-col items-center px-4 pt-16 pb-8">
+            <div class="flex w-full min-w-0 max-w-5xl flex-col gap-8">
                 <div class="flex flex-col gap-2">
                     <!-- Category and Date -->
                     <div class="flex gap-4">
@@ -79,12 +79,12 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
                 </div>
 
                 <!-- Article Content -->
-                <div class="flex flex-col gap-8">
+                <div class="flex min-w-0 flex-col gap-8">
                     <template v-for="(content, index) in blogPost.contents" :key="content.id">
                         <!-- Markdown Content -->
                         <div
                             v-if="content.content_type === 'App\\Models\\BlogContentMarkdown' && content.markdown"
-                            :class="index === 0 ? 'first-paragraph-large' : ''"
+                            :class="['min-w-0', index === 0 ? 'first-paragraph-large' : '']"
                         >
                             <MarkdownViewer :source="content.markdown" />
                         </div>

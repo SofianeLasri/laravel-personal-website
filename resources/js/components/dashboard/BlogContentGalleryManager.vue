@@ -70,6 +70,7 @@ watch(
 
         if (shouldUpdateFromProps) {
             images.value = [...(newInitialImages || [])];
+            hasUnsavedChanges.value = false;
         }
     },
     { deep: true, immediate: true },

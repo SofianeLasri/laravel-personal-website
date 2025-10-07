@@ -67,9 +67,9 @@ onMounted(() => {
     >
         <div
             v-if="isVisible && shouldShowPopup"
-            class="fixed! right-4 bottom-4 z-50 max-w-sm rounded-lg border border-gray-200 bg-white p-4 shadow-xl backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900"
+            class="bg-action-container-outer-color action-container-outer-shadow action-container-outer-border action-container-background-blur fixed! right-4 bottom-4 z-50 max-w-sm rounded-3xl p-2"
         >
-            <div class="flex items-start gap-3">
+            <div class="action-container-inner-shadow flex items-start gap-3 rounded-2xl border bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
                 <div class="bg-atomic-tangerine-100 dark:bg-atomic-tangerine-900 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full">
                     <Globe class="text-atomic-tangerine-600 dark:text-atomic-tangerine-400 h-4 w-4" />
                 </div>

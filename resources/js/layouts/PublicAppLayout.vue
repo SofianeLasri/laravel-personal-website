@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BlogNotificationPopup from '@/components/public/BlogNotificationPopup.vue';
 import BorderGlow from '@/components/public/BorderGlow.vue';
 import DotMatrixMask from '@/components/public/DotMatrixMask.vue';
 import LanguagePopup from '@/components/public/LanguagePopup.vue';
@@ -22,6 +23,7 @@ withDefaults(defineProps<Props>(), {
         <Navbar />
         <slot />
         <LanguagePopup />
+        <BlogNotificationPopup />
     </div>
     <Footer :social-media-links="socialMediaLinks" />
 </template>

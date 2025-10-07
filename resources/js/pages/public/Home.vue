@@ -14,7 +14,7 @@ import LaravelLogo from '@/components/shapes/LaravelLogo.vue';
 import { useRoute } from '@/composables/useRoute';
 import { useTranslation } from '@/composables/useTranslation';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
-import { SocialMediaLink, SSRExperience, SSRSimplifiedCreation, SSRTechnologyExperience } from '@/types';
+import { SocialMediaLink, SSRBlogPost, SSRExperience, SSRSimplifiedCreation, SSRTechnologyExperience } from '@/types';
 import { Head, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
@@ -29,6 +29,7 @@ const props = defineProps<{
     laravelCreations: SSRSimplifiedCreation[];
     technologyExperiences: SSRTechnologyExperience[];
     experiences: SSRExperience[];
+    latestBlogPost: SSRBlogPost | null;
 }>();
 
 const pageTitle = 'Sofiane Lasri - Développeur Full Stack';

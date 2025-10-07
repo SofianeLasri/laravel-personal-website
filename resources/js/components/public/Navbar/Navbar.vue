@@ -178,7 +178,7 @@ onUnmounted(() => {
         >
             <div class="flex-grow-1 cursor-pointer" @click="closeMenu"></div>
             <div
-                class="bg-background motion-preset-slide-left flex h-screen w-full max-w-lg flex-shrink-0 flex-col items-start overflow-y-auto border-l py-16 pr-8 dark:border-gray-800 dark:bg-gray-900"
+                class="bg-background motion-preset-slide-left flex h-dvh w-full max-w-lg flex-shrink-0 flex-col items-start overflow-y-auto border-l py-16 pr-8 dark:border-gray-800 dark:bg-gray-900"
             >
                 <div class="flex w-full flex-col gap-12">
                     <div class="flex items-center justify-end gap-4">

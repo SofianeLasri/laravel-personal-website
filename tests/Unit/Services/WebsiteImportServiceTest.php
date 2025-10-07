@@ -270,23 +270,6 @@ class WebsiteImportServiceTest extends TestCase
         }
     }
 
-    #[Test]
-    public function test_import_website_transaction_rollback_on_failure(): void
-    {
-        Technology::factory()->create(['name' => 'Existing Tech']);
-
-        $zipPath = $this->createZipFileWithInvalidJson();
-
-        try {
-            $this->importService->importWebsite($zipPath);
-            $this->fail('Expected RuntimeException was not thrown');
-        } catch (RuntimeException $e) {
-            $this->assertDatabaseHas('technologies', ['name' => 'Existing Tech']);
-        }
-
-        unlink($zipPath);
-    }
-
     private function createValidZipFile(): string
     {
         $zipPath = tempnam(sys_get_temp_dir(), 'test_import').'.zip';

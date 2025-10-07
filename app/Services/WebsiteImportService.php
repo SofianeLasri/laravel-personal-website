@@ -104,7 +104,6 @@ class WebsiteImportService
         ];
 
         try {
-            DB::beginTransaction();
             $this->validateExportStructure($zip);
             $this->clearExistingData();
 
@@ -115,12 +114,10 @@ class WebsiteImportService
 
             $this->resetAutoIncrements();
 
-            DB::commit();
             $zip->close();
 
             return $stats;
         } catch (Exception|Throwable $e) {
-            DB::rollBack();
             $zip->close();
             Log::error('Import failed');
             Log::error($e->getMessage(), $e->getTrace());

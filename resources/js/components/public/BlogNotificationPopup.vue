@@ -20,13 +20,16 @@ const latestBlogPost = computed(() => (page.props.latestBlogPost as SSRBlogPost 
 
 const shouldShow = () => {
     if (typeof window === 'undefined') return false;
-    const dismissed = localStorage.getItem('blog_notification_dismissed');
-    return dismissed !== 'true' && latestBlogPost.value !== null;
+    if (latestBlogPost.value === null) return false;
+
+    const lastSeenSlug = localStorage.getItem('blog_notification_last_seen');
+    // Show if no slug stored yet, or if current slug is different from stored slug
+    return lastSeenSlug !== latestBlogPost.value.slug;
 };
 
 const dismissPopup = () => {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('blog_notification_dismissed', 'true');
+    if (typeof window !== 'undefined' && latestBlogPost.value) {
+        localStorage.setItem('blog_notification_last_seen', latestBlogPost.value.slug);
     }
     emit('dismiss');
 };

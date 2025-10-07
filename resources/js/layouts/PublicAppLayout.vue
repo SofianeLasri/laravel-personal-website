@@ -20,7 +20,6 @@ withDefaults(defineProps<Props>(), {
 
 const page = usePage();
 
-// Define shouldShow functions for each popup
 const languagePopupShouldShow = () => {
     if (typeof window === 'undefined') return false;
     const dismissed = localStorage.getItem('language_popup_dismissed');
@@ -31,9 +30,11 @@ const languagePopupShouldShow = () => {
 
 const blogPopupShouldShow = () => {
     if (typeof window === 'undefined') return false;
-    const dismissed = localStorage.getItem('blog_notification_dismissed');
-    const latestBlogPost = page.props.latestBlogPost;
-    return dismissed !== 'true' && latestBlogPost !== null && latestBlogPost !== undefined;
+    const latestBlogPost = page.props.latestBlogPost as any;
+    if (!latestBlogPost) return false;
+
+    const lastSeenSlug = localStorage.getItem('blog_notification_last_seen');
+    return lastSeenSlug !== latestBlogPost.slug;
 };
 
 // Configure popups in order

@@ -68,6 +68,11 @@ const { t } = useTranslation();
                                         t('footer.blog_latest')
                                     }}</Link>
                                 </li>
+                                <li class="mb-2 list-none">
+                                    <a href="/feed" :title="t('footer.blog_rss')" target="_blank" rel="noopener noreferrer">{{
+                                        t('footer.blog_rss')
+                                    }}</a>
+                                </li>
                             </ul>
                         </div>
 

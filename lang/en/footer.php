@@ -12,6 +12,7 @@ return [
     'blog_home' => 'Home',
     'blog_articles' => 'Articles',
     'blog_latest' => 'Latest article',
+    'blog_rss' => 'RSS Feed',
     'find_me' => 'Find me.',
     'sitemap' => 'Sitemap',
     'copyright' => '2025 - Sofiane Lasri-Trienpont, developed on Laravel.',

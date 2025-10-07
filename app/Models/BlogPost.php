@@ -118,17 +118,6 @@ class BlogPost extends Model implements Feedable
      */
 
     /**
-     * Scope a query to only include posts from a specific category.
-     *
-     * @param  Builder<BlogPost>  $query
-     * @return Builder<BlogPost>
-     */
-    public function scopeByCategory(Builder $query, int $categoryId): Builder
-    {
-        return $query->where('category_id', $categoryId);
-    }
-
-    /**
      * Scope a query to only include posts of a specific type.
      *
      * @param  Builder<BlogPost>  $query
@@ -165,11 +154,8 @@ class BlogPost extends Model implements Feedable
      */
     public function toFeedItem(): FeedItem
     {
-        $locale = app()->getLocale();
-        $fallbackLocale = config('app.fallback_locale', 'en');
-
         // Get translated title with fallback
-        $title = $this->getTranslation($this->titleTranslationKey, $locale, $fallbackLocale);
+        $title = $this->getTranslatedText($this->titleTranslationKey);
 
         // Extract excerpt from first markdown content
         $excerpt = $this->extractExcerpt();
@@ -186,7 +172,7 @@ class BlogPost extends Model implements Feedable
 
         // Add category
         if ($this->category) {
-            $categoryName = $this->getTranslation($this->category->nameTranslationKey, $locale, $fallbackLocale);
+            $categoryName = $this->getTranslatedText($this->category->nameTranslationKey);
             $feedItem->category($categoryName);
         }
 
@@ -220,13 +206,33 @@ class BlogPost extends Model implements Feedable
     }
 
     /**
+     * Get current locale and fallback locale
+     *
+     * @return array{locale: string, fallbackLocale: string}
+     */
+    private function getLocales(): array
+    {
+        return [
+            'locale' => app()->getLocale(),
+            'fallbackLocale' => config('app.fallback_locale', 'en'),
+        ];
+    }
+
+    /**
+     * Get translated text with automatic locale fallback
+     */
+    private function getTranslatedText(?TranslationKey $translationKey): string
+    {
+        $locales = $this->getLocales();
+
+        return $this->getTranslation($translationKey, $locales['locale'], $locales['fallbackLocale']);
+    }
+
+    /**
      * Extract excerpt from first markdown content
      */
     private function extractExcerpt(int $maxLength = 200): string
     {
-        $locale = app()->getLocale();
-        $fallbackLocale = config('app.fallback_locale', 'en');
-
         // Get first markdown content
         $firstTextContent = $this->contents
             ->where('content_type', BlogContentMarkdown::class)
@@ -249,7 +255,7 @@ class BlogPost extends Model implements Feedable
         }
 
         // Get text content with fallback
-        $text = $this->getTranslation($markdownContent->translationKey, $locale, $fallbackLocale);
+        $text = $this->getTranslatedText($markdownContent->translationKey);
 
         if (empty($text)) {
             return '';

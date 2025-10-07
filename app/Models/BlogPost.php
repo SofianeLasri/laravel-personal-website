@@ -129,6 +129,17 @@ class BlogPost extends Model implements Feedable
     }
 
     /**
+     * Scope a query to only include posts from a specific category.
+     *
+     * @param  Builder<BlogPost>  $query
+     * @return Builder<BlogPost>
+     */
+    public function scopeByCategory(Builder $query, int $categoryId): Builder
+    {
+        return $query->where('category_id', $categoryId);
+    }
+
+    /**
      * Get feed items for RSS feed
      *
      * @return Collection<int, static>

@@ -23,7 +23,7 @@ use Throwable;
 class BlogPostConversionService
 {
     public function __construct(
-        private BlogContentDuplicationService $contentDuplicationService
+        private readonly BlogContentDuplicationService $contentDuplicationService
     ) {}
 
     /**

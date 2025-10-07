@@ -6,6 +6,7 @@ use App\Models\ApiRequestLog;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class AiLogsAnalyzeCommand extends Command
@@ -65,13 +66,13 @@ class AiLogsAnalyzeCommand extends Command
         }
 
         // Status breakdown
-        /** @var \Illuminate\Support\Collection<int, object{status: string, count: int}> $statusBreakdown */
+        /** @var Collection<int, object{status: string, count: int}> $statusBreakdown */
         $statusBreakdown = $query->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->get();
 
         // Provider breakdown
-        /** @var \Illuminate\Support\Collection<int, object{provider: string, count: int}> $providerBreakdown */
+        /** @var Collection<int, object{provider: string, count: int}> $providerBreakdown */
         $providerBreakdown = $query->select('provider', DB::raw('count(*) as count'))
             ->groupBy('provider')
             ->get();
@@ -155,7 +156,7 @@ class AiLogsAnalyzeCommand extends Command
         );
 
         // Get top errors
-        /** @var \Illuminate\Support\Collection<int, object{error_message: string, count: int}> $errors */
+        /** @var Collection<int, object{error_message: string, count: int}> $errors */
         $errors = $query->where('status', 'error')
             ->select('error_message', DB::raw('count(*) as count'))
             ->whereNotNull('error_message')
@@ -179,7 +180,7 @@ class AiLogsAnalyzeCommand extends Command
         }
 
         // Daily breakdown
-        /** @var \Illuminate\Support\Collection<int, object{date: string, count: int, daily_cost: float|null}> $dailyBreakdown */
+        /** @var Collection<int, object{date: string, count: int, daily_cost: float|null}> $dailyBreakdown */
         $dailyBreakdown = $query->select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('count(*) as count'),

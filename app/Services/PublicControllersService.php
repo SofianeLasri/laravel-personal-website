@@ -6,6 +6,7 @@ use App\Enums\BlogPostType;
 use App\Enums\CategoryColor;
 use App\Enums\CreationType;
 use App\Enums\ExperienceType;
+use App\Enums\GameReviewRating;
 use App\Enums\TechnologyType;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
@@ -25,6 +26,7 @@ use App\Models\TechnologyExperience;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\Video;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -978,8 +980,8 @@ class PublicControllersService
         // Apply search filter
         if (! empty($filters['search'])) {
             $searchTerm = $filters['search'];
-            $query->whereHas('titleTranslationKey.translations', function (\Illuminate\Database\Eloquent\Builder $q) use ($searchTerm) {
-                /** @var \Illuminate\Database\Eloquent\Builder<Translation> $q */
+            $query->whereHas('titleTranslationKey.translations', function (Builder $q) use ($searchTerm) {
+                /** @var Builder<Translation> $q */
                 $q->where('text', 'like', '%'.$searchTerm.'%');
             });
         }
@@ -1085,7 +1087,7 @@ class PublicControllersService
      *     publishedAtFormatted: string,
      *     excerpt: string,
      *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
-     *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array|null, rating: \App\Enums\GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
+     *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
      * }|null
      */
     public function getBlogPostBySlug(string $slug): ?array

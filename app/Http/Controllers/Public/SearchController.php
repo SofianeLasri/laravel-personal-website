@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Cache;
 class SearchController extends Controller
 {
     public function __construct(
-        private PublicControllersService $publicControllersService
+        private readonly PublicControllersService $publicControllersService
     ) {}
 
     /**

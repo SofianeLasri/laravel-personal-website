@@ -6,6 +6,7 @@ use App\Jobs\PictureJob;
 use App\Models\OptimizedPicture;
 use App\Models\Picture;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class OptimizePicturesCommand extends Command
@@ -43,7 +44,7 @@ class OptimizePicturesCommand extends Command
         $chunkSize = max(1, (int) $this->option('chunk'));
 
         $pictureIdsToOptimize->chunk($chunkSize)->each(function ($ids) use ($bar) {
-            /** @var \Illuminate\Support\Collection<int, int|string> $ids */
+            /** @var Collection<int, int|string> $ids */
             foreach ($ids as $id) {
                 $picture = Picture::find($id);
                 if ($picture instanceof Picture) {

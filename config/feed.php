@@ -19,7 +19,7 @@ return [
             'url' => '/feed',
 
             'title' => config('app.name') . ' - Blog',
-            'description' => 'Derniers articles de blog de '.config('app.name'),
+            'description' => 'Derniers articles de blog',
             'language' => 'fr-FR',
 
             /*
@@ -32,12 +32,12 @@ return [
             /*
              * The format of the feed. Acceptable values are 'rss', 'atom', or 'json'.
              */
-            'format' => 'rss',
+            'format' => 'atom',
 
             /*
              * The view that will render the feed.
              */
-            'view' => 'feed::rss',
+            'view' => 'feed::atom',
 
             /*
              * The mime type to be used in the <link> tag. Set to an empty string to automatically

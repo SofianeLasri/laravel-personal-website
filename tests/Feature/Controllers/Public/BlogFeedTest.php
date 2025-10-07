@@ -164,9 +164,78 @@ class BlogFeedTest extends TestCase
     }
 
     /**
+     * Test that feed item contains enclosure when cover image has optimized variants
+     */
+    public function test_feed_item_contains_enclosure_when_cover_image_has_optimized_variants(): void
+    {
+        // Create a blog post with cover image and optimized variants
+        $coverPicture = Picture::factory()->withOptimizedPictures()->create();
+
+        // Create the blog post with this cover picture
+        $blogPost = $this->createBlogPostWithCustomCoverPicture('test-with-enclosure', 'Post With Enclosure', $coverPicture);
+
+        $response = $this->get('/feed');
+
+        $response->assertStatus(200);
+
+        $xml = simplexml_load_string($response->content());
+        $this->assertNotFalse($xml, 'Response is not valid XML');
+
+        // Get the first item
+        $item = $xml->channel->item[0];
+
+        // Verify enclosure tag exists
+        $this->assertNotEmpty($item->enclosure, 'Enclosure tag should be present');
+
+        // Verify enclosure attributes
+        $enclosure = $item->enclosure;
+        $this->assertNotEmpty((string) $enclosure['url'], 'Enclosure URL should not be empty');
+        $this->assertNotEmpty((string) $enclosure['type'], 'Enclosure type should not be empty');
+        $this->assertEquals('image/jpeg', (string) $enclosure['type'], 'Enclosure type should be image/jpeg');
+        $this->assertGreaterThan(0, (int) $enclosure['length'], 'Enclosure length should be greater than 0');
+
+        // Verify the URL contains the full variant
+        $url = (string) $enclosure['url'];
+        $this->assertStringContainsString('/storage/', $url, 'URL should contain storage path');
+    }
+
+    /**
+     * Test that feed item does not contain enclosure when cover image has no optimized variants
+     */
+    public function test_feed_item_does_not_contain_enclosure_when_cover_image_has_no_optimized_variants(): void
+    {
+        // Create a blog post with cover image but NO optimized variants
+        $coverPicture = Picture::factory()->create();
+
+        // Create the blog post with this cover picture
+        $blogPost = $this->createBlogPostWithCustomCoverPicture('test-without-enclosure', 'Post Without Enclosure', $coverPicture);
+
+        $response = $this->get('/feed');
+
+        $response->assertStatus(200);
+
+        $xml = simplexml_load_string($response->content());
+        $this->assertNotFalse($xml, 'Response is not valid XML');
+
+        // Get the first item
+        $item = $xml->channel->item[0];
+
+        // Verify enclosure tag does NOT exist
+        $this->assertEmpty($item->enclosure, 'Enclosure tag should not be present when no optimized variants exist');
+    }
+
+    /**
+     * Helper method to create a blog post with a custom cover picture
+     */
+    private function createBlogPostWithCustomCoverPicture(string $slug, string $title, Picture $coverPicture): BlogPost
+    {
+        return $this->createBlogPost($slug, $title, true, $coverPicture);
+    }
+
+    /**
      * Helper method to create a blog post with all necessary relationships
      */
-    private function createBlogPost(string $slug = 'test-post', string $title = 'Test Post', bool $withCoverImage = true): BlogPost
+    private function createBlogPost(string $slug = 'test-post', string $title = 'Test Post', bool $withCoverImage = true, ?Picture $customCoverPicture = null): BlogPost
     {
         // Create category
         $categoryNameKey = TranslationKey::factory()->create();
@@ -200,7 +269,9 @@ class BlogFeedTest extends TestCase
 
         // Create cover picture if needed
         $coverPicture = null;
-        if ($withCoverImage) {
+        if ($customCoverPicture) {
+            $coverPicture = $customCoverPicture;
+        } elseif ($withCoverImage) {
             $coverPicture = Picture::factory()->create();
         }
 
@@ -240,6 +311,7 @@ class BlogFeedTest extends TestCase
             'titleTranslationKey.translations',
             'category.nameTranslationKey.translations',
             'coverPicture',
+            'coverPicture.optimizedPictures',
             'contents.content.translationKey.translations',
         ]);
     }

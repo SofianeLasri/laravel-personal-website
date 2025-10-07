@@ -50,7 +50,7 @@ onMounted(() => {
                 :data-pswp-height="picture.height"
                 :data-pswp-caption="picture.caption"
                 target="_blank"
-                class="group relative block overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] focus:ring-2"
+                class="group relative block overflow-hidden rounded-2xl bg-white shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] focus:ring-2"
                 :class="[pictures.length === 1 ? 'max-w-full min-w-[300px] sm:min-w-[400px]' : 'aspect-square']"
             >
                 <picture :class="[pictures.length === 1 ? 'block' : 'h-full w-full']">

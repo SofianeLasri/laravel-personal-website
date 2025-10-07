@@ -10,6 +10,7 @@ use App\Models\Technology;
 use App\Services\WebsiteExportService;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -365,6 +366,10 @@ class DataManagementControllerExportTest extends TestCase
         // Create a test file
         Storage::put($filePath, 'test zip content');
 
+        // Fix the time to avoid race condition
+        $fixedTime = Carbon::now();
+        Carbon::setTestNow($fixedTime);
+
         // Set cache to indicate completed export
         Cache::put($cacheKey, [
             'status' => 'completed',
@@ -377,7 +382,10 @@ class DataManagementControllerExportTest extends TestCase
 
         $response->assertSuccessful();
         $response->assertHeader('content-type', 'application/zip');
-        $response->assertDownload("website-export-{$requestId}-".now()->format('Y-m-d_H-i-s').'.zip');
+        $response->assertDownload("website-export-{$requestId}-".$fixedTime->format('Y-m-d_H-i-s').'.zip');
+
+        // Reset time
+        Carbon::setTestNow(null);
     }
 
     #[Test]

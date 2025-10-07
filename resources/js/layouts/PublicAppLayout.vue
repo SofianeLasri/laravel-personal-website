@@ -7,7 +7,7 @@ import Navbar from '@/components/public/Navbar/Navbar.vue';
 import PopupCarousel from '@/components/public/PopupCarousel.vue';
 import Footer from '@/components/public/Ui/Footer.vue';
 import { SocialMediaLink } from '@/types';
-import { usePage } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 interface Props {
@@ -53,6 +53,9 @@ const popups = computed(() => [
 </script>
 
 <template>
+    <Head>
+        <link rel="alternate" type="application/atom+xml" :href="route('feeds.blog')">
+    </Head>
     <div class="dots-background dark:bg-gray-990 relative flex min-h-screen flex-col items-center">
         <DotMatrixMask />
         <BorderGlow />

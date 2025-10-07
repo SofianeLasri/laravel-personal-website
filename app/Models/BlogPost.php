@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Spatie\Feed\Feedable;
+use Spatie\Feed\FeedItem;
 
 /**
  * @property int $id
@@ -34,7 +36,7 @@ use Illuminate\Support\Carbon;
  * @property-read BlogPostDraft|null $draft
  * @property-read GameReview|null $gameReview
  */
-class BlogPost extends Model
+class BlogPost extends Model implements Feedable
 {
     /** @use HasFactory<BlogPostFactory> */
     use HasFactory;
@@ -116,6 +118,17 @@ class BlogPost extends Model
      */
 
     /**
+     * Scope a query to only include posts of a specific type.
+     *
+     * @param  Builder<BlogPost>  $query
+     * @return Builder<BlogPost>
+     */
+    public function scopeByType(Builder $query, string $type): Builder
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
      * Scope a query to only include posts from a specific category.
      *
      * @param  Builder<BlogPost>  $query
@@ -127,13 +140,151 @@ class BlogPost extends Model
     }
 
     /**
-     * Scope a query to only include posts of a specific type.
+     * Get feed items for RSS feed
      *
-     * @param  Builder<BlogPost>  $query
-     * @return Builder<BlogPost>
+     * @return Collection<int, static>
      */
-    public function scopeByType(Builder $query, string $type): Builder
+    public static function getFeedItems(): Collection
     {
-        return $query->where('type', $type);
+        return static::with([
+            'titleTranslationKey.translations',
+            'category.nameTranslationKey.translations',
+            'coverPicture',
+            'contents' => function ($query) {
+                $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
+            },
+            'contents.content.translationKey.translations',
+        ])
+            ->orderBy('created_at', 'desc')
+            ->limit(50) // Limit to 50 most recent posts
+            ->get();
+    }
+
+    /**
+     * Convert blog post to feed item
+     */
+    public function toFeedItem(): FeedItem
+    {
+        // Get translated title with fallback
+        $title = $this->getTranslatedText($this->titleTranslationKey);
+
+        // Extract excerpt from first markdown content
+        $excerpt = $this->extractExcerpt();
+
+        // Generate feed item
+        $feedItem = FeedItem::create()
+            ->id($this->id)
+            ->title($title)
+            ->summary($excerpt)
+            ->updated($this->updated_at ?? $this->created_at ?? now())
+            ->link(route('public.blog.post', ['slug' => $this->slug]))
+            ->authorName("Sofiane Lasri")
+            ->authorEmail("sofianelasri@sl-projects.com");
+
+        // Add category
+        $categoryName = $this->getTranslatedText($this->category->nameTranslationKey);
+        $feedItem->category($categoryName);
+
+        return $feedItem;
+    }
+
+    /**
+     * Get translation with fallback
+     */
+    private function getTranslation(?TranslationKey $translationKey, string $locale, string $fallbackLocale): string
+    {
+        if (! $translationKey) {
+            return '';
+        }
+
+        // Try current locale first
+        $translation = $translationKey->translations
+            ->where('locale', $locale)
+            ->first();
+
+        if ($translation && ! empty($translation->text)) {
+            return $translation->text;
+        }
+
+        // Fallback to fallback locale
+        $translation = $translationKey->translations
+            ->where('locale', $fallbackLocale)
+            ->first();
+
+        return $translation ? $translation->text : '';
+    }
+
+    /**
+     * Get current locale and fallback locale
+     *
+     * @return array{locale: string, fallbackLocale: string}
+     */
+    private function getLocales(): array
+    {
+        return [
+            'locale' => app()->getLocale(),
+            'fallbackLocale' => config('app.fallback_locale', 'en'),
+        ];
+    }
+
+    /**
+     * Get translated text with automatic locale fallback
+     */
+    private function getTranslatedText(?TranslationKey $translationKey): string
+    {
+        $locales = $this->getLocales();
+
+        return $this->getTranslation($translationKey, $locales['locale'], $locales['fallbackLocale']);
+    }
+
+    /**
+     * Extract excerpt from first markdown content
+     */
+    private function extractExcerpt(int $maxLength = 200): string
+    {
+        // Get first markdown content
+        $firstTextContent = $this->contents
+            ->where('content_type', BlogContentMarkdown::class)
+            ->sortBy('order')
+            ->first();
+
+        // @phpstan-ignore booleanNot.alwaysFalse
+        if (! $firstTextContent || ! $firstTextContent->content) {
+            return '';
+        }
+
+        $markdownContent = $firstTextContent->content;
+
+        // Ensure content is BlogContentMarkdown and has translation key
+        if (! ($markdownContent instanceof BlogContentMarkdown)) {
+            return '';
+        }
+
+        // Get text content with fallback
+        $text = $this->getTranslatedText($markdownContent->translationKey);
+
+        if (empty($text)) {
+            return '';
+        }
+
+        // Remove markdown formatting
+        $plainText = strip_tags(str_replace(['#', '*', '_', '`'], '', $text));
+
+        // Clean up whitespace
+        $plainText = preg_replace('/\s+/', ' ', trim($plainText)) ?? '';
+
+        if (strlen($plainText) <= $maxLength) {
+            return $plainText;
+        }
+
+        // Truncate at word boundary
+        $truncated = substr($plainText, 0, $maxLength);
+        $lastSpace = strrpos($truncated, ' ');
+
+        if ($lastSpace !== false) {
+            $truncated = substr($truncated, 0, $lastSpace);
+        }
+
+        return $truncated.'...';
     }
 }

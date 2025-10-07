@@ -12,6 +12,7 @@ return [
     'blog_home' => 'Accueil',
     'blog_articles' => 'Articles',
     'blog_latest' => 'Dernier article',
+    'blog_rss' => 'Flux RSS',
     'find_me' => 'Me retrouver.',
     'sitemap' => 'Plan du site',
     'copyright' => '2025 - Sofiane Lasri-Trienpont, développé sur Laravel.',

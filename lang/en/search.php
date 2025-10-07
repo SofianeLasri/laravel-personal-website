@@ -13,6 +13,8 @@ return [
     'clear' => 'Clear',
     'tags' => 'Tags',
     'technologies' => 'Technologies',
+    'categories' => 'Categories',
+    'blog_types' => 'Article types',
     'see_less' => 'See less',
     'see_all' => 'See all',
     'show_less' => 'Show less',
@@ -37,4 +39,5 @@ return [
 
     // Project alt text
     'project_logo_alt' => 'Logo of :name',
+    'blog_post_alt' => 'Cover image of :title',
 ];

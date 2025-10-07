@@ -540,4 +540,28 @@ interface SSRBlogCategory {
     color: string;
 }
 
+// Search-related types
+interface BlogCategoryFilter {
+    id: number;
+    name: string;
+    slug: string;
+    color: string;
+}
+
+interface BlogTypeFilter {
+    value: string;
+    label: string;
+    icon: string;
+}
+
+type SSRSearchResultCreation = SSRSimplifiedCreation & {
+    resultType: 'creation';
+};
+
+type SSRSearchResultBlogPost = SSRBlogPost & {
+    resultType: 'blogPost';
+};
+
+type SSRSearchResult = SSRSearchResultCreation | SSRSearchResultBlogPost;
+
 export type BreadcrumbItemType = BreadcrumbItem;

@@ -561,7 +561,7 @@ class PublicControllersService
      * @param  \Illuminate\Database\Eloquent\Collection<int, Translation>  $translations  Collection of translations
      * @return string The translation text or empty string if not found
      */
-    private function getTranslationWithFallback(\Illuminate\Database\Eloquent\Collection $translations): string
+    public function getTranslationWithFallback(\Illuminate\Database\Eloquent\Collection $translations): string
     {
         $translation = $translations->where('locale', $this->locale)->first();
         if ($translation && isset($translation->text)) {

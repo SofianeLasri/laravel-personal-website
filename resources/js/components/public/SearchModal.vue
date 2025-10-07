@@ -21,14 +21,20 @@ const {
     searchQuery,
     selectedTags,
     selectedTechnologies,
+    selectedCategories,
+    selectedTypes,
     searchResults,
     availableTags,
     availableTechnologies,
+    availableCategories,
+    availableTypes,
     isLoading,
     hasActiveFilters,
     loadFilters,
     toggleTag,
     toggleTechnology,
+    toggleCategory,
+    toggleType,
     clearFilters,
     resetSearch,
 } = useSearch();
@@ -116,10 +122,16 @@ onUnmounted(() => {
                             <SearchFilters
                                 :available-tags="availableTags"
                                 :available-technologies="availableTechnologies"
+                                :available-categories="availableCategories"
+                                :available-types="availableTypes"
                                 :selected-tags="selectedTags"
                                 :selected-technologies="selectedTechnologies"
+                                :selected-categories="selectedCategories"
+                                :selected-types="selectedTypes"
                                 @toggle-tag="toggleTag"
                                 @toggle-technology="toggleTechnology"
+                                @toggle-category="toggleCategory"
+                                @toggle-type="toggleType"
                                 @clear="clearFilters"
                             />
                         </div>

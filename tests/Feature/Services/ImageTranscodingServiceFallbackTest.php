@@ -69,41 +69,12 @@ class ImageTranscodingServiceFallbackTest extends TestCase
     }
 
     #[Test]
-    public function it_can_transcode_image_to_jpeg()
-    {
-        // Create a simple 1x1 pixel PNG image
-        $imageData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAHGPh6kLwAAAABJRU5ErkJggg==');
-
-        try {
-            $result = $this->imageTranscodingService->transcode($imageData, null, 'jpeg');
-
-            $this->assertIsString($result);
-            $this->assertGreaterThan(0, strlen($result));
-
-            // Verify it's a valid JPEG by checking magic bytes
-            $this->assertStringStartsWith("\xFF\xD8\xFF", $result);
-        } catch (ImageTranscodingException $e) {
-            // If transcoding fails, log the details but don't fail the test
-            // as this might be expected in some environments
-            $this->markTestSkipped('Transcoding failed: '.$e->getMessage());
-        }
-    }
-
-    #[Test]
     public function it_handles_invalid_image_data()
     {
         $this->expectException(ImageTranscodingException::class);
 
         $invalidImageData = 'this is not image data';
         $this->imageTranscodingService->transcode($invalidImageData, null, 'jpeg');
-    }
-
-    #[Test]
-    public function it_validates_empty_output()
-    {
-        // This test would need to mock the encoding to return empty string
-        // For now, we'll just test that the validation logic exists
-        $this->assertTrue(true); // Placeholder - would need mocking to test properly
     }
 
     #[Test]

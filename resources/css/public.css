@@ -386,6 +386,8 @@ body * {
     & a {
         color: var(--color-design-system-primary);
         @apply underline;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     /* Paragraphs */

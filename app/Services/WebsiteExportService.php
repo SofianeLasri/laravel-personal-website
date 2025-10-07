@@ -37,6 +37,12 @@ class WebsiteExportService
         'certifications',
         'experiences',
 
+        // Blog tables (reference tables)
+        'blog_categories',
+        'blog_content_markdown',
+        'blog_content_galleries',
+        'blog_content_videos',
+
         // Content tables (depend on reference tables)
         'translations',
         'creations',
@@ -45,6 +51,12 @@ class WebsiteExportService
         'creation_drafts',
         'creation_draft_features',
         'creation_draft_screenshots',
+
+        // Blog content tables
+        'blog_posts',
+        'blog_post_drafts',
+        'blog_post_contents',
+        'blog_post_draft_contents',
 
         // Pivot tables (depend on all other tables)
         'creation_technology',
@@ -55,6 +67,7 @@ class WebsiteExportService
         'creation_draft_person',
         'creation_draft_tag',
         'creation_draft_video',
+        'blog_content_gallery_pictures',
 
         // Metadata tables
         'user_agent_metadata',

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Exception;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -37,6 +38,12 @@ class WebsiteImportService
         'certifications',
         'experiences',
 
+        // Blog tables (reference tables)
+        'blog_categories',
+        'blog_content_markdown',
+        'blog_content_galleries',
+        'blog_content_videos',
+
         // Content tables (depend on reference tables)
         'translations',
         'creations',
@@ -45,6 +52,12 @@ class WebsiteImportService
         'creation_drafts',
         'creation_draft_features',
         'creation_draft_screenshots',
+
+        // Blog content tables
+        'blog_posts',
+        'blog_post_drafts',
+        'blog_post_contents',
+        'blog_post_draft_contents',
 
         // Pivot tables (depend on all other tables)
         'creation_technology',
@@ -55,6 +68,7 @@ class WebsiteImportService
         'creation_draft_person',
         'creation_draft_tag',
         'creation_draft_video',
+        'blog_content_gallery_pictures',
 
         // Metadata tables
         'user_agent_metadata',
@@ -240,13 +254,17 @@ class WebsiteImportService
     private function importFiles(ZipArchive $zip): int
     {
         $publicDisk = Storage::disk('public');
+        $localDisk = Storage::disk('local');
         $filesImported = 0;
 
-        // Clear existing files
+        // Clear existing files from public disk
         $existingFiles = $publicDisk->allFiles('');
         foreach ($existingFiles as $file) {
             $publicDisk->delete($file);
         }
+
+        // Clear existing files from local disk (temp exports, etc.)
+        $this->clearLocalDiskFiles($localDisk);
 
         // Import files from ZIP
         for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -273,6 +291,29 @@ class WebsiteImportService
         }
 
         return $filesImported;
+    }
+
+    /**
+     * Clear all files from the local disk (temp exports and other temporary files).
+     */
+    private function clearLocalDiskFiles(Filesystem $localDisk): void
+    {
+        // Clear temp directory (where exports are stored)
+        if ($localDisk->exists('temp')) {
+            $tempFiles = $localDisk->allFiles('temp');
+            foreach ($tempFiles as $file) {
+                $localDisk->delete($file);
+            }
+        }
+
+        // Clear any other temporary files
+        $allFiles = $localDisk->allFiles('');
+        foreach ($allFiles as $file) {
+            // Skip essential directories/files
+            if (! str_starts_with($file, '.gitignore') && ! str_starts_with($file, 'framework/')) {
+                $localDisk->delete($file);
+            }
+        }
     }
 
     /**

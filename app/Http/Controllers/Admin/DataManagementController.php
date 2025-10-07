@@ -9,6 +9,7 @@ use App\Services\WebsiteImportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -36,6 +37,7 @@ class DataManagementController extends Controller
         return Inertia::render('dashboard/DataManagement', [
             'exportTables' => $this->exportService->getExportTables(),
             'importTables' => $this->importService->getImportTables(),
+            'isProduction' => app()->environment('production'),
         ]);
     }
 
@@ -186,10 +188,27 @@ class DataManagementController extends Controller
      */
     public function import(Request $request): JsonResponse
     {
-        $request->validate([
+        $validationRules = [
             'file_path' => 'required|string',
             'confirm_import' => 'required|boolean|accepted',
-        ]);
+        ];
+
+        // Require password in production environment
+        if (app()->environment('production')) {
+            $validationRules['password'] = 'required|string';
+        }
+
+        $request->validate($validationRules);
+
+        // Verify password in production
+        if (app()->environment('production')) {
+            $user = $request->user();
+            if (! $user || ! Hash::check($request->input('password'), $user->password)) {
+                return response()->json([
+                    'message' => 'Invalid password',
+                ], ResponseAlias::HTTP_UNAUTHORIZED);
+            }
+        }
 
         $filePath = $request->input('file_path');
         $fullPath = Storage::path($filePath);

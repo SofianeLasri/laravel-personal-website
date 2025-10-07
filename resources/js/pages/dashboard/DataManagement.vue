@@ -192,7 +192,10 @@ const initiateImport = () => {
         showPasswordModal.value = true;
     } else {
         // In development, proceed directly
-        handleImport();
+        handleImport().catch((err: unknown) => {
+            error.value = 'An unexpected error occurred during import.';
+            console.error('Import error:', err);
+        });
     }
 };
 
@@ -546,9 +549,7 @@ onUnmounted(() => {
                         <Alert variant="destructive">
                             <AlertTriangle class="h-4 w-4" />
                             <AlertTitle>Warning</AlertTitle>
-                            <AlertDescription>
-                                This action will completely replace all existing data. This cannot be undone.
-                            </AlertDescription>
+                            <AlertDescription> This action will completely replace all existing data. This cannot be undone. </AlertDescription>
                         </Alert>
 
                         <div class="space-y-2">

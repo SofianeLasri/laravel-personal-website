@@ -98,6 +98,10 @@ const contentListRef = ref<HTMLElement | null>(null);
 // Refs for gallery managers
 const galleryRefs = ref<Record<number, InstanceType<typeof BlogContentGalleryManager>>>({});
 
+// Optimistic UI: Track pending (temporary) blocks
+const pendingBlocks = ref<Set<string>>(new Set());
+const generateTempId = () => `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
 // Cache local pour les contenus en cours d'édition
 const contentCache = ref<Record<number, string>>({});
 const savingStatus = ref<Record<number, 'idle' | 'saving' | 'saved' | 'error'>>({});
@@ -178,7 +182,37 @@ const contentTypes = [
 
 const addContent = async (type: string) => {
     try {
-        // First, ensure all galleries are saved
+        // Optimistic UI for galleries: create temporary block immediately
+        if (type === 'gallery') {
+            const tempId = generateTempId();
+            const tempBlock: BlogContent = {
+                id: tempId as any, // Temporary string ID
+                content_type: 'App\\Models\\BlogContentGallery',
+                content_id: -1, // Negative ID indicates temporary
+                order: localContents.value.length + 1,
+                content: {
+                    id: -1,
+                    pictures: [],
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                },
+            };
+
+            // Add to UI immediately (optimistic)
+            localContents.value.push(tempBlock);
+            pendingBlocks.value.add(tempId);
+            toast.success('Bloc de contenu ajouté');
+
+            // Create real gallery in background (non-blocking)
+            void createGalleryInBackground(tempId, tempBlock);
+
+            return; // Exit immediately, don't wait for API
+        }
+
+        // For markdown and video, keep the original blocking behavior
+        // (these are already fast, no need for optimistic UI)
+
+        // First, ensure all galleries are saved (only for non-gallery types)
         const galleriesSaved = await saveAllGalleries();
         if (!galleriesSaved) {
             toast.error("Veuillez sauvegarder les galeries avant d'ajouter un nouveau bloc");
@@ -193,17 +227,6 @@ const addContent = async (type: string) => {
             // Create a new markdown content
             const response = await axios.post(route('dashboard.api.blog-content-markdown.store'), {
                 content: '',
-                locale: props.locale,
-            });
-            contentId = response.data.id;
-            newContent = response.data;
-        } else if (type === 'gallery') {
-            // Create a new gallery content
-            const response = await axios.post(route('dashboard.api.blog-content-gallery.store'), {
-                layout: 'grid',
-                columns: 2,
-                picture_ids: [],
-                captions: [],
                 locale: props.locale,
             });
             contentId = response.data.id;
@@ -264,6 +287,56 @@ const addContent = async (type: string) => {
         } else {
             toast.error("Erreur lors de l'ajout du contenu");
         }
+    }
+};
+
+// Optimistic UI: Create gallery in background without blocking UI
+const createGalleryInBackground = async (tempId: string, tempBlock: BlogContent) => {
+    try {
+        // Step 1: Save all existing galleries (non-blocking for UI)
+        await saveAllGalleries();
+
+        // Step 2: Create the real gallery via API
+        const galleryResponse = await axios.post(route('dashboard.api.blog-content-gallery.store'), {
+            layout: 'grid',
+            columns: 2,
+            picture_ids: [],
+            captions: [],
+            locale: props.locale,
+        });
+
+        const realGalleryId = galleryResponse.data.id;
+
+        // Step 3: Link gallery to draft
+        const linkResponse = await axios.post(route('dashboard.api.blog-post-draft-contents.store'), {
+            blog_post_draft_id: props.draftId,
+            content_type: 'App\\Models\\BlogContentGallery',
+            content_id: realGalleryId,
+            order: tempBlock.order,
+        });
+
+        // Step 4: Replace temporary block with real block
+        const index = localContents.value.findIndex((b) => b.id === tempId);
+        if (index !== -1) {
+            localContents.value[index] = {
+                ...linkResponse.data,
+                content: galleryResponse.data,
+            };
+        }
+
+        // Remove from pending blocks
+        pendingBlocks.value.delete(tempId);
+    } catch (error) {
+        console.error('Erreur lors de la création de la galerie:', error);
+
+        // On error, remove the temporary block
+        const index = localContents.value.findIndex((b) => b.id === tempId);
+        if (index !== -1) {
+            localContents.value.splice(index, 1);
+        }
+        pendingBlocks.value.delete(tempId);
+
+        toast.error('Erreur lors de la création de la galerie');
     }
 };
 
@@ -613,7 +686,26 @@ defineExpose({
 
                     <!-- Gallery Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'gallery'" class="space-y-2">
+                        <!-- Loading state for temporary galleries -->
+                        <div
+                            v-if="typeof content.id === 'string' && pendingBlocks.has(content.id)"
+                            class="rounded-lg border-2 border-dashed border-blue-300 bg-blue-50 p-6 text-center dark:border-blue-700 dark:bg-blue-950/30"
+                            data-status="creating"
+                        >
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="h-8 w-8 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+                                <div>
+                                    <p class="text-sm font-medium text-blue-900 dark:text-blue-100">Création de la galerie...</p>
+                                    <p class="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                                        Vous pourrez ajouter des images dans quelques secondes
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Real gallery component (only shown when ready) -->
                         <BlogContentGalleryManager
+                            v-else
                             :ref="
                                 (el: InstanceType<typeof BlogContentGalleryManager> | null) => {
                                     if (el) galleryRefs[content.content_id] = el;
@@ -622,6 +714,7 @@ defineExpose({
                             :gallery-id="content.content_id"
                             :initial-images="transformGalleryImages(content.content)"
                             :locale="locale"
+                            data-status="ready"
                             @update:images="(images) => updateGalleryComplete(content.content_id, images)"
                         />
                     </div>

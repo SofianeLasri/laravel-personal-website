@@ -134,4 +134,138 @@ class BlogPostEditTest extends DuskTestCase
             'text' => 'Test content',
         ]);
     }
+
+    /**
+     * Helper method to create a temporary 1x1 pixel PNG image for testing uploads
+     */
+    private function createTestImage(string $filename = 'test-image.png'): string
+    {
+        $tempDir = sys_get_temp_dir();
+        $filepath = $tempDir.'/'.$filename;
+
+        // Create a 1x1 pixel transparent PNG
+        $image = imagecreatetruecolor(1, 1);
+        imagesavealpha($image, true);
+        $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
+        imagefill($image, 0, 0, $transparent);
+        imagepng($image, $filepath);
+        imagedestroy($image);
+
+        return $filepath;
+    }
+
+    public function test_debug_gallery_addition(): void
+    {
+        $user = User::factory()->create();
+        $category = BlogCategory::factory()->withNames(['fr' => 'Technologie', 'en' => 'Technology'])->create();
+
+        $this->browse(function (Browser $browser) use ($user, $category) {
+            $browser->loginAs($user)
+                ->visit('/dashboard/blog-posts/edit')
+                ->waitFor('[data-testid="blog-form"]')
+                ->type('[data-testid="blog-title-input"]', 'Article Debug Galerie')
+                ->pause(1000)
+                ->clear('slug')
+                ->type('slug', 'article-debug-galerie')
+                ->pause(500)
+                ->click('[data-testid="blog-category-select"]')
+                ->pause(1000)
+                ->click('[data-slot="select-item"]')
+                ->pause(1000)
+                ->press('Sauvegarder le brouillon')
+                ->waitForText('Brouillon créé avec succès', 10)
+                ->waitFor('[data-testid="content-builder"]', 10);
+
+            // Check if gallery button exists
+            $hasGalleryButton = $browser->script("
+                return !!document.querySelector('[data-testid=\"add-gallery-button\"]');
+            ");
+            dump('Gallery button exists:', $hasGalleryButton);
+
+            $browser->assertVisible('[data-testid="add-gallery-button"]')
+                ->click('[data-testid="add-gallery-button"]')
+                ->pause(5000) // Long pause to see what happens
+                ->screenshot('after-gallery-button-click');
+
+            // Check database for gallery creation
+            $draft = \App\Models\BlogPostDraft::where('slug', 'article-debug-galerie')->first();
+            if ($draft) {
+                $contents = $draft->contents;
+                dump('Contents count:', $contents->count());
+                foreach ($contents as $content) {
+                    dump('Content type:', $content->content_type);
+                }
+            }
+
+            // Check DOM for gallery manager
+            $hasGalleryManager = $browser->script("
+                return !!document.querySelector('[data-testid=\"gallery-manager\"]');
+            ");
+            dump('Gallery manager exists:', $hasGalleryManager);
+        });
+    }
+
+    public function test_can_add_gallery_with_single_image_without_caption(): void
+    {
+        $user = User::factory()->create();
+        $category = BlogCategory::factory()->withNames(['fr' => 'Technologie', 'en' => 'Technology'])->create();
+
+        // Create a test image
+        $imagePath = $this->createTestImage('gallery-test-1.png');
+
+        $this->browse(function (Browser $browser) use ($user, $category, $imagePath) {
+            $browser->loginAs($user)
+                ->visit('/dashboard/blog-posts/edit')
+                ->waitFor('[data-testid="blog-form"]')
+                // Fill in basic blog post info and save draft
+                ->type('[data-testid="blog-title-input"]', 'Article avec Galerie')
+                ->pause(1000)
+                ->clear('slug')
+                ->type('slug', 'article-galerie-test')
+                ->pause(500)
+                ->click('[data-testid="blog-category-select"]')
+                ->pause(1000)
+                ->click('[data-slot="select-item"]')
+                ->pause(1000)
+                ->press('Sauvegarder le brouillon')
+                ->waitForText('Brouillon créé avec succès', 10)
+                ->waitFor('[data-testid="content-builder"]', 10)
+                // Add gallery content
+                ->assertVisible('[data-testid="content-builder"]')
+                ->click('[data-testid="add-gallery-button"]')
+                ->pause(2000)
+                // Wait for gallery component to load
+                ->waitFor('[data-testid="gallery-manager"]', 10)
+                ->assertVisible('[data-testid="gallery-upload-zone"]')
+                // Upload image using attach method
+                ->attach('[data-testid="gallery-file-input"]', $imagePath)
+                ->pause(3000) // Wait for upload to complete
+                // Wait for auto-save (1s debounce + margin)
+                ->pause(3000)
+                ->screenshot('gallery-single-image-no-caption');
+        });
+
+        // Cleanup
+        @unlink($imagePath);
+
+        // Verify the content was saved to database
+        $draft = \App\Models\BlogPostDraft::where('slug', 'article-galerie-test')->first();
+        $this->assertNotNull($draft);
+
+        // Verify gallery content was created
+        $galleryContent = $draft->contents()
+            ->where('content_type', 'App\Models\BlogContentGallery')
+            ->first();
+        $this->assertNotNull($galleryContent);
+
+        // Verify the gallery has 1 image
+        $gallery = $galleryContent->content;
+        $this->assertNotNull($gallery);
+        $this->assertCount(1, $gallery->pictures);
+
+        // Verify the image has no caption
+        $pivot = $gallery->pictures->first()->pivot;
+        $this->assertNull($pivot->caption_translation_key_id);
+        $this->assertEquals(1, $pivot->order);
+    }
 }

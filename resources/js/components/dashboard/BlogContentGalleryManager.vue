@@ -303,10 +303,11 @@ defineExpose({
 </script>
 
 <template>
-    <div class="space-y-4">
+    <div class="space-y-4" data-testid="gallery-manager">
         <!-- Upload Zone -->
         <div
             class="rounded-lg border-2 border-dashed p-6 text-center transition-colors"
+            data-testid="gallery-upload-zone"
             :class="[
                 uploading
                     ? 'border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-950/30'
@@ -315,7 +316,15 @@ defineExpose({
             @drop="handleDrop"
             @dragover="handleDragOver"
         >
-            <input ref="fileInput" type="file" multiple accept="image/*" class="hidden" @change="handleFileUpload" />
+            <input
+                ref="fileInput"
+                type="file"
+                multiple
+                accept="image/*"
+                class="hidden"
+                data-testid="gallery-file-input"
+                @change="handleFileUpload"
+            />
 
             <div class="flex flex-col items-center gap-2">
                 <Upload class="h-8 w-8 text-gray-400" />
@@ -361,6 +370,7 @@ defineExpose({
                     <button
                         type="button"
                         class="absolute top-2 right-2 rounded bg-red-500 p-1 text-white opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                        data-testid="gallery-remove-image-button"
                         @click="removeImage(index)"
                     >
                         <Trash2 class="h-4 w-4" />
@@ -390,6 +400,7 @@ defineExpose({
                             :value="image.caption"
                             placeholder="Ajoutez une description pour cette image..."
                             class="min-h-[40px] resize-none text-sm"
+                            :data-testid="`gallery-image-caption-${index}`"
                             @input="(e: Event) => updateCaption(index, (e.target as HTMLTextAreaElement).value)"
                         />
                     </div>

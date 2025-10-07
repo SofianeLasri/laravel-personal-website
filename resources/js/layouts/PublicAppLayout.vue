@@ -4,8 +4,11 @@ import BorderGlow from '@/components/public/BorderGlow.vue';
 import DotMatrixMask from '@/components/public/DotMatrixMask.vue';
 import LanguagePopup from '@/components/public/LanguagePopup.vue';
 import Navbar from '@/components/public/Navbar/Navbar.vue';
+import PopupCarousel from '@/components/public/PopupCarousel.vue';
 import Footer from '@/components/public/Ui/Footer.vue';
 import { SocialMediaLink } from '@/types';
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 interface Props {
     socialMediaLinks: SocialMediaLink[];
@@ -14,6 +17,38 @@ interface Props {
 withDefaults(defineProps<Props>(), {
     socialMediaLinks: () => [],
 });
+
+const page = usePage();
+
+// Define shouldShow functions for each popup
+const languagePopupShouldShow = () => {
+    if (typeof window === 'undefined') return false;
+    const dismissed = localStorage.getItem('language_popup_dismissed');
+    const browserLanguage = page.props.browserLanguage as string | null;
+    const locale = (page.props.locale as string) || 'fr';
+    return dismissed !== 'true' && browserLanguage !== null && browserLanguage !== 'fr' && locale === 'fr';
+};
+
+const blogPopupShouldShow = () => {
+    if (typeof window === 'undefined') return false;
+    const dismissed = localStorage.getItem('blog_notification_dismissed');
+    const latestBlogPost = page.props.latestBlogPost;
+    return dismissed !== 'true' && latestBlogPost !== null && latestBlogPost !== undefined;
+};
+
+// Configure popups in order
+const popups = computed(() => [
+    {
+        id: 'language',
+        component: LanguagePopup,
+        shouldShow: languagePopupShouldShow,
+    },
+    {
+        id: 'blog',
+        component: BlogNotificationPopup,
+        shouldShow: blogPopupShouldShow,
+    },
+]);
 </script>
 
 <template>
@@ -22,8 +57,7 @@ withDefaults(defineProps<Props>(), {
         <BorderGlow />
         <Navbar />
         <slot />
-        <LanguagePopup />
-        <BlogNotificationPopup />
+        <PopupCarousel :popups="popups" />
     </div>
     <Footer :social-media-links="socialMediaLinks" />
 </template>

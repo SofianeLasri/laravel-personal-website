@@ -195,6 +195,9 @@ const removeImage = (index: number) => {
 
 const updateCaption = (index: number, caption: string) => {
     images.value[index].caption = caption;
+
+    // Auto-save after caption change
+    autoSaveGallery();
 };
 
 const saveChanges = async () => {

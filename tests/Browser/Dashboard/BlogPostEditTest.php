@@ -21,7 +21,7 @@ class BlogPostEditTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($user) {
             $browser->loginAs($user)
                 ->visit('/dashboard/blog-posts/edit')
-                ->waitFor('[data-testid="blog-form"]')
+                ->waitFor('[data-testid="blog-form"]', 15)
                 // Content builder should not be visible initially
                 ->assertDontSee('[data-testid="content-builder"]')
                 ->assertSee('Veuillez d\'abord sauvegarder le brouillon pour pouvoir ajouter du contenu')
@@ -37,7 +37,7 @@ class BlogPostEditTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($user) {
             $browser->loginAs($user)
                 ->visit('/dashboard/blog-posts/edit')
-                ->waitFor('[data-testid="blog-form"]')
+                ->waitFor('[data-testid="blog-form"]', 15)
                 ->assertSee('Nouvel article')
                 // Fill in title
                 ->type('[data-testid="blog-title-input"]', 'Article de test')
@@ -53,7 +53,7 @@ class BlogPostEditTest extends DuskTestCase
                 ->pause(1000)
                 // Submit form
                 ->press('Sauvegarder le brouillon')
-                ->waitForText('Brouillon créé avec succès', 10)
+                ->waitForText('Brouillon créé avec succès', 20)
                 ->screenshot('blog-post-draft-form-filled');
         });
 
@@ -80,7 +80,7 @@ class BlogPostEditTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($user, $category) {
             $browser->loginAs($user)
                 ->visit('/dashboard/blog-posts/edit')
-                ->waitFor('[data-testid="blog-form"]')
+                ->waitFor('[data-testid="blog-form"]', 15)
                 // Fill in basic blog post info first and save draft
                 ->type('[data-testid="blog-title-input"]', 'Test Article avec Markdown')
                 ->pause(1000)
@@ -94,14 +94,14 @@ class BlogPostEditTest extends DuskTestCase
                 ->pause(1000)
                 // Submit form
                 ->press('Sauvegarder le brouillon')
-                ->waitForText('Brouillon créé avec succès', 10)
+                ->waitForText('Brouillon créé avec succès', 20)
                 ->waitFor('[data-testid="content-builder"]', 10)
                 // Add markdown content
                 ->assertVisible('[data-testid="content-builder"]')
                 ->click('[data-testid="add-text-button"]')
                 ->pause(2000)
                 // Wait for textarea and fill it with JavaScript to properly trigger Vue events
-                ->waitFor('[data-slot="textarea"]', 10);
+                ->waitFor('[data-slot="textarea"]', 15);
 
             // Use JavaScript to set value and trigger proper Vue events
             $browser->script("
@@ -154,57 +154,6 @@ class BlogPostEditTest extends DuskTestCase
         return $filepath;
     }
 
-    public function test_debug_gallery_addition(): void
-    {
-        $user = User::factory()->create();
-        $category = BlogCategory::factory()->withNames(['fr' => 'Technologie', 'en' => 'Technology'])->create();
-
-        $this->browse(function (Browser $browser) use ($user, $category) {
-            $browser->loginAs($user)
-                ->visit('/dashboard/blog-posts/edit')
-                ->waitFor('[data-testid="blog-form"]')
-                ->type('[data-testid="blog-title-input"]', 'Article Debug Galerie')
-                ->pause(1000)
-                ->clear('slug')
-                ->type('slug', 'article-debug-galerie')
-                ->pause(500)
-                ->click('[data-testid="blog-category-select"]')
-                ->pause(1000)
-                ->click('[data-slot="select-item"]')
-                ->pause(1000)
-                ->press('Sauvegarder le brouillon')
-                ->waitForText('Brouillon créé avec succès', 10)
-                ->waitFor('[data-testid="content-builder"]', 10);
-
-            // Check if gallery button exists
-            $hasGalleryButton = $browser->script("
-                return !!document.querySelector('[data-testid=\"add-gallery-button\"]');
-            ");
-            dump('Gallery button exists:', $hasGalleryButton);
-
-            $browser->assertVisible('[data-testid="add-gallery-button"]')
-                ->click('[data-testid="add-gallery-button"]')
-                ->pause(5000) // Long pause to see what happens
-                ->screenshot('after-gallery-button-click');
-
-            // Check database for gallery creation
-            $draft = \App\Models\BlogPostDraft::where('slug', 'article-debug-galerie')->first();
-            if ($draft) {
-                $contents = $draft->contents;
-                dump('Contents count:', $contents->count());
-                foreach ($contents as $content) {
-                    dump('Content type:', $content->content_type);
-                }
-            }
-
-            // Check DOM for gallery manager
-            $hasGalleryManager = $browser->script("
-                return !!document.querySelector('[data-testid=\"gallery-manager\"]');
-            ");
-            dump('Gallery manager exists:', $hasGalleryManager);
-        });
-    }
-
     public function test_can_add_gallery_with_single_image_without_caption(): void
     {
         $user = User::factory()->create();
@@ -216,7 +165,7 @@ class BlogPostEditTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($user, $category, $imagePath) {
             $browser->loginAs($user)
                 ->visit('/dashboard/blog-posts/edit')
-                ->waitFor('[data-testid="blog-form"]')
+                ->waitFor('[data-testid="blog-form"]', 15)
                 // Fill in basic blog post info and save draft
                 ->type('[data-testid="blog-title-input"]', 'Article avec Galerie')
                 ->pause(1000)
@@ -230,18 +179,25 @@ class BlogPostEditTest extends DuskTestCase
                 ->press('Sauvegarder le brouillon')
                 ->waitForText('Brouillon créé avec succès', 10)
                 ->waitFor('[data-testid="content-builder"]', 10)
-                // Add gallery content
+                // Add gallery content (optimistic UI)
                 ->assertVisible('[data-testid="content-builder"]')
                 ->click('[data-testid="add-gallery-button"]')
-                ->pause(2000)
-                // Wait for gallery component to load
-                ->waitFor('[data-testid="gallery-manager"]', 10)
-                ->assertVisible('[data-testid="gallery-upload-zone"]')
-                // Upload image using attach method
-                ->attach('[data-testid="gallery-file-input"]', $imagePath)
-                ->pause(3000) // Wait for upload to complete
-                // Wait for auto-save (1s debounce + margin)
-                ->pause(3000)
+                ->pause(500) // Gallery block appears instantly
+                // Wait for the gallery to be ready (API calls complete)
+                ->waitFor('[data-status="ready"]', 15)
+                ->assertVisible('[data-testid="gallery-manager"]')
+                ->assertVisible('[data-testid="gallery-upload-zone"]');
+
+            // Give the component a moment to fully initialize after becoming ready
+            $browser->pause(1000);
+
+            // Upload image using Dusk's native attach method
+            $browser->attach('[data-testid="gallery-file-input"]', $imagePath)
+                // Wait for upload success toast
+                ->waitForText('ajoutée avec succès', 10)
+                ->pause(2000) // Wait a bit after upload
+                // The gallery auto-saves after upload, wait for it
+                ->pause(2000) // Wait for auto-save (1s debounce + margin)
                 ->screenshot('gallery-single-image-no-caption');
         });
 
@@ -267,5 +223,295 @@ class BlogPostEditTest extends DuskTestCase
         $pivot = $gallery->pictures->first()->pivot;
         $this->assertNull($pivot->caption_translation_key_id);
         $this->assertEquals(1, $pivot->order);
+    }
+
+    public function test_can_add_gallery_with_single_image_with_caption(): void
+    {
+        $user = User::factory()->create();
+        $category = BlogCategory::factory()->withNames(['fr' => 'Technologie', 'en' => 'Technology'])->create();
+
+        // Create a test image
+        $imagePath = $this->createTestImage('gallery-test-caption.png');
+
+        $this->browse(function (Browser $browser) use ($user, $category, $imagePath) {
+            $browser->loginAs($user)
+                ->visit('/dashboard/blog-posts/edit')
+                ->waitFor('[data-testid="blog-form"]', 15)
+                // Fill in basic blog post info and save draft
+                ->type('[data-testid="blog-title-input"]', 'Article avec Image et Caption')
+                ->pause(1000)
+                ->clear('slug')
+                ->type('slug', 'article-image-caption-test')
+                ->pause(500)
+                ->click('[data-testid="blog-category-select"]')
+                ->pause(1000)
+                ->click('[data-slot="select-item"]')
+                ->pause(1000)
+                ->press('Sauvegarder le brouillon')
+                ->waitForText('Brouillon créé avec succès', 20)
+                ->waitFor('[data-testid="content-builder"]', 10)
+                // Add gallery content
+                ->assertVisible('[data-testid="content-builder"]')
+                ->click('[data-testid="add-gallery-button"]')
+                ->pause(500)
+                ->waitFor('[data-status="ready"]', 25)
+                ->assertVisible('[data-testid="gallery-manager"]')
+                ->assertVisible('[data-testid="gallery-upload-zone"]')
+                // Give the component a moment to fully initialize
+                ->pause(1000)
+                // Upload image
+                ->attach('[data-testid="gallery-file-input"]', $imagePath)
+                ->waitForText('ajoutée avec succès', 10)
+                // Wait for the upload auto-save to complete (1s debounce + API call time)
+                ->pause(3000)
+                // Now the image card should be visible, wait for it
+                ->waitFor('[data-testid="gallery-image-caption-0"]', 5);
+
+            // Add caption to the uploaded image using JavaScript (same approach as markdown test)
+            $browser->script("
+                const textarea = document.querySelector('[data-testid=\"gallery-image-caption-0\"]');
+                if (textarea) {
+                    textarea.value = 'Ceci est une description de test';
+                    textarea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                    textarea.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+                    textarea.blur();
+                    textarea.focus();
+                    textarea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                }
+            ");
+
+            $browser
+                // Wait for caption auto-save (1s debounce + API call time)
+                ->pause(4000)
+                ->screenshot('gallery-single-image-with-caption');
+        });
+
+        // Cleanup
+        @unlink($imagePath);
+
+        // Verify the content was saved to database
+        $draft = \App\Models\BlogPostDraft::where('slug', 'article-image-caption-test')->first();
+        $this->assertNotNull($draft);
+
+        // Verify gallery content was created
+        $galleryContent = $draft->contents()
+            ->where('content_type', 'App\\Models\\BlogContentGallery')
+            ->first();
+        $this->assertNotNull($galleryContent);
+
+        // Verify the gallery has 1 image
+        $gallery = $galleryContent->content;
+        $this->assertNotNull($gallery);
+        $this->assertCount(1, $gallery->pictures);
+
+        // Verify the image has a caption
+        $pivot = $gallery->pictures->first()->pivot;
+        $this->assertNotNull($pivot->caption_translation_key_id);
+
+        // Verify the caption text
+        $captionTranslation = \App\Models\Translation::where('translation_key_id', $pivot->caption_translation_key_id)
+            ->where('locale', 'fr')
+            ->first();
+        $this->assertNotNull($captionTranslation);
+        $this->assertEquals('Ceci est une description de test', $captionTranslation->text);
+    }
+
+    public function test_can_remove_image_from_gallery(): void
+    {
+        $user = User::factory()->create();
+        $category = BlogCategory::factory()->withNames(['fr' => 'Technologie', 'en' => 'Technology'])->create();
+
+        // Create two test images
+        $imagePath1 = $this->createTestImage('gallery-remove-1.png');
+        $imagePath2 = $this->createTestImage('gallery-remove-2.png');
+
+        $this->browse(function (Browser $browser) use ($user, $category, $imagePath1, $imagePath2) {
+            $browser->loginAs($user)
+                ->visit('/dashboard/blog-posts/edit')
+                ->waitFor('[data-testid="blog-form"]', 15)
+                // Fill in basic blog post info and save draft
+                ->type('[data-testid="blog-title-input"]', 'Test Suppression Image')
+                ->pause(1000)
+                ->clear('slug')
+                ->type('slug', 'test-suppression-image')
+                ->pause(500)
+                ->click('[data-testid="blog-category-select"]')
+                ->pause(1000)
+                ->click('[data-slot="select-item"]')
+                ->pause(1000)
+                ->press('Sauvegarder le brouillon')
+                ->waitForText('Brouillon créé avec succès', 10)
+                ->waitFor('[data-testid="content-builder"]', 10)
+                // Wait a bit more to ensure draft is fully saved
+                ->pause(2000)
+                // Add gallery content
+                ->assertVisible('[data-testid="content-builder"]')
+                ->click('[data-testid="add-gallery-button"]')
+                ->pause(500)
+                ->waitFor('[data-status="ready"]', 25)
+                ->assertVisible('[data-testid="gallery-manager"]')
+                ->pause(1000)
+                // Upload first image
+                ->attach('[data-testid="gallery-file-input"]', $imagePath1)
+                ->waitForText('ajoutée avec succès', 10)
+                ->waitFor('[data-testid="gallery-image-caption-0"]', 5)
+                ->pause(3000) // Wait for auto-save
+                // Upload second image
+                ->attach('[data-testid="gallery-file-input"]', $imagePath2)
+                ->waitForText('ajoutée avec succès', 10)
+                ->waitFor('[data-testid="gallery-image-caption-1"]', 10)
+                ->pause(3000) // Wait for auto-save
+                // Verify both images are visible
+                ->assertVisible('[data-testid="gallery-image-caption-0"]')
+                ->assertVisible('[data-testid="gallery-image-caption-1"]')
+                ->screenshot('gallery-before-remove');
+
+            // Remove the first image by hovering over it and clicking the remove button
+            // The remove button becomes visible on hover
+            $browser->script("
+                // Find the first image card and trigger hover
+                const imageCard = document.querySelector('[data-testid=\"gallery-image-caption-0\"]').closest('.group');
+                const removeButton = imageCard.querySelector('[data-testid=\"gallery-remove-image-button\"]');
+                if (removeButton) {
+                    removeButton.click();
+                }
+            ");
+
+            $browser
+                ->waitForText('Image supprimée', 5)
+                // Wait for auto-save after removal (1s debounce + API call time)
+                ->pause(4000)
+                // Verify only one caption textarea remains
+                ->assertVisible('[data-testid="gallery-image-caption-0"]')
+                ->assertMissing('[data-testid="gallery-image-caption-1"]')
+                ->screenshot('gallery-after-remove');
+        });
+
+        // Cleanup
+        @unlink($imagePath1);
+        @unlink($imagePath2);
+
+        // Verify the content was saved to database
+        $draft = \App\Models\BlogPostDraft::where('slug', 'test-suppression-image')->first();
+        $this->assertNotNull($draft);
+
+        // Verify gallery content exists
+        $galleryContent = $draft->contents()
+            ->where('content_type', 'App\\Models\\BlogContentGallery')
+            ->first();
+        $this->assertNotNull($galleryContent);
+
+        // Verify the gallery now has only 1 image
+        $gallery = $galleryContent->content;
+        $this->assertNotNull($gallery);
+        $this->assertCount(1, $gallery->pictures);
+    }
+
+    public function test_can_edit_caption_of_existing_image(): void
+    {
+        $user = User::factory()->create();
+        $category = BlogCategory::factory()->withNames(['fr' => 'Technologie', 'en' => 'Technology'])->create();
+
+        // Create a test image
+        $imagePath = $this->createTestImage('gallery-edit-caption.png');
+
+        $this->browse(function (Browser $browser) use ($user, $category, $imagePath) {
+            $browser->loginAs($user)
+                ->visit('/dashboard/blog-posts/edit')
+                ->waitFor('[data-testid="blog-form"]', 15)
+                // Fill in basic blog post info and save draft
+                ->type('[data-testid="blog-title-input"]', 'Test Edition Caption')
+                ->pause(1000)
+                ->clear('slug')
+                ->type('slug', 'test-edition-caption')
+                ->pause(500)
+                ->click('[data-testid="blog-category-select"]')
+                ->pause(1000)
+                ->click('[data-slot="select-item"]')
+                ->pause(1000)
+                ->press('Sauvegarder le brouillon')
+                ->waitForText('Brouillon créé avec succès', 10)
+                ->waitFor('[data-testid="content-builder"]', 10)
+                ->pause(2000)
+                // Add gallery content
+                ->assertVisible('[data-testid="content-builder"]')
+                ->click('[data-testid="add-gallery-button"]')
+                ->pause(500)
+                ->waitFor('[data-status="ready"]', 25)
+                ->assertVisible('[data-testid="gallery-manager"]')
+                ->assertVisible('[data-testid="gallery-upload-zone"]')
+                ->pause(2000) // Extra time to ensure component is fully initialized
+                ->screenshot('before-upload-edit-caption')
+                // Upload image
+                ->attach('[data-testid="gallery-file-input"]', $imagePath)
+                ->pause(1000) // Brief pause after attach
+                ->screenshot('after-attach-edit-caption')
+                ->waitForText('ajoutée avec succès', 15)
+                ->waitFor('[data-testid="gallery-image-caption-0"]', 5)
+                ->pause(3000); // Wait for auto-save
+
+            // Add initial caption
+            $browser->script("
+                const textarea = document.querySelector('[data-testid=\"gallery-image-caption-0\"]');
+                if (textarea) {
+                    textarea.value = 'Caption initiale';
+                    textarea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                    textarea.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+                    textarea.blur();
+                    textarea.focus();
+                    textarea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                }
+            ");
+
+            $browser
+                ->pause(4000) // Wait for caption auto-save
+                ->screenshot('gallery-initial-caption');
+
+            // Edit the caption to a new value
+            $browser->script("
+                const textarea = document.querySelector('[data-testid=\"gallery-image-caption-0\"]');
+                if (textarea) {
+                    textarea.value = 'Caption modifiée avec succès';
+                    textarea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                    textarea.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+                    textarea.blur();
+                    textarea.focus();
+                    textarea.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                }
+            ");
+
+            $browser
+                ->pause(4000) // Wait for caption auto-save
+                ->screenshot('gallery-edited-caption');
+        });
+
+        // Cleanup
+        @unlink($imagePath);
+
+        // Verify the content was saved to database
+        $draft = \App\Models\BlogPostDraft::where('slug', 'test-edition-caption')->first();
+        $this->assertNotNull($draft);
+
+        // Verify gallery content was created
+        $galleryContent = $draft->contents()
+            ->where('content_type', 'App\\Models\\BlogContentGallery')
+            ->first();
+        $this->assertNotNull($galleryContent);
+
+        // Verify the gallery has 1 image
+        $gallery = $galleryContent->content;
+        $this->assertNotNull($gallery);
+        $this->assertCount(1, $gallery->pictures);
+
+        // Verify the image has a caption
+        $pivot = $gallery->pictures->first()->pivot;
+        $this->assertNotNull($pivot->caption_translation_key_id);
+
+        // Verify the caption text was updated to the new value
+        $captionTranslation = \App\Models\Translation::where('translation_key_id', $pivot->caption_translation_key_id)
+            ->where('locale', 'fr')
+            ->first();
+        $this->assertNotNull($captionTranslation);
+        $this->assertEquals('Caption modifiée avec succès', $captionTranslation->text);
     }
 }

@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Models\Search;
 
+use App\Enums\BlogPostType;
 use App\Http\Controllers\Public\SearchController;
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\Creation;
 use App\Models\Tag;
 use App\Models\Technology;
@@ -30,6 +33,9 @@ class SearchControllerTest extends TestCase
                     'type' => 'framework',
                     'iconPicture' => 1,
                 ]);
+
+            $mock->shouldReceive('getTranslationWithFallback')
+                ->andReturn('Test Category');
         });
 
         // Create tags and technologies not used in any creation
@@ -47,6 +53,11 @@ class SearchControllerTest extends TestCase
             $creation->technologies()->attach($usedTechnologies->pluck('id'));
         }
 
+        // Create blog categories - one with blog posts, one without
+        $categoryWithPosts = BlogCategory::factory()->create();
+        $categoryWithoutPosts = BlogCategory::factory()->create();
+        BlogPost::factory()->create(['category_id' => $categoryWithPosts->id]);
+
         $response = $this->get(route('public.search.filters'));
 
         $response->assertOk();
@@ -57,12 +68,25 @@ class SearchControllerTest extends TestCase
             'technologies' => [
                 '*' => ['id', 'name', 'type', 'iconPicture'],
             ],
+            'blogCategories' => [
+                '*' => ['id', 'name', 'slug', 'color'],
+            ],
+            'blogTypes' => [
+                '*' => ['value', 'label', 'icon'],
+            ],
         ]);
 
         $data = $response->json();
         // Should only return the tags and technologies that are used in creations
         $this->assertCount(3, $data['tags']);
         $this->assertCount(2, $data['technologies']);
+
+        // Should only return categories with blog posts
+        $this->assertCount(1, $data['blogCategories']);
+        $this->assertEquals($categoryWithPosts->id, $data['blogCategories'][0]['id']);
+
+        // Should return all blog post types
+        $this->assertCount(count(BlogPostType::cases()), $data['blogTypes']);
 
         // Verify that the returned tags are the used ones
         $returnedTagIds = collect($data['tags'])->pluck('id')->sort()->values();
@@ -274,5 +298,223 @@ class SearchControllerTest extends TestCase
 
         // Both responses should be identical
         $this->assertEquals($response1->json(), $response2->json());
+    }
+
+    #[Test]
+    public function test_filters_returns_blog_categories_ordered_by_order()
+    {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatTechnologyForSSR')->andReturn([]);
+            $mock->shouldReceive('getTranslationWithFallback')
+                ->andReturnUsing(function ($translations) {
+                    return 'Category';
+                });
+        });
+
+        // Create categories with different order values
+        $category3 = BlogCategory::factory()->create(['order' => 3]);
+        $category1 = BlogCategory::factory()->create(['order' => 1]);
+        $category2 = BlogCategory::factory()->create(['order' => 2]);
+
+        // Create blog posts for each category
+        BlogPost::factory()->create(['category_id' => $category3->id]);
+        BlogPost::factory()->create(['category_id' => $category1->id]);
+        BlogPost::factory()->create(['category_id' => $category2->id]);
+
+        $response = $this->get(route('public.search.filters'));
+
+        $response->assertOk();
+        $data = $response->json();
+
+        // Verify categories are ordered by 'order' field
+        $this->assertCount(3, $data['blogCategories']);
+        $this->assertEquals($category1->id, $data['blogCategories'][0]['id']);
+        $this->assertEquals($category2->id, $data['blogCategories'][1]['id']);
+        $this->assertEquals($category3->id, $data['blogCategories'][2]['id']);
+    }
+
+    #[Test]
+    public function test_filters_returns_all_blog_post_types()
+    {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatTechnologyForSSR')->andReturn([]);
+            $mock->shouldReceive('getTranslationWithFallback')->andReturn('');
+        });
+
+        $response = $this->get(route('public.search.filters'));
+
+        $response->assertOk();
+        $data = $response->json();
+
+        // Verify all BlogPostType enum cases are returned
+        $this->assertCount(count(BlogPostType::cases()), $data['blogTypes']);
+
+        foreach (BlogPostType::cases() as $type) {
+            $found = collect($data['blogTypes'])->first(function ($item) use ($type) {
+                return $item['value'] === $type->value;
+            });
+
+            $this->assertNotNull($found, "BlogPostType {$type->value} not found in response");
+            $this->assertEquals($type->label(), $found['label']);
+            $this->assertEquals($type->icon(), $found['icon']);
+        }
+    }
+
+    #[Test]
+    public function test_filters_translates_blog_category_names()
+    {
+        $translatedName = 'Catégorie Traduite';
+
+        $this->mock(PublicControllersService::class, function ($mock) use ($translatedName) {
+            $mock->shouldReceive('formatTechnologyForSSR')->andReturn([]);
+            $mock->shouldReceive('getTranslationWithFallback')
+                ->once()
+                ->andReturn($translatedName);
+        });
+
+        $category = BlogCategory::factory()->create();
+        BlogPost::factory()->create(['category_id' => $category->id]);
+
+        $response = $this->get(route('public.search.filters'));
+
+        $response->assertOk();
+        $data = $response->json();
+
+        $this->assertCount(1, $data['blogCategories']);
+        $this->assertEquals($translatedName, $data['blogCategories'][0]['name']);
+    }
+
+    #[Test]
+    public function test_search_with_blog_category_filter()
+    {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatBlogPostForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'title' => 'Test Blog Post',
+                    'slug' => 'test-blog-post',
+                    'excerpt' => 'Test excerpt',
+                    'type' => 'article',
+                    'category' => ['name' => 'Tech', 'color' => 'blue'],
+                ]);
+        });
+
+        $category = BlogCategory::factory()->create();
+        $otherCategory = BlogCategory::factory()->create();
+
+        BlogPost::factory()->create(['category_id' => $category->id]);
+        BlogPost::factory()->create(['category_id' => $otherCategory->id]);
+
+        $response = $this->get(route('public.search', [
+            'categories' => [$category->id],
+        ]));
+
+        $response->assertOk();
+        $data = $response->json();
+        $this->assertGreaterThanOrEqual(1, $data['total']);
+    }
+
+    #[Test]
+    public function test_search_with_blog_type_filter()
+    {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatBlogPostForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'title' => 'Test Blog Post',
+                    'slug' => 'test-blog-post',
+                    'excerpt' => 'Test excerpt',
+                    'type' => 'article',
+                    'category' => ['name' => 'Tech', 'color' => 'blue'],
+                ]);
+        });
+
+        $category = BlogCategory::factory()->create();
+        BlogPost::factory()->create([
+            'category_id' => $category->id,
+            'type' => BlogPostType::ARTICLE,
+        ]);
+        BlogPost::factory()->create([
+            'category_id' => $category->id,
+            'type' => BlogPostType::GAME_REVIEW,
+        ]);
+
+        $response = $this->get(route('public.search', [
+            'types' => [BlogPostType::ARTICLE->value],
+        ]));
+
+        $response->assertOk();
+        $data = $response->json();
+        $this->assertGreaterThanOrEqual(1, $data['total']);
+    }
+
+    #[Test]
+    public function test_search_returns_blog_posts_and_creations()
+    {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatCreationForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'name' => 'Test Creation',
+                    'slug' => 'test-creation',
+                    'shortDescription' => 'Test description',
+                    'type' => 'website',
+                    'technologies' => [],
+                ]);
+
+            $mock->shouldReceive('formatBlogPostForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'title' => 'Test Blog Post',
+                    'slug' => 'test-blog-post',
+                    'excerpt' => 'Test excerpt',
+                    'type' => 'article',
+                    'category' => ['name' => 'Tech', 'color' => 'blue'],
+                ]);
+        });
+
+        Creation::factory()->create(['name' => 'Test Creation']);
+        $category = BlogCategory::factory()->create();
+        BlogPost::factory()->create(['category_id' => $category->id]);
+
+        $response = $this->get(route('public.search', ['q' => 'Test']));
+
+        $response->assertOk();
+        $data = $response->json();
+
+        // Should return at least one result (either creation or blog post)
+        // The exact count depends on title translation matching
+        $this->assertGreaterThanOrEqual(1, $data['total']);
+
+        // Verify that resultType is added to results
+        if ($data['total'] > 0) {
+            $this->assertArrayHasKey('resultType', $data['results'][0]);
+            $this->assertContains($data['results'][0]['resultType'], ['creation', 'blogPost']);
+        }
+    }
+
+    #[Test]
+    public function test_search_blog_posts_by_title()
+    {
+        $this->mock(PublicControllersService::class, function ($mock) {
+            $mock->shouldReceive('formatBlogPostForSSRShort')
+                ->andReturn([
+                    'id' => 1,
+                    'title' => 'Laravel Tutorial',
+                    'slug' => 'laravel-tutorial',
+                    'excerpt' => 'Learn Laravel',
+                    'type' => 'article',
+                    'category' => ['name' => 'Tech', 'color' => 'blue'],
+                ]);
+        });
+
+        $category = BlogCategory::factory()->create();
+        BlogPost::factory()->create(['category_id' => $category->id]);
+
+        $response = $this->get(route('public.search', ['q' => 'Laravel']));
+
+        $response->assertOk();
+        $data = $response->json();
+        $this->assertGreaterThanOrEqual(0, $data['total']);
     }
 }

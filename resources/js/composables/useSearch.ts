@@ -1,5 +1,5 @@
 import { useRoute } from '@/composables/useRoute';
-import { SSRSimplifiedCreation, SSRTechnology, Tag } from '@/types';
+import { BlogCategoryFilter, BlogTypeFilter, SSRSearchResult, SSRTechnology, Tag } from '@/types';
 import axios from 'axios';
 import debounce from 'lodash.debounce';
 import { computed, ref, watch } from 'vue';
@@ -11,19 +11,28 @@ export function useSearch() {
     const searchQuery = ref('');
     const selectedTags = ref<number[]>([]);
     const selectedTechnologies = ref<number[]>([]);
-    const searchResults = ref<SSRSimplifiedCreation[]>([]);
+    const selectedCategories = ref<number[]>([]);
+    const selectedTypes = ref<string[]>([]);
+    const searchResults = ref<SSRSearchResult[]>([]);
     const availableTags = ref<Tag[]>([]);
     const availableTechnologies = ref<SSRTechnology[]>([]);
+    const availableCategories = ref<BlogCategoryFilter[]>([]);
+    const availableTypes = ref<BlogTypeFilter[]>([]);
     const isLoading = ref(false);
-    const searchCache = ref<Map<string, SSRSimplifiedCreation[]>>(new Map());
+    const searchCache = ref<Map<string, SSRSearchResult[]>>(new Map());
 
     // Computed
     const searchKey = computed(() => {
-        return `${searchQuery.value}|${[...selectedTags.value].sort().join(',')}|${[...selectedTechnologies.value].sort().join(',')}`;
+        return `${searchQuery.value}|${[...selectedTags.value].sort().join(',')}|${[...selectedTechnologies.value].sort().join(',')}|${[...selectedCategories.value].sort().join(',')}|${[...selectedTypes.value].sort().join(',')}`;
     });
 
     const hasActiveFilters = computed(() => {
-        return selectedTags.value.length > 0 || selectedTechnologies.value.length > 0;
+        return (
+            selectedTags.value.length > 0 ||
+            selectedTechnologies.value.length > 0 ||
+            selectedCategories.value.length > 0 ||
+            selectedTypes.value.length > 0
+        );
     });
 
     const filteredTags = computed(() => {
@@ -42,6 +51,8 @@ export function useSearch() {
             const response = await axios.get(route('public.search.filters'));
             availableTags.value = response.data.tags;
             availableTechnologies.value = response.data.technologies;
+            availableCategories.value = response.data.blogCategories;
+            availableTypes.value = response.data.blogTypes;
         } catch (error) {
             console.error('Failed to load search filters:', error);
         }
@@ -68,6 +79,8 @@ export function useSearch() {
                     q: searchQuery.value,
                     tags: selectedTags.value,
                     technologies: selectedTechnologies.value,
+                    categories: selectedCategories.value,
+                    types: selectedTypes.value,
                 },
             });
 
@@ -99,9 +112,29 @@ export function useSearch() {
         }
     };
 
+    const toggleCategory = (categoryId: number) => {
+        const index = selectedCategories.value.indexOf(categoryId);
+        if (index > -1) {
+            selectedCategories.value.splice(index, 1);
+        } else {
+            selectedCategories.value.push(categoryId);
+        }
+    };
+
+    const toggleType = (type: string) => {
+        const index = selectedTypes.value.indexOf(type);
+        if (index > -1) {
+            selectedTypes.value.splice(index, 1);
+        } else {
+            selectedTypes.value.push(type);
+        }
+    };
+
     const clearFilters = () => {
         selectedTags.value = [];
         selectedTechnologies.value = [];
+        selectedCategories.value = [];
+        selectedTypes.value = [];
     };
 
     const resetSearch = () => {
@@ -116,7 +149,7 @@ export function useSearch() {
     }, 300);
 
     // Watch for changes
-    watch([searchQuery, selectedTags, selectedTechnologies], () => {
+    watch([searchQuery, selectedTags, selectedTechnologies, selectedCategories, selectedTypes], () => {
         debouncedSearch();
     });
 
@@ -125,9 +158,13 @@ export function useSearch() {
         searchQuery,
         selectedTags,
         selectedTechnologies,
+        selectedCategories,
+        selectedTypes,
         searchResults,
         availableTags,
         availableTechnologies,
+        availableCategories,
+        availableTypes,
         isLoading,
 
         // Computed
@@ -140,6 +177,8 @@ export function useSearch() {
         performSearch,
         toggleTag,
         toggleTechnology,
+        toggleCategory,
+        toggleType,
         clearFilters,
         resetSearch,
     };

@@ -38,10 +38,6 @@
             <summary type="html">
                 {!! \Spatie\Feed\Helpers\Cdata::out($item->summary) !!}
             </summary>
-            @if($item->__isset('enclosure'))
-                <link rel="enclosure" href="{{ url($item->enclosure) }}" length="{{ $item->enclosureLength }}"
-                      type="{{ $item->enclosureType }}" />
-            @endif
             @foreach($item->category as $category)
                 <category term="{{ $category }}" />
             @endforeach

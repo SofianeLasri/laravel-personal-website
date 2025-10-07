@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
 use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 
@@ -151,7 +150,6 @@ class BlogPost extends Model implements Feedable
             'titleTranslationKey.translations',
             'category.nameTranslationKey.translations',
             'coverPicture',
-            'coverPicture.optimizedPictures',
             'contents' => function ($query) {
                 $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
             },
@@ -183,28 +181,8 @@ class BlogPost extends Model implements Feedable
             ->summary($excerpt)
             ->updated($this->updated_at)
             ->link(route('public.blog.post', ['slug' => $this->slug]))
-            ->authorName(config('app.name'))
+            ->authorName("Sofiane Lasri")
             ->authorEmail("sofianelasri@sl-projects.com");
-
-        // Add cover image as enclosure if available
-        if ($this->coverPicture) {
-            $imageUrl = $this->coverPicture->getUrl('full', 'jpg');
-
-            if (! empty($imageUrl)) {
-                // Get the optimized picture to access its path
-                $optimizedPicture = $this->coverPicture->getOptimizedPicture('full', 'jpg');
-
-                // Get file size, default to 0 if file doesn't exist
-                $fileSize = 0;
-                if ($optimizedPicture && Storage::disk('public')->exists($optimizedPicture->path)) {
-                    $fileSize = Storage::disk('public')->size($optimizedPicture->path);
-                }
-
-                $feedItem->enclosure($imageUrl);
-                $feedItem->enclosureType('image/jpeg');
-                $feedItem->enclosureLength($fileSize);
-            }
-        }
 
         // Add category
         if ($this->category) {

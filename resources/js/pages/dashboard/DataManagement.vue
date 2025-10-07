@@ -2,6 +2,7 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
@@ -11,12 +12,13 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
-import { AlertTriangle, Download, Info, Trash2, Upload } from 'lucide-vue-next';
+import { AlertTriangle, Download, Info, Lock, Trash2, Upload } from 'lucide-vue-next';
 import { computed, onUnmounted, ref } from 'vue';
 
 interface Props {
     exportTables: string[];
     importTables: string[];
+    isProduction: boolean;
 }
 
 const props = defineProps<Props>();
@@ -46,6 +48,9 @@ const importMetadata = ref<Record<string, unknown> | null>(null);
 const importStats = ref<Record<string, unknown> | null>(null);
 const error = ref<string | null>(null);
 const success = ref<string | null>(null);
+const showPasswordModal = ref(false);
+const password = ref('');
+const passwordError = ref<string | null>(null);
 
 const fileInput = ref<HTMLInputElement>();
 
@@ -177,6 +182,20 @@ const uploadImportFile = async () => {
     }
 };
 
+const initiateImport = () => {
+    if (!uploadedFilePath.value) return;
+
+    // If in production, show password modal
+    if (props.isProduction) {
+        password.value = '';
+        passwordError.value = null;
+        showPasswordModal.value = true;
+    } else {
+        // In development, proceed directly
+        handleImport();
+    }
+};
+
 const handleImport = async () => {
     if (!uploadedFilePath.value) return;
 
@@ -184,6 +203,7 @@ const handleImport = async () => {
     importProgress.value = 0;
     error.value = null;
     success.value = null;
+    passwordError.value = null;
 
     // Simulate progress
     const progressInterval = setInterval(() => {
@@ -193,10 +213,17 @@ const handleImport = async () => {
     }, 300);
 
     try {
-        const response = await axios.post('/dashboard/data-management/import', {
+        const requestData: Record<string, unknown> = {
             file_path: uploadedFilePath.value,
             confirm_import: true,
-        });
+        };
+
+        // Add password if in production
+        if (props.isProduction) {
+            requestData.password = password.value;
+        }
+
+        const response = await axios.post('/dashboard/data-management/import', requestData);
 
         clearInterval(progressInterval);
         importProgress.value = 100;
@@ -208,12 +235,22 @@ const handleImport = async () => {
         importFile.value = null;
         uploadedFilePath.value = null;
         importMetadata.value = null;
+        password.value = '';
+        showPasswordModal.value = false;
         if (fileInput.value) {
             fileInput.value.value = '';
         }
     } catch (err: unknown) {
         clearInterval(progressInterval);
-        error.value = err.response?.data?.message || 'Import failed. Please try again.';
+        const errorMessage = err.response?.data?.message || 'Import failed. Please try again.';
+
+        // Show error in modal if it's a password error
+        if (err.response?.status === 401 && props.isProduction) {
+            passwordError.value = errorMessage;
+        } else {
+            error.value = errorMessage;
+            showPasswordModal.value = false;
+        }
     } finally {
         isImporting.value = false;
         importProgress.value = 0;
@@ -405,7 +442,7 @@ onUnmounted(() => {
 
                             <!-- Import Actions -->
                             <div class="flex gap-2">
-                                <Button :disabled="!canImport || isImporting" variant="destructive" class="flex-1" @click="handleImport">
+                                <Button :disabled="!canImport || isImporting" variant="destructive" class="flex-1" @click="initiateImport">
                                     <Upload class="mr-2 h-4 w-4" />
                                     {{ isImporting ? 'Importing...' : 'Import Data' }}
                                 </Button>
@@ -491,6 +528,53 @@ onUnmounted(() => {
                     </CardContent>
                 </Card>
             </div>
+
+            <!-- Password Confirmation Modal -->
+            <Dialog v-model:open="showPasswordModal">
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle class="flex items-center gap-2">
+                            <Lock class="h-5 w-5" />
+                            Confirm Import
+                        </DialogTitle>
+                        <DialogDescription>
+                            This is a production environment. Please enter your password to confirm the import operation.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div class="space-y-4">
+                        <Alert variant="destructive">
+                            <AlertTriangle class="h-4 w-4" />
+                            <AlertTitle>Warning</AlertTitle>
+                            <AlertDescription>
+                                This action will completely replace all existing data. This cannot be undone.
+                            </AlertDescription>
+                        </Alert>
+
+                        <div class="space-y-2">
+                            <Label for="password">Password</Label>
+                            <Input
+                                id="password"
+                                v-model="password"
+                                type="password"
+                                placeholder="Enter your password"
+                                :disabled="isImporting"
+                                @keydown.enter="handleImport"
+                            />
+                            <p v-if="passwordError" class="text-sm text-red-600 dark:text-red-400">
+                                {{ passwordError }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" :disabled="isImporting" @click="showPasswordModal = false">Cancel</Button>
+                        <Button variant="destructive" :disabled="isImporting || !password" @click="handleImport">
+                            {{ isImporting ? 'Importing...' : 'Confirm Import' }}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     </AppLayout>
 </template>

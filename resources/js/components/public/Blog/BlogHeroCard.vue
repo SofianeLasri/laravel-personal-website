@@ -14,7 +14,7 @@ defineProps<Props>();
 <template>
     <Link
         :href="route('public.blog.post', { slug: post.slug })"
-        class="group flex cursor-pointer flex-col gap-6 transition-transform hover:scale-[1.01] lg:flex-row lg:items-center lg:gap-10"
+        class="group flex cursor-pointer flex-col gap-6 transition-transform hover:scale-[1.01] lg:flex-row lg:items-center lg:gap-10 no-glow"
     >
         <!-- Hero Image -->
         <div class="no-glow flex aspect-video h-96 shrink-0 overflow-hidden rounded-2xl shadow-[0px_0.25rem_0.5rem_0px_rgba(0,0,0,0.25)] lg:h-96">

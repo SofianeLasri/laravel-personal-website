@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Browser;
+namespace Tests\Browser\Dashboard;
 
 use App\Models\BlogCategory;
 use App\Models\BlogPostDraft;

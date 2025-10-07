@@ -131,7 +131,7 @@ class BlogPost extends Model implements Feedable
     /**
      * Get feed items for RSS feed
      *
-     * @return Collection<int, BlogPost>
+     * @return Collection<int, static>
      */
     public static function getFeedItems(): Collection
     {
@@ -165,16 +165,14 @@ class BlogPost extends Model implements Feedable
             ->id($this->id)
             ->title($title)
             ->summary($excerpt)
-            ->updated($this->updated_at)
+            ->updated($this->updated_at ?? $this->created_at ?? now())
             ->link(route('public.blog.post', ['slug' => $this->slug]))
             ->authorName("Sofiane Lasri")
             ->authorEmail("sofianelasri@sl-projects.com");
 
         // Add category
-        if ($this->category) {
-            $categoryName = $this->getTranslatedText($this->category->nameTranslationKey);
-            $feedItem->category($categoryName);
-        }
+        $categoryName = $this->getTranslatedText($this->category->nameTranslationKey);
+        $feedItem->category($categoryName);
 
         return $feedItem;
     }
@@ -184,7 +182,7 @@ class BlogPost extends Model implements Feedable
      */
     private function getTranslation(?TranslationKey $translationKey, string $locale, string $fallbackLocale): string
     {
-        if (! $translationKey || ! $translationKey->translations) {
+        if (! $translationKey) {
             return '';
         }
 
@@ -239,6 +237,7 @@ class BlogPost extends Model implements Feedable
             ->sortBy('order')
             ->first();
 
+        // @phpstan-ignore booleanNot.alwaysFalse
         if (! $firstTextContent || ! $firstTextContent->content) {
             return '';
         }
@@ -247,10 +246,6 @@ class BlogPost extends Model implements Feedable
 
         // Ensure content is BlogContentMarkdown and has translation key
         if (! ($markdownContent instanceof BlogContentMarkdown)) {
-            return '';
-        }
-
-        if (! $markdownContent->translationKey || ! $markdownContent->translationKey->translations) {
             return '';
         }
 

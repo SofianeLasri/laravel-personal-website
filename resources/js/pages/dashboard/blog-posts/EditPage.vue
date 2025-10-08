@@ -48,7 +48,7 @@ const isPublishing = ref(false);
 const currentBlogPostDraft = ref<BlogPostDraftWithAllRelations | null>(null);
 
 // Ref for BlogContentBuilder to access saveAllGalleries method
-const blogContentBuilderRef = ref<{ saveAllGalleries?: () => Promise<void> } | null>(null);
+const blogContentBuilderRef = ref<{ saveAllGalleries?: () => Promise<boolean> } | null>(null);
 
 if (props.blogPostDraft) {
     currentBlogPostDraft.value = props.blogPostDraft;
@@ -86,7 +86,7 @@ const form = useForm({
         slug: currentBlogPostDraft.value?.slug || '',
         cover_picture_id: currentBlogPostDraft.value?.cover_picture_id || null,
         type: currentBlogPostDraft.value?.type || 'article',
-        category_id: currentBlogPostDraft.value?.category_id?.toString() || props.categories[0]?.id?.toString() || '1',
+        category_id: currentBlogPostDraft.value?.category_id || props.categories[0]?.id || 1,
         locale: 'fr' as 'fr' | 'en',
         title_content: '',
     },
@@ -105,7 +105,7 @@ onMounted(() => {
 
         // Load category
         if (currentBlogPostDraft.value.category_id) {
-            form.setFieldValue('category_id', currentBlogPostDraft.value.category_id.toString());
+            form.setFieldValue('category_id', currentBlogPostDraft.value.category_id);
         }
 
         // Load cover picture
@@ -336,7 +336,13 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                             <FormLabel>Image de couverture</FormLabel>
                             <FormControl>
                                 <PictureInput
+                                    v-if="form.values.cover_picture_id !== null"
                                     :model-value="form.values.cover_picture_id"
+                                    label="Image de couverture (16:9 recommandé)"
+                                    @update:model-value="handleCoverPictureChange"
+                                />
+                                <PictureInput
+                                    v-else
                                     label="Image de couverture (16:9 recommandé)"
                                     @update:model-value="handleCoverPictureChange"
                                 />

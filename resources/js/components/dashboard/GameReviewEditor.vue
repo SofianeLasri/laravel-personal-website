@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
+import { GameReviewDraft } from '@/types';
 import axios from 'axios';
 import { Plus, Trash2 } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
@@ -17,33 +18,6 @@ interface GameReviewLink {
     url: string;
     label?: string;
     order: number;
-}
-
-interface GameReviewDraft {
-    id: number;
-    game_title: string;
-    release_date: string | null;
-    genre: string;
-    developer: string;
-    publisher: string;
-    platforms: string[];
-    cover_picture_id: number | null;
-    pros_translation_key_id: number | null;
-    cons_translation_key_id: number | null;
-    rating: 'positive' | 'negative' | null;
-    pros_translation_key?: {
-        translations: Array<{
-            locale: string;
-            text: string;
-        }>;
-    };
-    cons_translation_key?: {
-        translations: Array<{
-            locale: string;
-            text: string;
-        }>;
-    };
-    links?: GameReviewLink[];
 }
 
 interface Props {

@@ -320,15 +320,7 @@ defineExpose({
             @drop="handleDrop"
             @dragover="handleDragOver"
         >
-            <input
-                ref="fileInput"
-                type="file"
-                multiple
-                accept="image/*"
-                class="hidden"
-                data-testid="gallery-file-input"
-                @change="handleFileUpload"
-            />
+            <input ref="fileInput" type="file" multiple accept="image/*" class="hidden" data-testid="gallery-file-input" @change="handleFileUpload" />
 
             <div class="flex flex-col items-center gap-2">
                 <Upload class="h-8 w-8 text-gray-400" />

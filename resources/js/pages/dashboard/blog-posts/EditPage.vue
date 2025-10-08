@@ -341,11 +341,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                                     label="Image de couverture (16:9 recommandé)"
                                     @update:model-value="handleCoverPictureChange"
                                 />
-                                <PictureInput
-                                    v-else
-                                    label="Image de couverture (16:9 recommandé)"
-                                    @update:model-value="handleCoverPictureChange"
-                                />
+                                <PictureInput v-else label="Image de couverture (16:9 recommandé)" @update:model-value="handleCoverPictureChange" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -364,11 +360,12 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                         </p>
                     </div>
                     <GameReviewEditor
-                        v-else
-                        :draft-id="currentBlogPostDraft?.id"
-                        :game-review-draft="currentBlogPostDraft?.game_review_draft"
+                        v-else-if="currentBlogPostDraft?.game_review_draft !== null"
+                        :draft-id="currentBlogPostDraft.id"
+                        :game-review-draft="currentBlogPostDraft.game_review_draft"
                         :locale="locale"
                     />
+                    <GameReviewEditor v-else :draft-id="currentBlogPostDraft.id" :locale="locale" />
                 </div>
 
                 <!-- Content Builder -->

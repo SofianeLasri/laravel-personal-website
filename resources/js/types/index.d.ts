@@ -18,21 +18,31 @@ export interface GameReview {
     updated_at: string;
 }
 
-export interface GameReviewDraft {
+interface GameReviewDraft {
     id: number;
-    blog_post_draft_id: number;
     game_title: string;
     release_date: string | null;
-    genre: string | null;
-    developer: string | null;
-    publisher: string | null;
-    platforms: string[] | null;
+    genre: string;
+    developer: string;
+    publisher: string;
+    platforms: string[];
     cover_picture_id: number | null;
     pros_translation_key_id: number | null;
     cons_translation_key_id: number | null;
     rating: 'positive' | 'negative' | null;
-    created_at: string;
-    updated_at: string;
+    pros_translation_key?: {
+        translations: Array<{
+            locale: string;
+            text: string;
+        }>;
+    };
+    cons_translation_key?: {
+        translations: Array<{
+            locale: string;
+            text: string;
+        }>;
+    };
+    links?: GameReviewLink[];
 }
 
 export interface Auth {
@@ -177,6 +187,8 @@ interface BlogPostDraftWithAllRelations {
     category: BlogCategory;
     cover_picture: Picture | null;
     original_blog_post: BlogPost | null;
+    contents: BlogPostDraftContent[];
+    game_review_draft: GameReviewDraft | null;
 }
 
 interface BlogPostWithAllRelations {
@@ -193,6 +205,14 @@ interface BlogPostWithAllRelations {
     category: BlogCategory;
     cover_picture: Picture | null;
     drafts: BlogPostDraftWithAllRelations[];
+}
+
+interface BlogPostDraftContent {
+    id: number;
+    blog_post_draft_id: number;
+    content_type: 'App\\Models\\BlogContentGallery' | 'App\\Models\\BlogContentMarkdown' | 'App\\Models\\BlogContentVideo';
+    content_id: number;
+    order: number;
 }
 
 interface CreationDraft {

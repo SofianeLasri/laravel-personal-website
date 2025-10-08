@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import IconToggleButton from '@/components/ui/IconToggleButton.vue';
 import { useAppearance } from '@/composables/useAppearance';
 import { Monitor, Moon, Sun } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
@@ -19,6 +20,12 @@ const currentThemeDisplay = computed(() => {
         return systemPrefersDark.value ? 'dark' : 'light';
     }
     return appearance.value;
+});
+
+const ariaLabel = computed(() => `Current theme: ${appearance.value}. Click to change theme`);
+
+const tooltip = computed(() => {
+    return appearance.value === 'system' ? `System (${currentThemeDisplay.value})` : appearance.value;
 });
 
 function cycleTheme() {
@@ -47,19 +54,5 @@ onMounted(() => {
 </script>
 
 <template>
-    <button
-        class="group relative inline-flex items-center justify-center rounded-lg p-2 transition-all hover:bg-gray-200 dark:hover:bg-gray-800"
-        :aria-label="`Current theme: ${appearance}. Click to change theme`"
-        type="button"
-        @click="cycleTheme"
-    >
-        <component :is="currentIcon" class="h-5 w-5 text-gray-700 transition-transform group-hover:scale-110 dark:text-gray-300" />
-
-        <!-- Tooltip -->
-        <span
-            class="absolute -bottom-8 left-1/2 -translate-x-1/2 rounded bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-100 dark:text-gray-900"
-        >
-            {{ appearance === 'system' ? `System (${currentThemeDisplay})` : appearance }}
-        </span>
-    </button>
+    <IconToggleButton :icon="currentIcon" :aria-label="ariaLabel" :tooltip="tooltip" @click="cycleTheme" />
 </template>

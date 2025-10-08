@@ -92,6 +92,9 @@ Route::name('public.')->group(function () {
     Route::post('/set-language', [LanguageController::class, 'setLanguage'])->name('set-language');
 });
 
+// RSS Feed
+Route::feeds();
+
 Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\HomeController::class, 'index'])->name('index');
     Route::get('/stats', [\App\Http\Controllers\Admin\HomeController::class, 'stats'])->name('stats');

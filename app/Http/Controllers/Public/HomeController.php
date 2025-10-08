@@ -39,6 +39,10 @@ class HomeController extends PublicController
         // Laravel + tech with experience texts
         $masteredFrameworksCount = 1 + TechnologyExperience::join('technologies', 'technologies.id', '=', 'technology_experiences.technology_id')->where('technologies.type', TechnologyType::FRAMEWORK)->count();
 
+        // Get latest blog post for notification popup
+        $blogPosts = $this->service->getBlogPostsForPublicHome();
+        $latestBlogPost = $blogPosts->isNotEmpty() ? $this->service->formatBlogPostForSSRShort($blogPosts->first()) : null;
+
         return Inertia::render('public/Home', [
             'locale' => app()->getLocale(),
             'browserLanguage' => $this->getBrowserLanguage($request),
@@ -59,6 +63,7 @@ class HomeController extends PublicController
             'laravelCreations' => $this->service->getLaravelCreations(),
             'technologyExperiences' => $this->service->getTechnologyExperiences(),
             'experiences' => $this->service->getExperiences(),
+            'latestBlogPost' => $latestBlogPost,
         ]);
     }
 }

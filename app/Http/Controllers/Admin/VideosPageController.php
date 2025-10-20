@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Video;
+use Inertia\Response;
 
 class VideosPageController extends Controller
 {
-    public function __invoke()
+    public function __invoke(): Response
     {
         $videos = Video::with(['coverPicture'])
             ->orderBy('created_at', 'desc')
@@ -19,7 +20,7 @@ class VideosPageController extends Controller
                     'created_at' => $video->created_at,
                     'cover_picture' => $video->coverPicture ? [
                         'id' => $video->coverPicture->id,
-                        'path_small' => $video->coverPicture->path_small,
+                        'path_original' => $video->coverPicture->path_original,
                     ] : null,
                     'usages' => $this->getVideoUsages($video),
                 ];

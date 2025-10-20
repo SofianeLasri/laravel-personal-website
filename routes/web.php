@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Http\Controllers\Admin\ApiRequestLogController;
+use App\Http\Controllers\Admin\BlogCategoriesPageController;
 use App\Http\Controllers\Admin\BlogPostDraftsPageController;
 use App\Http\Controllers\Admin\BlogPostEditPageController;
 use App\Http\Controllers\Admin\BlogPostsPageController;
@@ -185,6 +186,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::get('/edit', [BlogPostEditPageController::class, 'editPage'])
             ->name('edit');
     });
+
+    Route::get('/blog-categories', [BlogCategoriesPageController::class, 'index'])
+        ->name('blog-categories.index');
 
     Route::name('api.')->prefix('api')->group(function () {
         // Notifications routes

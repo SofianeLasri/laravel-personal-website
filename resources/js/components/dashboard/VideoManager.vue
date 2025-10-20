@@ -83,7 +83,7 @@ const editVideoCoverPictureId = ref<number | undefined>(undefined);
 const editVideoVisibility = ref<'private' | 'public'>('private');
 
 // Synced video data (including cover_picture relationship and bunny_data)
-const syncedVideoData = ref<Video & { bunny_data?: any; cover_picture?: any } | null>(null);
+const syncedVideoData = ref<(Video & { bunny_data?: any; cover_picture?: any }) | null>(null);
 
 // Select form
 const selectedVideoId = ref<number | undefined>(undefined);
@@ -114,7 +114,7 @@ const isImportModalOpen = computed({
 });
 
 const filteredAvailableVideos = computed(() => {
-    return props.availableVideos.filter(v => !props.excludeVideoIds.includes(v.id));
+    return props.availableVideos.filter((v) => !props.excludeVideoIds.includes(v.id));
 });
 
 // Use synced video data when available, otherwise fallback to editingVideo from props
@@ -196,10 +196,7 @@ const updateVideo = async () => {
             updateData.visibility = editVideoVisibility.value;
         }
 
-        const response = await axios.put(
-            route('dashboard.api.videos.update', { video: props.editingVideo.id }),
-            updateData
-        );
+        const response = await axios.put(route('dashboard.api.videos.update', { video: props.editingVideo.id }), updateData);
 
         emit('video-updated', response.data);
         resetEditForm();
@@ -256,9 +253,7 @@ const downloadThumbnail = async (video: Video) => {
     loading.value = true;
 
     try {
-        await axios.post(
-            route('dashboard.api.videos.download-thumbnail', { video: video.id })
-        );
+        await axios.post(route('dashboard.api.videos.download-thumbnail', { video: video.id }));
 
         // Get updated video data
         const response = await axios.get(route('dashboard.api.videos.show', { video: video.id }));
@@ -414,7 +409,7 @@ watch(
             syncedVideoData.value = null;
         }
     },
-    { immediate: false }
+    { immediate: false },
 );
 
 // Expose helpers for parent components
@@ -551,7 +546,7 @@ defineExpose({
                         <Label>Image de couverture</Label>
 
                         <!-- Aperçu de l'image de couverture actuelle -->
-                        <div v-if="currentEditingVideo.cover_picture" class="mb-3 rounded-lg border p-3 bg-gray-50 dark:bg-gray-800">
+                        <div v-if="currentEditingVideo.cover_picture" class="mb-3 rounded-lg border bg-gray-50 p-3 dark:bg-gray-800">
                             <p class="mb-2 text-sm font-medium">Image actuelle:</p>
                             <div class="aspect-video w-full max-w-xs overflow-hidden rounded-lg bg-gray-100">
                                 <img
@@ -615,7 +610,9 @@ defineExpose({
                                     {{ syncedVideoData.bunny_data.is_ready ? 'Prêt' : 'En traitement' }}
                                 </span>
                                 <span v-if="syncedVideoData.bunny_data.duration" class="text-muted-foreground ml-2">
-                                    (Durée: {{ Math.floor(syncedVideoData.bunny_data.duration / 60) }}:{{ String(syncedVideoData.bunny_data.duration % 60).padStart(2, '0') }})
+                                    (Durée: {{ Math.floor(syncedVideoData.bunny_data.duration / 60) }}:{{
+                                        String(syncedVideoData.bunny_data.duration % 60).padStart(2, '0')
+                                    }})
                                 </span>
                             </p>
                             <p><strong>ID Bunny:</strong> {{ currentEditingVideo.bunny_video_id }}</p>
@@ -644,19 +641,16 @@ defineExpose({
                 <div class="space-y-4 py-4">
                     <div class="rounded-lg bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-900/20 dark:text-blue-100">
                         <p class="font-medium">Information</p>
-                        <p class="mt-1">Cette fonctionnalité permet d'importer des vidéos déjà hébergées sur Bunny Stream sans avoir à les télécharger et re-uploader.</p>
+                        <p class="mt-1">
+                            Cette fonctionnalité permet d'importer des vidéos déjà hébergées sur Bunny Stream sans avoir à les télécharger et
+                            re-uploader.
+                        </p>
                     </div>
 
                     <div class="space-y-2">
                         <Label>ID de la vidéo Bunny Stream</Label>
-                        <Input
-                            v-model="importBunnyVideoId"
-                            placeholder="ex: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                            :disabled="loading"
-                        />
-                        <p class="text-muted-foreground text-xs">
-                            Vous pouvez trouver l'ID de la vidéo dans le tableau de bord Bunny Stream
-                        </p>
+                        <Input v-model="importBunnyVideoId" placeholder="ex: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" :disabled="loading" />
+                        <p class="text-muted-foreground text-xs">Vous pouvez trouver l'ID de la vidéo dans le tableau de bord Bunny Stream</p>
                     </div>
 
                     <div class="flex items-center space-x-2">
@@ -667,7 +661,10 @@ defineExpose({
                             class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                             :disabled="loading"
                         />
-                        <label for="download-thumbnail" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        <label
+                            for="download-thumbnail"
+                            class="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
                             Télécharger la miniature comme image de couverture
                         </label>
                     </div>

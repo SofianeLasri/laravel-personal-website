@@ -65,7 +65,7 @@ const playVideo = () => {
                 leave-from-class="opacity-100"
                 leave-to-class="opacity-0"
             >
-                <div v-if="!isPlaying" class="absolute inset-0 z-10 cursor-pointer group" @click="playVideo">
+                <div v-if="!isPlaying" class="group absolute inset-0 z-10 cursor-pointer" @click="playVideo">
                     <picture class="h-full w-full">
                         <source :srcset="video.coverPicture.avif.large" type="image/avif" />
                         <source :srcset="video.coverPicture.webp.large" type="image/webp" />

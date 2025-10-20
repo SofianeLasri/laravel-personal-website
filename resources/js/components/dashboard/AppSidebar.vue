@@ -15,7 +15,6 @@ import {
     FileVideo,
     Folder,
     FolderOutput,
-    FolderTree,
     Image as ImageIcon,
     Languages,
     LayoutGrid,

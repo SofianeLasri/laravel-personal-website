@@ -223,13 +223,14 @@ class BlogPostConversionService
         foreach ($videoContents as $content) {
             $videoContent = $content->content;
 
-            if (!$videoContent instanceof BlogContentVideo) {
+            if (! $videoContent instanceof BlogContentVideo) {
                 continue;
             }
 
             // Check if video exists
-            if (!$videoContent->video_id || !$videoContent->video) {
+            if (! $videoContent->video_id || ! $videoContent->video) {
                 $errors[] = "Un contenu vidéo n'a pas de vidéo associée.";
+
                 continue;
             }
 
@@ -237,7 +238,7 @@ class BlogPostConversionService
             $videoName = $video->name ?? 'Sans nom';
 
             // Check if video has a cover picture
-            if (!$video->cover_picture_id) {
+            if (! $video->cover_picture_id) {
                 $errors[] = "La vidéo '{$videoName}' doit avoir une image de couverture avant publication.";
             }
 
@@ -250,6 +251,7 @@ class BlogPostConversionService
                     default => 'invalide',
                 };
                 $errors[] = "La vidéo '{$videoName}' doit être transcodée avant publication (statut actuel: {$statusText}).";
+
                 continue;
             }
 
@@ -264,7 +266,7 @@ class BlogPostConversionService
             }
         }
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $validator = Validator::make([], []);
             foreach ($errors as $error) {
                 $validator->errors()->add('videos', $error);

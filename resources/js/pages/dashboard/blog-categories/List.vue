@@ -354,19 +354,19 @@ const canDeleteCategory = computed(() => {
                     <div class="grid gap-2">
                         <Label for="slug">Slug</Label>
                         <Input id="slug" v-model="formData.slug" placeholder="ma-categorie" />
-                        <p v-if="formErrors.slug" class="text-sm text-destructive">{{ formErrors.slug[0] }}</p>
+                        <p v-if="formErrors.slug" class="text-destructive text-sm">{{ formErrors.slug[0] }}</p>
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="name_fr">Nom (Français)</Label>
                         <Input id="name_fr" v-model="formData.name_fr" placeholder="Ma Catégorie" />
-                        <p v-if="formErrors.name_fr" class="text-sm text-destructive">{{ formErrors.name_fr[0] }}</p>
+                        <p v-if="formErrors.name_fr" class="text-destructive text-sm">{{ formErrors.name_fr[0] }}</p>
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="name_en">Nom (Anglais)</Label>
                         <Input id="name_en" v-model="formData.name_en" placeholder="My Category" />
-                        <p v-if="formErrors.name_en" class="text-sm text-destructive">{{ formErrors.name_en[0] }}</p>
+                        <p v-if="formErrors.name_en" class="text-destructive text-sm">{{ formErrors.name_en[0] }}</p>
                     </div>
 
                     <div class="grid gap-2">
@@ -384,13 +384,13 @@ const canDeleteCategory = computed(() => {
                                 </SelectItem>
                             </SelectContent>
                         </Select>
-                        <p v-if="formErrors.color" class="text-sm text-destructive">{{ formErrors.color[0] }}</p>
+                        <p v-if="formErrors.color" class="text-destructive text-sm">{{ formErrors.color[0] }}</p>
                     </div>
 
                     <div v-if="editingCategory" class="grid gap-2">
                         <Label for="order">Ordre</Label>
                         <Input id="order" v-model.number="formData.order" type="number" min="0" />
-                        <p v-if="formErrors.order" class="text-sm text-destructive">{{ formErrors.order[0] }}</p>
+                        <p v-if="formErrors.order" class="text-destructive text-sm">{{ formErrors.order[0] }}</p>
                     </div>
                 </div>
 
@@ -409,14 +409,12 @@ const canDeleteCategory = computed(() => {
                     <AlertDialogDescription v-if="deletingCategory">
                         <template v-if="canDeleteCategory">
                             Êtes-vous sûr de vouloir supprimer la catégorie
-                            <strong>{{ getFrenchTranslation(deletingCategory) }}</strong> ?
-                            Cette action est irréversible.
+                            <strong>{{ getFrenchTranslation(deletingCategory) }}</strong> ? Cette action est irréversible.
                         </template>
                         <template v-else>
-                            Impossible de supprimer la catégorie <strong>{{ getFrenchTranslation(deletingCategory) }}</strong> car elle est utilisée par
-                            <strong>{{ deletingCategory.blog_posts_count }}</strong> article(s) publié(s) et
-                            <strong>{{ deletingCategory.blog_post_drafts_count }}</strong> brouillon(s).
-                            <br /><br />
+                            Impossible de supprimer la catégorie <strong>{{ getFrenchTranslation(deletingCategory) }}</strong> car elle est utilisée
+                            par <strong>{{ deletingCategory.blog_posts_count }}</strong> article(s) publié(s) et
+                            <strong>{{ deletingCategory.blog_post_drafts_count }}</strong> brouillon(s). <br /><br />
                             Veuillez d'abord modifier ou supprimer ces articles avant de supprimer cette catégorie.
                         </template>
                     </AlertDialogDescription>

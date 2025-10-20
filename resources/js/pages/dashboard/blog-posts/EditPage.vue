@@ -215,9 +215,34 @@ const handlePublish = async () => {
 
         toast.success('Article publié avec succès');
         router.visit(route('dashboard.blog-posts.index'));
-    } catch (error) {
+    } catch (error: any) {
         console.error('Erreur lors de la publication:', error);
-        toast.error('Une erreur est survenue lors de la publication');
+
+        // Extract and display validation errors
+        if (error.response?.data?.errors) {
+            const errors = error.response.data.errors;
+
+            // Check for video-related errors specifically
+            if (errors.videos && Array.isArray(errors.videos)) {
+                errors.videos.forEach((errorMessage: string) => {
+                    toast.warning(errorMessage, { duration: 8000 });
+                });
+            } else {
+                // Display the first error from any field
+                const firstErrorField = Object.values(errors)[0];
+                if (Array.isArray(firstErrorField) && firstErrorField.length > 0) {
+                    toast.error(firstErrorField[0]);
+                } else {
+                    toast.error('Une erreur est survenue lors de la publication');
+                }
+            }
+        } else if (error.response?.data?.message) {
+            // Display the error message from the response
+            toast.error(error.response.data.message);
+        } else {
+            // Generic fallback error
+            toast.error('Une erreur est survenue lors de la publication');
+        }
     } finally {
         isPublishing.value = false;
     }

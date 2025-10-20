@@ -12,7 +12,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, Video } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { Edit, ExternalLink, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
+import { Download, Edit, ExternalLink, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -47,6 +47,7 @@ const videos = ref<VideoWithUsage[]>([...props.videos]);
 const loading = ref(false);
 const isUploadModalOpen = ref(false);
 const isEditModalOpen = ref(false);
+const isImportModalOpen = ref(false);
 const newVideoFile = ref<File | null>(null);
 const newVideoName = ref('');
 const newVideoCoverPictureId = ref<number | undefined>(undefined);
@@ -54,6 +55,8 @@ const editingVideo = ref<VideoWithUsage | null>(null);
 const editVideoName = ref('');
 const editVideoCoverPictureId = ref<number | undefined>(undefined);
 const uploadProgress = ref(0);
+const importBunnyVideoId = ref('');
+const importDownloadThumbnail = ref(true);
 
 // Upload new video
 const uploadVideo = async () => {
@@ -219,6 +222,45 @@ const getUsageTypeLabel = (usage: VideoUsage): string => {
     return usage.type === 'creation' ? 'Création' : 'Article';
 };
 
+// Import video from Bunny Stream
+const importFromBunny = async () => {
+    if (!importBunnyVideoId.value.trim()) {
+        toast.error('Veuillez entrer un ID de vidéo Bunny Stream');
+        return;
+    }
+
+    loading.value = true;
+
+    try {
+        const response = await axios.post(route('dashboard.api.videos.import-from-bunny'), {
+            bunny_video_id: importBunnyVideoId.value.trim(),
+            download_thumbnail: importDownloadThumbnail.value,
+        });
+
+        // Add imported video to list
+        videos.value.unshift({
+            ...response.data.video,
+            usages: [],
+        });
+
+        resetImportForm();
+        isImportModalOpen.value = false;
+        toast.success(response.data.message || 'Vidéo importée avec succès');
+    } catch (error: any) {
+        console.error("Erreur lors de l'import:", error);
+        const message = error.response?.data?.message || "Erreur lors de l'import de la vidéo";
+        toast.error(message);
+    } finally {
+        loading.value = false;
+    }
+};
+
+// Reset import form
+const resetImportForm = () => {
+    importBunnyVideoId.value = '';
+    importDownloadThumbnail.value = true;
+};
+
 onMounted(() => {
     // Initial data is already loaded via props
 });
@@ -234,6 +276,10 @@ onMounted(() => {
 
                 <div class="flex items-center gap-3">
                     <Button type="button" variant="outline" @click="refreshVideos"> Actualiser </Button>
+                    <Button type="button" variant="outline" @click="isImportModalOpen = true">
+                        <Download class="mr-2 h-4 w-4" />
+                        Importer depuis Bunny
+                    </Button>
                     <Button type="button" @click="isUploadModalOpen = true">
                         <Plus class="mr-2 h-4 w-4" />
                         Ajouter une vidéo
@@ -428,6 +474,58 @@ onMounted(() => {
                         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
                         <Edit v-else class="mr-2 h-4 w-4" />
                         Mettre à jour
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        <!-- Import from Bunny Stream Modal -->
+        <Dialog v-model:open="isImportModalOpen">
+            <DialogContent class="max-w-lg">
+                <DialogHeader>
+                    <DialogTitle>Importer une vidéo depuis Bunny Stream</DialogTitle>
+                </DialogHeader>
+
+                <div class="space-y-4">
+                    <div class="rounded-lg bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-900/20 dark:text-blue-100">
+                        <p class="font-medium">Information</p>
+                        <p class="mt-1">Cette fonctionnalité permet d'importer des vidéos déjà hébergées sur Bunny Stream sans avoir à les télécharger et re-uploader.</p>
+                    </div>
+
+                    <!-- Bunny Video ID -->
+                    <div>
+                        <Label>ID de la vidéo Bunny Stream</Label>
+                        <Input
+                            v-model="importBunnyVideoId"
+                            placeholder="ex: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                            :disabled="loading"
+                        />
+                        <p class="mt-1 text-xs text-gray-500">
+                            Vous pouvez trouver l'ID de la vidéo dans le tableau de bord Bunny Stream
+                        </p>
+                    </div>
+
+                    <!-- Download Thumbnail Option -->
+                    <div class="flex items-center space-x-2">
+                        <input
+                            id="download-thumbnail"
+                            v-model="importDownloadThumbnail"
+                            type="checkbox"
+                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            :disabled="loading"
+                        />
+                        <label for="download-thumbnail" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            Télécharger la miniature comme image de couverture
+                        </label>
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button type="button" variant="outline" :disabled="loading" @click="isImportModalOpen = false"> Annuler </Button>
+                    <Button type="button" :disabled="!importBunnyVideoId.trim() || loading" @click="importFromBunny">
+                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
+                        <Download v-else class="mr-2 h-4 w-4" />
+                        Importer
                     </Button>
                 </DialogFooter>
             </DialogContent>

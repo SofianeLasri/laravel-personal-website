@@ -12,6 +12,7 @@ use App\Enums\VideoVisibility;
 use App\Models\BlogCategory;
 use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
+use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\Certification;
 use App\Models\Creation;
@@ -1094,6 +1095,7 @@ class PublicControllersService
                 $query->morphWith([
                     BlogContentMarkdown::class => ['translationKey.translations'],
                     BlogContentGallery::class => ['pictures'],
+                    BlogContentVideo::class => ['video.coverPicture', 'captionTranslationKey.translations'],
                 ]);
             },
             'gameReview.coverPicture',
@@ -1159,6 +1161,20 @@ class PublicControllersService
                         return $formattedPicture;
                     })->toArray(),
                 ];
+            } elseif ($content->content_type === BlogContentVideo::class && $content->content instanceof BlogContentVideo) {
+                $video = $content->content->video;
+
+                if ($video && $video->status === VideoStatus::READY && $video->visibility === VideoVisibility::PUBLIC) {
+                    $caption = null;
+                    if ($content->content->captionTranslationKey) {
+                        $caption = $this->getTranslationWithFallback($content->content->captionTranslationKey->translations);
+                    }
+
+                    $formattedVideo = $this->formatVideoForSSR($video);
+                    $formattedVideo['caption'] = $caption;
+
+                    $result['video'] = $formattedVideo;
+                }
             }
 
             return $result;

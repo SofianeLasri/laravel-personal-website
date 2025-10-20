@@ -520,6 +520,14 @@ interface SSRBlogPostDetailed extends SSRBlogPost {
             id: number;
             pictures: SSRPicture[];
         };
+        video?: {
+            id: number;
+            bunnyVideoId: string;
+            name: string;
+            coverPicture: SSRPicture;
+            libraryId: string;
+            caption: string | null;
+        };
     }>;
     gameReview?: {
         gameTitle: string;

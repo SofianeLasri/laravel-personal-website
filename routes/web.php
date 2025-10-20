@@ -252,6 +252,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         ]);
 
         // Routes spécifiques pour les vidéos
+        Route::post('videos/import-from-bunny', [VideoController::class, 'importFromBunny'])
+            ->name('videos.import-from-bunny');
         Route::get('videos/{video}/metadata', [VideoController::class, 'metadata'])
             ->name('videos.metadata');
         Route::get('videos/{video}/status', [VideoController::class, 'status'])

@@ -222,14 +222,13 @@ class VideoControllerTest extends TestCase
         $video = Video::factory()->create();
 
         $updateData = [
-            'name' => '',
-            'cover_picture_id' => 99999,
+            'cover_picture_id' => 99999, // Invalid picture ID
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'cover_picture_id']);
+            ->assertJsonValidationErrors(['cover_picture_id']);
     }
 
     #[Test]

@@ -30,7 +30,7 @@ const languagePopupShouldShow = () => {
 
 const blogPopupShouldShow = () => {
     if (typeof window === 'undefined') return false;
-    const latestBlogPost = page.props.latestBlogPost as any;
+    const latestBlogPost = page.props.latestBlogPost as { slug: string } | undefined;
     if (!latestBlogPost) return false;
 
     const lastSeenSlug = localStorage.getItem('blog_notification_last_seen');
@@ -65,15 +65,7 @@ const popups = computed(() => [
     </div>
     <Footer
         :social-media-links="socialMediaLinks"
-        :latest-blog-post="
-            (page.props.latestBlogPost as
-                | {
-                      title: string;
-                      slug: string;
-                      published_at: string;
-                  }
-                | undefined)
-        "
+        :latest-blog-post="page.props.latestBlogPost as { title: string; slug: string; published_at: string } | undefined"
     />
 </template>
 

@@ -279,6 +279,7 @@ const getUsageTypeLabel = (usage: VideoUsage): string => {
             v-model:show-import-modal="isImportModalOpen"
             :editing-video="editingVideo"
             :allow-visibility-edit="true"
+            :allow-thumbnail-download="true"
             @video-uploaded="handleVideoUploaded"
             @video-updated="handleVideoUpdated"
             @video-imported="handleVideoImported"

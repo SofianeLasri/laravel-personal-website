@@ -96,21 +96,43 @@ class VideoController extends Controller
     public function show(int $videoId): JsonResponse
     {
         $video = Video::with('coverPicture')->findOrFail($videoId);
-        $bunnyVideoData = $this->bunnyStreamService->getVideo($video->bunny_video_id);
 
         $response = $video->toArray();
 
-        if ($bunnyVideoData) {
-            $response['bunny_data'] = [
-                'status' => $bunnyVideoData['status'],
-                'duration' => $bunnyVideoData['length'],
-                'width' => $bunnyVideoData['width'],
-                'height' => $bunnyVideoData['height'],
-                'size' => $bunnyVideoData['storageSize'],
-                'playback_url' => $this->bunnyStreamService->getPlaybackUrl($video->bunny_video_id),
-                'thumbnail_url' => $this->bunnyStreamService->getThumbnailUrl($video->bunny_video_id),
-                'is_ready' => $this->bunnyStreamService->isVideoReady($video->bunny_video_id),
-            ];
+        // Try to fetch video data from BunnyCDN
+        try {
+            $bunnyVideoData = $this->bunnyStreamService->getVideo($video->bunny_video_id);
+
+            if ($bunnyVideoData) {
+                $response['bunny_data'] = [
+                    'status' => $bunnyVideoData['status'],
+                    'duration' => $bunnyVideoData['length'],
+                    'width' => $bunnyVideoData['width'],
+                    'height' => $bunnyVideoData['height'],
+                    'size' => $bunnyVideoData['storageSize'],
+                    'playback_url' => $this->bunnyStreamService->getPlaybackUrl($video->bunny_video_id),
+                    'thumbnail_url' => $this->bunnyStreamService->getThumbnailUrl($video->bunny_video_id),
+                    'is_ready' => $this->bunnyStreamService->isVideoReady($video->bunny_video_id),
+                ];
+            } else {
+                // Video not found in BunnyCDN library (might be from different library)
+                Log::warning('Video not found in configured BunnyCDN library', [
+                    'video_id' => $videoId,
+                    'bunny_video_id' => $video->bunny_video_id,
+                    'library_id' => config('services.bunny.stream_library_id'),
+                ]);
+
+                $response['bunny_data'] = null;
+            }
+        } catch (Exception $e) {
+            // BunnyCDN API error
+            Log::error('Error fetching video from BunnyCDN', [
+                'video_id' => $videoId,
+                'bunny_video_id' => $video->bunny_video_id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $response['bunny_data'] = null;
         }
 
         return response()->json($response);

@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useRoute } from '@/composables/useRoute';
 import type { Video } from '@/types';
 import axios from 'axios';
-import { Download, FileVideo, Loader2, Upload } from 'lucide-vue-next';
+import { Download, FileVideo, ImageDown, Loader2, Upload } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -70,6 +70,7 @@ const route = useRoute();
 // State
 const loading = ref(false);
 const uploadProgress = ref(0);
+const syncingStatus = ref(false);
 
 // Upload form
 const newVideoFile = ref<File | null>(null);
@@ -80,6 +81,9 @@ const newVideoCoverPictureId = ref<number | undefined>(undefined);
 const editVideoName = ref('');
 const editVideoCoverPictureId = ref<number | undefined>(undefined);
 const editVideoVisibility = ref<'private' | 'public'>('private');
+
+// Synced video data (including cover_picture relationship and bunny_data)
+const syncedVideoData = ref<Video & { bunny_data?: any; cover_picture?: any } | null>(null);
 
 // Select form
 const selectedVideoId = ref<number | undefined>(undefined);
@@ -111,6 +115,11 @@ const isImportModalOpen = computed({
 
 const filteredAvailableVideos = computed(() => {
     return props.availableVideos.filter(v => !props.excludeVideoIds.includes(v.id));
+});
+
+// Use synced video data when available, otherwise fallback to editingVideo from props
+const currentEditingVideo = computed(() => {
+    return syncedVideoData.value || props.editingVideo;
 });
 
 // Actions
@@ -253,6 +262,13 @@ const downloadThumbnail = async (video: Video) => {
 
         // Get updated video data
         const response = await axios.get(route('dashboard.api.videos.show', { video: video.id }));
+
+        // Update synced data
+        syncedVideoData.value = response.data;
+
+        // Re-initialize form with new data
+        initializeEditForm();
+
         emit('thumbnail-downloaded', response.data);
         toast.success('Miniature téléchargée et définie comme image de couverture');
     } catch (error) {
@@ -260,6 +276,33 @@ const downloadThumbnail = async (video: Video) => {
         toast.error('Erreur lors du téléchargement de la miniature');
     } finally {
         loading.value = false;
+    }
+};
+
+/**
+ * Sync video status from BunnyCDN
+ * This method fetches the latest video data including Bunny Stream status
+ */
+const syncVideoStatus = async () => {
+    if (!props.editingVideo) return;
+
+    syncingStatus.value = true;
+
+    try {
+        const response = await axios.get(route('dashboard.api.videos.show', { video: props.editingVideo.id }));
+
+        // Store the synced data (includes bunny_data and cover_picture)
+        syncedVideoData.value = response.data;
+
+        // Re-initialize the form with updated data
+        initializeEditForm();
+
+        console.log('Video status synced from BunnyCDN', response.data);
+    } catch (error) {
+        console.error('Erreur lors de la synchronisation du statut:', error);
+        toast.error('Erreur lors de la synchronisation du statut de la vidéo');
+    } finally {
+        syncingStatus.value = false;
     }
 };
 
@@ -344,20 +387,35 @@ const formatFileSize = (bytes: number): string => {
 
 // Initialize edit form when editing video changes
 const initializeEditForm = () => {
-    if (props.editingVideo) {
-        editVideoName.value = props.editingVideo.name;
-        editVideoCoverPictureId.value = props.editingVideo.cover_picture_id;
-        editVideoVisibility.value = props.editingVideo.visibility;
+    const videoData = currentEditingVideo.value;
+    if (videoData) {
+        editVideoName.value = videoData.name;
+        editVideoCoverPictureId.value = videoData.cover_picture_id;
+        editVideoVisibility.value = videoData.visibility;
     }
 };
 
-// Watch for changes in editingVideo
+// Watch for changes in editingVideo and modal state
 import { watch } from 'vue';
-watch(() => props.editingVideo, () => {
-    if (props.editingVideo && isEditModalOpen.value) {
-        initializeEditForm();
-    }
-});
+watch(
+    [() => props.editingVideo, isEditModalOpen],
+    async ([newEditingVideo, newModalOpen], [oldEditingVideo, oldModalOpen]) => {
+        // When modal opens with an editing video
+        if (newEditingVideo && newModalOpen && !oldModalOpen) {
+            // Sync status from BunnyCDN
+            await syncVideoStatus();
+        } else if (newEditingVideo && newModalOpen) {
+            // Just initialize if already open
+            initializeEditForm();
+        }
+
+        // Reset synced data when modal closes
+        if (!newModalOpen && oldModalOpen) {
+            syncedVideoData.value = null;
+        }
+    },
+    { immediate: false }
+);
 
 // Expose helpers for parent components
 defineExpose({
@@ -366,6 +424,7 @@ defineExpose({
     canSetPublic,
     formatFileSize,
     downloadThumbnail,
+    syncVideoStatus,
 });
 </script>
 
@@ -476,9 +535,13 @@ defineExpose({
             <DialogContent class="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Modifier la vidéo</DialogTitle>
+                    <div v-if="syncingStatus" class="mt-2 flex items-center gap-2 text-sm text-blue-600">
+                        <Loader2 class="h-4 w-4 animate-spin" />
+                        Synchronisation avec BunnyCDN...
+                    </div>
                 </DialogHeader>
 
-                <div v-if="editingVideo" class="space-y-4 py-4">
+                <div v-if="currentEditingVideo" class="space-y-4 py-4">
                     <div class="space-y-2">
                         <Label>Titre de la vidéo</Label>
                         <Input v-model="editVideoName" placeholder="Titre de la vidéo" :disabled="loading" />
@@ -486,23 +549,54 @@ defineExpose({
 
                     <div class="space-y-2">
                         <Label>Image de couverture</Label>
+
+                        <!-- Aperçu de l'image de couverture actuelle -->
+                        <div v-if="currentEditingVideo.cover_picture" class="mb-3 rounded-lg border p-3 bg-gray-50 dark:bg-gray-800">
+                            <p class="mb-2 text-sm font-medium">Image actuelle:</p>
+                            <div class="aspect-video w-full max-w-xs overflow-hidden rounded-lg bg-gray-100">
+                                <img
+                                    :src="`/storage/${currentEditingVideo.cover_picture.path_original}`"
+                                    :alt="currentEditingVideo.name"
+                                    class="h-full w-full object-cover"
+                                />
+                            </div>
+                        </div>
+
                         <PictureInput v-model="editVideoCoverPictureId" :disabled="loading" />
                         <p class="text-muted-foreground text-xs">L'image de couverture sera utilisée comme miniature pour la vidéo</p>
+
+                        <!-- Bouton de téléchargement de miniature BunnyCDN -->
+                        <Button
+                            v-if="allowThumbnailDownload && currentEditingVideo.status === 'ready'"
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            class="w-full"
+                            :disabled="loading"
+                            @click="downloadThumbnail(currentEditingVideo)"
+                        >
+                            <ImageDown class="mr-2 h-4 w-4" />
+                            Télécharger la miniature BunnyCDN
+                        </Button>
                     </div>
 
                     <div v-if="allowVisibilityEdit" class="space-y-2">
                         <Label>Visibilité</Label>
                         <Select v-model="editVideoVisibility" :disabled="loading">
                             <SelectTrigger>
-                                <SelectValue />
+                                <SelectValue placeholder="Sélectionner la visibilité" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="private">Privée</SelectItem>
-                                <SelectItem value="public" :disabled="!canSetPublic(editingVideo.status)"> Publique </SelectItem>
+                                <SelectItem value="public" :disabled="!canSetPublic(currentEditingVideo.status)"> Publique </SelectItem>
                             </SelectContent>
                         </Select>
-                        <p v-if="!canSetPublic(editingVideo.status)" class="text-muted-foreground text-xs">
+                        <p v-if="!canSetPublic(currentEditingVideo.status)" class="text-muted-foreground text-xs">
                             La vidéo doit être entièrement transcodée pour être rendue publique
+                        </p>
+                        <p class="text-muted-foreground text-xs">
+                            <strong>Visibilité actuelle:</strong>
+                            {{ currentEditingVideo.visibility === 'public' ? 'Publique' : 'Privée' }}
                         </p>
                     </div>
 
@@ -511,18 +605,21 @@ defineExpose({
                         <div class="space-y-1 text-sm">
                             <p>
                                 <strong>Statut:</strong>
-                                <span :class="getStatusColor(editingVideo.status)" class="font-medium">
-                                    {{ getStatusLabel(editingVideo.status) }}
+                                <span :class="getStatusColor(currentEditingVideo.status)" class="font-medium">
+                                    {{ getStatusLabel(currentEditingVideo.status) }}
                                 </span>
                             </p>
-                            <p>
-                                <strong>Visibilité actuelle:</strong>
+                            <p v-if="syncedVideoData?.bunny_data">
+                                <strong>Statut BunnyCDN:</strong>
                                 <span class="font-medium">
-                                    {{ editingVideo.visibility === 'public' ? 'Publique' : 'Privée' }}
+                                    {{ syncedVideoData.bunny_data.is_ready ? 'Prêt' : 'En traitement' }}
+                                </span>
+                                <span v-if="syncedVideoData.bunny_data.duration" class="text-muted-foreground ml-2">
+                                    (Durée: {{ Math.floor(syncedVideoData.bunny_data.duration / 60) }}:{{ String(syncedVideoData.bunny_data.duration % 60).padStart(2, '0') }})
                                 </span>
                             </p>
-                            <p><strong>ID Bunny:</strong> {{ editingVideo.bunny_video_id }}</p>
-                            <p><strong>Créée le:</strong> {{ new Date(editingVideo.created_at).toLocaleDateString('fr-FR') }}</p>
+                            <p><strong>ID Bunny:</strong> {{ currentEditingVideo.bunny_video_id }}</p>
+                            <p><strong>Créée le:</strong> {{ new Date(currentEditingVideo.created_at).toLocaleDateString('fr-FR') }}</p>
                         </div>
                     </div>
                 </div>

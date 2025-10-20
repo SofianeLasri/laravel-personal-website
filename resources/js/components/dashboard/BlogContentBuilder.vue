@@ -378,93 +378,6 @@ const updateGalleryComplete = (contentId: number, images: GalleryImage[]) => {
     void images;
 };
 
-const updateVideoContent = async (contentId: number, videoId: number) => {
-    try {
-        await axios.put(
-            route('dashboard.api.blog-content-video.update', {
-                blog_content_video: contentId,
-            }),
-            {
-                video_id: videoId === 0 ? null : videoId,
-                locale: props.locale,
-            },
-        );
-        toast.success('Vidéo mise à jour');
-    } catch (error: unknown) {
-        console.error('Erreur lors de la mise à jour:', error);
-        toast.error('Erreur lors de la mise à jour');
-    }
-};
-
-// Fonction debounced pour sauvegarder les captions vidéo
-const debouncedSaveVideoCaption = (blogContentVideoId: number, caption: string) => {
-    // Annuler la sauvegarde précédente si elle existe
-    if (saveTimeouts.value[`video_${blogContentVideoId}`]) {
-        clearTimeout(saveTimeouts.value[`video_${blogContentVideoId}`]);
-    }
-
-    // Programmer une nouvelle sauvegarde après 1.5 secondes
-    saveTimeouts.value[`video_${blogContentVideoId}`] = setTimeout(() => {
-        void saveVideoCaption(blogContentVideoId, caption);
-    }, 1500);
-};
-
-const saveVideoCaption = async (blogContentVideoId: number, caption: string) => {
-    // Find the BlogPostDraftContent that contains this BlogContentVideo
-    const draftContent = localContents.value.find((c) => c.content_type === 'App\\Models\\BlogContentVideo' && c.content?.id === blogContentVideoId);
-    const videoId = draftContent?.content?.video_id ?? 0;
-
-    savingStatus.value[`video_${blogContentVideoId}`] = 'saving';
-
-    try {
-        await axios.put(
-            route('dashboard.api.blog-content-video.update', {
-                blog_content_video: blogContentVideoId,
-            }),
-            {
-                video_id: videoId,
-                caption,
-                locale: props.locale,
-            },
-        );
-
-        savingStatus.value[`video_${blogContentVideoId}`] = 'saved';
-
-        // Nettoyer le timeout après sauvegarde réussie
-        if (saveTimeouts.value[`video_${blogContentVideoId}`]) {
-            clearTimeout(saveTimeouts.value[`video_${blogContentVideoId}`]);
-            delete saveTimeouts.value[`video_${blogContentVideoId}`];
-        }
-
-        // Marquer comme "idle" après 2 secondes
-        setTimeout(() => {
-            if (savingStatus.value[`video_${blogContentVideoId}`] === 'saved') {
-                savingStatus.value[`video_${blogContentVideoId}`] = 'idle';
-            }
-        }, 2000);
-    } catch (error: unknown) {
-        console.error('Erreur lors de la mise à jour de la description:', error);
-        savingStatus.value[`video_${blogContentVideoId}`] = 'error';
-        toast.error('Erreur lors de la mise à jour de la description');
-
-        // Nettoyer le timeout même en cas d'erreur
-        if (saveTimeouts.value[`video_${blogContentVideoId}`]) {
-            clearTimeout(saveTimeouts.value[`video_${blogContentVideoId}`]);
-            delete saveTimeouts.value[`video_${blogContentVideoId}`];
-        }
-    }
-};
-
-const updateVideoCaption = (blogContentVideoId: number, caption: string) => {
-    // Sauvegarde debounced
-    debouncedSaveVideoCaption(blogContentVideoId, caption);
-};
-
-const getVideoIdFromContent = (contentId: number): number => {
-    const content = localContents.value.find((c) => c.id === contentId);
-    return content?.content?.video_id ?? 0;
-};
-
 const getContentTypeLabel = (type: string) => {
     const contentType = contentTypes.find((t) => t.value === type);
     return contentType?.label ?? type;
@@ -629,11 +542,10 @@ defineExpose({
                     <!-- Video Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'video'" class="space-y-2">
                         <BlogContentVideoManager
-                            :video-id="getVideoIdFromContent(content.id)"
-                            :content-data="content.content"
+                            :blog-content-video-id="content.content.id"
                             :locale="locale"
-                            @video-selected="(videoId) => updateVideoContent(content.content.id, videoId)"
-                            @caption-updated="(caption) => updateVideoCaption(content.content.id, caption)"
+                            @video-selected="() => {}"
+                            @video-removed="() => {}"
                         />
                     </div>
                 </CardContent>

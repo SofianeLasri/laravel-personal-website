@@ -116,14 +116,14 @@ const handleEditCreation = (post: BlogPostWithAllRelations) => {
         selectedPost.value = post;
         showDraftAlert.value = true;
     } else {
-        router.visit(route('dashboard.creations.edit', { 'creation-id': post.id })); // TODO: Use correct route
+        router.visit(route('dashboard.blog-posts.edit', { 'blog-post-id': post.id }));
     }
 };
 
 const navigateToDraftEdit = () => {
     if (selectedPost.value && selectedPost.value.drafts.length > 0) {
         const draftId = selectedPost.value.drafts[0].id;
-        router.visit(route('dashboard.creations.edit', { 'draft-id': draftId })); // TODO: Use correct route
+        router.visit(route('dashboard.blog-posts.edit', { 'draft-id': draftId }));
     }
     showDraftAlert.value = false;
 };

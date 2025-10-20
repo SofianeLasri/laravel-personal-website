@@ -63,7 +63,18 @@ const popups = computed(() => [
         <slot />
         <PopupCarousel :popups="popups" />
     </div>
-    <Footer :social-media-links="socialMediaLinks" :latest-blog-post="page.props.latestBlogPost as any" />
+    <Footer
+        :social-media-links="socialMediaLinks"
+        :latest-blog-post="
+            (page.props.latestBlogPost as
+                | {
+                      title: string;
+                      slug: string;
+                      published_at: string;
+                  }
+                | undefined)
+        "
+    />
 </template>
 
 <style>

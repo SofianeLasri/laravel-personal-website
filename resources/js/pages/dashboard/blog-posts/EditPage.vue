@@ -215,12 +215,14 @@ const handlePublish = async () => {
 
         toast.success('Article publié avec succès');
         router.visit(route('dashboard.blog-posts.index'));
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la publication:', error);
 
+        const axiosError = error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } };
+
         // Extract and display validation errors
-        if (error.response?.data?.errors) {
-            const errors = error.response.data.errors;
+        if (axiosError.response?.data?.errors) {
+            const errors = axiosError.response.data.errors;
 
             // Check for video-related errors specifically
             if (errors.videos && Array.isArray(errors.videos)) {
@@ -236,9 +238,9 @@ const handlePublish = async () => {
                     toast.error('Une erreur est survenue lors de la publication');
                 }
             }
-        } else if (error.response?.data?.message) {
+        } else if (axiosError.response?.data?.message) {
             // Display the error message from the response
-            toast.error(error.response.data.message);
+            toast.error(axiosError.response.data.message);
         } else {
             // Generic fallback error
             toast.error('Une erreur est survenue lors de la publication');

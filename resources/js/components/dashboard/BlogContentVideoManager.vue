@@ -111,7 +111,9 @@ const removeVideo = async () => {
         );
 
         currentVideo.value = null;
-        blogContentVideo.value!.video_id = null;
+        if (blogContentVideo.value) {
+            blogContentVideo.value.video_id = null;
+        }
         emit('video-removed');
         toast.success('Vidéo retirée');
     } catch (error) {

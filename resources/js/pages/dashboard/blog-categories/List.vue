@@ -181,9 +181,9 @@ const submitCategory = async () => {
         }
         showCreateEditDialog.value = false;
         router.reload();
-    } catch (error: any) {
-        if (error.response?.status === 422) {
-            formErrors.value = error.response.data.errors || {};
+    } catch (error: unknown) {
+        if ((error as { response?: { status?: number; data?: { errors?: Record<string, string[]> } } }).response?.status === 422) {
+            formErrors.value = (error as { response: { data: { errors: Record<string, string[]> } } }).response.data.errors || {};
         } else {
             console.error('Erreur lors de la sauvegarde:', error);
         }
@@ -204,10 +204,10 @@ const confirmDelete = async () => {
         showDeleteDialog.value = false;
         deletingCategory.value = null;
         router.reload();
-    } catch (error: any) {
-        if (error.response?.status === 422) {
+    } catch (error: unknown) {
+        if ((error as { response?: { status?: number; data?: { message?: string } } }).response?.status === 422) {
             // Category is used, keep dialog open to show error
-            console.error('Cannot delete category:', error.response.data.message);
+            console.error('Cannot delete category:', (error as { response: { data: { message: string } } }).response.data.message);
         } else {
             console.error('Erreur lors de la suppression:', error);
         }

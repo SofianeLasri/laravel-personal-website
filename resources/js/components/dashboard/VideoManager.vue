@@ -83,7 +83,16 @@ const editVideoCoverPictureId = ref<number | undefined>(undefined);
 const editVideoVisibility = ref<'private' | 'public'>('private');
 
 // Synced video data (including cover_picture relationship and bunny_data)
-const syncedVideoData = ref<(Video & { bunny_data?: any; cover_picture?: any }) | null>(null);
+const syncedVideoData = ref<
+    | (Video & {
+          bunny_data?: {
+              is_ready: boolean;
+              duration: number;
+          };
+          cover_picture?: { path_original: string };
+      })
+    | null
+>(null);
 
 // Select form
 const selectedVideoId = ref<number | undefined>(undefined);
@@ -165,7 +174,7 @@ const uploadVideo = async () => {
 /**
  * Select an existing video
  */
-const selectVideo = async () => {
+const selectVideo = () => {
     if (!selectedVideoId.value) return;
 
     emit('video-selected', selectedVideoId.value);
@@ -231,9 +240,9 @@ const importFromBunny = async () => {
         resetImportForm();
         isImportModalOpen.value = false;
         toast.success(response.data.message || 'Vidéo importée avec succès');
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Erreur lors de l'import:", error);
-        const message = error.response?.data?.message || "Erreur lors de l'import de la vidéo";
+        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Erreur lors de l'import de la vidéo";
         toast.error(message);
     } finally {
         loading.value = false;
@@ -291,8 +300,6 @@ const syncVideoStatus = async () => {
 
         // Re-initialize the form with updated data
         initializeEditForm();
-
-        console.log('Video status synced from BunnyCDN', response.data);
     } catch (error) {
         console.error('Erreur lors de la synchronisation du statut:', error);
         toast.error('Erreur lors de la synchronisation du statut de la vidéo');
@@ -394,7 +401,7 @@ const initializeEditForm = () => {
 import { watch } from 'vue';
 watch(
     [() => props.editingVideo, isEditModalOpen],
-    async ([newEditingVideo, newModalOpen], [oldEditingVideo, oldModalOpen]) => {
+    async ([newEditingVideo, newModalOpen], [_oldEditingVideo, oldModalOpen]) => {
         // When modal opens with an editing video
         if (newEditingVideo && newModalOpen && !oldModalOpen) {
             // Sync status from BunnyCDN

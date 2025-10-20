@@ -48,17 +48,34 @@ class VideosPageController extends Controller
 
         // Check usage in blog posts
         $blogPostUsages = $video->blogContentVideos()
-            ->with(['blogContent.blogPostDraft'])
+            ->with(['blogContent.blogPostDraft.titleTranslationKey.translations'])
             ->get();
 
         foreach ($blogPostUsages as $blogContentVideo) {
             $blogContent = $blogContentVideo->blogContent;
             if ($blogContent && $blogContent->blogPostDraft) {
                 $blogPost = $blogContent->blogPostDraft;
+
+                // Extract title from translation (prefer French, fallback to first available)
+                $translationKey = $blogPost->titleTranslationKey;
+                $title = 'Sans titre';
+
+                if ($translationKey && $translationKey->translations) {
+                    $frenchTranslation = $translationKey->translations->firstWhere('locale', 'fr');
+                    if ($frenchTranslation) {
+                        $title = $frenchTranslation->text;
+                    } else {
+                        $firstTranslation = $translationKey->translations->first();
+                        if ($firstTranslation) {
+                            $title = $firstTranslation->text;
+                        }
+                    }
+                }
+
                 $usages[] = [
                     'id' => $blogPost->id,
                     'type' => 'blog_post',
-                    'title' => $blogPost->title,
+                    'title' => $title,
                     'slug' => $blogPost->slug ?? '',
                     'url' => route('dashboard.blog-posts.edit').'?id='.$blogPost->id,
                 ];

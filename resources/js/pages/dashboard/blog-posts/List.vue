@@ -147,7 +147,7 @@ const navigateToDraftEdit = () => {
                                     <ArrowDown v-if="sortColumn === 'id' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
                                 </div>
                             </TableHead>
-                            <TableHead class="text-right">Titre</TableHead>
+                            <TableHead>Titre</TableHead>
                             <TableHead class="cursor-pointer" @click="toggleSort('type')">
                                 <div class="flex items-center">
                                     Type
@@ -175,6 +175,7 @@ const navigateToDraftEdit = () => {
                                 <!--                                    <Badge variant="outline">{{ getTypeLabel(post.type) }}</Badge>-->
                             </TableCell>
                             <TableCell>{{ post.category?.name || 'Non définie' }}</TableCell>
+                            <TableCell>{{ post.published_at ? new Date(post.published_at).toLocaleDateString('fr-FR') : '-' }}</TableCell>
                             <TableCell class="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger as-child>

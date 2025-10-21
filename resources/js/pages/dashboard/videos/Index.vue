@@ -47,6 +47,7 @@ const isImportModalOpen = ref(false);
 const editingVideo = ref<VideoWithUsage | null>(null);
 
 // Ref to VideoManager for helpers
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 const videoManager = ref<InstanceType<typeof VideoManager> | null>(null);
 
 // VideoManager event handlers

@@ -40,6 +40,7 @@ const isSelectModalOpen = ref(false);
 const isUploadModalOpen = ref(false);
 
 // Ref to VideoManager for helpers
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 const videoManager = ref<InstanceType<typeof VideoManager> | null>(null);
 
 // Load blog content video data

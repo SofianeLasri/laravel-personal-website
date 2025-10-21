@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\Api\TechnologyController;
 use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Http\Controllers\Admin\ApiRequestLogController;
+use App\Http\Controllers\Admin\BlogCategoriesPageController;
 use App\Http\Controllers\Admin\BlogPostDraftsPageController;
 use App\Http\Controllers\Admin\BlogPostEditPageController;
 use App\Http\Controllers\Admin\BlogPostsPageController;
@@ -186,6 +187,9 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('edit');
     });
 
+    Route::get('/blog-categories', [BlogCategoriesPageController::class, 'index'])
+        ->name('blog-categories.index');
+
     Route::name('api.')->prefix('api')->group(function () {
         // Notifications routes
         Route::get('notifications', [NotificationController::class, 'index'])
@@ -252,6 +256,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         ]);
 
         // Routes spécifiques pour les vidéos
+        Route::post('videos/import-from-bunny', [VideoController::class, 'importFromBunny'])
+            ->name('videos.import-from-bunny');
         Route::get('videos/{video}/metadata', [VideoController::class, 'metadata'])
             ->name('videos.metadata');
         Route::get('videos/{video}/status', [VideoController::class, 'status'])

@@ -20,6 +20,11 @@ withDefaults(defineProps<Props>(), {
 
 const page = usePage();
 
+const latestBlogPostData = computed(() => {
+    const blogPost = page.props.latestBlogPost as { title: string; slug: string; published_at: string } | undefined;
+    return blogPost;
+});
+
 const languagePopupShouldShow = () => {
     if (typeof window === 'undefined') return false;
     const dismissed = localStorage.getItem('language_popup_dismissed');
@@ -30,7 +35,7 @@ const languagePopupShouldShow = () => {
 
 const blogPopupShouldShow = () => {
     if (typeof window === 'undefined') return false;
-    const latestBlogPost = page.props.latestBlogPost as any;
+    const latestBlogPost = page.props.latestBlogPost as { slug: string } | undefined;
     if (!latestBlogPost) return false;
 
     const lastSeenSlug = localStorage.getItem('blog_notification_last_seen');
@@ -63,7 +68,7 @@ const popups = computed(() => [
         <slot />
         <PopupCarousel :popups="popups" />
     </div>
-    <Footer :social-media-links="socialMediaLinks" :latest-blog-post="page.props.latestBlogPost as any" />
+    <Footer :social-media-links="socialMediaLinks" :latest-blog-post="latestBlogPostData" />
 </template>
 
 <style>

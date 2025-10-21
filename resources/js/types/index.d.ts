@@ -310,6 +310,7 @@ interface Video {
     path: string;
     cover_picture_id: number;
     bunny_video_id: string;
+    file_size?: number;
     created_at: string;
     updated_at: string;
     cover_picture?: Picture;
@@ -519,6 +520,14 @@ interface SSRBlogPostDetailed extends SSRBlogPost {
         gallery?: {
             id: number;
             pictures: SSRPicture[];
+        };
+        video?: {
+            id: number;
+            bunnyVideoId: string;
+            name: string;
+            coverPicture: SSRPicture;
+            libraryId: string;
+            caption: string | null;
         };
     }>;
     gameReview?: {

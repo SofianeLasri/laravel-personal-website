@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import Heading from '@/components/dashboard/Heading.vue';
-import PictureInput from '@/components/dashboard/PictureInput.vue';
+import VideoManager from '@/components/dashboard/VideoManager.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, Video } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { Edit, ExternalLink, FileVideo, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { Download, Edit, ExternalLink, FileVideo, Plus, Trash2 } from 'lucide-vue-next';
+import { ref } from 'vue';
 import { toast } from 'vue-sonner';
 
 interface VideoUsage {
@@ -44,100 +41,48 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 // State
 const videos = ref<VideoWithUsage[]>([...props.videos]);
-const loading = ref(false);
 const isUploadModalOpen = ref(false);
 const isEditModalOpen = ref(false);
-const newVideoFile = ref<File | null>(null);
-const newVideoName = ref('');
-const newVideoCoverPictureId = ref<number | undefined>(undefined);
+const isImportModalOpen = ref(false);
 const editingVideo = ref<VideoWithUsage | null>(null);
-const editVideoName = ref('');
-const editVideoCoverPictureId = ref<number | undefined>(undefined);
-const uploadProgress = ref(0);
 
-// Upload new video
-const uploadVideo = async () => {
-    if (!newVideoFile.value) return;
+// Ref to VideoManager for helpers
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+const videoManager = ref<InstanceType<typeof VideoManager> | null>(null);
 
-    loading.value = true;
-    uploadProgress.value = 0;
+// VideoManager event handlers
+const handleVideoUploaded = (video: Video) => {
+    // Add new video to list with empty usages
+    videos.value.unshift({
+        ...video,
+        usages: [],
+    });
+};
 
-    try {
-        const formData = new FormData();
-        formData.append('video', newVideoFile.value);
-        formData.append('name', newVideoName.value || newVideoFile.value.name);
-        if (newVideoCoverPictureId.value) {
-            formData.append('cover_picture_id', newVideoCoverPictureId.value.toString());
-        }
-
-        const response = await axios.post(route('dashboard.api.videos.store'), formData, {
-            onUploadProgress: (progressEvent) => {
-                if (progressEvent.total) {
-                    uploadProgress.value = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                }
-            },
-        });
-
-        // Add new video to list with empty usages
-        videos.value.unshift({
-            ...response.data,
-            usages: [],
-        });
-
-        resetUploadForm();
-        isUploadModalOpen.value = false;
-        toast.success('Vidéo uploadée avec succès');
-    } catch (error) {
-        console.error("Erreur lors de l'upload:", error);
-        toast.error("Erreur lors de l'upload de la vidéo");
-    } finally {
-        loading.value = false;
-        uploadProgress.value = 0;
+const handleVideoUpdated = (video: Video) => {
+    // Update video in list
+    const index = videos.value.findIndex((v) => v.id === video.id);
+    if (index !== -1) {
+        videos.value[index] = {
+            ...video,
+            usages: videos.value[index].usages, // Preserve usages
+        };
     }
+    editingVideo.value = null;
+};
+
+const handleVideoImported = (video: Video) => {
+    // Add imported video to list with empty usages
+    videos.value.unshift({
+        ...video,
+        usages: [],
+    });
 };
 
 // Edit video
 const openEditModal = (video: VideoWithUsage) => {
     editingVideo.value = video;
-    editVideoName.value = video.name;
-    editVideoCoverPictureId.value = video.cover_picture?.id;
     isEditModalOpen.value = true;
-};
-
-const updateVideo = async () => {
-    if (!editingVideo.value) return;
-
-    loading.value = true;
-
-    try {
-        const updateData: { name: string; cover_picture_id?: number } = {
-            name: editVideoName.value,
-        };
-
-        if (editVideoCoverPictureId.value) {
-            updateData.cover_picture_id = editVideoCoverPictureId.value;
-        }
-
-        const response = await axios.put(route('dashboard.api.videos.update', { video: editingVideo.value.id }), updateData);
-
-        // Update video in list
-        const index = videos.value.findIndex((v) => v.id === editingVideo.value?.id);
-        if (index !== -1) {
-            videos.value[index] = {
-                ...response.data,
-                usages: videos.value[index].usages, // Preserve usages
-            };
-        }
-
-        resetEditForm();
-        isEditModalOpen.value = false;
-        toast.success('Vidéo mise à jour avec succès');
-    } catch (error) {
-        console.error('Erreur lors de la mise à jour:', error);
-        toast.error('Erreur lors de la mise à jour');
-    } finally {
-        loading.value = false;
-    }
 };
 
 // Delete video
@@ -176,30 +121,6 @@ const refreshVideos = () => {
     }
 };
 
-// Reset forms
-const resetUploadForm = () => {
-    newVideoFile.value = null;
-    newVideoName.value = '';
-    newVideoCoverPictureId.value = undefined;
-};
-
-const resetEditForm = () => {
-    editingVideo.value = null;
-    editVideoName.value = '';
-    editVideoCoverPictureId.value = undefined;
-};
-
-// File input handler
-const handleFileSelect = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files?.[0]) {
-        newVideoFile.value = target.files[0];
-        if (!newVideoName.value) {
-            newVideoName.value = target.files[0].name;
-        }
-    }
-};
-
 // Format file size
 const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';
@@ -218,10 +139,6 @@ const formatDate = (dateString: string): string => {
 const getUsageTypeLabel = (usage: VideoUsage): string => {
     return usage.type === 'creation' ? 'Création' : 'Article';
 };
-
-onMounted(() => {
-    // Initial data is already loaded via props
-});
 </script>
 
 <template>
@@ -234,6 +151,10 @@ onMounted(() => {
 
                 <div class="flex items-center gap-3">
                     <Button type="button" variant="outline" @click="refreshVideos"> Actualiser </Button>
+                    <Button type="button" variant="outline" @click="isImportModalOpen = true">
+                        <Download class="mr-2 h-4 w-4" />
+                        Importer depuis Bunny
+                    </Button>
                     <Button type="button" @click="isUploadModalOpen = true">
                         <Plus class="mr-2 h-4 w-4" />
                         Ajouter une vidéo
@@ -265,8 +186,8 @@ onMounted(() => {
                                     <TableCell>
                                         <div class="h-8 w-12 overflow-hidden rounded bg-gray-100">
                                             <img
-                                                v-if="video.cover_picture?.path_small"
-                                                :src="`/storage/${video.cover_picture.path_small}`"
+                                                v-if="video.cover_picture?.path_original"
+                                                :src="`/storage/${video.cover_picture.path_original}`"
                                                 :alt="video.name"
                                                 class="h-full w-full object-cover"
                                             />
@@ -351,86 +272,18 @@ onMounted(() => {
             </Card>
         </div>
 
-        <!-- Upload Video Modal -->
-        <Dialog v-model:open="isUploadModalOpen">
-            <DialogContent class="max-w-lg">
-                <DialogHeader>
-                    <DialogTitle>Ajouter une nouvelle vidéo</DialogTitle>
-                </DialogHeader>
-
-                <div class="space-y-4">
-                    <!-- File Input -->
-                    <div>
-                        <Label>Fichier vidéo</Label>
-                        <Input type="file" accept="video/*" @change="handleFileSelect" />
-                        <p class="mt-1 text-xs text-gray-500">Formats supportés: MP4, AVI, MOV, etc.</p>
-                    </div>
-
-                    <!-- Video Name -->
-                    <div>
-                        <Label>Nom de la vidéo</Label>
-                        <Input v-model="newVideoName" placeholder="Nom de la vidéo" />
-                    </div>
-
-                    <!-- Cover Picture -->
-                    <div>
-                        <Label>Image de couverture (optionnelle)</Label>
-                        <PictureInput :picture-id="newVideoCoverPictureId" @picture-selected="(id) => (newVideoCoverPictureId = id)" />
-                    </div>
-
-                    <!-- Upload Progress -->
-                    <div v-if="uploadProgress > 0" class="space-y-2">
-                        <div class="flex justify-between text-sm">
-                            <span>Upload en cours...</span>
-                            <span>{{ uploadProgress }}%</span>
-                        </div>
-                        <div class="h-2 w-full rounded-full bg-gray-200">
-                            <div class="h-2 rounded-full bg-blue-600 transition-all" :style="{ width: `${uploadProgress}%` }"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <DialogFooter>
-                    <Button type="button" variant="outline" :disabled="loading" @click="isUploadModalOpen = false"> Annuler </Button>
-                    <Button type="button" :disabled="!newVideoFile || loading" @click="uploadVideo">
-                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-                        <Upload v-else class="mr-2 h-4 w-4" />
-                        Uploader
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-
-        <!-- Edit Video Modal -->
-        <Dialog v-model:open="isEditModalOpen">
-            <DialogContent class="max-w-lg">
-                <DialogHeader>
-                    <DialogTitle>Modifier la vidéo</DialogTitle>
-                </DialogHeader>
-
-                <div class="space-y-4">
-                    <!-- Video Name -->
-                    <div>
-                        <Label>Nom de la vidéo</Label>
-                        <Input v-model="editVideoName" placeholder="Nom de la vidéo" />
-                    </div>
-
-                    <!-- Cover Picture -->
-                    <div>
-                        <Label>Image de couverture</Label>
-                        <PictureInput :picture-id="editVideoCoverPictureId" @picture-selected="(id) => (editVideoCoverPictureId = id)" />
-                    </div>
-                </div>
-
-                <DialogFooter>
-                    <Button type="button" variant="outline" :disabled="loading" @click="isEditModalOpen = false"> Annuler </Button>
-                    <Button type="button" :disabled="loading" @click="updateVideo">
-                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-                        <Edit v-else class="mr-2 h-4 w-4" />
-                        Mettre à jour
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+        <!-- VideoManager with all modals -->
+        <VideoManager
+            ref="videoManager"
+            v-model:show-upload-modal="isUploadModalOpen"
+            v-model:show-edit-modal="isEditModalOpen"
+            v-model:show-import-modal="isImportModalOpen"
+            :editing-video="editingVideo"
+            :allow-visibility-edit="true"
+            :allow-thumbnail-download="true"
+            @video-uploaded="handleVideoUploaded"
+            @video-updated="handleVideoUpdated"
+            @video-imported="handleVideoImported"
+        />
     </AppLayout>
 </template>

@@ -369,17 +369,9 @@ defineExpose({
                     <!-- Image -->
                     <div class="mb-2 aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
                         <img
-                            :src="`/storage/${image.picture.path_medium || image.picture.path_original}`"
+                            :src="`/storage/${image.picture.path_original}`"
                             :alt="image.caption || 'Image de galerie'"
                             class="h-full w-full object-cover"
-                            @error="
-                                (e) => {
-                                    // Fallback to original if medium fails to load
-                                    if (image.picture.path_medium && e.target.src.includes(image.picture.path_medium)) {
-                                        e.target.src = `/storage/${image.picture.path_original}`;
-                                    }
-                                }
-                            "
                         />
                     </div>
 

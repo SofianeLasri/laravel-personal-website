@@ -1630,4 +1630,198 @@ class PublicControllersServiceTest extends TestCase
 
         $this->assertEquals('', $result['excerpt']);
     }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_with_video_content(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-with-video',
+            'category_id' => $category->id,
+        ]);
+
+        // Create video content
+        $video = \App\Models\Video::factory()->readyAndPublic()->create([
+            'name' => 'Test Video',
+            'bunny_video_id' => 'test-video-123',
+        ]);
+
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        // Add caption translation
+        $captionKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'en',
+            'text' => 'Video caption text',
+        ]);
+        $blogContentVideo->update(['caption_translation_key_id' => $captionKey->id]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-with-video');
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        $this->assertEquals(\App\Models\BlogContentVideo::class, $result['contents'][0]['content_type']);
+        $this->assertArrayHasKey('video', $result['contents'][0]);
+        $this->assertEquals($video->id, $result['contents'][0]['video']['id']);
+        $this->assertEquals('test-video-123', $result['contents'][0]['video']['bunnyVideoId']);
+        $this->assertEquals('Test Video', $result['contents'][0]['video']['name']);
+        $this->assertEquals('Video caption text', $result['contents'][0]['video']['caption']);
+        $this->assertArrayHasKey('coverPicture', $result['contents'][0]['video']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_excludes_private_videos(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-private-video',
+            'category_id' => $category->id,
+        ]);
+
+        // Create private video (ready but private)
+        $video = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::READY,
+            'visibility' => VideoVisibility::PRIVATE,
+        ]);
+
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-private-video');
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        // Video should NOT be included because it's private
+        $this->assertArrayNotHasKey('video', $result['contents'][0]);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_excludes_transcoding_videos(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-transcoding-video',
+            'category_id' => $category->id,
+        ]);
+
+        // Create transcoding video (public but not ready)
+        $video = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::TRANSCODING,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-transcoding-video');
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        // Video should NOT be included because it's not ready
+        $this->assertArrayNotHasKey('video', $result['contents'][0]);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_with_video_caption(): void
+    {
+        app()->setLocale('fr');
+
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-video-caption',
+            'category_id' => $category->id,
+        ]);
+
+        $video = \App\Models\Video::factory()->readyAndPublic()->create();
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        // Create caption with French translation
+        $captionKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'fr',
+            'text' => 'Légende de la vidéo en français',
+        ]);
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'en',
+            'text' => 'Video caption in English',
+        ]);
+        $blogContentVideo->update(['caption_translation_key_id' => $captionKey->id]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-video-caption');
+
+        $this->assertNotNull($result);
+        // Should use French translation based on current locale
+        $this->assertEquals('Légende de la vidéo en français', $result['contents'][0]['video']['caption']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_with_video_without_caption(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-video-no-caption',
+            'category_id' => $category->id,
+        ]);
+
+        $video = \App\Models\Video::factory()->readyAndPublic()->create();
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+            'caption_translation_key_id' => null,
+        ]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-video-no-caption');
+
+        $this->assertNotNull($result);
+        $this->assertArrayHasKey('video', $result['contents'][0]);
+        $this->assertNull($result['contents'][0]['video']['caption']);
+    }
 }

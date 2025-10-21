@@ -769,7 +769,7 @@ class BlogPostConversionServiceTest extends TestCase
             'category_id' => $category->id,
         ]);
 
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
         $oldCaptionKey = TranslationKey::factory()->create(['key' => 'old.video.caption']);
         $oldCaptionKey->translations()->create(['locale' => 'en', 'text' => 'Old video caption']);
 
@@ -861,7 +861,7 @@ class BlogPostConversionServiceTest extends TestCase
             'caption_translation_key_id' => $galleryCaptionKey->id,
         ]);
 
-        $video = Video::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create();
         $videoCaptionKey = TranslationKey::factory()->create(['key' => 'draft.video.caption']);
         $videoCaptionKey->translations()->create(['locale' => 'en', 'text' => 'Video caption']);
 
@@ -1228,5 +1228,118 @@ class BlogPostConversionServiceTest extends TestCase
         $this->assertEquals(BlogPostType::GAME_REVIEW, $publishedPost->type);
         $this->assertEquals($category->id, $publishedPost->category_id);
         $this->assertEquals($picture->id, $publishedPost->cover_picture_id);
+    }
+
+    #[Test]
+    public function convert_draft_to_blog_post_fails_when_video_has_no_cover_picture(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $titleKey = TranslationKey::factory()->create(['key' => 'draft.title']);
+        $titleKey->translations()->create(['locale' => 'en', 'text' => 'Draft Title']);
+
+        $draft = BlogPostDraft::factory()->create([
+            'title_translation_key_id' => $titleKey->id,
+            'category_id' => $category->id,
+            'slug' => 'video-without-cover',
+            'type' => BlogPostType::ARTICLE,
+        ]);
+
+        // Create video without cover picture
+        $video = Video::factory()->create([
+            'name' => 'Test Video',
+            'cover_picture_id' => null,
+        ]);
+
+        $videoContent = BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+            'caption_translation_key_id' => null,
+        ]);
+
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentVideo::class,
+            'content_id' => $videoContent->id,
+            'order' => 1,
+        ]);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage("La vidéo 'Test Video' doit avoir une image de couverture avant publication");
+
+        $this->conversionService->convertDraftToBlogPost($draft);
+    }
+
+    #[Test]
+    public function convert_draft_to_blog_post_succeeds_when_video_has_cover_picture(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $titleKey = TranslationKey::factory()->create(['key' => 'draft.title']);
+        $titleKey->translations()->create(['locale' => 'en', 'text' => 'Draft Title']);
+
+        $draft = BlogPostDraft::factory()->create([
+            'title_translation_key_id' => $titleKey->id,
+            'category_id' => $category->id,
+            'slug' => 'video-with-cover',
+            'type' => BlogPostType::ARTICLE,
+        ]);
+
+        // Create video WITH cover picture AND ready status
+        $coverPicture = Picture::factory()->create();
+        $video = Video::factory()->readyAndPublic()->create([
+            'name' => 'Test Video',
+            'cover_picture_id' => $coverPicture->id,
+        ]);
+
+        $videoContent = BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+            'caption_translation_key_id' => null,
+        ]);
+
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentVideo::class,
+            'content_id' => $videoContent->id,
+            'order' => 1,
+        ]);
+
+        // Should not throw exception
+        $publishedPost = $this->conversionService->convertDraftToBlogPost($draft);
+
+        $this->assertNotNull($publishedPost);
+        $this->assertCount(1, $publishedPost->contents);
+        $publishedVideoContent = $publishedPost->contents->first()->content;
+        $this->assertEquals($video->id, $publishedVideoContent->video_id);
+    }
+
+    #[Test]
+    public function convert_draft_to_blog_post_fails_when_video_content_has_no_video(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $titleKey = TranslationKey::factory()->create(['key' => 'draft.title']);
+        $titleKey->translations()->create(['locale' => 'en', 'text' => 'Draft Title']);
+
+        $draft = BlogPostDraft::factory()->create([
+            'title_translation_key_id' => $titleKey->id,
+            'category_id' => $category->id,
+            'slug' => 'video-content-without-video',
+            'type' => BlogPostType::ARTICLE,
+        ]);
+
+        // Create video content without video
+        $videoContent = BlogContentVideo::factory()->create([
+            'video_id' => null,
+            'caption_translation_key_id' => null,
+        ]);
+
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentVideo::class,
+            'content_id' => $videoContent->id,
+            'order' => 1,
+        ]);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage("Un contenu vidéo n'a pas de vidéo associée");
+
+        $this->conversionService->convertDraftToBlogPost($draft);
     }
 }

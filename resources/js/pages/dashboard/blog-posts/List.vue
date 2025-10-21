@@ -116,14 +116,14 @@ const handleEditCreation = (post: BlogPostWithAllRelations) => {
         selectedPost.value = post;
         showDraftAlert.value = true;
     } else {
-        router.visit(route('dashboard.creations.edit', { 'creation-id': post.id })); // TODO: Use correct route
+        router.visit(route('dashboard.blog-posts.edit', { 'blog-post-id': post.id }));
     }
 };
 
 const navigateToDraftEdit = () => {
     if (selectedPost.value && selectedPost.value.drafts.length > 0) {
         const draftId = selectedPost.value.drafts[0].id;
-        router.visit(route('dashboard.creations.edit', { 'draft-id': draftId })); // TODO: Use correct route
+        router.visit(route('dashboard.blog-posts.edit', { 'draft-id': draftId }));
     }
     showDraftAlert.value = false;
 };
@@ -147,7 +147,7 @@ const navigateToDraftEdit = () => {
                                     <ArrowDown v-if="sortColumn === 'id' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
                                 </div>
                             </TableHead>
-                            <TableHead class="text-right">Titre</TableHead>
+                            <TableHead>Titre</TableHead>
                             <TableHead class="cursor-pointer" @click="toggleSort('type')">
                                 <div class="flex items-center">
                                     Type
@@ -175,6 +175,7 @@ const navigateToDraftEdit = () => {
                                 <!--                                    <Badge variant="outline">{{ getTypeLabel(post.type) }}</Badge>-->
                             </TableCell>
                             <TableCell>{{ post.category?.name || 'Non définie' }}</TableCell>
+                            <TableCell>{{ post.published_at ? new Date(post.published_at).toLocaleDateString('fr-FR') : '-' }}</TableCell>
                             <TableCell class="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger as-child>

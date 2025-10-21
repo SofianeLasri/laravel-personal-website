@@ -232,11 +232,11 @@ class BlogContentService
                 ? $content->blogPostDraft
                 : $content->blogPost;
 
-            if (!$parent) {
+            if (! $parent) {
                 throw new \RuntimeException('Parent blog post or draft not found');
             }
 
-            if (!$newContent) {
+            if (! $newContent) {
                 throw new \RuntimeException('Failed to duplicate content');
             }
 

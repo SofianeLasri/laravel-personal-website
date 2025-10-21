@@ -33,7 +33,7 @@ class CreationController extends Controller
         /** @var CreationDraft|null $creationDraft */
         $creationDraft = app(CreationDraft::class)->find($request->draft_id);
 
-        if (!$creationDraft) {
+        if (! $creationDraft) {
             return response()->json(['message' => 'Creation draft not found'], 404);
         }
 

@@ -24,7 +24,7 @@ class BlogContentDuplicationService
         return DB::transaction(function () use ($originalContent) {
             // Duplicate the translation key with all its translations
             $translationKey = $originalContent->translationKey;
-            if (!$translationKey) {
+            if (! $translationKey) {
                 throw new RuntimeException('Markdown content missing translation key');
             }
 
@@ -86,7 +86,7 @@ class BlogContentDuplicationService
             // Duplicate caption translation key if it exists
             if ($originalContent->caption_translation_key_id) {
                 $captionTranslationKey = $originalContent->captionTranslationKey;
-                if (!$captionTranslationKey) {
+                if (! $captionTranslationKey) {
                     throw new RuntimeException('Video content missing caption translation key');
                 }
 
@@ -110,7 +110,7 @@ class BlogContentDuplicationService
 
         foreach ($originalContents as $originalContent) {
             // Type guard: ensure we have the expected properties
-            if (!isset($originalContent->content_type) || !isset($originalContent->content)) {
+            if (! isset($originalContent->content_type) || ! isset($originalContent->content)) {
                 continue;
             }
 
@@ -118,7 +118,7 @@ class BlogContentDuplicationService
             $content = $originalContent->content;
 
             // Skip if content is null
-            if (!$content) {
+            if (! $content) {
                 continue;
             }
 
@@ -145,6 +145,7 @@ class BlogContentDuplicationService
                     'content_type' => $contentType,
                     'error' => $e->getMessage(),
                 ]);
+
                 continue;
             }
         }

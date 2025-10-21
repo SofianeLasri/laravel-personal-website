@@ -36,7 +36,7 @@ class BlogPostConversionService
     {
         return DB::transaction(function () use ($blogPost) {
             $titleTranslationKey = $blogPost->titleTranslationKey;
-            if (!$titleTranslationKey) {
+            if (! $titleTranslationKey) {
                 throw new \RuntimeException('Blog post missing title translation key');
             }
 
@@ -90,7 +90,7 @@ class BlogPostConversionService
         // Duplicate translation keys for pros and cons if they exist
         if ($gameReview->pros_translation_key_id) {
             $prosTranslationKey = $gameReview->prosTranslationKey;
-            if (!$prosTranslationKey) {
+            if (! $prosTranslationKey) {
                 throw new \RuntimeException('Game review missing pros translation key');
             }
             $gameReviewDraftData['pros_translation_key_id'] = $this->duplicateTranslationKey($prosTranslationKey)->id;
@@ -98,7 +98,7 @@ class BlogPostConversionService
 
         if ($gameReview->cons_translation_key_id) {
             $consTranslationKey = $gameReview->consTranslationKey;
-            if (!$consTranslationKey) {
+            if (! $consTranslationKey) {
                 throw new \RuntimeException('Game review missing cons translation key');
             }
             $gameReviewDraftData['cons_translation_key_id'] = $this->duplicateTranslationKey($consTranslationKey)->id;

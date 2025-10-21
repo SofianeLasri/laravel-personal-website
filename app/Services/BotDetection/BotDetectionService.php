@@ -150,7 +150,7 @@ class BotDetectionService
      */
     private function analyzeRequestFrequency(LoggedRequest $request): array
     {
-        if (!$request->ipAddress) {
+        if (! $request->ipAddress) {
             return ['is_suspicious' => false];
         }
 
@@ -168,7 +168,7 @@ class BotDetectionService
 
         // Calculate request frequency for this IP in the last hour relative to the request time
         $createdAt = $request->created_at;
-        if (!$createdAt) {
+        if (! $createdAt) {
             return ['is_suspicious' => false];
         }
 
@@ -194,14 +194,14 @@ class BotDetectionService
             $currentRequest = $recentRequests->get($i);
             $previousRequest = $recentRequests->get($i - 1);
 
-            if (!$currentRequest || !$previousRequest) {
+            if (! $currentRequest || ! $previousRequest) {
                 continue;
             }
 
             $currentCreatedAt = $currentRequest->created_at;
             $previousCreatedAt = $previousRequest->created_at;
 
-            if (!$currentCreatedAt || !$previousCreatedAt) {
+            if (! $currentCreatedAt || ! $previousCreatedAt) {
                 continue;
             }
 

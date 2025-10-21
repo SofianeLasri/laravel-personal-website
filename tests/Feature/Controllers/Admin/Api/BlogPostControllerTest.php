@@ -304,8 +304,8 @@ class BlogPostControllerTest extends TestCase
 
         $response = $this->deleteJson("/dashboard/api/blog-posts/{$blogPost->id}");
 
-        // Method exists but is empty, so it should return 200 with null
-        $response->assertStatus(200);
+        // Method exists but is not implemented, so it should return 501
+        $response->assertStatus(501);
     }
 
     protected function tearDown(): void

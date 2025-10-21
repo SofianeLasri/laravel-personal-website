@@ -202,7 +202,7 @@ class BlogPostConversionService
         $validator = Validator::make([
             'title_translation_key_id' => $draft->title_translation_key_id,
             'slug' => $draft->slug,
-            'type' => $draft->type->value,
+            'type' => $draft->type?->value,
             'category_id' => $draft->category_id,
         ], [
             'title_translation_key_id' => 'required|integer|exists:translation_keys,id',

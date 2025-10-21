@@ -200,8 +200,8 @@ class PublicControllersService
      *     id: int,
      *     name: string,
      *     slug: string,
-     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}},
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     startedAt: string,
      *     endedAt: string|null,
      *     startedAtFormatted: string|null,
@@ -1093,7 +1093,7 @@ class PublicControllersService
      *     publishedAtFormatted: string,
      *     excerpt: string,
      *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
-     *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
+     *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array<string, mixed>|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
      * }|null
      */
     public function getBlogPostBySlug(string $slug): ?array
@@ -1217,7 +1217,7 @@ class PublicControllersService
             ],
             'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
             'publishedAt' => $blogPost->created_at,
-            'publishedAtFormatted' => $blogPost->created_at instanceof Carbon ? Carbon::parse($blogPost->created_at)->locale($this->locale)->translatedFormat('j F Y') : '',
+            'publishedAtFormatted' => $blogPost->created_at ? Carbon::parse($blogPost->created_at)->locale($this->locale)->translatedFormat('j F Y') : '',
             'excerpt' => $excerpt,
             'contents' => $contents->toArray(),
         ];
@@ -1331,7 +1331,8 @@ class PublicControllersService
                         $formattedPicture = $this->formatPictureForSSR($picture);
 
                         // Add caption if it exists in the pivot data
-                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
+                        // @phpstan-ignore-next-line (Pivot property access - known PHPStan limitation)
+                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id ?? null;
                         if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
                             $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
                         }
@@ -1380,7 +1381,7 @@ class PublicControllersService
             ],
             'coverImage' => $draft->coverPicture ? $this->formatPictureForSSR($draft->coverPicture) : null,
             'publishedAt' => $draft->created_at,
-            'publishedAtFormatted' => $draft->created_at instanceof Carbon ? Carbon::parse($draft->created_at)->locale($this->locale)->translatedFormat('j F Y') : '',
+            'publishedAtFormatted' => $draft->created_at ? Carbon::parse($draft->created_at)->locale($this->locale)->translatedFormat('j F Y') : '',
             'excerpt' => $excerpt,
             'contents' => $contents->toArray(),
             'isPreview' => true, // Flag to indicate this is a preview

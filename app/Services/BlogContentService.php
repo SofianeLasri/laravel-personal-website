@@ -89,7 +89,9 @@ class BlogContentService
             'translation_key_id' => $translationKeyId,
         ]);
 
-        return $markdown->fresh();
+        $markdown->refresh();
+
+        return $markdown;
     }
 
     /**
@@ -112,7 +114,10 @@ class BlogContentService
             $gallery->pictures()->sync($pictureData);
         }
 
-        return $gallery->fresh(['pictures']);
+        $gallery->refresh();
+        $gallery->load('pictures');
+
+        return $gallery;
     }
 
     /**
@@ -128,7 +133,9 @@ class BlogContentService
             'caption_translation_key_id' => $captionTranslationKeyId,
         ]);
 
-        return $videoContent->fresh();
+        $videoContent->refresh();
+
+        return $videoContent;
     }
 
     /**
@@ -154,7 +161,7 @@ class BlogContentService
      */
     public function deleteContent(BlogPostDraftContent|BlogPostContent $content): bool
     {
-        return DB::transaction(function () use ($content) {
+        return DB::transaction(function () use ($content): bool {
             // Delete the actual content
             if ($content->content) {
                 if ($content->content instanceof BlogContentGallery) {
@@ -164,7 +171,7 @@ class BlogContentService
             }
 
             // Delete the pivot record
-            return $content->delete();
+            return (bool) $content->delete();
         });
     }
 
@@ -180,37 +187,43 @@ class BlogContentService
             switch ($content->content_type) {
                 case BlogContentMarkdown::class:
                     $original = $content->content;
-                    $newContent = BlogContentMarkdown::create([
-                        'translation_key_id' => $original->translation_key_id,
-                    ]);
+                    if ($original instanceof BlogContentMarkdown) {
+                        $newContent = BlogContentMarkdown::create([
+                            'translation_key_id' => $original->translation_key_id,
+                        ]);
+                    }
                     break;
 
                 case BlogContentGallery::class:
                     $original = $content->content;
-                    $newContent = BlogContentGallery::create([
-                        'layout' => $original->layout,
-                        'columns' => $original->columns,
-                    ]);
+                    if ($original instanceof BlogContentGallery) {
+                        $newContent = BlogContentGallery::create([
+                            'layout' => $original->layout,
+                            'columns' => $original->columns,
+                        ]);
 
-                    // Copy picture relationships
-                    $pictureData = [];
-                    foreach ($original->pictures as $picture) {
-                        $pictureData[$picture->id] = [
-                            'order' => $picture->pivot->order,
-                            'caption_translation_key_id' => $picture->pivot->caption_translation_key_id,
-                        ];
-                    }
-                    if (! empty($pictureData)) {
-                        $newContent->pictures()->attach($pictureData);
+                        // Copy picture relationships
+                        $pictureData = [];
+                        foreach ($original->pictures as $picture) {
+                            $pictureData[$picture->id] = [
+                                'order' => $picture->pivot->order,
+                                'caption_translation_key_id' => $picture->pivot->caption_translation_key_id,
+                            ];
+                        }
+                        if (! empty($pictureData)) {
+                            $newContent->pictures()->attach($pictureData);
+                        }
                     }
                     break;
 
                 case BlogContentVideo::class:
                     $original = $content->content;
-                    $newContent = BlogContentVideo::create([
-                        'video_id' => $original->video_id,
-                        'caption_translation_key_id' => $original->caption_translation_key_id,
-                    ]);
+                    if ($original instanceof BlogContentVideo) {
+                        $newContent = BlogContentVideo::create([
+                            'video_id' => $original->video_id,
+                            'caption_translation_key_id' => $original->caption_translation_key_id,
+                        ]);
+                    }
                     break;
             }
 
@@ -218,6 +231,14 @@ class BlogContentService
             $parent = $content instanceof BlogPostDraftContent
                 ? $content->blogPostDraft
                 : $content->blogPost;
+
+            if (!$parent) {
+                throw new \RuntimeException('Parent blog post or draft not found');
+            }
+
+            if (!$newContent) {
+                throw new \RuntimeException('Failed to duplicate content');
+            }
 
             // Get the max order value
             $maxOrder = $parent->contents()->max('order') ?? 0;

@@ -12,6 +12,9 @@ class BotDetectionService
 {
     private BrowserDetection $browserDetection;
 
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private array $suspiciousDevicePatterns = [
         'android' => [
             'versions' => ['4.4', '4.3', '4.2', '4.1', '4.0'],
@@ -92,7 +95,7 @@ class BotDetectionService
         $frequencyAnalysis = $this->analyzeRequestFrequency($request);
         if ($frequencyAnalysis['is_suspicious']) {
             $isBotByFrequency = true;
-            $reasons[] = $frequencyAnalysis['reason'];
+            $reasons[] = $frequencyAnalysis['reason'] ?? 'Suspicious frequency pattern';
         }
 
         // Analyze user agent patterns
@@ -103,7 +106,7 @@ class BotDetectionService
             );
             if ($userAgentAnalysis['is_suspicious']) {
                 $isBotByUserAgent = true;
-                $reasons[] = $userAgentAnalysis['reason'];
+                $reasons[] = $userAgentAnalysis['reason'] ?? 'Suspicious user agent';
             }
         }
 
@@ -112,7 +115,7 @@ class BotDetectionService
             $parameterAnalysis = $this->analyzeUrlParameters($request->url->url);
             if ($parameterAnalysis['is_suspicious']) {
                 $isBotByParameters = true;
-                $reasons[] = $parameterAnalysis['reason'];
+                $reasons[] = $parameterAnalysis['reason'] ?? 'Suspicious URL parameters';
             }
         }
 
@@ -147,7 +150,7 @@ class BotDetectionService
      */
     private function analyzeRequestFrequency(LoggedRequest $request): array
     {
-        if ($request->ipAddress === null) {
+        if (!$request->ipAddress) {
             return ['is_suspicious' => false];
         }
 
@@ -164,9 +167,14 @@ class BotDetectionService
         );
 
         // Calculate request frequency for this IP in the last hour relative to the request time
+        $createdAt = $request->created_at;
+        if (!$createdAt) {
+            return ['is_suspicious' => false];
+        }
+
         $recentRequests = LoggedRequest::where('ip_address_id', $request->ip_address_id)
-            ->where('created_at', '>=', $request->created_at->copy()->subHour())
-            ->where('created_at', '<=', $request->created_at)
+            ->where('created_at', '>=', $createdAt->copy()->subHour())
+            ->where('created_at', '<=', $createdAt)
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -183,10 +191,22 @@ class BotDetectionService
         // Calculate average interval between requests
         $intervals = [];
         for ($i = 1; $i < $recentRequests->count(); $i++) {
+            $currentRequest = $recentRequests->get($i);
+            $previousRequest = $recentRequests->get($i - 1);
+
+            if (!$currentRequest || !$previousRequest) {
+                continue;
+            }
+
+            $currentCreatedAt = $currentRequest->created_at;
+            $previousCreatedAt = $previousRequest->created_at;
+
+            if (!$currentCreatedAt || !$previousCreatedAt) {
+                continue;
+            }
+
             // Calculate interval in seconds (always positive)
-            $interval = abs($recentRequests[$i]->created_at->diffInSeconds(
-                $recentRequests[$i - 1]->created_at
-            ));
+            $interval = abs($currentCreatedAt->diffInSeconds($previousCreatedAt));
             if ($interval > 0) {
                 $intervals[] = $interval;
             }
@@ -326,7 +346,7 @@ class BotDetectionService
         if (! empty($unexpectedParams)) {
             // Check if parameters look like random/bot-generated
             foreach ($unexpectedParams as $param) {
-                if ($this->isRandomParameter($param, $params[$param] ?? '')) {
+                if ($this->isRandomParameter((string) $param, $params[$param] ?? '')) {
                     return [
                         'is_suspicious' => true,
                         'reason' => sprintf(
@@ -354,6 +374,9 @@ class BotDetectionService
         ];
 
         $valueStr = is_string($value) ? $value : json_encode($value);
+        if ($valueStr === false) {
+            $valueStr = '';
+        }
 
         foreach ($suspiciousPatterns as $pattern) {
             if (preg_match($pattern, $key) || preg_match($pattern, $valueStr)) {
@@ -402,6 +425,8 @@ class BotDetectionService
 
     /**
      * Batch analyze unanalyzed requests (excluding authenticated users)
+     *
+     * @return Collection<int, array<string, mixed>>
      */
     public function analyzeUnanalyzedRequests(int $limit = 100): Collection
     {
@@ -425,6 +450,8 @@ class BotDetectionService
 
     /**
      * Re-analyze requests for IPs that haven't been analyzed recently (excluding authenticated users)
+     *
+     * @return Collection<int, array<string, mixed>>
      */
     public function reanalyzeOldRequests(int $hoursAgo = 24, int $limit = 100): Collection
     {

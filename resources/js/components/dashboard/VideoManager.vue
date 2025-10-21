@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import PictureInput from '@/components/dashboard/PictureInput.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -71,6 +81,8 @@ const route = useRoute();
 const loading = ref(false);
 const uploadProgress = ref(0);
 const syncingStatus = ref(false);
+const isDownloadThumbnailDialogOpen = ref(false);
+const videoForThumbnail = ref<Video | null>(null);
 
 // Upload form
 const newVideoFile = ref<File | null>(null);
@@ -250,22 +262,28 @@ const importFromBunny = async () => {
 };
 
 /**
+ * Open download thumbnail confirmation dialog
+ */
+const confirmDownloadThumbnail = (video: Video) => {
+    if (!props.allowThumbnailDownload) return;
+    videoForThumbnail.value = video;
+    isDownloadThumbnailDialogOpen.value = true;
+};
+
+/**
  * Download thumbnail from Bunny CDN
  */
-const downloadThumbnail = async (video: Video) => {
-    if (!props.allowThumbnailDownload) return;
-
-    if (!confirm('Télécharger la miniature Bunny Stream comme image de couverture ?')) {
-        return;
-    }
+const downloadThumbnail = async () => {
+    if (!videoForThumbnail.value) return;
 
     loading.value = true;
+    isDownloadThumbnailDialogOpen.value = false;
 
     try {
-        await axios.post(route('dashboard.api.videos.download-thumbnail', { video: video.id }));
+        await axios.post(route('dashboard.api.videos.download-thumbnail', { video: videoForThumbnail.value.id }));
 
         // Get updated video data
-        const response = await axios.get(route('dashboard.api.videos.show', { video: video.id }));
+        const response = await axios.get(route('dashboard.api.videos.show', { video: videoForThumbnail.value.id }));
 
         // Update synced data
         syncedVideoData.value = response.data;
@@ -275,6 +293,7 @@ const downloadThumbnail = async (video: Video) => {
 
         emit('thumbnail-downloaded', response.data);
         toast.success('Miniature téléchargée et définie comme image de couverture');
+        videoForThumbnail.value = null;
     } catch (error) {
         console.error('Erreur lors du téléchargement de la miniature:', error);
         toast.error('Erreur lors du téléchargement de la miniature');
@@ -425,7 +444,7 @@ defineExpose({
     getStatusColor,
     canSetPublic,
     formatFileSize,
-    downloadThumbnail,
+    downloadThumbnail: confirmDownloadThumbnail,
     syncVideoStatus,
 });
 </script>
@@ -575,7 +594,7 @@ defineExpose({
                             size="sm"
                             class="w-full"
                             :disabled="loading"
-                            @click="downloadThumbnail(currentEditingVideo)"
+                            @click="confirmDownloadThumbnail(currentEditingVideo)"
                         >
                             <ImageDown class="mr-2 h-4 w-4" />
                             Télécharger la miniature BunnyCDN
@@ -687,5 +706,25 @@ defineExpose({
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+
+        <!-- Download Thumbnail Confirmation Dialog -->
+        <AlertDialog v-model:open="isDownloadThumbnailDialogOpen">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Télécharger la miniature Bunny Stream comme image de couverture ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Cette action téléchargera automatiquement la miniature depuis Bunny Stream et la définira comme image de couverture de la
+                        vidéo.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction @click="downloadThumbnail">
+                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
+                        Télécharger
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
 </template>

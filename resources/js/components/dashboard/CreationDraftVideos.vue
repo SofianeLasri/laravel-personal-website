@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
 import VideoManager from '@/components/dashboard/VideoManager.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Video } from '@/types';
@@ -21,7 +31,9 @@ const error = ref<string | null>(null);
 const isSelectModalOpen = ref(false);
 const isUploadModalOpen = ref(false);
 const isEditModalOpen = ref(false);
+const isDetachDialogOpen = ref(false);
 const editingVideo = ref<Video | null>(null);
+const videoToDetach = ref<Video | null>(null);
 
 // Ref to VideoManager for helpers
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
@@ -57,13 +69,17 @@ const fetchAllVideos = async () => {
     }
 };
 
-const detachVideo = async (video: Video) => {
-    if (!confirm('Êtes-vous sûr de vouloir retirer cette vidéo de la création ?')) {
-        return;
-    }
+const confirmDetachVideo = (video: Video) => {
+    videoToDetach.value = video;
+    isDetachDialogOpen.value = true;
+};
+
+const detachVideo = async () => {
+    if (!videoToDetach.value) return;
 
     loading.value = true;
     error.value = null;
+    isDetachDialogOpen.value = false;
 
     try {
         await axios.post(
@@ -71,11 +87,12 @@ const detachVideo = async (video: Video) => {
                 creation_draft: props.creationDraftId,
             }),
             {
-                video_id: video.id,
+                video_id: videoToDetach.value.id,
             },
         );
 
         await fetchVideos();
+        videoToDetach.value = null;
     } catch (err) {
         error.value = 'Erreur lors de la suppression de la vidéo';
         console.error(err);
@@ -240,7 +257,7 @@ watch(
                                 <Button variant="ghost" size="icon" title="Modifier la vidéo" @click.stop="openEditModal(video)">
                                     <Edit class="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" title="Retirer de la création" @click.stop="detachVideo(video)">
+                                <Button variant="ghost" size="icon" title="Retirer de la création" @click.stop="confirmDetachVideo(video)">
                                     <Trash2 class="h-4 w-4" />
                                 </Button>
                             </div>
@@ -278,5 +295,24 @@ watch(
             @video-updated="handleVideoUpdated"
             @thumbnail-downloaded="handleThumbnailDownloaded"
         />
+
+        <!-- Detach Video Confirmation Dialog -->
+        <AlertDialog v-model:open="isDetachDialogOpen">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Êtes-vous sûr de vouloir retirer cette vidéo de la création ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Cette action retirera la vidéo de cette création. La vidéo ne sera pas supprimée et pourra être réutilisée.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction @click="detachVideo">
+                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
+                        Retirer
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
 </template>

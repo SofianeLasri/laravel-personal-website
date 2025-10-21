@@ -85,7 +85,8 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
                         <!-- Markdown Content -->
                         <div
                             v-if="content.content_type === 'App\\Models\\BlogContentMarkdown' && content.markdown"
-                            class="min-w-0" :class="[index === 0 ? 'first-paragraph-large' : '']"
+                            class="min-w-0"
+                            :class="[index === 0 ? 'first-paragraph-large' : '']"
                         >
                             <MarkdownViewer :source="content.markdown" />
                         </div>

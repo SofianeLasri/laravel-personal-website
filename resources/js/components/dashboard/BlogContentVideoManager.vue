@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import VideoManager from '@/components/dashboard/VideoManager.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -38,6 +48,7 @@ const captionSaveTimeout = ref<ReturnType<typeof setTimeout> | null>(null);
 // Modals
 const isSelectModalOpen = ref(false);
 const isUploadModalOpen = ref(false);
+const isRemoveDialogOpen = ref(false);
 
 // Ref to VideoManager for helpers
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
@@ -93,11 +104,16 @@ const fetchAllVideos = async () => {
     }
 };
 
+// Open remove video dialog
+const confirmRemoveVideo = () => {
+    isRemoveDialogOpen.value = true;
+};
+
 // Remove video
 const removeVideo = async () => {
-    if (!confirm('Êtes-vous sûr de vouloir retirer cette vidéo ?')) return;
-
     loading.value = true;
+    isRemoveDialogOpen.value = false;
+
     try {
         // Remove video from blog content video
         await axios.put(
@@ -298,7 +314,7 @@ watch(
                                     <Button type="button" variant="ghost" size="sm" @click="openSelectModal">
                                         <Edit class="h-4 w-4" />
                                     </Button>
-                                    <Button type="button" variant="ghost" size="sm" @click="removeVideo">
+                                    <Button type="button" variant="ghost" size="sm" @click="confirmRemoveVideo">
                                         <Trash2 class="h-4 w-4" />
                                     </Button>
                                 </div>
@@ -361,5 +377,24 @@ watch(
             @video-selected="handleVideoSelected"
             @thumbnail-downloaded="handleThumbnailDownloaded"
         />
+
+        <!-- Remove Video Confirmation Dialog -->
+        <AlertDialog v-model:open="isRemoveDialogOpen">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Êtes-vous sûr de vouloir retirer cette vidéo ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Cette action retirera la vidéo de ce contenu. La vidéo ne sera pas supprimée définitivement et pourra être réutilisée.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction @click="removeVideo">
+                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
+                        Retirer
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
 </template>

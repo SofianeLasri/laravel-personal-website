@@ -12,8 +12,7 @@ import axios from 'axios';
 import debounce from 'lodash.debounce';
 import { ActivityIcon, LanguagesIcon, RefreshCwIcon } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
-
-// import { toast } from '@/components/ui/toast'
+import { toast } from 'vue-sonner';
 
 interface Translation {
     id: number;
@@ -123,14 +122,14 @@ async function updateTranslation(translation: Translation, newText: string) {
             // Successfully updated - update the translation in the current data
             translation.text = newText;
         } else {
-            alert('Échec de la mise à jour de la traduction');
+            toast.error('Échec de la mise à jour de la traduction');
         }
     } catch (error) {
         console.error('Failed to update translation:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
-            alert(error.response.data.message);
+            toast.error(error.response.data.message);
         } else {
-            alert('Échec de la mise à jour de la traduction');
+            toast.error('Échec de la mise à jour de la traduction');
         }
     }
 }
@@ -142,16 +141,16 @@ async function translateSingle(translationKey: TranslationKey) {
         const response = await axios.post(route('dashboard.api.translations.translate-single', translationKey.id), {});
 
         if (response.data.success) {
-            alert("Tâche de traduction mise en file d'attente avec succès");
+            toast.success("Tâche de traduction mise en file d'attente avec succès");
         } else {
-            alert(response.data.message || "Échec de la mise en file d'attente de la traduction");
+            toast.error(response.data.message || "Échec de la mise en file d'attente de la traduction");
         }
     } catch (error) {
         console.error('Failed to translate:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
-            alert(error.response.data.message);
+            toast.error(error.response.data.message);
         } else {
-            alert("Échec de la mise en file d'attente de la traduction");
+            toast.error("Échec de la mise en file d'attente de la traduction");
         }
     } finally {
         isTranslating.value = false;
@@ -165,16 +164,16 @@ async function retranslateSingle(translationKey: TranslationKey) {
         const response = await axios.post(route('dashboard.api.translations.retranslate-single', translationKey.id), {});
 
         if (response.data.success) {
-            alert("Tâche de re-traduction mise en file d'attente avec succès");
+            toast.success("Tâche de re-traduction mise en file d'attente avec succès");
         } else {
-            alert(response.data.message || "Échec de la mise en file d'attente de la re-traduction");
+            toast.error(response.data.message || "Échec de la mise en file d'attente de la re-traduction");
         }
     } catch (error) {
         console.error('Failed to retranslate:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
-            alert(error.response.data.message);
+            toast.error(error.response.data.message);
         } else {
-            alert("Échec de la mise en file d'attente de la re-traduction");
+            toast.error("Échec de la mise en file d'attente de la re-traduction");
         }
     } finally {
         isTranslating.value = false;
@@ -190,16 +189,16 @@ async function translateBatch(mode: 'missing' | 'all' | 'retranslate') {
         });
 
         if (response.data.success) {
-            alert(`${response.data.jobs_dispatched || 0} tâches de traduction mises en file d'attente`);
+            toast.success(`${response.data.jobs_dispatched || 0} tâches de traduction mises en file d'attente`);
         } else {
-            alert(response.data.message || "Échec de la mise en file d'attente des traductions");
+            toast.error(response.data.message || "Échec de la mise en file d'attente des traductions");
         }
     } catch (error) {
         console.error('Failed to batch translate:', error);
         if (axios.isAxiosError(error) && error.response?.data?.message) {
-            alert(error.response.data.message);
+            toast.error(error.response.data.message);
         } else {
-            alert("Échec de la mise en file d'attente des traductions");
+            toast.error("Échec de la mise en file d'attente des traductions");
         }
     } finally {
         isTranslating.value = false;

@@ -124,7 +124,14 @@ export default defineConfigWithVueTs(
             // General JavaScript/TypeScript Rules
             'no-console': ['warn', { allow: ['warn', 'error'] }],
             'no-debugger': 'error',
-            // 'no-alert': 'warn',
+            'no-alert': 'error',
+            'no-restricted-globals': [
+                'error',
+                {
+                    name: 'confirm',
+                    message: 'Use a proper confirmation dialog component instead of confirm().',
+                },
+            ],
             'no-unused-expressions': 'error',
             'prefer-const': 'error',
             'no-var': 'error',

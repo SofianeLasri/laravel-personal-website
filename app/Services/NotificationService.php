@@ -17,7 +17,7 @@ class NotificationService
      *     type: string,
      *     title: string,
      *     message: string,
-     *     data?: array|null,
+     *     data?: array<string, mixed>|null,
      *     source?: string|null,
      *     action_url?: string|null,
      *     action_label?: string|null,
@@ -118,7 +118,7 @@ class NotificationService
      */
     public function getUserNotifications(?int $userId = null, bool $includeRead = false): Collection
     {
-        $userId = $userId ?? auth()->id();
+        $userId = $userId ?? (int) auth()->id();
 
         $query = Notification::forUser($userId)
             ->notExpired()
@@ -136,7 +136,7 @@ class NotificationService
      */
     public function getUnreadCount(?int $userId = null): int
     {
-        $userId = $userId ?? auth()->id();
+        $userId = $userId ?? (int) auth()->id();
 
         return Notification::forUser($userId)
             ->unread()
@@ -165,7 +165,7 @@ class NotificationService
      */
     public function markAllAsRead(?int $userId = null): int
     {
-        $userId = $userId ?? auth()->id();
+        $userId = $userId ?? (int) auth()->id();
 
         return Notification::forUser($userId)
             ->unread()
@@ -196,7 +196,7 @@ class NotificationService
      */
     public function deleteReadNotifications(?int $userId = null): int
     {
-        $userId = $userId ?? auth()->id();
+        $userId = $userId ?? (int) auth()->id();
 
         return Notification::forUser($userId)
             ->read()

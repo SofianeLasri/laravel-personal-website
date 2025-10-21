@@ -73,7 +73,7 @@ class TranslationPageController extends Controller
             ->where('locale', 'en')
             ->first();
 
-        if ($existingEnglishTranslation) {
+        if ($existingEnglishTranslation && ! empty($existingEnglishTranslation->text)) {
             return response()->json([
                 'success' => false,
                 'message' => 'English translation already exists',
@@ -131,9 +131,20 @@ class TranslationPageController extends Controller
         });
 
         if ($mode === 'missing') {
-            $query->whereDoesntHave('translations', function ($q) {
-                // @phpstan-ignore-next-line
-                $q->where('locale', 'en');
+            $query->where(function ($q) {
+                // Include keys without English translation OR with empty English translation
+                $q->whereDoesntHave('translations', function ($subQ) {
+                    // @phpstan-ignore-next-line
+                    $subQ->where('locale', 'en');
+                })->orWhereHas('translations', function ($subQ) {
+                    // @phpstan-ignore-next-line
+                    $subQ->where('locale', 'en')
+                        ->where(function ($emptyQ) {
+                            // @phpstan-ignore-next-line
+                            $emptyQ->whereNull('text')
+                                ->orWhere('text', '');
+                        });
+                });
             });
         } elseif ($mode === 'retranslate') {
             // For retranslate mode, get keys that have both French and English translations
@@ -177,7 +188,10 @@ class TranslationPageController extends Controller
     {
         $totalKeys = TranslationKey::count();
         $frenchTranslations = Translation::where('locale', 'fr')->count();
-        $englishTranslations = Translation::where('locale', 'en')->count();
+        $englishTranslations = Translation::where('locale', 'en')
+            ->where('text', '!=', '')
+            ->whereNotNull('text')
+            ->count();
         $missingEnglish = $frenchTranslations - $englishTranslations;
 
         return [

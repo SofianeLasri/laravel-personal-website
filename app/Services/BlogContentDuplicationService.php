@@ -18,7 +18,12 @@ class BlogContentDuplicationService
     {
         return DB::transaction(function () use ($originalContent) {
             // Duplicate the translation key with all its translations
-            $newTranslationKey = $this->duplicateTranslationKey($originalContent->translationKey);
+            $translationKey = $originalContent->translationKey;
+            if (!$translationKey) {
+                throw new \RuntimeException('Markdown content missing translation key');
+            }
+
+            $newTranslationKey = $this->duplicateTranslationKey($translationKey);
 
             // Create new markdown content
             return BlogContentMarkdown::create([
@@ -50,7 +55,7 @@ class BlogContentDuplicationService
                     $captionTranslationKey = TranslationKey::with('translations')
                         ->find($picture->pivot->caption_translation_key_id);
 
-                    if ($captionTranslationKey) {
+                    if ($captionTranslationKey instanceof TranslationKey) {
                         $newCaptionTranslationKey = $this->duplicateTranslationKey($captionTranslationKey);
                         $pivotData['caption_translation_key_id'] = $newCaptionTranslationKey->id;
                     }
@@ -75,7 +80,12 @@ class BlogContentDuplicationService
 
             // Duplicate caption translation key if it exists
             if ($originalContent->caption_translation_key_id) {
-                $newCaptionTranslationKey = $this->duplicateTranslationKey($originalContent->captionTranslationKey);
+                $captionTranslationKey = $originalContent->captionTranslationKey;
+                if (!$captionTranslationKey) {
+                    throw new \RuntimeException('Video content missing caption translation key');
+                }
+
+                $newCaptionTranslationKey = $this->duplicateTranslationKey($captionTranslationKey);
                 $data['caption_translation_key_id'] = $newCaptionTranslationKey->id;
             }
 
@@ -86,33 +96,52 @@ class BlogContentDuplicationService
     /**
      * Duplicate all contents from one blog post to another
      *
-     * @param  Collection  $originalContents
-     * @return array Array of new content data with ['content_type', 'content_id', 'order']
+     * @param  Collection<int, \App\Models\BlogPostContent|\App\Models\BlogPostDraftContent>  $originalContents
+     * @return array<int, array{content_type: string, content_id: int, order: int}>
      */
     public function duplicateAllContents($originalContents): array
     {
         $newContents = [];
 
         foreach ($originalContents as $originalContent) {
-            $contentType = $originalContent->content_type;
-            $content = $originalContent->content;
-
-            if ($contentType === BlogContentMarkdown::class) {
-                $newContent = $this->duplicateMarkdownContent($content);
-            } elseif ($contentType === BlogContentGallery::class) {
-                $newContent = $this->duplicateGalleryContent($content);
-            } elseif ($contentType === BlogContentVideo::class) {
-                $newContent = $this->duplicateVideoContent($content);
-            } else {
-                // Skip unknown content types
+            // Type guard: ensure we have the expected properties
+            if (!isset($originalContent->content_type) || !isset($originalContent->content)) {
                 continue;
             }
 
-            $newContents[] = [
-                'content_type' => $contentType,
-                'content_id' => $newContent->id,
-                'order' => $originalContent->order,
-            ];
+            $contentType = $originalContent->content_type;
+            $content = $originalContent->content;
+
+            // Skip if content is null
+            if (!$content) {
+                continue;
+            }
+
+            try {
+                if ($contentType === BlogContentMarkdown::class && $content instanceof BlogContentMarkdown) {
+                    $newContent = $this->duplicateMarkdownContent($content);
+                } elseif ($contentType === BlogContentGallery::class && $content instanceof BlogContentGallery) {
+                    $newContent = $this->duplicateGalleryContent($content);
+                } elseif ($contentType === BlogContentVideo::class && $content instanceof BlogContentVideo) {
+                    $newContent = $this->duplicateVideoContent($content);
+                } else {
+                    // Skip unknown content types
+                    continue;
+                }
+
+                $newContents[] = [
+                    'content_type' => $contentType,
+                    'content_id' => $newContent->id,
+                    'order' => $originalContent->order ?? 0,
+                ];
+            } catch (\Exception $e) {
+                // Log error but continue with other contents
+                \Log::warning('Failed to duplicate content', [
+                    'content_type' => $contentType,
+                    'error' => $e->getMessage(),
+                ]);
+                continue;
+            }
         }
 
         return $newContents;

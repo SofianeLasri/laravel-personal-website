@@ -5,9 +5,14 @@ namespace App\Services;
 use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
 use App\Models\BlogContentVideo;
+use App\Models\BlogPostContent;
+use App\Models\BlogPostDraftContent;
 use App\Models\TranslationKey;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Log;
+use RuntimeException;
 
 class BlogContentDuplicationService
 {
@@ -20,7 +25,7 @@ class BlogContentDuplicationService
             // Duplicate the translation key with all its translations
             $translationKey = $originalContent->translationKey;
             if (!$translationKey) {
-                throw new \RuntimeException('Markdown content missing translation key');
+                throw new RuntimeException('Markdown content missing translation key');
             }
 
             $newTranslationKey = $this->duplicateTranslationKey($translationKey);
@@ -82,7 +87,7 @@ class BlogContentDuplicationService
             if ($originalContent->caption_translation_key_id) {
                 $captionTranslationKey = $originalContent->captionTranslationKey;
                 if (!$captionTranslationKey) {
-                    throw new \RuntimeException('Video content missing caption translation key');
+                    throw new RuntimeException('Video content missing caption translation key');
                 }
 
                 $newCaptionTranslationKey = $this->duplicateTranslationKey($captionTranslationKey);
@@ -96,7 +101,7 @@ class BlogContentDuplicationService
     /**
      * Duplicate all contents from one blog post to another
      *
-     * @param  Collection<int, \App\Models\BlogPostContent|\App\Models\BlogPostDraftContent>  $originalContents
+     * @param  Collection<int, BlogPostContent|BlogPostDraftContent>  $originalContents
      * @return array<int, array{content_type: string, content_id: int, order: int}>
      */
     public function duplicateAllContents($originalContents): array
@@ -134,9 +139,9 @@ class BlogContentDuplicationService
                     'content_id' => $newContent->id,
                     'order' => $originalContent->order ?? 0,
                 ];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Log error but continue with other contents
-                \Log::warning('Failed to duplicate content', [
+                Log::warning('Failed to duplicate content', [
                     'content_type' => $contentType,
                     'error' => $e->getMessage(),
                 ]);

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BlogCategoryBadge from '@/components/public/Blog/BlogCategoryBadge.vue';
 import BlogImageGallery from '@/components/public/Blog/BlogImageGallery.vue';
+import BlogVideoPlayer from '@/components/public/Blog/BlogVideoPlayer.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import MarkdownViewer from '@/components/public/MarkdownViewer.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
@@ -84,7 +85,8 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
                         <!-- Markdown Content -->
                         <div
                             v-if="content.content_type === 'App\\Models\\BlogContentMarkdown' && content.markdown"
-                            :class="['min-w-0', index === 0 ? 'first-paragraph-large' : '']"
+                            class="min-w-0"
+                            :class="[index === 0 ? 'first-paragraph-large' : '']"
                         >
                             <MarkdownViewer :source="content.markdown" />
                         </div>
@@ -93,6 +95,12 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
                         <BlogImageGallery
                             v-else-if="content.content_type === 'App\\Models\\BlogContentGallery' && content.gallery"
                             :pictures="content.gallery.pictures"
+                        />
+
+                        <!-- Video Content -->
+                        <BlogVideoPlayer
+                            v-else-if="content.content_type === 'App\\Models\\BlogContentVideo' && content.video"
+                            :video="content.video"
                         />
                     </template>
                 </div>

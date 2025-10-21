@@ -10,11 +10,15 @@ use App\Enums\VideoVisibility;
 use App\Models\BlogCategory;
 use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
+use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
+use App\Models\BlogPostDraft;
+use App\Models\BlogPostDraftContent;
 use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\GameReview;
+use App\Models\GameReviewDraft;
 use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
@@ -1629,5 +1633,596 @@ class PublicControllersServiceTest extends TestCase
         $result = $service->formatBlogPostForSSRShort($post);
 
         $this->assertEquals('', $result['excerpt']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_with_video_content(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-with-video',
+            'category_id' => $category->id,
+        ]);
+
+        // Create video content
+        $video = \App\Models\Video::factory()->readyAndPublic()->create([
+            'name' => 'Test Video',
+            'bunny_video_id' => 'test-video-123',
+        ]);
+
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        // Add caption translation
+        $captionKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'en',
+            'text' => 'Video caption text',
+        ]);
+        $blogContentVideo->update(['caption_translation_key_id' => $captionKey->id]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-with-video');
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        $this->assertEquals(\App\Models\BlogContentVideo::class, $result['contents'][0]['content_type']);
+        $this->assertArrayHasKey('video', $result['contents'][0]);
+        $this->assertEquals($video->id, $result['contents'][0]['video']['id']);
+        $this->assertEquals('test-video-123', $result['contents'][0]['video']['bunnyVideoId']);
+        $this->assertEquals('Test Video', $result['contents'][0]['video']['name']);
+        $this->assertEquals('Video caption text', $result['contents'][0]['video']['caption']);
+        $this->assertArrayHasKey('coverPicture', $result['contents'][0]['video']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_excludes_private_videos(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-private-video',
+            'category_id' => $category->id,
+        ]);
+
+        // Create private video (ready but private)
+        $video = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::READY,
+            'visibility' => VideoVisibility::PRIVATE,
+        ]);
+
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-private-video');
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        // Video should NOT be included because it's private
+        $this->assertArrayNotHasKey('video', $result['contents'][0]);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_excludes_transcoding_videos(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-transcoding-video',
+            'category_id' => $category->id,
+        ]);
+
+        // Create transcoding video (public but not ready)
+        $video = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::TRANSCODING,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-transcoding-video');
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        // Video should NOT be included because it's not ready
+        $this->assertArrayNotHasKey('video', $result['contents'][0]);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_with_video_caption(): void
+    {
+        app()->setLocale('fr');
+
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-video-caption',
+            'category_id' => $category->id,
+        ]);
+
+        $video = \App\Models\Video::factory()->readyAndPublic()->create();
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        // Create caption with French translation
+        $captionKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'fr',
+            'text' => 'Légende de la vidéo en français',
+        ]);
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'en',
+            'text' => 'Video caption in English',
+        ]);
+        $blogContentVideo->update(['caption_translation_key_id' => $captionKey->id]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-video-caption');
+
+        $this->assertNotNull($result);
+        // Should use French translation based on current locale
+        $this->assertEquals('Légende de la vidéo en français', $result['contents'][0]['video']['caption']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_by_slug_with_video_without_caption(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $post = BlogPost::factory()->create([
+            'slug' => 'test-post-video-no-caption',
+            'category_id' => $category->id,
+        ]);
+
+        $video = \App\Models\Video::factory()->readyAndPublic()->create();
+        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+            'caption_translation_key_id' => null,
+        ]);
+
+        BlogPostContent::factory()->create([
+            'blog_post_id' => $post->id,
+            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostBySlug('test-post-video-no-caption');
+
+        $this->assertNotNull($result);
+        $this->assertArrayHasKey('video', $result['contents'][0]);
+        $this->assertNull($result['contents'][0]['video']['caption']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_with_markdown(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+            'type' => BlogPostType::ARTICLE,
+        ]);
+
+        // Add markdown content
+        $markdownKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $markdownKey->id,
+            'locale' => 'en',
+            'text' => 'This is the draft blog content.',
+        ]);
+
+        $markdown = BlogContentMarkdown::factory()->create([
+            'translation_key_id' => $markdownKey->id,
+        ]);
+
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        $this->assertEquals($draft->id, $result['id']);
+        $this->assertEquals($draft->slug, $result['slug']);
+        $this->assertTrue($result['isPreview']);
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertCount(1, $result['contents']);
+        $this->assertEquals('This is the draft blog content.', $result['contents'][0]['markdown']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_has_is_preview_flag(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertArrayHasKey('isPreview', $result);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_with_gallery(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        // Add gallery content
+        $gallery = BlogContentGallery::factory()->create();
+        $pictures = \App\Models\Picture::factory()->count(3)->create();
+
+        foreach ($pictures as $index => $picture) {
+            // Create caption for first picture only
+            if ($index === 0) {
+                $captionKey = TranslationKey::factory()->create();
+                Translation::factory()->create([
+                    'translation_key_id' => $captionKey->id,
+                    'locale' => 'en',
+                    'text' => 'Draft gallery caption',
+                ]);
+                $gallery->pictures()->attach($picture->id, [
+                    'order' => $index,
+                    'caption_translation_key_id' => $captionKey->id,
+                ]);
+            } else {
+                $gallery->pictures()->attach($picture->id, [
+                    'order' => $index,
+                ]);
+            }
+        }
+
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentGallery::class,
+            'content_id' => $gallery->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        $this->assertEquals(BlogContentGallery::class, $result['contents'][0]['content_type']);
+        $this->assertArrayHasKey('gallery', $result['contents'][0]);
+        $this->assertCount(3, $result['contents'][0]['gallery']['pictures']);
+        $this->assertEquals('Draft gallery caption', $result['contents'][0]['gallery']['pictures'][0]['caption']);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_includes_ready_private_videos(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        // Create private video (ready but private) - should be included in preview
+        $video = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::READY,
+            'visibility' => VideoVisibility::PRIVATE,
+            'name' => 'Private Draft Video',
+            'bunny_video_id' => 'test-private-123',
+        ]);
+
+        $blogContentVideo = BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        // Video SHOULD be included in preview even if private
+        $this->assertArrayHasKey('video', $result['contents'][0]);
+        $this->assertEquals($video->id, $result['contents'][0]['video']['id']);
+        $this->assertEquals('test-private-123', $result['contents'][0]['video']['bunnyVideoId']);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_excludes_transcoding_videos(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        // Create transcoding video - should NOT be included even in preview
+        $video = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::TRANSCODING,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+
+        $blogContentVideo = BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        $this->assertCount(1, $result['contents']);
+        // Video should NOT be included because it's not ready
+        $this->assertArrayNotHasKey('video', $result['contents'][0]);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_with_game_review(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+            'type' => BlogPostType::GAME_REVIEW,
+        ]);
+
+        // Create game review draft
+        $gameReviewDraft = GameReviewDraft::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'game_title' => 'Test Draft Game',
+            'rating' => GameReviewRating::POSITIVE,
+            'platforms' => ['PC', 'PS5'],
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        $this->assertArrayHasKey('gameReview', $result);
+        $this->assertEquals('Test Draft Game', $result['gameReview']['gameTitle']);
+        $this->assertEquals(GameReviewRating::POSITIVE, $result['gameReview']['rating']);
+        $this->assertEquals(['PC', 'PS5'], $result['gameReview']['platforms']);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_with_no_content(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        $this->assertEquals('', $result['excerpt']);
+        $this->assertCount(0, $result['contents']);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_with_multiple_content_blocks(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        // Add markdown content (order 1)
+        $markdownKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $markdownKey->id,
+            'locale' => 'en',
+            'text' => 'First markdown block',
+        ]);
+        $markdown = BlogContentMarkdown::factory()->create([
+            'translation_key_id' => $markdownKey->id,
+        ]);
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 1,
+        ]);
+
+        // Add gallery content (order 2)
+        $gallery = BlogContentGallery::factory()->create();
+        $picture = \App\Models\Picture::factory()->create();
+        $gallery->pictures()->attach($picture->id, ['order' => 0]);
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentGallery::class,
+            'content_id' => $gallery->id,
+            'order' => 2,
+        ]);
+
+        // Add video content (order 3)
+        $video = \App\Models\Video::factory()->readyAndPublic()->create();
+        $blogContentVideo = BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 3,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        $this->assertCount(3, $result['contents']);
+        $this->assertEquals(1, $result['contents'][0]['order']);
+        $this->assertEquals(2, $result['contents'][1]['order']);
+        $this->assertEquals(3, $result['contents'][2]['order']);
+        $this->assertEquals(BlogContentMarkdown::class, $result['contents'][0]['content_type']);
+        $this->assertEquals(BlogContentGallery::class, $result['contents'][1]['content_type']);
+        $this->assertEquals(BlogContentVideo::class, $result['contents'][2]['content_type']);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_translation_fallback(): void
+    {
+        app()->setLocale('es');
+        config(['app.fallback_locale' => 'en']);
+
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        // Create only English translation for title
+        $draft->titleTranslationKey->translations()->delete();
+        Translation::factory()->create([
+            'translation_key_id' => $draft->titleTranslationKey->id,
+            'locale' => 'en',
+            'text' => 'English Draft Title',
+        ]);
+
+        // Add markdown content with only English translation
+        $markdownKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $markdownKey->id,
+            'locale' => 'en',
+            'text' => 'English draft content',
+        ]);
+        $markdown = BlogContentMarkdown::factory()->create([
+            'translation_key_id' => $markdownKey->id,
+        ]);
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertEquals('English Draft Title', $result['title']);
+        $this->assertEquals('English draft content', $result['contents'][0]['markdown']);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_with_video_caption(): void
+    {
+        app()->setLocale('fr');
+
+        $category = BlogCategory::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+        ]);
+
+        $video = \App\Models\Video::factory()->readyAndPublic()->create();
+        $blogContentVideo = BlogContentVideo::factory()->create([
+            'video_id' => $video->id,
+        ]);
+
+        // Create caption with French translation
+        $captionKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'fr',
+            'text' => 'Légende du brouillon en français',
+        ]);
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'en',
+            'text' => 'Draft caption in English',
+        ]);
+        $blogContentVideo->update(['caption_translation_key_id' => $captionKey->id]);
+
+        BlogPostDraftContent::factory()->create([
+            'blog_post_draft_id' => $draft->id,
+            'content_type' => BlogContentVideo::class,
+            'content_id' => $blogContentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        // Should use French translation based on current locale
+        $this->assertEquals('Légende du brouillon en français', $result['contents'][0]['video']['caption']);
+        $this->assertTrue($result['isPreview']);
+    }
+
+    #[Test]
+    public function test_get_blog_post_draft_for_preview_includes_category_and_cover(): void
+    {
+        $category = BlogCategory::factory()->create();
+        $coverPicture = \App\Models\Picture::factory()->create();
+        $draft = BlogPostDraft::factory()->create([
+            'category_id' => $category->id,
+            'cover_picture_id' => $coverPicture->id,
+        ]);
+
+        $service = new PublicControllersService;
+        $result = $service->getBlogPostDraftForPreview($draft);
+
+        $this->assertNotNull($result);
+        $this->assertArrayHasKey('category', $result);
+        $this->assertArrayHasKey('coverImage', $result);
+        $this->assertNotNull($result['coverImage']);
+        $this->assertEquals($coverPicture->filename, $result['coverImage']['filename']);
+        $this->assertTrue($result['isPreview']);
     }
 }

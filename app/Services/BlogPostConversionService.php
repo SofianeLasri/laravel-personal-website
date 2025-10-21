@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Enums\BlogPostType;
+use App\Enums\VideoStatus;
+use App\Enums\VideoVisibility;
 use App\Jobs\TranslateToEnglishJob;
 use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
@@ -195,6 +197,80 @@ class BlogPostConversionService
         ]);
 
         if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        // Validate that all videos have cover pictures
+        $this->validateVideoCoverPictures($draft);
+    }
+
+    /**
+     * Validate that all videos in the draft have cover pictures and are ready
+     * Auto-publish videos that are ready but private
+     *
+     * @throws ValidationException
+     */
+    private function validateVideoCoverPictures(BlogPostDraft $draft): void
+    {
+        // Load all video contents with their videos
+        $videoContents = $draft->contents()
+            ->where('content_type', BlogContentVideo::class)
+            ->with('content.video')
+            ->get();
+
+        $errors = [];
+
+        foreach ($videoContents as $content) {
+            $videoContent = $content->content;
+
+            if (! $videoContent instanceof BlogContentVideo) {
+                continue;
+            }
+
+            // Check if video exists
+            if (! $videoContent->video_id || ! $videoContent->video) {
+                $errors[] = "Un contenu vidéo n'a pas de vidéo associée.";
+
+                continue;
+            }
+
+            $video = $videoContent->video;
+            $videoName = $video->name ?? 'Sans nom';
+
+            // Check if video has a cover picture
+            if (! $video->cover_picture_id) {
+                $errors[] = "La vidéo '{$videoName}' doit avoir une image de couverture avant publication.";
+            }
+
+            // Check if video is ready (transcoded)
+            if ($video->status !== VideoStatus::READY) {
+                $statusText = match ($video->status) {
+                    VideoStatus::PENDING => 'en attente',
+                    VideoStatus::TRANSCODING => 'en cours de transcodage',
+                    VideoStatus::ERROR => 'en erreur',
+                    default => 'invalide',
+                };
+                $errors[] = "La vidéo '{$videoName}' doit être transcodée avant publication (statut actuel: {$statusText}).";
+
+                continue;
+            }
+
+            // Auto-publish video if it's ready but private
+            if ($video->visibility === VideoVisibility::PRIVATE) {
+                $video->update(['visibility' => VideoVisibility::PUBLIC]);
+                Log::info('Video auto-published during blog post publication', [
+                    'video_id' => $video->id,
+                    'video_name' => $video->name,
+                    'blog_post_draft_id' => $draft->id,
+                ]);
+            }
+        }
+
+        if (! empty($errors)) {
+            $validator = Validator::make([], []);
+            foreach ($errors as $error) {
+                $validator->errors()->add('videos', $error);
+            }
             throw new ValidationException($validator);
         }
     }

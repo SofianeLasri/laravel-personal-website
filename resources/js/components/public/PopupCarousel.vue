@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { Component, computed, onMounted, ref, watch } from 'vue';
 
 interface PopupItem {
     id: string;
-    component: any;
-    props?: Record<string, any>;
+    component: Component;
+    props?: Record<string, unknown>;
     shouldShow: () => boolean;
 }
 

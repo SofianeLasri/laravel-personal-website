@@ -68,6 +68,10 @@ const mainNavItems: NavItem[] = [
                 title: 'Éditeur',
                 href: route('dashboard.blog-posts.edit', undefined, false),
             },
+            {
+                title: 'Catégories',
+                href: route('dashboard.blog-categories.index', undefined, false),
+            },
         ],
     },
     {

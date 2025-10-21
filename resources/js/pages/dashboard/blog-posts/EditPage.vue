@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BlogContentBuilder from '@/components/dashboard/BlogContentBuilder.vue';
+import BlogPostPreviewTokenManager from '@/components/dashboard/BlogPostPreviewTokenManager.vue';
 import CategoryQuickCreate from '@/components/dashboard/CategoryQuickCreate.vue';
 import GameReviewEditor from '@/components/dashboard/GameReviewEditor.vue';
 import Heading from '@/components/dashboard/Heading.vue';
@@ -215,9 +216,36 @@ const handlePublish = async () => {
 
         toast.success('Article publié avec succès');
         router.visit(route('dashboard.blog-posts.index'));
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Erreur lors de la publication:', error);
-        toast.error('Une erreur est survenue lors de la publication');
+
+        const axiosError = error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } };
+
+        // Extract and display validation errors
+        if (axiosError.response?.data?.errors) {
+            const errors = axiosError.response.data.errors;
+
+            // Check for video-related errors specifically
+            if (errors.videos && Array.isArray(errors.videos)) {
+                errors.videos.forEach((errorMessage: string) => {
+                    toast.warning(errorMessage, { duration: 8000 });
+                });
+            } else {
+                // Display the first error from any field
+                const firstErrorField = Object.values(errors)[0];
+                if (Array.isArray(firstErrorField) && firstErrorField.length > 0) {
+                    toast.error(firstErrorField[0]);
+                } else {
+                    toast.error('Une erreur est survenue lors de la publication');
+                }
+            }
+        } else if (axiosError.response?.data?.message) {
+            // Display the error message from the response
+            toast.error(axiosError.response.data.message);
+        } else {
+            // Generic fallback error
+            toast.error('Une erreur est survenue lors de la publication');
+        }
     } finally {
         isPublishing.value = false;
     }
@@ -344,6 +372,11 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                             <FormMessage />
                         </FormItem>
                     </FormField>
+                </div>
+
+                <!-- Preview Token Manager -->
+                <div v-if="currentBlogPostDraft" class="space-y-4">
+                    <BlogPostPreviewTokenManager :draft-id="currentBlogPostDraft.id" />
                 </div>
 
                 <!-- Game Review Section (if type is game_review) -->

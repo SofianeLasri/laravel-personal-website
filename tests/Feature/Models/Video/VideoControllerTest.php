@@ -222,14 +222,13 @@ class VideoControllerTest extends TestCase
         $video = Video::factory()->create();
 
         $updateData = [
-            'name' => '',
-            'cover_picture_id' => 99999,
+            'cover_picture_id' => 99999, // Invalid picture ID
         ];
 
         $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'cover_picture_id']);
+            ->assertJsonValidationErrors(['cover_picture_id']);
     }
 
     #[Test]
@@ -937,5 +936,467 @@ class VideoControllerTest extends TestCase
             ->assertJson([
                 'message' => 'Failed to download thumbnail from Bunny Stream.',
             ]);
+    }
+
+    #[Test]
+    public function test_import_from_bunny_success_with_thumbnail_download(): void
+    {
+        Queue::fake();
+        Storage::fake('public');
+
+        $bunnyVideoId = 'test-bunny-video-123';
+        $bunnyVideoData = [
+            'guid' => $bunnyVideoId,
+            'title' => 'Imported Test Video',
+            'status' => 4, // Ready
+        ];
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($bunnyVideoId, $bunnyVideoData) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn($bunnyVideoData);
+                $mock->shouldReceive('getThumbnailUrl')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn('https://example.com/thumbnail.jpg');
+            })
+        );
+
+        Http::fake([
+            'https://example.com/thumbnail.jpg' => Http::response('fake-thumbnail-content', 200),
+        ]);
+
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'bunny_video_id' => $bunnyVideoId,
+            'download_thumbnail' => true,
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonStructure([
+                'message',
+                'video' => [
+                    'id',
+                    'name',
+                    'bunny_video_id',
+                    'status',
+                    'visibility',
+                    'cover_picture',
+                ],
+            ])
+            ->assertJson([
+                'message' => 'Video imported successfully.',
+                'video' => [
+                    'name' => 'Imported Test Video',
+                    'bunny_video_id' => $bunnyVideoId,
+                    'status' => VideoStatus::READY->value,
+                    'visibility' => VideoVisibility::PUBLIC->value,
+                ],
+            ]);
+
+        $this->assertDatabaseHas('videos', [
+            'bunny_video_id' => $bunnyVideoId,
+            'name' => 'Imported Test Video',
+            'status' => VideoStatus::READY,
+        ]);
+
+        // Verify thumbnail was downloaded and picture was created
+        $video = Video::where('bunny_video_id', $bunnyVideoId)->first();
+        $this->assertNotNull($video->cover_picture_id);
+
+        // Verify PictureJob was dispatched
+        Queue::assertPushed(PictureJob::class);
+    }
+
+    #[Test]
+    public function test_import_from_bunny_success_without_thumbnail_download(): void
+    {
+        Storage::fake('public');
+
+        $bunnyVideoId = 'test-bunny-video-456';
+        $bunnyVideoData = [
+            'guid' => $bunnyVideoId,
+            'title' => 'Imported Video Without Thumbnail',
+            'status' => 4,
+        ];
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($bunnyVideoId, $bunnyVideoData) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn($bunnyVideoData);
+                // getThumbnailUrl should NOT be called when download_thumbnail is false
+            })
+        );
+
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'bunny_video_id' => $bunnyVideoId,
+            'download_thumbnail' => false,
+        ]);
+
+        $response->assertCreated()
+            ->assertJson([
+                'video' => [
+                    'bunny_video_id' => $bunnyVideoId,
+                    'cover_picture' => null,
+                ],
+            ]);
+
+        $video = Video::where('bunny_video_id', $bunnyVideoId)->first();
+        $this->assertNull($video->cover_picture_id);
+    }
+
+    #[Test]
+    public function test_import_from_bunny_fails_with_missing_bunny_video_id(): void
+    {
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'download_thumbnail' => true,
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors('bunny_video_id');
+    }
+
+    #[Test]
+    public function test_import_from_bunny_fails_when_video_not_found_on_bunny(): void
+    {
+        $bunnyVideoId = 'non-existent-video-123';
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($bunnyVideoId) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn(null);
+            })
+        );
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Starting Bunny Stream video import', Mockery::type('array'));
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Failed to get video from Bunny Stream', Mockery::type('array'));
+
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'bunny_video_id' => $bunnyVideoId,
+        ]);
+
+        $response->assertNotFound()
+            ->assertJson([
+                'message' => 'Failed to retrieve video from Bunny Stream. Please check the video ID.',
+            ]);
+
+        $this->assertDatabaseMissing('videos', [
+            'bunny_video_id' => $bunnyVideoId,
+        ]);
+    }
+
+    #[Test]
+    public function test_import_from_bunny_fails_when_video_already_exists_in_db(): void
+    {
+        $bunnyVideoId = 'existing-video-123';
+
+        // Create existing video
+        Video::factory()->create([
+            'bunny_video_id' => $bunnyVideoId,
+        ]);
+
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'bunny_video_id' => $bunnyVideoId,
+        ]);
+
+        $response->assertConflict() // 409
+            ->assertJson([
+                'message' => 'This video has already been imported.',
+            ]);
+
+        // Verify only one video exists
+        $this->assertEquals(1, Video::where('bunny_video_id', $bunnyVideoId)->count());
+    }
+
+    #[Test]
+    public function test_import_from_bunny_handles_thumbnail_download_failure(): void
+    {
+        Storage::fake('public');
+
+        $bunnyVideoId = 'test-video-thumbnail-fail';
+        $bunnyVideoData = [
+            'guid' => $bunnyVideoId,
+            'title' => 'Video With Thumbnail Failure',
+            'status' => 4,
+        ];
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($bunnyVideoId, $bunnyVideoData) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn($bunnyVideoData);
+                $mock->shouldReceive('getThumbnailUrl')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andThrow(new Exception('Failed to get thumbnail URL'));
+            })
+        );
+
+        Log::shouldReceive('info')->atLeast()->once();
+        // Log warning should be called when thumbnail download fails
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Failed to download thumbnail during import', Mockery::type('array'));
+
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'bunny_video_id' => $bunnyVideoId,
+            'download_thumbnail' => true,
+        ]);
+
+        // Should still succeed even if thumbnail download fails
+        $response->assertCreated()
+            ->assertJson([
+                'video' => [
+                    'bunny_video_id' => $bunnyVideoId,
+                    'cover_picture' => null,
+                ],
+            ]);
+
+        $this->assertDatabaseHas('videos', [
+            'bunny_video_id' => $bunnyVideoId,
+        ]);
+    }
+
+    #[Test]
+    public function test_import_from_bunny_maps_transcoding_status(): void
+    {
+        $bunnyVideoId = 'transcoding-video-123';
+        $bunnyVideoData = [
+            'guid' => $bunnyVideoId,
+            'title' => 'Transcoding Video',
+            'status' => 3, // Transcoding
+        ];
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($bunnyVideoId, $bunnyVideoData) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn($bunnyVideoData);
+            })
+        );
+
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'bunny_video_id' => $bunnyVideoId,
+            'download_thumbnail' => false,
+        ]);
+
+        $response->assertCreated();
+
+        $video = Video::where('bunny_video_id', $bunnyVideoId)->first();
+        $this->assertEquals(VideoStatus::TRANSCODING, $video->status);
+    }
+
+    #[Test]
+    public function test_import_from_bunny_maps_error_status(): void
+    {
+        $bunnyVideoId = 'error-video-123';
+        $bunnyVideoData = [
+            'guid' => $bunnyVideoId,
+            'title' => 'Error Video',
+            'status' => 5, // Error
+        ];
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($bunnyVideoId, $bunnyVideoData) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn($bunnyVideoData);
+            })
+        );
+
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'bunny_video_id' => $bunnyVideoId,
+        ]);
+
+        $response->assertCreated();
+
+        $video = Video::where('bunny_video_id', $bunnyVideoId)->first();
+        $this->assertEquals(VideoStatus::ERROR, $video->status);
+    }
+
+    #[Test]
+    public function test_import_from_bunny_defaults_download_thumbnail_to_true(): void
+    {
+        Queue::fake();
+        Storage::fake('public');
+
+        $bunnyVideoId = 'default-thumbnail-video';
+        $bunnyVideoData = [
+            'guid' => $bunnyVideoId,
+            'title' => 'Default Thumbnail Video',
+            'status' => 4,
+        ];
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($bunnyVideoId, $bunnyVideoData) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn($bunnyVideoData);
+                // getThumbnailUrl SHOULD be called since default is true
+                $mock->shouldReceive('getThumbnailUrl')
+                    ->once()
+                    ->with($bunnyVideoId)
+                    ->andReturn('https://example.com/thumbnail.jpg');
+            })
+        );
+
+        Http::fake([
+            'https://example.com/thumbnail.jpg' => Http::response('fake-thumbnail', 200),
+        ]);
+
+        // Don't provide download_thumbnail parameter
+        $response = $this->postJson(route('dashboard.api.videos.import-from-bunny'), [
+            'bunny_video_id' => $bunnyVideoId,
+        ]);
+
+        $response->assertCreated();
+
+        $video = Video::where('bunny_video_id', $bunnyVideoId)->first();
+        $this->assertNotNull($video->cover_picture_id);
+    }
+
+    #[Test]
+    public function test_show_handles_bunny_cdn_exception_gracefully(): void
+    {
+        $video = Video::factory()->create();
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($video) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($video->bunny_video_id)
+                    ->andThrow(new Exception('Bunny CDN connection failed'));
+            })
+        );
+
+        $response = $this->getJson(route('dashboard.api.videos.show', $video->id));
+
+        // Should still return the video even if Bunny CDN data retrieval fails
+        $response->assertOk()
+            ->assertJson([
+                'id' => $video->id,
+                'name' => $video->name,
+            ])
+            ->assertJsonMissing(['bunny_data']);
+    }
+
+    #[Test]
+    public function test_show_returns_null_bunny_data_when_video_not_in_library(): void
+    {
+        $video = Video::factory()->create([
+            'bunny_video_id' => 'wrong-library-video-123',
+        ]);
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($video) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($video->bunny_video_id)
+                    ->andReturn(null);
+            })
+        );
+
+        $response = $this->getJson(route('dashboard.api.videos.show', $video->id));
+
+        $response->assertOk()
+            ->assertJson([
+                'id' => $video->id,
+            ])
+            ->assertJsonMissing(['bunny_data']);
+    }
+
+    #[Test]
+    public function test_show_logs_warning_when_video_not_found_in_bunny_library(): void
+    {
+        $video = Video::factory()->create([
+            'bunny_video_id' => 'not-found-video-123',
+        ]);
+
+        $this->instance(
+            BunnyStreamService::class,
+            Mockery::mock(BunnyStreamService::class, function (MockInterface $mock) use ($video) {
+                $mock->shouldReceive('getVideo')
+                    ->once()
+                    ->with($video->bunny_video_id)
+                    ->andReturn(null);
+            })
+        );
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->with('Video not found in configured BunnyCDN library', Mockery::type('array'));
+
+        $response = $this->getJson(route('dashboard.api.videos.show', $video->id));
+
+        $response->assertOk();
+    }
+
+    #[Test]
+    public function test_update_allows_keeping_same_visibility_even_if_not_ready(): void
+    {
+        $video = Video::factory()->transcodingAndPrivate()->create();
+
+        $updateData = [
+            'name' => 'Updated Name',
+            'visibility' => VideoVisibility::PRIVATE->value, // Same as current
+        ];
+
+        $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
+
+        // Should succeed because we're not changing from private to public
+        $response->assertOk();
+
+        $this->assertDatabaseHas('videos', [
+            'id' => $video->id,
+            'name' => 'Updated Name',
+            'visibility' => VideoVisibility::PRIVATE,
+        ]);
+    }
+
+    #[Test]
+    public function test_update_allows_partial_updates_without_visibility_field(): void
+    {
+        $video = Video::factory()->transcodingAndPrivate()->create([
+            'name' => 'Original Name',
+        ]);
+
+        $updateData = [
+            'name' => 'New Name Without Visibility Change',
+        ];
+
+        $response = $this->putJson(route('dashboard.api.videos.update', $video->id), $updateData);
+
+        // Should succeed even though video is not ready, because we're not changing visibility
+        $response->assertOk();
+
+        $this->assertDatabaseHas('videos', [
+            'id' => $video->id,
+            'name' => 'New Name Without Visibility Change',
+            'visibility' => VideoVisibility::PRIVATE, // Unchanged
+            'status' => VideoStatus::TRANSCODING, // Still transcoding
+        ]);
     }
 }

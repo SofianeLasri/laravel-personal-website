@@ -68,7 +68,7 @@ class VideosPageControllerTest extends TestCase
             ->has('videos.0', fn ($videoData) => $videoData->where('id', $video->id)
                 ->where('name', 'Test Video')
                 ->has('cover_picture', fn ($cover) => $cover->where('id', $coverPicture->id)
-                    ->has('path_small')
+                    ->has('path_original')
                 )
                 ->has('created_at')
                 ->has('usages')

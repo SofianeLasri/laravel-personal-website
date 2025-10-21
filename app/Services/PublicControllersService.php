@@ -13,7 +13,10 @@ use App\Enums\VideoVisibility;
 use App\Models\BlogCategory;
 use App\Models\BlogContentGallery;
 use App\Models\BlogContentMarkdown;
+use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
+use App\Models\BlogPostDraft;
+use App\Models\BlogPostDraftContent;
 use App\Models\Certification;
 use App\Models\Creation;
 use App\Models\Experience;
@@ -1104,6 +1107,7 @@ class PublicControllersService
                 $query->morphWith([
                     BlogContentMarkdown::class => ['translationKey.translations'],
                     BlogContentGallery::class => ['pictures'],
+                    BlogContentVideo::class => ['video.coverPicture', 'captionTranslationKey.translations'],
                 ]);
             },
             'gameReview.coverPicture',
@@ -1170,6 +1174,20 @@ class PublicControllersService
                         return $formattedPicture;
                     })->toArray(),
                 ];
+            } elseif ($content->content_type === BlogContentVideo::class && $content->content instanceof BlogContentVideo) {
+                $video = $content->content->video;
+
+                if ($video && $video->status === VideoStatus::READY && $video->visibility === VideoVisibility::PUBLIC) {
+                    $caption = null;
+                    if ($content->content->captionTranslationKey) {
+                        $caption = $this->getTranslationWithFallback($content->content->captionTranslationKey->translations);
+                    }
+
+                    $formattedVideo = $this->formatVideoForSSR($video);
+                    $formattedVideo['caption'] = $caption;
+
+                    $result['video'] = $formattedVideo;
+                }
             }
 
             return $result;
@@ -1218,6 +1236,170 @@ class PublicControllersService
                 'pros' => $pros,
                 'cons' => $cons,
                 'coverPicture' => $gameReview->coverPicture ? $this->formatPictureForSSR($gameReview->coverPicture) : null,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get a blog post draft for preview with all its content
+     * Similar to getBlogPostBySlug but works with drafts
+     *
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
+     *     excerpt: string,
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
+     *     gameReview?: array{gameTitle: string, releaseDate: string, genre: string, developer: string, publisher: string, platforms: string, rating: int, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null},
+     *     isPreview: bool
+     * }
+     */
+    public function getBlogPostDraftForPreview(BlogPostDraft $draft): array
+    {
+        // Load all necessary relations
+        $draft->load([
+            'titleTranslationKey.translations',
+            'category.nameTranslationKey.translations',
+            'coverPicture',
+            'contents' => function ($query) {
+                $query->orderBy('order');
+            },
+            'contents.content' => function ($query) {
+                // Load different relations based on content type
+                $query->morphWith([
+                    BlogContentMarkdown::class => ['translationKey.translations'],
+                    BlogContentGallery::class => ['pictures'],
+                    BlogContentVideo::class => ['video.coverPicture', 'captionTranslationKey.translations'],
+                ]);
+            },
+            'gameReviewDraft.coverPicture',
+            'gameReviewDraft.prosTranslationKey.translations',
+            'gameReviewDraft.consTranslationKey.translations',
+        ]);
+
+        $title = $draft->titleTranslationKey ?
+            $this->getTranslationWithFallback($draft->titleTranslationKey->translations) : '';
+        $categoryName = $draft->category->nameTranslationKey ?
+            $this->getTranslationWithFallback($draft->category->nameTranslationKey->translations) : '';
+
+        // Format contents (using BlogPostDraftContent instead of BlogPostContent)
+        $contents = $draft->contents->map(function ($content) {
+            $result = [
+                'id' => $content->id,
+                'order' => $content->order,
+                'content_type' => $content->content_type,
+            ];
+
+            // Handle different content types
+            if ($content->content_type === BlogContentMarkdown::class && $content->content instanceof BlogContentMarkdown) {
+                $markdownContent = $content->content->translationKey ?
+                    $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
+                $result['markdown'] = $markdownContent;
+            } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
+                // Get caption translation keys from the pivot data
+                $captionTranslationKeyIds = $content->content->pictures
+                    ->pluck('pivot.caption_translation_key_id')
+                    ->filter()
+                    ->unique();
+
+                // Load translation keys with their translations if any captions exist
+                $captionTranslations = [];
+                if ($captionTranslationKeyIds->isNotEmpty()) {
+                    $translationKeys = TranslationKey::with('translations')
+                        ->whereIn('id', $captionTranslationKeyIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    foreach ($translationKeys as $key => $translationKey) {
+                        $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
+                    }
+                }
+
+                $result['gallery'] = [
+                    'id' => $content->content->id,
+                    'pictures' => $content->content->pictures->map(function ($picture) use ($captionTranslations) {
+                        $formattedPicture = $this->formatPictureForSSR($picture);
+
+                        // Add caption if it exists in the pivot data
+                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
+                        if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
+                            $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
+                        }
+
+                        return $formattedPicture;
+                    })->toArray(),
+                ];
+            } elseif ($content->content_type === BlogContentVideo::class && $content->content instanceof BlogContentVideo) {
+                $video = $content->content->video;
+
+                // For preview, show all videos regardless of visibility (but still check if ready)
+                if ($video && $video->status === VideoStatus::READY) {
+                    $caption = null;
+                    if ($content->content->captionTranslationKey) {
+                        $caption = $this->getTranslationWithFallback($content->content->captionTranslationKey->translations);
+                    }
+
+                    $formattedVideo = $this->formatVideoForSSR($video);
+                    $formattedVideo['caption'] = $caption;
+
+                    $result['video'] = $formattedVideo;
+                }
+            }
+
+            return $result;
+        });
+
+        // Generate excerpt from first markdown content
+        $excerpt = '';
+        $firstMarkdownContent = $contents->first(function ($content) {
+            return $content['content_type'] === BlogContentMarkdown::class;
+        });
+
+        if ($firstMarkdownContent && isset($firstMarkdownContent['markdown'])) {
+            $excerpt = Str::limit(strip_tags($firstMarkdownContent['markdown']), 200);
+        }
+
+        $result = [
+            'id' => $draft->id,
+            'title' => $title,
+            'slug' => $draft->slug,
+            'type' => $draft->type,
+            'category' => [
+                'name' => $categoryName,
+                'color' => $draft->category->color,
+            ],
+            'coverImage' => $draft->coverPicture ? $this->formatPictureForSSR($draft->coverPicture) : null,
+            'publishedAt' => $draft->created_at,
+            'publishedAtFormatted' => $draft->created_at instanceof Carbon ? $draft->created_at->locale($this->locale)->translatedFormat('j F Y') : '',
+            'excerpt' => $excerpt,
+            'contents' => $contents->toArray(),
+            'isPreview' => true, // Flag to indicate this is a preview
+        ];
+
+        // Add game review draft data if it's a game review
+        if ($draft->type === BlogPostType::GAME_REVIEW && $draft->gameReviewDraft) {
+            $gameReviewDraft = $draft->gameReviewDraft;
+            $pros = $gameReviewDraft->prosTranslationKey ? $this->getTranslationWithFallback($gameReviewDraft->prosTranslationKey->translations) : null;
+            $cons = $gameReviewDraft->consTranslationKey ? $this->getTranslationWithFallback($gameReviewDraft->consTranslationKey->translations) : null;
+
+            $result['gameReview'] = [
+                'gameTitle' => $gameReviewDraft->game_title,
+                'releaseDate' => $gameReviewDraft->release_date,
+                'genre' => $gameReviewDraft->genre,
+                'developer' => $gameReviewDraft->developer,
+                'publisher' => $gameReviewDraft->publisher,
+                'platforms' => $gameReviewDraft->platforms,
+                'rating' => $gameReviewDraft->rating,
+                'pros' => $pros,
+                'cons' => $cons,
+                'coverPicture' => $gameReviewDraft->coverPicture ? $this->formatPictureForSSR($gameReviewDraft->coverPicture) : null,
             ];
         }
 

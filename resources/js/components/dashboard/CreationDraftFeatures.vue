@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
 import PictureInput from '@/components/dashboard/PictureInput.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -23,7 +33,9 @@ const loading = ref(false);
 const error = ref<string | null>(null);
 const isAddModalOpen = ref(false);
 const isEditModalOpen = ref(false);
+const isDeleteDialogOpen = ref(false);
 const selectedFeature = ref<Feature | null>(null);
+const featureToDelete = ref<Feature | null>(null);
 const newFeaturePictureId = ref<number | undefined>(undefined);
 const newFeatureTitle = ref('');
 const newFeatureDescription = ref('');
@@ -115,22 +127,27 @@ const updateFeature = async () => {
     }
 };
 
-const deleteFeature = async (feature: Feature) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette fonctionnalité clé ?')) {
-        return;
-    }
+const confirmDeleteFeature = (feature: Feature) => {
+    featureToDelete.value = feature;
+    isDeleteDialogOpen.value = true;
+};
+
+const deleteFeature = async () => {
+    if (!featureToDelete.value) return;
 
     loading.value = true;
     error.value = null;
+    isDeleteDialogOpen.value = false;
 
     try {
         await axios.delete(
             route('dashboard.api.draft-features.destroy', {
-                draft_feature: feature.id,
+                draft_feature: featureToDelete.value.id,
             }),
         );
 
         await fetchFeatures();
+        featureToDelete.value = null;
     } catch (err) {
         error.value = 'Erreur lors de la suppression de la fonctionnalité';
         console.error(err);
@@ -223,7 +240,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                                 <Button variant="ghost" size="icon" title="Modifier" @click.stop="openEditModal(feature)">
                                     <Pencil class="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" title="Supprimer" @click.stop="deleteFeature(feature)">
+                                <Button variant="ghost" size="icon" title="Supprimer" @click.stop="confirmDeleteFeature(feature)">
                                     <Trash2 class="h-4 w-4" />
                                 </Button>
                             </div>
@@ -315,5 +332,22 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+
+        <!-- Delete Feature Confirmation Dialog -->
+        <AlertDialog v-model:open="isDeleteDialogOpen">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette fonctionnalité clé ?</AlertDialogTitle>
+                    <AlertDialogDescription> Cette action est irréversible. La fonctionnalité sera supprimée définitivement. </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deleteFeature">
+                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
+                        Supprimer
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
 </template>

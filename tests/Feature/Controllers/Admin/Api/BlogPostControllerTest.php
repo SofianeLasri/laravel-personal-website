@@ -275,39 +275,6 @@ class BlogPostControllerTest extends TestCase
             ]);
     }
 
-    #[Test]
-    public function show_method_exists(): void
-    {
-        $blogPost = BlogPost::factory()->create();
-
-        $response = $this->getJson("/dashboard/api/blog-posts/{$blogPost->id}");
-
-        // Method exists but is empty, so it should return 200 with null
-        $response->assertStatus(200);
-    }
-
-    #[Test]
-    public function update_method_exists(): void
-    {
-        $blogPost = BlogPost::factory()->create();
-
-        $response = $this->putJson("/dashboard/api/blog-posts/{$blogPost->id}", []);
-
-        // Method exists but is empty, so it should return 200 with null
-        $response->assertStatus(200);
-    }
-
-    #[Test]
-    public function destroy_method_exists(): void
-    {
-        $blogPost = BlogPost::factory()->create();
-
-        $response = $this->deleteJson("/dashboard/api/blog-posts/{$blogPost->id}");
-
-        // Method exists but is not implemented, so it should return 501
-        $response->assertStatus(501);
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();

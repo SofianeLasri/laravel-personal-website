@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\Api\BlogContentVideoController;
 use App\Http\Controllers\Admin\Api\BlogPostController as AdminBlogPostController;
 use App\Http\Controllers\Admin\Api\BlogPostDraftContentController;
 use App\Http\Controllers\Admin\Api\BlogPostDraftController;
+use App\Http\Controllers\Admin\Api\BlogPostPreviewTokenController;
 use App\Http\Controllers\Admin\Api\CertificationController;
 use App\Http\Controllers\Admin\Api\CreationController;
 use App\Http\Controllers\Admin\Api\CreationDraftController;
@@ -41,6 +42,7 @@ use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\BlogHomeController;
 use App\Http\Controllers\Public\BlogPostController;
+use App\Http\Controllers\Public\BlogPostPreviewController;
 use App\Http\Controllers\Public\BlogPostsController;
 use App\Http\Controllers\Public\CertificationsCareerController;
 use App\Http\Controllers\Public\ExperienceController as PublicExperienceController;
@@ -50,6 +52,7 @@ use App\Http\Controllers\Public\ProjectController;
 use App\Http\Controllers\Public\ProjectsController;
 use App\Http\Controllers\Public\SearchController;
 use App\Http\Controllers\Public\SitemapController;
+use App\Http\Middleware\PreventIndexing;
 use Illuminate\Support\Facades\Route;
 
 // Debug route (only in non-production)
@@ -81,6 +84,11 @@ Route::name('public.')->group(function () {
     Route::get('/blog/articles/{slug}', [BlogPostController::class, '__invoke'])
         ->where('slug', '[A-Za-z0-9\-]+')
         ->name('blog.post');
+
+    // Blog preview route (with noindex middleware)
+    Route::get('/blog/preview/{token}', [BlogPostPreviewController::class, '__invoke'])
+        ->middleware(PreventIndexing::class)
+        ->name('blog.preview');
 
     // Search routes
     Route::get('/search', [SearchController::class, 'search'])->name('search');
@@ -216,6 +224,14 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
 
         // Blog post drafts routes
         Route::apiResource('blog-post-drafts', BlogPostDraftController::class);
+
+        // Blog post preview token routes
+        Route::post('blog-post-drafts/{blog_post_draft}/preview-token', [BlogPostPreviewTokenController::class, 'store'])
+            ->name('blog-post-preview-tokens.store');
+        Route::get('blog-post-drafts/{blog_post_draft}/preview-token', [BlogPostPreviewTokenController::class, 'show'])
+            ->name('blog-post-preview-tokens.show');
+        Route::delete('blog-post-preview-tokens/{blog_post_preview_token}', [BlogPostPreviewTokenController::class, 'destroy'])
+            ->name('blog-post-preview-tokens.destroy');
 
         // Blog post draft content routes
         Route::apiResource('blog-post-draft-contents', BlogPostDraftContentController::class)->except(['index', 'show']);

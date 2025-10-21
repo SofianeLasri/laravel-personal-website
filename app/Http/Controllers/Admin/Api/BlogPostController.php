@@ -32,6 +32,7 @@ class BlogPostController extends Controller
         }
 
         try {
+            /** @var BlogPostDraft $draft */
             $draft = BlogPostDraft::with([
                 'titleTranslationKey.translations',
                 'category',
@@ -61,9 +62,18 @@ class BlogPostController extends Controller
         }
     }
 
-    public function show(BlogPost $blogPost) {}
+    public function show(BlogPost $blogPost): JsonResponse
+    {
+        return response()->json($blogPost);
+    }
 
-    public function update(Request $request, BlogPost $blogPost) {}
+    public function update(Request $request, BlogPost $blogPost): JsonResponse
+    {
+        return response()->json($blogPost);
+    }
 
-    public function destroy(BlogPost $blogPost) {}
+    public function destroy(BlogPost $blogPost): JsonResponse
+    {
+        return response()->json(['message' => 'Not implemented'], 501);
+    }
 }

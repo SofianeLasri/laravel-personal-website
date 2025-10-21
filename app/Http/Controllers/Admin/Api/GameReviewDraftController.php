@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\GameReviewDraft;
 use App\Models\TranslationKey;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class GameReviewDraftController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'blog_post_draft_id' => 'required|integer|exists:blog_post_drafts,id',
@@ -113,7 +114,7 @@ class GameReviewDraftController extends Controller
         }
     }
 
-    public function show(GameReviewDraft $gameReviewDraft)
+    public function show(GameReviewDraft $gameReviewDraft): JsonResponse
     {
         $gameReviewDraft->load([
             'blogPostDraft',
@@ -126,7 +127,7 @@ class GameReviewDraftController extends Controller
         return response()->json($gameReviewDraft);
     }
 
-    public function update(Request $request, GameReviewDraft $gameReviewDraft)
+    public function update(Request $request, GameReviewDraft $gameReviewDraft): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'game_title' => 'required|string|max:255',
@@ -169,11 +170,11 @@ class GameReviewDraftController extends Controller
                     $gameReviewDraft->refresh();
                 }
 
-                $gameReviewDraft->prosTranslationKey->translations()->updateOrCreate(
+                $gameReviewDraft->prosTranslationKey?->translations()->updateOrCreate(
                     ['locale' => $request->locale],
                     ['text' => $request->pros]
                 );
-            } elseif ($request->has('pros') && (empty($request->pros) || $request->pros === '' || $request->pros === null)) {
+            } elseif ($request->has('pros') && ($request->pros === null || $request->pros === '')) {
                 // Remove pros only if explicitly provided as empty
                 if ($gameReviewDraft->prosTranslationKey) {
                     $translationKey = $gameReviewDraft->prosTranslationKey;
@@ -199,11 +200,11 @@ class GameReviewDraftController extends Controller
                     $gameReviewDraft->refresh();
                 }
 
-                $gameReviewDraft->consTranslationKey->translations()->updateOrCreate(
+                $gameReviewDraft->consTranslationKey?->translations()->updateOrCreate(
                     ['locale' => $request->locale],
                     ['text' => $request->cons]
                 );
-            } elseif ($request->has('cons') && (empty($request->cons) || $request->cons === '' || $request->cons === null)) {
+            } elseif ($request->has('cons') && ($request->cons === null || $request->cons === '')) {
                 // Remove cons only if explicitly provided as empty
                 if ($gameReviewDraft->consTranslationKey) {
                     $translationKey = $gameReviewDraft->consTranslationKey;
@@ -246,7 +247,7 @@ class GameReviewDraftController extends Controller
         }
     }
 
-    public function destroy(GameReviewDraft $gameReviewDraft)
+    public function destroy(GameReviewDraft $gameReviewDraft): JsonResponse
     {
         DB::beginTransaction();
 

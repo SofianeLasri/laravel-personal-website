@@ -71,7 +71,9 @@ class CreationDraftScreenshotController extends Controller
                 'caption_translation_key_id' => $translationKeyId,
             ]);
         } else {
-            $creationDraftScreenshot->captionTranslationKey->delete();
+            if ($creationDraftScreenshot->captionTranslationKey) {
+                $creationDraftScreenshot->captionTranslationKey->delete();
+            }
 
             $creationDraftScreenshot->update([
                 'caption_translation_key_id' => null,

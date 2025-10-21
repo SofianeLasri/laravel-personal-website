@@ -220,8 +220,8 @@ class PublicControllersService
             'id' => $creation->id,
             'name' => $creation->name,
             'slug' => $creation->slug,
-            'logo' => $this->formatPictureForSSR($creation->logo),
-            'coverImage' => $this->formatPictureForSSR($creation->coverImage),
+            'logo' => $creation->logo ? $this->formatPictureForSSR($creation->logo) : null,
+            'coverImage' => $creation->coverImage ? $this->formatPictureForSSR($creation->coverImage) : null,
             'startedAt' => $creation->started_at,
             'endedAt' => $creation->ended_at,
             'startedAtFormatted' => $this->formatDate($creation->started_at),
@@ -534,16 +534,19 @@ class PublicControllersService
         ])->get();
 
         return $experiences->map(function (Experience $experience) {
-            $title = $this->getTranslationWithFallback($experience->titleTranslationKey->translations);
-            $shortDescription = $this->getTranslationWithFallback($experience->shortDescriptionTranslationKey->translations);
-            $fullDescription = $this->getTranslationWithFallback($experience->fullDescriptionTranslationKey->translations);
+            $title = $experience->titleTranslationKey ?
+                $this->getTranslationWithFallback($experience->titleTranslationKey->translations) : '';
+            $shortDescription = $experience->shortDescriptionTranslationKey ?
+                $this->getTranslationWithFallback($experience->shortDescriptionTranslationKey->translations) : '';
+            $fullDescription = $experience->fullDescriptionTranslationKey ?
+                $this->getTranslationWithFallback($experience->fullDescriptionTranslationKey->translations) : '';
 
             return [
                 'id' => $experience->id,
                 'title' => $title,
                 'organizationName' => $experience->organization_name,
                 'slug' => $experience->slug,
-                'logo' => $this->formatPictureForSSR($experience->logo),
+                'logo' => $experience->logo ? $this->formatPictureForSSR($experience->logo) : null,
                 'location' => $experience->location,
                 'websiteUrl' => $experience->website_url,
                 'shortDescription' => $shortDescription,
@@ -598,8 +601,6 @@ class PublicControllersService
         if (! $date instanceof Carbon) {
             $date = Carbon::parse($date);
         }
-
-        assert($date instanceof Carbon);
 
         $month = Str::ucfirst($date->translatedFormat('F'));
 
@@ -749,9 +750,12 @@ class PublicControllersService
      */
     public function formatExperienceForSSR(Experience $experience): array
     {
-        $title = $this->getTranslationWithFallback($experience->titleTranslationKey->translations);
-        $shortDescription = $this->getTranslationWithFallback($experience->shortDescriptionTranslationKey->translations);
-        $fullDescription = $this->getTranslationWithFallback($experience->fullDescriptionTranslationKey->translations);
+        $title = $experience->titleTranslationKey ?
+            $this->getTranslationWithFallback($experience->titleTranslationKey->translations) : '';
+        $shortDescription = $experience->shortDescriptionTranslationKey ?
+            $this->getTranslationWithFallback($experience->shortDescriptionTranslationKey->translations) : '';
+        $fullDescription = $experience->fullDescriptionTranslationKey ?
+            $this->getTranslationWithFallback($experience->fullDescriptionTranslationKey->translations) : '';
 
         $startedAtFormatted = $this->formatDate($experience->started_at);
         $endedAtFormatted = $this->formatDate($experience->ended_at);
@@ -983,8 +987,7 @@ class PublicControllersService
         // Apply search filter
         if (! empty($filters['search'])) {
             $searchTerm = $filters['search'];
-            $query->whereHas('titleTranslationKey.translations', function (Builder $q) use ($searchTerm) {
-                /** @var Builder<Translation> $q */
+            $query->whereHas('titleTranslationKey.translations', function ($q) use ($searchTerm) {
                 $q->where('text', 'like', '%'.$searchTerm.'%');
             });
         }
@@ -1214,7 +1217,7 @@ class PublicControllersService
             ],
             'coverImage' => $blogPost->coverPicture ? $this->formatPictureForSSR($blogPost->coverPicture) : null,
             'publishedAt' => $blogPost->created_at,
-            'publishedAtFormatted' => $blogPost->created_at instanceof Carbon ? $blogPost->created_at->locale($this->locale)->translatedFormat('j F Y') : '',
+            'publishedAtFormatted' => $blogPost->created_at instanceof Carbon ? Carbon::parse($blogPost->created_at)->locale($this->locale)->translatedFormat('j F Y') : '',
             'excerpt' => $excerpt,
             'contents' => $contents->toArray(),
         ];
@@ -1252,12 +1255,12 @@ class PublicControllersService
      *     slug: string,
      *     type: BlogPostType,
      *     category: array{name: string, color: CategoryColor},
-     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     publishedAt: Carbon|null,
-     *     publishedAtFormatted: string|null,
+     *     publishedAtFormatted: string,
      *     excerpt: string,
      *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
-     *     gameReview?: array{gameTitle: string, releaseDate: string, genre: string, developer: string, publisher: string, platforms: string, rating: int, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null},
+     *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array<int, string>|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null},
      *     isPreview: bool
      * }
      */
@@ -1377,7 +1380,7 @@ class PublicControllersService
             ],
             'coverImage' => $draft->coverPicture ? $this->formatPictureForSSR($draft->coverPicture) : null,
             'publishedAt' => $draft->created_at,
-            'publishedAtFormatted' => $draft->created_at instanceof Carbon ? $draft->created_at->locale($this->locale)->translatedFormat('j F Y') : '',
+            'publishedAtFormatted' => $draft->created_at instanceof Carbon ? Carbon::parse($draft->created_at)->locale($this->locale)->translatedFormat('j F Y') : '',
             'excerpt' => $excerpt,
             'contents' => $contents->toArray(),
             'isPreview' => true, // Flag to indicate this is a preview

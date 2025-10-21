@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BlogPostDraft;
 use App\Models\BlogPostDraftContent;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BlogPostDraftContentController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'blog_post_draft_id' => 'required|integer|exists:blog_post_drafts,id',
@@ -42,7 +43,7 @@ class BlogPostDraftContentController extends Controller
         return response()->json($draftContent, 201);
     }
 
-    public function update(Request $request, BlogPostDraftContent $blogPostDraftContent)
+    public function update(Request $request, BlogPostDraftContent $blogPostDraftContent): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'order' => 'nullable|integer',
@@ -66,7 +67,7 @@ class BlogPostDraftContentController extends Controller
         return response()->json($blogPostDraftContent);
     }
 
-    public function reorder(Request $request, BlogPostDraft $blogPostDraft)
+    public function reorder(Request $request, BlogPostDraft $blogPostDraft): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'content_ids' => 'required|array',
@@ -91,7 +92,7 @@ class BlogPostDraftContentController extends Controller
         return response()->json(['message' => 'Content reordered successfully']);
     }
 
-    public function destroy(BlogPostDraftContent $blogPostDraftContent)
+    public function destroy(BlogPostDraftContent $blogPostDraftContent): JsonResponse
     {
         $blogPostDraftContent->delete();
 

@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class BlogCategoriesPageController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $categories = BlogCategory::with([
             'nameTranslationKey.translations',

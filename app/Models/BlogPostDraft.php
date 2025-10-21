@@ -25,11 +25,13 @@ use Illuminate\Support\Carbon;
  * @property int|null $categories_count
  * @property int|null $cover_pictures_count
  * @property int|null $contents_count
+ * @property int|null $preview_tokens_count
  * @property-read BlogPost|null $originalBlogPost
  * @property-read BlogCategory $category
  * @property-read Picture|null $coverPicture
  * @property-read Collection|BlogPostDraftContent[] $contents
  * @property-read GameReviewDraft|null $gameReviewDraft
+ * @property-read Collection|BlogPostPreviewToken[] $previewTokens
  */
 class BlogPostDraft extends Model
 {
@@ -96,5 +98,13 @@ class BlogPostDraft extends Model
     public function gameReviewDraft(): HasOne
     {
         return $this->hasOne(GameReviewDraft::class);
+    }
+
+    /**
+     * @return HasMany<BlogPostPreviewToken, $this>
+     */
+    public function previewTokens(): HasMany
+    {
+        return $this->hasMany(BlogPostPreviewToken::class);
     }
 }

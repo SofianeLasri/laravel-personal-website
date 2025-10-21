@@ -6,7 +6,6 @@ use App\Enums\VideoVisibility;
 use App\Http\Requests\Video\VideoUpdateRequest;
 use App\Models\Picture;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;

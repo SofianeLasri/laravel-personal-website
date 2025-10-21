@@ -236,13 +236,6 @@ class VideoController extends Controller
     {
         $video = Video::findOrFail($videoId);
 
-        Log::info('Starting thumbnail download', [
-            'video_id' => $videoId,
-            'video_name' => $video->name,
-            'bunny_video_id' => $video->bunny_video_id,
-            'video_status' => $video->status->value,
-        ]);
-
         // Check if video is ready
         if ($video->status !== VideoStatus::READY) {
             Log::warning('Cannot download thumbnail: video not ready', [
@@ -270,11 +263,6 @@ class VideoController extends Controller
                 ], 500);
             }
 
-            Log::info('Downloading thumbnail from BunnyStream', [
-                'video_id' => $videoId,
-                'thumbnail_url' => $thumbnailUrl,
-            ]);
-
             // Download the thumbnail image
             $response = Http::get($thumbnailUrl);
 
@@ -295,12 +283,6 @@ class VideoController extends Controller
                 ], 500);
             }
 
-            Log::info('Thumbnail downloaded successfully', [
-                'video_id' => $videoId,
-                'content_length' => strlen($response->body()),
-                'content_type' => $response->header('Content-Type'),
-            ]);
-
             // Store the image file
             $folderName = 'uploads/'.Carbon::now()->format('Y/m/d');
             $fileName = 'bunny_thumbnail_'.$video->bunny_video_id.'_'.uniqid().'.jpg';
@@ -319,13 +301,6 @@ class VideoController extends Controller
                 'filename' => $fileName,
                 'size' => strlen($response->body()),
                 'path_original' => $filePath,
-            ]);
-
-            Log::info('Picture record created', [
-                'video_id' => $videoId,
-                'picture_id' => $picture->id,
-                'file_path' => $filePath,
-                'file_size' => $picture->size,
             ]);
 
             // Dispatch optimization job

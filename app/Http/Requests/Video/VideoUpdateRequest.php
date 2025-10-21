@@ -10,7 +10,7 @@ class VideoUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string'],
+            'name' => ['sometimes', 'string', 'max:255'],
             'cover_picture_id' => ['nullable', 'exists:pictures,id'],
             'visibility' => ['sometimes', 'in:'.implode(',', VideoVisibility::values())],
         ];

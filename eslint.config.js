@@ -32,23 +32,23 @@ export default defineConfigWithVueTs(
         },
         rules: {
             // TypeScript Rules - Strict
-            '@typescript-eslint/no-explicit-any': 'warn', // Changed from 'off' to 'warn'
+            '@typescript-eslint/no-explicit-any': 'error', // Phase 2: Enforce proper typing
             '@typescript-eslint/explicit-function-return-type': 'off', // Too strict for Vue components
             '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-            '@typescript-eslint/no-non-null-assertion': 'warn',
+            '@typescript-eslint/no-non-null-assertion': 'error', // Phase 2: Avoid dangerous ! assertions
             '@typescript-eslint/strict-boolean-expressions': 'off', // Too strict for practical use
             '@typescript-eslint/no-floating-promises': 'error',
             '@typescript-eslint/no-misused-promises': 'error',
             '@typescript-eslint/await-thenable': 'error',
             '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-            '@typescript-eslint/prefer-nullish-coalescing': 'warn',
+            '@typescript-eslint/prefer-nullish-coalescing': 'error', // Phase 2: Enforce ?? operator
             '@typescript-eslint/prefer-optional-chain': 'error',
             '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
-            '@typescript-eslint/no-unsafe-assignment': 'off', // Often too strict with third-party libs
-            '@typescript-eslint/no-unsafe-member-access': 'off',
-            '@typescript-eslint/no-unsafe-call': 'off',
-            '@typescript-eslint/no-unsafe-return': 'off',
-            '@typescript-eslint/no-unsafe-argument': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'error', // Phase 3: Maximum type safety
+            '@typescript-eslint/no-unsafe-member-access': 'error', // Phase 3: Maximum type safety
+            '@typescript-eslint/no-unsafe-call': 'error', // Phase 3: Maximum type safety
+            '@typescript-eslint/no-unsafe-return': 'error', // Phase 3: Maximum type safety
+            '@typescript-eslint/no-unsafe-argument': 'error', // Phase 3: Maximum type safety
 
             // Vue Rules - Strict
             'vue/multi-word-component-names': 'off', // Keep off for single-word components
@@ -150,7 +150,7 @@ export default defineConfigWithVueTs(
             'no-invalid-this': 'error',
             'no-loop-func': 'error',
             'no-multi-str': 'error',
-            'no-new': 'warn',
+            'no-new': 'error', // Phase 2: Enforce proper constructor usage
             'no-return-assign': 'error',
             'no-return-await': 'error',
             'no-self-compare': 'error',

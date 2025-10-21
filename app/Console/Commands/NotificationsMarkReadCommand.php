@@ -10,11 +10,16 @@ use Illuminate\Console\Command;
 class NotificationsMarkReadCommand extends Command
 {
     /**
+     * Default period in days when no period is specified
+     */
+    private const DEFAULT_PERIOD_DAYS = 7;
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'notifications:mark-read 
+    protected $signature = 'notifications:mark-read
                             {--older-than=7days : Mark notifications older than this period as read}
                             {--type= : Filter by notification type}
                             {--severity= : Filter by severity (info, warning, error, critical)}
@@ -70,6 +75,7 @@ class NotificationsMarkReadCommand extends Command
 
         // Show breakdown by type and severity
         $breakdown = clone $query;
+        /** @var \Illuminate\Support\Collection<int, object{type: string, severity: string, count: int}> $typeBreakdown */
         $typeBreakdown = $breakdown->selectRaw('type, severity, count(*) as count')
             ->groupBy('type', 'severity')
             ->get();
@@ -79,8 +85,7 @@ class NotificationsMarkReadCommand extends Command
             $this->info('Breakdown by Type and Severity:');
             $this->table(
                 ['Type', 'Severity', 'Count'],
-                $typeBreakdown->map(function (object $item) {
-                    /** @var object{type: string, severity: string, count: int} $item */
+                $typeBreakdown->map(function ($item) {
                     return [
                         $item->type,
                         ucfirst($item->severity),
@@ -139,6 +144,7 @@ class NotificationsMarkReadCommand extends Command
             $this->info("Remaining unread notifications: {$remainingUnread}");
 
             // Show breakdown of remaining
+            /** @var \Illuminate\Support\Collection<int, object{severity: string, count: int}> $remainingBreakdown */
             $remainingBreakdown = Notification::where('is_read', false)
                 ->selectRaw('severity, count(*) as count')
                 ->groupBy('severity')
@@ -147,8 +153,7 @@ class NotificationsMarkReadCommand extends Command
             if ($remainingBreakdown->isNotEmpty()) {
                 $this->table(
                     ['Severity', 'Count'],
-                    $remainingBreakdown->map(function (object $item) {
-                        /** @var object{severity: string, count: int} $item */
+                    $remainingBreakdown->map(function ($item) {
                         return [
                             ucfirst($item->severity),
                             $item->count,
@@ -171,7 +176,7 @@ class NotificationsMarkReadCommand extends Command
     {
         // Default to 7 days if period is null
         if ($period === null) {
-            return Carbon::now()->subDays(7);
+            return Carbon::now()->subDays(self::DEFAULT_PERIOD_DAYS);
         }
 
         // Handle common formats

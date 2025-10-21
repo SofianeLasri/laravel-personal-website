@@ -61,19 +61,4 @@ class BlogPostController extends Controller
             ], 500);
         }
     }
-
-    public function show(BlogPost $blogPost): JsonResponse
-    {
-        return response()->json($blogPost);
-    }
-
-    public function update(Request $request, BlogPost $blogPost): JsonResponse
-    {
-        return response()->json($blogPost);
-    }
-
-    public function destroy(BlogPost $blogPost): JsonResponse
-    {
-        return response()->json(['message' => 'Not implemented'], 501);
-    }
 }

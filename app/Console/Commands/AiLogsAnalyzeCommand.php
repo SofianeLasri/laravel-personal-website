@@ -12,11 +12,16 @@ use Illuminate\Support\Facades\DB;
 class AiLogsAnalyzeCommand extends Command
 {
     /**
+     * Default period in days when no period is specified
+     */
+    private const DEFAULT_PERIOD_DAYS = 7;
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'ai:logs:analyze 
+    protected $signature = 'ai:logs:analyze
                             {--period=7days : The period to analyze (e.g., 7days, 1month, 24hours)}
                             {--provider= : Filter by specific provider}
                             {--status= : Filter by status (success, error, timeout, fallback)}';
@@ -216,7 +221,7 @@ class AiLogsAnalyzeCommand extends Command
     {
         // Default to 7 days if period is null
         if ($period === null) {
-            return Carbon::now()->subDays(7);
+            return Carbon::now()->subDays(self::DEFAULT_PERIOD_DAYS);
         }
 
         // Handle common formats

@@ -257,8 +257,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('pictures.health');
         Route::post('pictures/{picture}/rotate', [PictureController::class, 'rotate'])
             ->name('pictures.rotate');
+        Route::apiResource('blog-posts', AdminBlogPostController::class)->only(['index', 'store']);
         Route::apiResources([
-            'blog-posts' => AdminBlogPostController::class,
             'certifications' => CertificationController::class,
             'creations' => CreationController::class,
             'creation-drafts' => CreationDraftController::class,

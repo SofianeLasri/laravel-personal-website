@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
@@ -22,6 +24,8 @@ const emit = defineEmits<{
 const content = ref(props.modelValue || '');
 const rawMode = ref(false);
 const rawContent = ref(props.modelValue || '');
+const isLinkDialogOpen = ref(false);
+const linkUrl = ref('');
 
 const editor = useEditor({
     content: content.value,
@@ -110,21 +114,31 @@ const toggleHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
     editor.value?.chain().focus().toggleHeading({ level }).run();
 };
 
-const setLink = () => {
+const openLinkDialog = () => {
     if (typeof window === 'undefined') return;
 
-    const url = window.prompt('URL');
+    // Get current link if any
+    const currentLink = editor.value?.getAttributes('link').href || '';
+    linkUrl.value = currentLink;
+    isLinkDialogOpen.value = true;
+};
 
-    if (url === null) {
-        return;
-    }
+const setLink = () => {
+    const url = linkUrl.value.trim();
 
     if (url === '') {
         editor.value?.chain().focus().extendMarkRange('link').unsetLink().run();
-        return;
+    } else {
+        editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     }
 
-    editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    isLinkDialogOpen.value = false;
+    linkUrl.value = '';
+};
+
+const cancelLink = () => {
+    isLinkDialogOpen.value = false;
+    linkUrl.value = '';
 };
 
 const isActive = (type: string, options = {}) => {
@@ -207,7 +221,7 @@ const isActive = (type: string, options = {}) => {
                 type="button"
                 :class="{ 'is-active': isActive('link') }"
                 title="Lien ([texte](url))"
-                @click="setLink"
+                @click="openLinkDialog"
             >
                 <LucideLink />
             </Button>
@@ -260,6 +274,26 @@ const isActive = (type: string, options = {}) => {
             :disabled="disabled"
             @input="handleRawContentChange"
         ></textarea>
+
+        <!-- Link Dialog -->
+        <Dialog v-model:open="isLinkDialogOpen">
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Ajouter/Modifier un lien</DialogTitle>
+                </DialogHeader>
+                <div class="space-y-4 py-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">URL</label>
+                        <Input v-model="linkUrl" placeholder="https://example.com" data-form-type="other" @keyup.enter="setLink" />
+                        <p class="text-muted-foreground text-xs">Laissez vide pour supprimer le lien</p>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" @click="cancelLink">Annuler</Button>
+                    <Button @click="setLink">Confirmer</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </Card>
 </template>
 

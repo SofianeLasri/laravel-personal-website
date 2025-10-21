@@ -41,7 +41,7 @@ onMounted(() => {
 <template>
     <div class="space-y-4">
         <!-- Galerie PhotoSwipe - Structure simplifiée -->
-        <div :id="galleryId" class="w-full gap-4" :class="[pictures.length === 1 ? 'flex justify-center' : `grid ${  gridClasses}`]">
+        <div :id="galleryId" class="w-full gap-4" :class="[pictures.length === 1 ? 'flex justify-center' : `grid ${gridClasses}`]">
             <a
                 v-for="picture in pictures"
                 :key="picture.id"

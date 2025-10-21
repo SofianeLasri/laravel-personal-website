@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import Heading from '@/components/dashboard/Heading.vue';
 import VideoManager from '@/components/dashboard/VideoManager.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -9,7 +19,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import type { BreadcrumbItem, Video } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { Download, Edit, ExternalLink, FileVideo, Plus, Trash2 } from 'lucide-vue-next';
+import { Download, Edit, ExternalLink, FileVideo, Loader2, Plus, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -44,7 +54,10 @@ const videos = ref<VideoWithUsage[]>([...props.videos]);
 const isUploadModalOpen = ref(false);
 const isEditModalOpen = ref(false);
 const isImportModalOpen = ref(false);
+const isDeleteDialogOpen = ref(false);
 const editingVideo = ref<VideoWithUsage | null>(null);
+const videoToDelete = ref<VideoWithUsage | null>(null);
+const isDeleting = ref(false);
 
 // Ref to VideoManager for helpers
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
@@ -85,30 +98,40 @@ const openEditModal = (video: VideoWithUsage) => {
     isEditModalOpen.value = true;
 };
 
-// Delete video
-const deleteVideo = async (video: VideoWithUsage) => {
+// Open delete confirmation dialog
+const confirmDeleteVideo = (video: VideoWithUsage) => {
     if (video.usages.length > 0) {
         toast.error('Impossible de supprimer une vidéo utilisée dans des contenus');
         return;
     }
 
-    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer la vidéo "${video.name}" ?`)) {
-        return;
-    }
+    videoToDelete.value = video;
+    isDeleteDialogOpen.value = true;
+};
+
+// Delete video
+const deleteVideo = async () => {
+    if (!videoToDelete.value) return;
+
+    isDeleting.value = true;
+    isDeleteDialogOpen.value = false;
 
     try {
-        await axios.delete(route('dashboard.api.videos.destroy', { video: video.id }));
+        await axios.delete(route('dashboard.api.videos.destroy', { video: videoToDelete.value.id }));
 
         // Remove from list
-        const index = videos.value.findIndex((v) => v.id === video.id);
+        const index = videos.value.findIndex((v) => v.id === videoToDelete.value?.id);
         if (index !== -1) {
             videos.value.splice(index, 1);
         }
 
         toast.success('Vidéo supprimée avec succès');
+        videoToDelete.value = null;
     } catch (error) {
         console.error('Erreur lors de la suppression:', error);
         toast.error('Erreur lors de la suppression');
+    } finally {
+        isDeleting.value = false;
     }
 };
 
@@ -251,8 +274,8 @@ const getUsageTypeLabel = (usage: VideoUsage): string => {
                                                 type="button"
                                                 variant="ghost"
                                                 size="sm"
-                                                :disabled="video.usages.length > 0"
-                                                @click="deleteVideo(video)"
+                                                :disabled="video.usages.length > 0 || isDeleting"
+                                                @click="confirmDeleteVideo(video)"
                                             >
                                                 <Trash2 class="h-4 w-4" />
                                             </Button>
@@ -285,5 +308,24 @@ const getUsageTypeLabel = (usage: VideoUsage): string => {
             @video-updated="handleVideoUpdated"
             @video-imported="handleVideoImported"
         />
+
+        <!-- Delete Video Confirmation Dialog -->
+        <AlertDialog v-model:open="isDeleteDialogOpen">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer la vidéo "{{ videoToDelete?.name }}" ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Cette action est irréversible. La vidéo sera définitivement supprimée de la base de données et de Bunny Stream.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deleteVideo">
+                        <Loader2 v-if="isDeleting" class="mr-2 h-4 w-4 animate-spin" />
+                        Supprimer
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </AppLayout>
 </template>

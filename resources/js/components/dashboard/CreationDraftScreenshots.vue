@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
 import PictureInput from '@/components/dashboard/PictureInput.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -22,7 +32,9 @@ const loading = ref(false);
 const error = ref<string | null>(null);
 const isAddModalOpen = ref(false);
 const isEditModalOpen = ref(false);
+const isDeleteDialogOpen = ref(false);
 const selectedScreenshot = ref<Screenshot | null>(null);
+const screenshotToDelete = ref<Screenshot | null>(null);
 const newScreenshotPictureId = ref<number | undefined>(undefined);
 const newScreenshotCaption = ref('');
 const editScreenshotCaption = ref('');
@@ -112,22 +124,27 @@ const updateScreenshot = async () => {
     }
 };
 
-const deleteScreenshot = async (screenshot: Screenshot) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer cette capture d'écran ?")) {
-        return;
-    }
+const confirmDeleteScreenshot = (screenshot: Screenshot) => {
+    screenshotToDelete.value = screenshot;
+    isDeleteDialogOpen.value = true;
+};
+
+const deleteScreenshot = async () => {
+    if (!screenshotToDelete.value) return;
 
     loading.value = true;
     error.value = null;
+    isDeleteDialogOpen.value = false;
 
     try {
         await axios.delete(
             route('dashboard.api.draft-screenshots.destroy', {
-                draft_screenshot: screenshot.id,
+                draft_screenshot: screenshotToDelete.value.id,
             }),
         );
 
         await fetchScreenshots();
+        screenshotToDelete.value = null;
     } catch (err) {
         error.value = "Erreur lors de la suppression de la capture d'écran";
         console.error(err);
@@ -212,7 +229,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                                 <Button variant="ghost" size="icon" title="Modifier la description" @click.stop="openEditModal(screenshot)">
                                     <Pencil class="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" title="Supprimer" @click.stop="deleteScreenshot(screenshot)">
+                                <Button variant="ghost" size="icon" title="Supprimer" @click.stop="confirmDeleteScreenshot(screenshot)">
                                     <Trash2 class="h-4 w-4" />
                                 </Button>
                             </div>
@@ -290,5 +307,24 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+
+        <!-- Delete Screenshot Confirmation Dialog -->
+        <AlertDialog v-model:open="isDeleteDialogOpen">
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer cette capture d'écran ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Cette action est irréversible. La capture d'écran sera supprimée définitivement.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction class="bg-destructive text-destructive-foreground hover:bg-destructive/90" @click="deleteScreenshot">
+                        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
+                        Supprimer
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
 </template>

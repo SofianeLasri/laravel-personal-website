@@ -82,12 +82,12 @@ const formSchema = toTypedSchema(
 const form = useForm({
     validationSchema: formSchema,
     initialValues: {
-        name: props.certification?.name || '',
-        level: props.certification?.level || '',
-        score: props.certification?.score || '',
+        name: props.certification?.name ?? '',
+        level: props.certification?.level ?? '',
+        score: props.certification?.score ?? '',
         date: props.certification?.date ? props.certification.date.split('T')[0] : '',
-        link: props.certification?.link || '',
-        picture_id: props.certification?.picture_id || null,
+        link: props.certification?.link ?? '',
+        picture_id: props.certification?.picture_id ?? null,
     },
 });
 

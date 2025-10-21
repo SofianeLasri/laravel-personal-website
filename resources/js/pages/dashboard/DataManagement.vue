@@ -80,7 +80,7 @@ const handleExport = async () => {
             isExporting.value = false;
         }
     } catch (err: unknown) {
-        error.value = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to start export. Please try again.';
+        error.value = (err as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed to start export. Please try again.';
         isExporting.value = false;
     }
 };
@@ -108,7 +108,7 @@ const startExportStatusPolling = () => {
                     isExporting.value = false;
                     break;
                 case 'failed':
-                    error.value = status.error || 'Export failed. Please try again.';
+                    error.value = status.error ?? 'Export failed. Please try again.';
                     stopExportStatusPolling();
                     isExporting.value = false;
                     break;
@@ -175,7 +175,7 @@ const uploadImportFile = async () => {
         importMetadata.value = response.data.metadata;
         success.value = 'File uploaded and validated successfully!';
     } catch (err: unknown) {
-        error.value = err.response?.data?.message || 'Upload failed. Please check your file and try again.';
+        error.value = err.response?.data?.message ?? 'Upload failed. Please check your file and try again.';
         if (err.response?.data?.errors?.import_file) {
             error.value = err.response.data.errors.import_file.join(', ');
         }
@@ -245,7 +245,7 @@ const handleImport = async () => {
         }
     } catch (err: unknown) {
         clearInterval(progressInterval);
-        const errorMessage = err.response?.data?.message || 'Import failed. Please try again.';
+        const errorMessage = err.response?.data?.message ?? 'Import failed. Please try again.';
 
         // Show error in modal if it's a password error
         if (err.response?.status === 401 && props.isProduction) {

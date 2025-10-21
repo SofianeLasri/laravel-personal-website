@@ -109,7 +109,7 @@ const formSchema = toTypedSchema(
 const getContentForLocale = (translationKey: TranslationKey | undefined, targetLocale: string) => {
     if (!translationKey) return '';
     const translations = translationKey.translations;
-    return translations.find((t) => t.locale === targetLocale)?.text || '';
+    return translations.find((t) => t.locale === targetLocale)?.text ?? '';
 };
 
 let shortDescriptionContent = '';

@@ -56,19 +56,19 @@ const props = defineProps<Props>();
 const route = useRoute();
 
 const gameData = ref({
-    game_title: props.gameReviewDraft?.game_title || '',
-    release_date: props.gameReviewDraft?.release_date || '',
-    genre: props.gameReviewDraft?.genre || '',
-    developer: props.gameReviewDraft?.developer || '',
-    publisher: props.gameReviewDraft?.publisher || '',
-    platforms: props.gameReviewDraft?.platforms?.join(', ') || '',
-    cover_picture_id: props.gameReviewDraft?.cover_picture_id || null,
-    rating: props.gameReviewDraft?.rating || null,
+    game_title: props.gameReviewDraft?.game_title ?? '',
+    release_date: props.gameReviewDraft?.release_date ?? '',
+    genre: props.gameReviewDraft?.genre ?? '',
+    developer: props.gameReviewDraft?.developer ?? '',
+    publisher: props.gameReviewDraft?.publisher ?? '',
+    platforms: props.gameReviewDraft?.platforms?.join(', ') ?? '',
+    cover_picture_id: props.gameReviewDraft?.cover_picture_id ?? null,
+    rating: props.gameReviewDraft?.rating ?? null,
     pros: '',
     cons: '',
 });
 
-const links = ref<GameReviewLink[]>(props.gameReviewDraft?.links || []);
+const links = ref<GameReviewLink[]>(props.gameReviewDraft?.links ?? []);
 
 const linkTypes = [
     { value: 'steam', label: 'Steam' },
@@ -86,8 +86,8 @@ onMounted(() => {
         const prosTranslation = props.gameReviewDraft.pros_translation_key?.translations?.find((t) => t.locale === props.locale);
         const consTranslation = props.gameReviewDraft.cons_translation_key?.translations?.find((t) => t.locale === props.locale);
 
-        gameData.value.pros = prosTranslation?.text || '';
-        gameData.value.cons = consTranslation?.text || '';
+        gameData.value.pros = prosTranslation?.text ?? '';
+        gameData.value.cons = consTranslation?.text ?? '';
     }
 });
 

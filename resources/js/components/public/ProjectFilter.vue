@@ -16,7 +16,7 @@ const emit = defineEmits<{
     (e: 'filter-change', value: number[]): void;
 }>();
 
-const selectedFilters = ref<Set<number>>(new Set(props.initialSelectedFilters || []));
+const selectedFilters = ref<Set<number>>(new Set(props.initialSelectedFilters ?? []));
 
 // Check if screen is mobile size (< lg breakpoint = 1024px)
 const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);

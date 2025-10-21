@@ -275,11 +275,11 @@ const reoptimizePicture = async (picture: Picture) => {
                 router.reload({ only: ['pictures'] });
             }, 2000);
         } else {
-            toast.error(response.data.message || 'Erreur lors de la recompression');
+            toast.error(response.data.message ?? 'Erreur lors de la recompression');
         }
     } catch (error: unknown) {
         console.error('Erreur lors de la recompression:', error);
-        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Erreur lors de la recompression';
+        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Erreur lors de la recompression';
         toast.error(message);
     } finally {
         reoptimizingPictures.value.delete(picture.id);
@@ -305,18 +305,18 @@ const rotatePicture = async () => {
         });
 
         if (response.data.success) {
-            toast.success(response.data.message || `Image tournée de ${rotationAngle.value}° avec succès`);
+            toast.success(response.data.message ?? `Image tournée de ${rotationAngle.value}° avec succès`);
 
             // Refresh the page to show rotated images
             setTimeout(() => {
                 router.reload({ only: ['pictures'] });
             }, 500);
         } else {
-            toast.error(response.data.message || 'Erreur lors de la rotation');
+            toast.error(response.data.message ?? 'Erreur lors de la rotation');
         }
     } catch (error: unknown) {
         console.error('Erreur lors de la rotation:', error);
-        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Erreur lors de la rotation de l'image";
+        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message ?? "Erreur lors de la rotation de l'image";
         toast.error(message);
     } finally {
         rotatingPictures.value.delete(pictureId);

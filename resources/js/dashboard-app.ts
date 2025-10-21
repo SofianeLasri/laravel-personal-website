@@ -9,7 +9,7 @@ import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
 import { useNotificationStore } from './stores/notification';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME ?? 'Laravel';
 
 void createInertiaApp({
     title: (title) => `${title} - ${appName}`,

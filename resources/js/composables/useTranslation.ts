@@ -6,7 +6,7 @@ export function useTranslation() {
 
     function t(key: string, replacements?: Record<string, string | number>): string {
         const keys = key.split('.');
-        let result: unknown = page.props.translations || {};
+        let result: unknown = page.props.translations ?? {};
 
         for (const k of keys) {
             if (result && typeof result === 'object' && k in result) {
@@ -37,6 +37,6 @@ export function useTranslation() {
 
     return {
         t,
-        locale: computed(() => (page.props.locale as string) || 'fr'),
+        locale: computed(() => (page.props.locale as string) ?? 'fr'),
     };
 }

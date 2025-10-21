@@ -84,10 +84,10 @@ const formSchema = toTypedSchema(
 const form = useForm({
     validationSchema: formSchema,
     initialValues: {
-        slug: currentBlogPostDraft.value?.slug || '',
-        cover_picture_id: currentBlogPostDraft.value?.cover_picture_id || null,
-        type: currentBlogPostDraft.value?.type || 'article',
-        category_id: currentBlogPostDraft.value?.category_id?.toString() || props.categories[0]?.id?.toString() || '1',
+        slug: currentBlogPostDraft.value?.slug ?? '',
+        cover_picture_id: currentBlogPostDraft.value?.cover_picture_id ?? null,
+        type: currentBlogPostDraft.value?.type ?? 'article',
+        category_id: currentBlogPostDraft.value?.category_id?.toString() ?? props.categories[0]?.id?.toString() ?? '1',
         locale: 'fr' as 'fr' | 'en',
         title_content: '',
     },
@@ -129,7 +129,7 @@ onMounted(() => {
 watch(locale, (newLocale) => {
     if (currentBlogPostDraft.value?.title_translation_key) {
         const translation = currentBlogPostDraft.value.title_translation_key.translations.find((t) => t.locale === newLocale);
-        form.setFieldValue('title_content', translation?.text || '');
+        form.setFieldValue('title_content', translation?.text ?? '');
     }
 });
 
@@ -171,7 +171,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
         const payload = {
             ...values,
             title_translation_key_id: currentBlogPostDraft.value?.title_translation_key_id,
-            original_blog_post_id: currentBlogPostDraft.value?.original_blog_post_id || originalBlogPostId.value,
+            original_blog_post_id: currentBlogPostDraft.value?.original_blog_post_id ?? originalBlogPostId.value,
         };
 
         if (currentBlogPostDraft.value) {

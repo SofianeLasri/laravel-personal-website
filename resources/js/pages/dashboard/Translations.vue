@@ -105,11 +105,11 @@ function navigateToPage(page: number) {
 }
 
 function getFrenchTranslation(translationKey: TranslationKey): Translation | null {
-    return translationKey.translations.find((t) => t.locale === 'fr') || null;
+    return translationKey.translations.find((t) => t.locale === 'fr') ?? null;
 }
 
 function getEnglishTranslation(translationKey: TranslationKey): Translation | null {
-    return translationKey.translations.find((t) => t.locale === 'en') || null;
+    return translationKey.translations.find((t) => t.locale === 'en') ?? null;
 }
 
 async function updateTranslation(translation: Translation, newText: string) {
@@ -143,7 +143,7 @@ async function translateSingle(translationKey: TranslationKey) {
         if (response.data.success) {
             toast.success("Tâche de traduction mise en file d'attente avec succès");
         } else {
-            toast.error(response.data.message || "Échec de la mise en file d'attente de la traduction");
+            toast.error(response.data.message ?? "Échec de la mise en file d'attente de la traduction");
         }
     } catch (error) {
         console.error('Failed to translate:', error);
@@ -166,7 +166,7 @@ async function retranslateSingle(translationKey: TranslationKey) {
         if (response.data.success) {
             toast.success("Tâche de re-traduction mise en file d'attente avec succès");
         } else {
-            toast.error(response.data.message || "Échec de la mise en file d'attente de la re-traduction");
+            toast.error(response.data.message ?? "Échec de la mise en file d'attente de la re-traduction");
         }
     } catch (error) {
         console.error('Failed to retranslate:', error);
@@ -189,9 +189,9 @@ async function translateBatch(mode: 'missing' | 'all' | 'retranslate') {
         });
 
         if (response.data.success) {
-            toast.success(`${response.data.jobs_dispatched || 0} tâches de traduction mises en file d'attente`);
+            toast.success(`${response.data.jobs_dispatched ?? 0} tâches de traduction mises en file d'attente`);
         } else {
-            toast.error(response.data.message || "Échec de la mise en file d'attente des traductions");
+            toast.error(response.data.message ?? "Échec de la mise en file d'attente des traductions");
         }
     } catch (error) {
         console.error('Failed to batch translate:', error);

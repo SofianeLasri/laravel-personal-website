@@ -278,8 +278,8 @@ const checkPersonAssociations = async (personId: number): Promise<boolean> => {
 const openEditForm = (person: Person) => {
     editPersonId.value = person.id;
     editPersonName.value = person.name;
-    editPersonUrl.value = person.url || '';
-    editPersonPictureId.value = person.picture_id || undefined;
+    editPersonUrl.value = person.url ?? '';
+    editPersonPictureId.value = person.picture_id ?? undefined;
     isEditPersonDialogOpen.value = true;
 };
 

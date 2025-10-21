@@ -140,7 +140,7 @@ const filteredAvailableVideos = computed(() => {
 
 // Use synced video data when available, otherwise fallback to editingVideo from props
 const currentEditingVideo = computed(() => {
-    return syncedVideoData.value || props.editingVideo;
+    return syncedVideoData.value ?? props.editingVideo;
 });
 
 // Actions
@@ -251,10 +251,10 @@ const importFromBunny = async () => {
         emit('video-imported', response.data.video);
         resetImportForm();
         isImportModalOpen.value = false;
-        toast.success(response.data.message || 'Vidéo importée avec succès');
+        toast.success(response.data.message ?? 'Vidéo importée avec succès');
     } catch (error: unknown) {
         console.error("Erreur lors de l'import:", error);
-        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Erreur lors de l'import de la vidéo";
+        const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message ?? "Erreur lors de l'import de la vidéo";
         toast.error(message);
     } finally {
         loading.value = false;

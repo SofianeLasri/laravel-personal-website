@@ -21,9 +21,9 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void;
 }>();
 
-const content = ref(props.modelValue || '');
+const content = ref(props.modelValue ?? '');
 const rawMode = ref(false);
-const rawContent = ref(props.modelValue || '');
+const rawContent = ref(props.modelValue ?? '');
 const isLinkDialogOpen = ref(false);
 const linkUrl = ref('');
 
@@ -118,7 +118,7 @@ const openLinkDialog = () => {
     if (typeof window === 'undefined') return;
 
     // Get current link if any
-    const currentLink = editor.value?.getAttributes('link').href || '';
+    const currentLink = editor.value?.getAttributes('link').href ?? '';
     linkUrl.value = currentLink;
     isLinkDialogOpen.value = true;
 };

@@ -73,15 +73,15 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const searchQuery = ref(props.filters.search || '');
+const searchQuery = ref(props.filters.search ?? '');
 const perPage = ref(props.filters.per_page.toString());
 const isBotFilter = ref(props.filters.is_bot || 'all');
 const includeUserAgents = ref(props.filters.include_user_agents?.join('\n') || '');
 const excludeUserAgents = ref(props.filters.exclude_user_agents?.join('\n') || '');
 const includeIps = ref(props.filters.include_ips?.join('\n') || '');
 const excludeIps = ref(props.filters.exclude_ips?.join('\n') || '');
-const dateFrom = ref(props.filters.date_from || '');
-const dateTo = ref(props.filters.date_to || '');
+const dateFrom = ref(props.filters.date_from ?? '');
+const dateTo = ref(props.filters.date_to ?? '');
 const excludeConnectedUsersIps = ref(props.filters.exclude_connected_users_ips);
 
 // Sélection de requêtes
@@ -219,7 +219,7 @@ const paginationInfo = computed(() => {
 });
 
 const isDetectedAsBot = (request: RequestLog): boolean => {
-    return request.is_bot || request.is_bot_by_frequency || request.is_bot_by_user_agent || request.is_bot_by_parameters;
+    return (request.is_bot ?? false) || (request.is_bot_by_frequency ?? false) || (request.is_bot_by_user_agent ?? false) || (request.is_bot_by_parameters ?? false);
 };
 
 const getBotDetectionReasons = (request: RequestLog): string[] => {

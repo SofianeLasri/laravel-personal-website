@@ -162,9 +162,9 @@ const openEditModal = (feature: Feature) => {
     const titleTranslation = feature.title_translation_key?.translations.find((t) => t.locale === props.locale);
     const descriptionTranslation = feature.description_translation_key?.translations.find((t) => t.locale === props.locale);
 
-    editFeatureTitle.value = titleTranslation?.text || '';
-    editFeatureDescription.value = descriptionTranslation?.text || '';
-    editFeaturePictureId.value = feature.picture_id || undefined;
+    editFeatureTitle.value = titleTranslation?.text ?? '';
+    editFeatureDescription.value = descriptionTranslation?.text ?? '';
+    editFeaturePictureId.value = feature.picture_id ?? undefined;
     isEditModalOpen.value = true;
 };
 
@@ -179,7 +179,7 @@ const getFeatureTitle = (feature: Feature): string => {
 
     const translation = feature.title_translation_key.translations.find((t) => t.locale === props.locale);
 
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 const getFeatureDescription = (feature: Feature): string => {
@@ -187,7 +187,7 @@ const getFeatureDescription = (feature: Feature): string => {
 
     const translation = feature.description_translation_key.translations.find((t) => t.locale === props.locale);
 
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 onMounted(() => {

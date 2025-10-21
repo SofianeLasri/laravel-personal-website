@@ -108,7 +108,7 @@ const showLocaleChangeDialog = ref(false);
 const pendingLocale = ref<string | null>(null);
 const modalTechOpen = ref(false);
 const searchTechQuery = ref('');
-const selectedTechnologies = ref<Technology[]>(props.experience?.technologies || []);
+const selectedTechnologies = ref<Technology[]>(props.experience?.technologies ?? []);
 
 // Obtenir les traductions
 const getTranslation = (translationKey: { translations: { locale: string; text: string }[] }, targetLocale: string) => {

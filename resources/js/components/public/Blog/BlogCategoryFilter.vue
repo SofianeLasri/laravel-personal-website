@@ -20,14 +20,14 @@ const emit = defineEmits<{
     (e: 'filter-change', value: string[]): void;
 }>();
 
-const selectedFilters = ref<Set<string>>(new Set(props.initialSelectedFilters || []));
+const selectedFilters = ref<Set<string>>(new Set(props.initialSelectedFilters ?? []));
 
 // Check if screen is mobile size (< lg breakpoint = 1024px)
 const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
 const isCollapsed = ref(isMobile.value);
 
 const sortedCategories = computed(() => {
-    return [...props.categories].filter((category) => (category.postCount || 0) > 0).sort((a, b) => (b.postCount || 0) - (a.postCount || 0));
+    return [...props.categories].filter((category) => (category.postCount ?? 0) > 0).sort((a, b) => (b.postCount ?? 0) - (a.postCount ?? 0));
 });
 
 const handleResize = () => {

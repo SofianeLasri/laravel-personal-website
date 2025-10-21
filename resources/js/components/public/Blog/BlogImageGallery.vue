@@ -13,7 +13,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const galleryId = computed(() => `blog-gallery-${props.pictures[0]?.id || 'default'}`);
+const galleryId = computed(() => `blog-gallery-${props.pictures[0]?.id ?? 'default'}`);
 
 const gridClasses = computed(() => {
     if (props.pictures.length === 2) return 'grid-cols-1 md:grid-cols-2';

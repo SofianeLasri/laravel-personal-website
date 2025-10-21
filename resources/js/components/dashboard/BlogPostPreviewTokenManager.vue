@@ -54,7 +54,7 @@ const generatePreviewToken = async () => {
 
         if (response.data.success && response.data.data) {
             previewToken.value = response.data.data;
-            toast.success(response.data.message || 'Lien de prévisualisation généré avec succès');
+            toast.success(response.data.message ?? 'Lien de prévisualisation généré avec succès');
         }
     } catch (error) {
         console.error('Error generating preview token:', error);

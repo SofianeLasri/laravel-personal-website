@@ -158,7 +158,7 @@ const openEditModal = (screenshot: Screenshot) => {
 
     const captionTranslation = screenshot.caption_translation_key?.translations.find((t) => t.locale === props.locale);
 
-    editScreenshotCaption.value = captionTranslation?.text || '';
+    editScreenshotCaption.value = captionTranslation?.text ?? '';
     isEditModalOpen.value = true;
 };
 
@@ -172,7 +172,7 @@ const getScreenshotCaption = (screenshot: Screenshot): string => {
 
     const translation = screenshot.caption_translation_key.translations.find((t) => t.locale === props.locale);
 
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 onMounted(() => {

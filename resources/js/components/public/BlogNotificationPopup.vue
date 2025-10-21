@@ -16,7 +16,7 @@ const emit = defineEmits<{
     dismiss: [];
 }>();
 
-const latestBlogPost = computed(() => (page.props.latestBlogPost as SSRBlogPost | null) || null);
+const latestBlogPost = computed(() => (page.props.latestBlogPost as SSRBlogPost | null) ?? null);
 
 const shouldShow = () => {
     if (typeof window === 'undefined') return false;

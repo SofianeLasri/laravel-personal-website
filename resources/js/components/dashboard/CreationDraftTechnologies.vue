@@ -321,7 +321,7 @@ const getTechnologyDescription = (technology: Technology): string => {
 
     const translation = technology.description_translation_key.translations.find((t) => t.locale === props.locale);
 
-    return translation?.text || '';
+    return translation?.text ?? '';
 };
 
 const getTechnologyTypeLabel = (type: string): string => {
@@ -333,7 +333,7 @@ const openEditForm = (technology: Technology) => {
     editTechnologyId.value = technology.id;
     editTechnologyName.value = technology.name;
     editTechnologyType.value = technology.type;
-    editTechnologyIconPictureId.value = technology.icon_picture?.id || undefined;
+    editTechnologyIconPictureId.value = technology.icon_picture?.id ?? undefined;
     editTechnologyDescription.value = getTechnologyDescription(technology);
     isEditTechnologyDialogOpen.value = true;
 };

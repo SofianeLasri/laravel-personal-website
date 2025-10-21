@@ -25,7 +25,7 @@ const emit = defineEmits<{
     (e: 'item-click', id: string): void;
 }>();
 
-const currentActiveItem = ref(props.activeItem || (props.items.length > 0 ? props.items[0].id : ''));
+const currentActiveItem = ref(props.activeItem ?? (props.items.length > 0 ? props.items[0].id : ''));
 const navBarRef = ref<HTMLElement | null>(null);
 const navScrollContainer = ref<HTMLElement | null>(null);
 const isNavSticky = ref(false);

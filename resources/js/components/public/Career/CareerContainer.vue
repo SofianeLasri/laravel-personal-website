@@ -52,7 +52,7 @@ const experiencesByYear = computed(() => {
 });
 
 const selectedExperience = computed(() => {
-    return props.experience.find((exp) => exp.id === selectedExperienceId.value) || null;
+    return props.experience.find((exp) => exp.id === selectedExperienceId.value) ?? null;
 });
 
 const selectedExperienceYear = computed(() => {

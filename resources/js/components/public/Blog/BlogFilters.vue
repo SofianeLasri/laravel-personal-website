@@ -29,7 +29,7 @@ const selectedCategories = ref<string[]>(
           : [],
 );
 
-const selectedSort = ref(props.currentFilters.sort || 'newest');
+const selectedSort = ref(props.currentFilters.sort ?? 'newest');
 
 const hasActiveFilters = computed(() => {
     return selectedCategories.value.length > 0;
@@ -72,7 +72,7 @@ watch(
     (newFilters) => {
         selectedCategories.value = Array.isArray(newFilters.category) ? newFilters.category : newFilters.category ? [newFilters.category] : [];
 
-        selectedSort.value = newFilters.sort || 'newest';
+        selectedSort.value = newFilters.sort ?? 'newest';
     },
     { deep: true },
 );

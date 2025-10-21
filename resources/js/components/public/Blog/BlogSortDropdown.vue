@@ -12,7 +12,7 @@ const emit = defineEmits<{
     (e: 'sort-change', value: string): void;
 }>();
 
-const selectedSort = ref(props.currentSort || 'newest');
+const selectedSort = ref(props.currentSort ?? 'newest');
 
 const sortOptions = [
     { value: 'newest', label: 'Plus récent' },

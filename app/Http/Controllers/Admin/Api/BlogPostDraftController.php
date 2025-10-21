@@ -7,13 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogPostDraft;
 use App\Models\Translation;
 use App\Models\TranslationKey;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class BlogPostDraftController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $drafts = BlogPostDraft::with([
             'titleTranslationKey.translations',
@@ -25,7 +26,7 @@ class BlogPostDraftController extends Controller
         return response()->json($drafts);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
@@ -77,7 +78,7 @@ class BlogPostDraftController extends Controller
         return response()->json($draft, 201);
     }
 
-    public function show(BlogPostDraft $blogPostDraft)
+    public function show(BlogPostDraft $blogPostDraft): JsonResponse
     {
         $blogPostDraft->load([
             'titleTranslationKey.translations',
@@ -91,7 +92,7 @@ class BlogPostDraftController extends Controller
         return response()->json($blogPostDraft);
     }
 
-    public function update(Request $request, BlogPostDraft $blogPostDraft)
+    public function update(Request $request, BlogPostDraft $blogPostDraft): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string',
@@ -144,7 +145,7 @@ class BlogPostDraftController extends Controller
         return response()->json($blogPostDraft);
     }
 
-    public function destroy(BlogPostDraft $blogPostDraft)
+    public function destroy(BlogPostDraft $blogPostDraft): JsonResponse
     {
         // Get translation key before deleting the draft
         $titleTranslationKey = $blogPostDraft->titleTranslationKey;

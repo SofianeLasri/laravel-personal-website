@@ -40,7 +40,7 @@ class ImageCacheService
     /**
      * Get cached optimizations for a given checksum
      *
-     * @return array|null Array containing cached optimization data or null if not found
+     * @return array{width: int, height: int, cached_at: string, optimized_files: array<string, array<string, string>>}|null
      *
      * @throws InvalidArgumentException
      */
@@ -84,7 +84,7 @@ class ImageCacheService
     /**
      * Store optimized images in cache
      *
-     * @param  array  $optimizedImages  Format: ['format' => ['variant' => 'image_content']]
+     * @param  array<string, array<string, string>>  $optimizedImages  Format: ['format' => ['variant' => 'image_content']]
      * @param  int  $width  Source image width
      * @param  int  $height  Source image height
      */
@@ -102,7 +102,7 @@ class ImageCacheService
         ];
 
         $jsonData = json_encode($cacheData);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if ($jsonData === false || json_last_error() !== JSON_ERROR_NONE) {
             Log::warning('Failed to encode image data for cache', [
                 'checksum' => $checksum,
                 'json_error' => json_last_error_msg(),
@@ -135,6 +135,8 @@ class ImageCacheService
 
     /**
      * Copy cached files to the target picture's storage locations
+     *
+     * @param  array{width: int, height: int, cached_at: string, optimized_files: array<string, array<string, string>>}  $cachedData
      */
     public function copyCachedFiles(array $cachedData, Picture $targetPicture): bool
     {
@@ -144,7 +146,7 @@ class ImageCacheService
             return false;
         }
 
-        $optimizedFiles = $cachedData['optimized_files'] ?? [];
+        $optimizedFiles = $cachedData['optimized_files'];
         $dimensions = [
             'width' => $cachedData['width'],
             'height' => $cachedData['height'],
@@ -154,12 +156,14 @@ class ImageCacheService
             foreach ($optimizedFiles as $format => $variants) {
                 foreach ($variants as $variantName => $imageContent) {
                     // Decode base64 content if needed
-                    if (base64_encode(base64_decode($imageContent, true)) === $imageContent) {
-                        $imageContent = base64_decode($imageContent);
+                    $decoded = base64_decode($imageContent, true);
+                    if ($decoded !== false && base64_encode($decoded) === $imageContent) {
+                        $imageContent = $decoded;
                     }
 
                     // Generate the path for this variant
-                    $path = Str::beforeLast($targetPicture->path_original, '.')."_{$variantName}.{$format}";
+                    $originalPath = $targetPicture->path_original ?? '';
+                    $path = Str::beforeLast($originalPath, '.')."_{$variantName}.{$format}";
 
                     // Store the file
                     Storage::disk('public')->put($path, $imageContent);
@@ -247,6 +251,8 @@ class ImageCacheService
 
     /**
      * Get cache statistics
+     *
+     * @return array{enabled: bool, total_keys: int, total_memory: int, hit_rate?: float, miss_rate?: float}
      */
     public function getCacheStats(): array
     {

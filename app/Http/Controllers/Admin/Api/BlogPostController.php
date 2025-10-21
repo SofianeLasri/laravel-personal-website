@@ -32,6 +32,7 @@ class BlogPostController extends Controller
         }
 
         try {
+            /** @var BlogPostDraft $draft */
             $draft = BlogPostDraft::with([
                 'titleTranslationKey.translations',
                 'category',
@@ -60,10 +61,4 @@ class BlogPostController extends Controller
             ], 500);
         }
     }
-
-    public function show(BlogPost $blogPost) {}
-
-    public function update(Request $request, BlogPost $blogPost) {}
-
-    public function destroy(BlogPost $blogPost) {}
 }

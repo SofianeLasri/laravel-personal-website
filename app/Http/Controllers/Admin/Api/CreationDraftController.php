@@ -64,8 +64,16 @@ class CreationDraftController extends Controller
 
     public function update(CreationDraftRequest $request, CreationDraft $creationDraft): JsonResponse
     {
-        $shortDescriptionTranslation = Translation::createOrUpdate($creationDraft->shortDescriptionTranslationKey, $request->input('locale'), $request->short_description_content);
-        $fullDescriptionTranslation = Translation::createOrUpdate($creationDraft->fullDescriptionTranslationKey, $request->input('locale'), $request->full_description_content);
+        $shortDescriptionTranslation = Translation::createOrUpdate(
+            $creationDraft->shortDescriptionTranslationKey ?? uniqid(),
+            $request->input('locale'),
+            $request->short_description_content
+        );
+        $fullDescriptionTranslation = Translation::createOrUpdate(
+            $creationDraft->fullDescriptionTranslationKey ?? uniqid(),
+            $request->input('locale'),
+            $request->full_description_content
+        );
 
         $creationDraft->update([
             'name' => $request->name,

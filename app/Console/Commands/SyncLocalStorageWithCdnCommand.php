@@ -43,7 +43,10 @@ class SyncLocalStorageWithCdnCommand extends Command
         $this->withProgressBar($filesToUpload->concat($filesToDelete), function ($file) use ($filesToUpload, $filesToDelete, $localDisk, $cdnDisk) {
             if ($filesToUpload->contains($file)) {
                 // Upload file to CDN
-                $cdnDisk->put($file, $localDisk->get($file));
+                $contents = $localDisk->get($file);
+                if ($contents !== null) {
+                    $cdnDisk->put($file, $contents);
+                }
             } elseif ($filesToDelete->contains($file)) {
                 // Delete file from CDN
                 $cdnDisk->delete($file);

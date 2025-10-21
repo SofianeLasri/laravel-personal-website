@@ -14,7 +14,8 @@
       "Bash(cp:*)",
       "Bash(php artisan make:migration:*)",
       "WebFetch(domain:image.intervention.io)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(./vendor/bin/phpstan:*)"
     ],
     "deny": []
   },

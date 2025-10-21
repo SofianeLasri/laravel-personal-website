@@ -18,8 +18,14 @@ use InvalidArgumentException;
 
 class ImageTranscodingService
 {
+    /**
+     * @var array<string>
+     */
     protected array $availableDrivers = [];
 
+    /**
+     * @var array<string, ImageManager>
+     */
     protected array $driverManagers = [];
 
     protected NotificationService $notificationService;
@@ -150,7 +156,7 @@ class ImageTranscodingService
                 Log::warning('Driver failed, trying next', [
                     'failed_driver' => $driverName,
                     'error' => $e->getMessage(),
-                    'remaining_drivers' => array_slice($driversToTry, array_search($driverName, $driversToTry) + 1),
+                    'remaining_drivers' => array_slice($driversToTry, (int) array_search($driverName, $driversToTry) + 1),
                 ]);
 
                 // If this error shouldn't trigger a fallback, break early
@@ -213,7 +219,7 @@ class ImageTranscodingService
             };
 
             // Validate the output
-            if (empty($encodedImage) || strlen($encodedImage) === 0) {
+            if (empty($encodedImage)) {
                 throw ImageTranscodingException::emptyOutput($driverName, [
                     'codec' => $codec,
                     'resolution' => $resolution,
@@ -328,6 +334,8 @@ class ImageTranscodingService
 
     /**
      * Get prioritized drivers for a specific format
+     *
+     * @return array<string>
      */
     protected function getDriversForFormat(string $format): array
     {
@@ -364,6 +372,8 @@ class ImageTranscodingService
 
     /**
      * Send notification when fallback is used
+     *
+     * @param  array<string, string>  $failedAttempts
      */
     protected function notifyFallbackUsed(string $successfulDriver, array $failedAttempts, string $codec): void
     {
@@ -408,6 +418,8 @@ class ImageTranscodingService
 
     /**
      * Get available drivers
+     *
+     * @return array<string>
      */
     public function getAvailableDrivers(): array
     {

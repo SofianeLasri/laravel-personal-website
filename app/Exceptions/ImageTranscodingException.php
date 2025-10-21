@@ -14,8 +14,14 @@ class ImageTranscodingException extends Exception
 
     protected ?string $fallbackAttempted;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $context;
 
+    /**
+     * @param  array<string, mixed>  $context
+     */
     public function __construct(
         ImageTranscodingError $errorCode,
         string $driverUsed,
@@ -43,6 +49,8 @@ class ImageTranscodingException extends Exception
 
     /**
      * Create an exception from a failed Imagick operation
+     *
+     * @param  array<string, mixed>  $context
      */
     public static function imagickFailed(string $message, array $context = [], ?Throwable $previous = null): self
     {
@@ -58,6 +66,8 @@ class ImageTranscodingException extends Exception
 
     /**
      * Create an exception from a failed GD operation
+     *
+     * @param  array<string, mixed>  $context
      */
     public static function gdFailed(string $message, array $context = [], ?Throwable $previous = null): self
     {
@@ -73,6 +83,9 @@ class ImageTranscodingException extends Exception
 
     /**
      * Create an exception when all drivers fail
+     *
+     * @param  array<string, mixed>  $attempts
+     * @param  array<string, mixed>  $context
      */
     public static function allDriversFailed(array $attempts, array $context = []): self
     {
@@ -89,6 +102,8 @@ class ImageTranscodingException extends Exception
 
     /**
      * Create an exception for empty output
+     *
+     * @param  array<string, mixed>  $context
      */
     public static function emptyOutput(string $driver, array $context = []): self
     {
@@ -103,6 +118,8 @@ class ImageTranscodingException extends Exception
 
     /**
      * Create an exception for unsupported format
+     *
+     * @param  array<string, mixed>  $context
      */
     public static function unsupportedFormat(string $format, string $driver, array $context = []): self
     {
@@ -117,6 +134,8 @@ class ImageTranscodingException extends Exception
 
     /**
      * Create an exception for resource limits
+     *
+     * @param  array<string, mixed>  $context
      */
     public static function resourceLimitExceeded(string $driver, string $limitType, array $context = []): self
     {
@@ -155,6 +174,8 @@ class ImageTranscodingException extends Exception
 
     /**
      * Get additional context information
+     *
+     * @return array<string, mixed>
      */
     public function getContext(): array
     {
@@ -189,6 +210,8 @@ class ImageTranscodingException extends Exception
 
     /**
      * Convert to array for logging
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

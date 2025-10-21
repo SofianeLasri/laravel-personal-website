@@ -25,7 +25,7 @@ use Throwable;
 class BlogPostConversionService
 {
     public function __construct(
-        private BlogContentDuplicationService $contentDuplicationService
+        private readonly BlogContentDuplicationService $contentDuplicationService
     ) {}
 
     /**
@@ -35,11 +35,16 @@ class BlogPostConversionService
     public function createDraftFromBlogPost(BlogPost $blogPost): BlogPostDraft
     {
         return DB::transaction(function () use ($blogPost) {
+            $titleTranslationKey = $blogPost->titleTranslationKey;
+            if (! $titleTranslationKey) {
+                throw new \RuntimeException('Blog post missing title translation key');
+            }
+
             // Create draft from published post
             $draft = BlogPostDraft::create([
                 'original_blog_post_id' => $blogPost->id,
                 'slug' => $blogPost->slug,
-                'title_translation_key_id' => $this->duplicateTranslationKey($blogPost->titleTranslationKey)->id,
+                'title_translation_key_id' => $this->duplicateTranslationKey($titleTranslationKey)->id,
                 'type' => $blogPost->type,
                 'category_id' => $blogPost->category_id,
                 'cover_picture_id' => $blogPost->cover_picture_id,
@@ -84,11 +89,19 @@ class BlogPostConversionService
 
         // Duplicate translation keys for pros and cons if they exist
         if ($gameReview->pros_translation_key_id) {
-            $gameReviewDraftData['pros_translation_key_id'] = $this->duplicateTranslationKey($gameReview->prosTranslationKey)->id;
+            $prosTranslationKey = $gameReview->prosTranslationKey;
+            if (! $prosTranslationKey) {
+                throw new \RuntimeException('Game review missing pros translation key');
+            }
+            $gameReviewDraftData['pros_translation_key_id'] = $this->duplicateTranslationKey($prosTranslationKey)->id;
         }
 
         if ($gameReview->cons_translation_key_id) {
-            $gameReviewDraftData['cons_translation_key_id'] = $this->duplicateTranslationKey($gameReview->consTranslationKey)->id;
+            $consTranslationKey = $gameReview->consTranslationKey;
+            if (! $consTranslationKey) {
+                throw new \RuntimeException('Game review missing cons translation key');
+            }
+            $gameReviewDraftData['cons_translation_key_id'] = $this->duplicateTranslationKey($consTranslationKey)->id;
         }
 
         $gameReviewDraft = GameReviewDraft::create($gameReviewDraftData);
@@ -173,7 +186,9 @@ class BlogPostConversionService
             // Auto-translate title to English if missing or empty
             $this->autoTranslateIfNeeded($blogPost->titleTranslationKey);
 
-            return $blogPost->fresh();
+            $blogPost->refresh();
+
+            return $blogPost;
         });
     }
 
@@ -248,7 +263,6 @@ class BlogPostConversionService
                     VideoStatus::PENDING => 'en attente',
                     VideoStatus::TRANSCODING => 'en cours de transcodage',
                     VideoStatus::ERROR => 'en erreur',
-                    default => 'invalide',
                 };
                 $errors[] = "La vidéo '{$videoName}' doit être transcodée avant publication (statut actuel: {$statusText}).";
 
@@ -277,6 +291,8 @@ class BlogPostConversionService
 
     /**
      * Map draft attributes to blog post attributes
+     *
+     * @return array{slug: string, title_translation_key_id: int, type: BlogPostType, category_id: int, cover_picture_id: int|null}
      */
     private function mapDraftAttributes(BlogPostDraft $draft): array
     {
@@ -328,14 +344,17 @@ class BlogPostConversionService
             // Handle specific cleanup based on content type
             if ($content instanceof BlogContentMarkdown) {
                 // Delete translation key and its translations
-                $content->translationKey?->translations()?->delete();
-                $content->translationKey?->delete();
+                $translationKey = $content->translationKey;
+                if ($translationKey instanceof TranslationKey) {
+                    $translationKey->translations()->delete();
+                    $translationKey->delete();
+                }
             } elseif ($content instanceof BlogContentGallery) {
                 // Detach pictures and delete caption translation keys
                 foreach ($content->pictures as $picture) {
                     if ($picture->pivot->caption_translation_key_id) {
                         $captionTranslationKey = TranslationKey::find($picture->pivot->caption_translation_key_id);
-                        if ($captionTranslationKey) {
+                        if ($captionTranslationKey instanceof TranslationKey) {
                             $captionTranslationKey->translations()->delete();
                             $captionTranslationKey->delete();
                         }

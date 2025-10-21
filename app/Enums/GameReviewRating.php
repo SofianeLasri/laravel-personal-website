@@ -25,6 +25,8 @@ enum GameReviewRating: string
 
     /**
      * Get all available values as array
+     *
+     * @return array<string>
      */
     public static function values(): array
     {
@@ -33,6 +35,8 @@ enum GameReviewRating: string
 
     /**
      * Get all labels as array
+     *
+     * @return array<string>
      */
     public static function labels(): array
     {

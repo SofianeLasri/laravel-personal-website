@@ -10,6 +10,9 @@ use ReflectionNamedType;
 
 class RouteParameterWhitelistService
 {
+    /**
+     * @var array<string, array<string>>|null
+     */
     private static ?array $whitelistCache = null;
 
     /**
@@ -32,9 +35,11 @@ class RouteParameterWhitelistService
         }
 
         // Try to match with route patterns
-        foreach (self::$whitelistCache as $pattern => $params) {
-            if (self::matchesPattern($path, $pattern)) {
-                return $params;
+        if (is_array(self::$whitelistCache)) {
+            foreach (self::$whitelistCache as $pattern => $params) {
+                if (self::matchesPattern($path, $pattern)) {
+                    return $params;
+                }
             }
         }
 
@@ -103,8 +108,23 @@ class RouteParameterWhitelistService
             }
 
             // Look for validate() calls in the method body
-            $source = file_get_contents($reflection->getFileName());
-            $methodBody = self::extractMethodBody($source, $reflection->getStartLine(), $reflection->getEndLine());
+            $fileName = $reflection->getFileName();
+            if ($fileName === false) {
+                return array_values(array_unique($parameters));
+            }
+
+            $source = file_get_contents($fileName);
+            if ($source === false) {
+                return array_values(array_unique($parameters));
+            }
+
+            $startLine = $reflection->getStartLine();
+            $endLine = $reflection->getEndLine();
+            if ($startLine === false || $endLine === false) {
+                return array_values(array_unique($parameters));
+            }
+
+            $methodBody = self::extractMethodBody($source, $startLine, $endLine);
 
             if (preg_match('/->validate\s*\(\s*\[([^\]]+)\]/s', $methodBody, $matches)) {
                 $validationRules = $matches[1];
@@ -137,12 +157,15 @@ class RouteParameterWhitelistService
 
                 // Handle nested array validation (e.g., 'items.*.name')
                 $parameters = array_map(function ($param) {
-                    return explode('.', $param)[0];
+                    return explode('.', (string) $param)[0];
                 }, $parameters);
             }
         } catch (Exception $e) {
             // Silently fail
         }
+
+        // Ensure all elements are strings
+        $parameters = array_filter($parameters, 'is_string');
 
         return array_values(array_unique($parameters));
     }

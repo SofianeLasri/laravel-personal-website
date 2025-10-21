@@ -6,16 +6,22 @@ use App\Models\ApiRequestLog;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class AiLogsAnalyzeCommand extends Command
 {
     /**
+     * Default period in days when no period is specified
+     */
+    private const DEFAULT_PERIOD_DAYS = 7;
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'ai:logs:analyze 
+    protected $signature = 'ai:logs:analyze
                             {--period=7days : The period to analyze (e.g., 7days, 1month, 24hours)}
                             {--provider= : Filter by specific provider}
                             {--status= : Filter by status (success, error, timeout, fallback)}';
@@ -65,11 +71,13 @@ class AiLogsAnalyzeCommand extends Command
         }
 
         // Status breakdown
+        /** @var Collection<int, object{status: string, count: int}> $statusBreakdown */
         $statusBreakdown = $query->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->get();
 
         // Provider breakdown
+        /** @var Collection<int, object{provider: string, count: int}> $providerBreakdown */
         $providerBreakdown = $query->select('provider', DB::raw('count(*) as count'))
             ->groupBy('provider')
             ->get();
@@ -153,6 +161,7 @@ class AiLogsAnalyzeCommand extends Command
         );
 
         // Get top errors
+        /** @var Collection<int, object{error_message: string, count: int}> $errors */
         $errors = $query->where('status', 'error')
             ->select('error_message', DB::raw('count(*) as count'))
             ->whereNotNull('error_message')
@@ -176,6 +185,7 @@ class AiLogsAnalyzeCommand extends Command
         }
 
         // Daily breakdown
+        /** @var Collection<int, object{date: string, count: int, daily_cost: float|null}> $dailyBreakdown */
         $dailyBreakdown = $query->select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('count(*) as count'),
@@ -207,8 +217,13 @@ class AiLogsAnalyzeCommand extends Command
     /**
      * Parse the period option into a Carbon date
      */
-    private function parsePeriod(string $period): Carbon
+    private function parsePeriod(?string $period): Carbon
     {
+        // Default to 7 days if period is null
+        if ($period === null) {
+            return Carbon::now()->subDays(self::DEFAULT_PERIOD_DAYS);
+        }
+
         // Handle common formats
         if (preg_match('/^(\d+)(hours?|days?|weeks?|months?)$/', $period, $matches)) {
             $value = (int) $matches[1];

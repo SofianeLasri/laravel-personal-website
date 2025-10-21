@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogContentGallery;
 use App\Models\TranslationKey;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BlogContentGalleryController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'picture_ids' => 'nullable|array',
@@ -81,14 +82,14 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function show(BlogContentGallery $blogContentGallery)
+    public function show(BlogContentGallery $blogContentGallery): JsonResponse
     {
         $blogContentGallery->load('pictures');
 
         return response()->json($blogContentGallery);
     }
 
-    public function update(Request $request, BlogContentGallery $blogContentGallery)
+    public function update(Request $request, BlogContentGallery $blogContentGallery): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'picture_ids' => 'nullable|array',
@@ -117,8 +118,9 @@ class BlogContentGalleryController extends Controller
                 ->pluck('caption_translation_key_id');
 
             foreach ($oldCaptionKeys as $keyId) {
+                /** @var TranslationKey|null $translationKey */
                 $translationKey = TranslationKey::find($keyId);
-                if ($translationKey) {
+                if ($translationKey instanceof TranslationKey) {
                     $translationKey->translations()->delete();
                     $translationKey->delete();
                 }
@@ -173,7 +175,7 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function updatePictures(Request $request, BlogContentGallery $blogContentGallery)
+    public function updatePictures(Request $request, BlogContentGallery $blogContentGallery): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'pictures' => 'required|array',
@@ -200,8 +202,9 @@ class BlogContentGalleryController extends Controller
                 ->pluck('caption_translation_key_id');
 
             foreach ($oldCaptionKeys as $keyId) {
+                /** @var TranslationKey|null $translationKey */
                 $translationKey = TranslationKey::find($keyId);
-                if ($translationKey) {
+                if ($translationKey instanceof TranslationKey) {
                     $translationKey->translations()->delete();
                     $translationKey->delete();
                 }
@@ -254,7 +257,7 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function destroy(BlogContentGallery $blogContentGallery)
+    public function destroy(BlogContentGallery $blogContentGallery): JsonResponse
     {
         DB::beginTransaction();
 
@@ -266,8 +269,9 @@ class BlogContentGalleryController extends Controller
                 ->pluck('caption_translation_key_id');
 
             foreach ($captionKeys as $keyId) {
+                /** @var TranslationKey|null $translationKey */
                 $translationKey = TranslationKey::find($keyId);
-                if ($translationKey) {
+                if ($translationKey instanceof TranslationKey) {
                     $translationKey->translations()->delete();
                     $translationKey->delete();
                 }

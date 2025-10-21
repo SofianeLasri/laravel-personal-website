@@ -18,8 +18,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $blog_posts_count
- * @property-read BlogPost $blogPost
- * @property-read Model $content
+ * @property-read BlogPost|null $blogPost
+ * @property-read Model|null $content
  */
 class BlogPostContent extends Model
 {

@@ -6,12 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ExperienceRequest;
 use App\Models\Experience;
 use App\Models\Translation;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 
 class ExperienceController extends Controller
 {
-    public function index()
+    /**
+     * @return Collection<int, Experience>
+     */
+    public function index(): Collection
     {
         return Experience::with([
             'titleTranslationKey.translations',
@@ -20,7 +24,7 @@ class ExperienceController extends Controller
         ])->get();
     }
 
-    public function store(ExperienceRequest $request)
+    public function store(ExperienceRequest $request): Experience
     {
         $titleTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->title);
         $shortDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->short_description);
@@ -62,7 +66,7 @@ class ExperienceController extends Controller
         return $experience;
     }
 
-    public function show(int $id)
+    public function show(int $id): Experience
     {
         $experience = Experience::findOrFail($id);
 
@@ -73,13 +77,17 @@ class ExperienceController extends Controller
         ]);
     }
 
-    public function update(ExperienceRequest $request, int $id)
+    public function update(ExperienceRequest $request, int $id): Experience
     {
         $experience = Experience::findOrFail($id);
 
-        $titleTranslation = Translation::createOrUpdate($experience->titleTranslationKey, $request->input('locale'), $request->title);
-        $shortDescriptionTranslation = Translation::createOrUpdate($experience->shortDescriptionTranslationKey, $request->input('locale'), $request->short_description);
-        $fullDescriptionTranslation = Translation::createOrUpdate($experience->fullDescriptionTranslationKey, $request->input('locale'), $request->full_description);
+        $titleTranslationKey = $experience->titleTranslationKey;
+        $shortDescriptionTranslationKey = $experience->shortDescriptionTranslationKey;
+        $fullDescriptionTranslationKey = $experience->fullDescriptionTranslationKey;
+
+        $titleTranslation = Translation::createOrUpdate($titleTranslationKey ?? uniqid(), $request->input('locale'), $request->title);
+        $shortDescriptionTranslation = Translation::createOrUpdate($shortDescriptionTranslationKey ?? uniqid(), $request->input('locale'), $request->short_description);
+        $fullDescriptionTranslation = Translation::createOrUpdate($fullDescriptionTranslationKey ?? uniqid(), $request->input('locale'), $request->full_description);
 
         // Generate new slug if organization name or title changed
         $updateData = [

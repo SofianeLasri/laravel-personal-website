@@ -30,7 +30,13 @@ class CreationController extends Controller
             'draft_id' => ['required', 'exists:creation_drafts,id'],
         ]);
 
+        /** @var CreationDraft|null $creationDraft */
         $creationDraft = app(CreationDraft::class)->find($request->draft_id);
+
+        if (! $creationDraft) {
+            return response()->json(['message' => 'Creation draft not found'], 404);
+        }
+
         try {
             $creation = $creationDraft->toCreation();
 

@@ -174,20 +174,16 @@ class AiProvidersCheckCommand extends Command
 
                 $this->info("✅ {$providerName} responded in {$responseTime}ms");
 
-                if (isset($response['usage'])) {
-                    $usage = $response['usage'];
-                    $cost = $provider->estimateCost(
-                        $usage['prompt_tokens'] ?? 0,
-                        $usage['completion_tokens'] ?? 0
-                    );
+                $usage = $response['usage'];
+                $cost = $provider->estimateCost(
+                    $usage['prompt_tokens'],
+                    $usage['completion_tokens']
+                );
 
-                    $this->info("   Tokens: {$usage['prompt_tokens']} input, {$usage['completion_tokens']} output");
-                    $this->info('   Estimated cost: $'.number_format($cost, 6));
-                }
+                $this->info("   Tokens: {$usage['prompt_tokens']} input, {$usage['completion_tokens']} output");
+                $this->info('   Estimated cost: $'.number_format($cost, 6));
 
-                if (isset($response['content'])) {
-                    $this->info('   Response: '.substr($response['content'], 0, 100));
-                }
+                $this->info('   Response: '.substr($response['content'], 0, 100));
 
             } catch (Exception $e) {
                 $this->error("❌ {$providerName} test failed: ".$e->getMessage());

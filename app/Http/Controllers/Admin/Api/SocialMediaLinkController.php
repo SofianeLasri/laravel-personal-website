@@ -5,10 +5,15 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SocialMediaLinkRequest;
 use App\Models\SocialMediaLink;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Response;
 
 class SocialMediaLinkController extends Controller
 {
-    public function index()
+    /**
+     * @return Collection<int, SocialMediaLink>
+     */
+    public function index(): Collection
     {
         return SocialMediaLink::all();
     }
@@ -33,7 +38,7 @@ class SocialMediaLinkController extends Controller
         return $socialMediaLink;
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id): Response
     {
         $socialMediaLink = SocialMediaLink::findOrFail($id);
         $socialMediaLink->delete();

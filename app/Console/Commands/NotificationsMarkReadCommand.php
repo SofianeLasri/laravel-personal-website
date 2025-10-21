@@ -10,11 +10,16 @@ use Illuminate\Console\Command;
 class NotificationsMarkReadCommand extends Command
 {
     /**
+     * Default period in days when no period is specified
+     */
+    private const DEFAULT_PERIOD_DAYS = 7;
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'notifications:mark-read 
+    protected $signature = 'notifications:mark-read
                             {--older-than=7days : Mark notifications older than this period as read}
                             {--type= : Filter by notification type}
                             {--severity= : Filter by severity (info, warning, error, critical)}
@@ -70,6 +75,7 @@ class NotificationsMarkReadCommand extends Command
 
         // Show breakdown by type and severity
         $breakdown = clone $query;
+        /** @var \Illuminate\Support\Collection<int, object{type: string, severity: string, count: int}> $typeBreakdown */
         $typeBreakdown = $breakdown->selectRaw('type, severity, count(*) as count')
             ->groupBy('type', 'severity')
             ->get();
@@ -107,7 +113,7 @@ class NotificationsMarkReadCommand extends Command
                             $notification->type,
                             ucfirst($notification->severity),
                             substr($notification->title, 0, 40).(strlen($notification->title) > 40 ? '...' : ''),
-                            $notification->created_at->format('Y-m-d H:i:s'),
+                            $notification->created_at?->format('Y-m-d H:i:s') ?? 'N/A',
                         ];
                     })
                 );
@@ -138,6 +144,7 @@ class NotificationsMarkReadCommand extends Command
             $this->info("Remaining unread notifications: {$remainingUnread}");
 
             // Show breakdown of remaining
+            /** @var \Illuminate\Support\Collection<int, object{severity: string, count: int}> $remainingBreakdown */
             $remainingBreakdown = Notification::where('is_read', false)
                 ->selectRaw('severity, count(*) as count')
                 ->groupBy('severity')
@@ -165,8 +172,13 @@ class NotificationsMarkReadCommand extends Command
     /**
      * Parse the period option into a Carbon date
      */
-    private function parsePeriod(string $period): Carbon
+    private function parsePeriod(?string $period): Carbon
     {
+        // Default to 7 days if period is null
+        if ($period === null) {
+            return Carbon::now()->subDays(self::DEFAULT_PERIOD_DAYS);
+        }
+
         // Handle common formats
         if (preg_match('/^(\d+)(hours?|days?|weeks?|months?)$/', $period, $matches)) {
             $value = (int) $matches[1];

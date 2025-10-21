@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property int|null $translation_keys_count
- * @property-read TranslationKey $translationKey
+ * @property-read TranslationKey|null $translationKey
  */
 class BlogContentMarkdown extends Model
 {

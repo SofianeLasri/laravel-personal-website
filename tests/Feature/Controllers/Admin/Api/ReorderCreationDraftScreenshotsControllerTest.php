@@ -1,21 +1,31 @@
 <?php
 
-namespace Tests\Feature\Feature\Controllers;
+namespace Tests\Feature\Controllers\Admin\Api;
 
+use App\Http\Controllers\Admin\Api\ReorderCreationDraftScreenshotsController;
 use App\Models\CreationDraft;
 use App\Models\CreationDraftScreenshot;
 use App\Models\Picture;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Tests\Traits\ActsAsUser;
 
+#[CoversClass(ReorderCreationDraftScreenshotsController::class)]
 class ReorderCreationDraftScreenshotsControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActsAsUser, RefreshDatabase;
 
-    public function test_can_reorder_screenshots_successfully(): void
+    protected function setUp(): void
     {
-        $user = User::factory()->create();
+        parent::setUp();
+        $this->loginAsAdmin();
+    }
+
+    #[Test]
+    public function reorders_screenshots_successfully(): void
+    {
         $draft = CreationDraft::factory()->create();
 
         $screenshot1 = CreationDraftScreenshot::factory()->create([
@@ -36,7 +46,7 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
             'order' => 3,
         ]);
 
-        $response = $this->actingAs($user)->putJson(
+        $response = $this->putJson(
             route('dashboard.api.creation-drafts.draft-screenshots.reorder', $draft->id),
             [
                 'screenshots' => [
@@ -65,9 +75,9 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         ]);
     }
 
-    public function test_can_swap_two_screenshots_without_constraint_violation(): void
+    #[Test]
+    public function swaps_two_screenshots_without_constraint_violation(): void
     {
-        $user = User::factory()->create();
         $draft = CreationDraft::factory()->create();
 
         $screenshot1 = CreationDraftScreenshot::factory()->create([
@@ -84,7 +94,7 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
 
         // Swap the two screenshots - this is the critical edge case that triggers
         // the unique constraint issue if not handled properly with temporary values
-        $response = $this->actingAs($user)->putJson(
+        $response = $this->putJson(
             route('dashboard.api.creation-drafts.draft-screenshots.reorder', $draft->id),
             [
                 'screenshots' => [
@@ -108,9 +118,9 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         ]);
     }
 
-    public function test_validates_continuous_sequence(): void
+    #[Test]
+    public function validates_continuous_sequence(): void
     {
-        $user = User::factory()->create();
         $draft = CreationDraft::factory()->create();
 
         $screenshot1 = CreationDraftScreenshot::factory()->create([
@@ -126,7 +136,7 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         ]);
 
         // Try to set orders with gaps (1, 3 instead of 1, 2)
-        $response = $this->actingAs($user)->putJson(
+        $response = $this->putJson(
             route('dashboard.api.creation-drafts.draft-screenshots.reorder', $draft->id),
             [
                 'screenshots' => [
@@ -140,9 +150,9 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         $response->assertJsonValidationErrors('screenshots');
     }
 
-    public function test_validates_all_screenshot_ids_belong_to_draft(): void
+    #[Test]
+    public function validates_all_screenshot_ids_belong_to_draft(): void
     {
-        $user = User::factory()->create();
         $draft1 = CreationDraft::factory()->create();
         $draft2 = CreationDraft::factory()->create();
 
@@ -158,7 +168,7 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
             'order' => 1,
         ]);
 
-        $response = $this->actingAs($user)->putJson(
+        $response = $this->putJson(
             route('dashboard.api.creation-drafts.draft-screenshots.reorder', $draft1->id),
             [
                 'screenshots' => [
@@ -172,9 +182,9 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         $response->assertJsonValidationErrors('screenshots');
     }
 
-    public function test_prevents_duplicate_orders(): void
+    #[Test]
+    public function prevents_duplicate_orders(): void
     {
-        $user = User::factory()->create();
         $draft = CreationDraft::factory()->create();
 
         $screenshot1 = CreationDraftScreenshot::factory()->create([
@@ -189,7 +199,7 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
             'order' => 2,
         ]);
 
-        $response = $this->actingAs($user)->putJson(
+        $response = $this->putJson(
             route('dashboard.api.creation-drafts.draft-screenshots.reorder', $draft->id),
             [
                 'screenshots' => [
@@ -203,9 +213,9 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         $response->assertJsonValidationErrors('screenshots');
     }
 
-    public function test_rejects_invalid_screenshot_ids(): void
+    #[Test]
+    public function rejects_invalid_screenshot_ids(): void
     {
-        $user = User::factory()->create();
         $draft = CreationDraft::factory()->create();
 
         $screenshot1 = CreationDraftScreenshot::factory()->create([
@@ -214,7 +224,7 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
             'order' => 1,
         ]);
 
-        $response = $this->actingAs($user)->putJson(
+        $response = $this->putJson(
             route('dashboard.api.creation-drafts.draft-screenshots.reorder', $draft->id),
             [
                 'screenshots' => [
@@ -228,8 +238,11 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         $response->assertJsonValidationErrors('screenshots.1.id');
     }
 
-    public function test_requires_authentication(): void
+    #[Test]
+    public function requires_authentication(): void
     {
+        $this->app['auth']->forgetGuards(); // Logout
+
         $draft = CreationDraft::factory()->create();
 
         $screenshot1 = CreationDraftScreenshot::factory()->create([
@@ -250,9 +263,9 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         $response->assertUnauthorized();
     }
 
-    public function test_requires_all_screenshots_to_be_included(): void
+    #[Test]
+    public function requires_all_screenshots_to_be_included(): void
     {
-        $user = User::factory()->create();
         $draft = CreationDraft::factory()->create();
 
         $screenshot1 = CreationDraftScreenshot::factory()->create([
@@ -268,7 +281,7 @@ class ReorderCreationDraftScreenshotsControllerTest extends TestCase
         ]);
 
         // Only sending one screenshot when there are two
-        $response = $this->actingAs($user)->putJson(
+        $response = $this->putJson(
             route('dashboard.api.creation-drafts.draft-screenshots.reorder', $draft->id),
             [
                 'screenshots' => [

@@ -35,11 +35,16 @@ class CreationConversionServiceTest extends TestCase
     {
         $draft = CreationDraft::factory()
             ->has(CreationDraftFeature::factory()->count(2), 'features')
-            ->has(CreationDraftScreenshot::factory()->count(3), 'screenshots')
             ->has(Technology::factory()->count(2), 'technologies')
             ->has(Person::factory()->count(1), 'people')
             ->has(Tag::factory()->count(1), 'tags')
             ->create();
+
+        // Add screenshots with proper sequence
+        CreationDraftScreenshot::factory()
+            ->count(3)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create(['creation_draft_id' => $draft->id]);
 
         $creation = $this->service->convertDraftToCreation($draft);
 
@@ -82,11 +87,16 @@ class CreationConversionServiceTest extends TestCase
 
         $draft = CreationDraft::factory()
             ->has(CreationDraftFeature::factory()->count(3), 'features')
-            ->has(CreationDraftScreenshot::factory()->count(4), 'screenshots')
             ->has(Technology::factory()->count(3), 'technologies')
             ->has(Person::factory()->count(2), 'people')
             ->has(Tag::factory()->count(2), 'tags')
             ->create();
+
+        // Add screenshots with proper sequence
+        CreationDraftScreenshot::factory()
+            ->count(4)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create(['creation_draft_id' => $draft->id]);
 
         $updatedCreation = $this->service->updateCreationFromDraft($draft, $originalCreation);
 
@@ -111,8 +121,14 @@ class CreationConversionServiceTest extends TestCase
 
         $draft = CreationDraft::factory()
             ->has(CreationDraftFeature::factory()->count(1), 'features')
-            ->has(CreationDraftScreenshot::factory()->count(1), 'screenshots')
             ->create();
+
+        // Add screenshot with proper sequence
+        CreationDraftScreenshot::factory()
+            ->create([
+                'creation_draft_id' => $draft->id,
+                'order' => 1,
+            ]);
 
         $this->service->updateCreationFromDraft($draft, $originalCreation);
 
@@ -219,5 +235,96 @@ class CreationConversionServiceTest extends TestCase
         foreach ($updatedCreation->technologies as $technology) {
             $this->assertTrue($draft->technologies->contains($technology));
         }
+    }
+
+    #[Test]
+    public function test_preserves_screenshot_order_on_conversion()
+    {
+        $draft = CreationDraft::factory()->create();
+
+        // Create screenshots with specific order
+        $screenshot1 = CreationDraftScreenshot::factory()->create([
+            'creation_draft_id' => $draft->id,
+            'order' => 1,
+        ]);
+
+        $screenshot2 = CreationDraftScreenshot::factory()->create([
+            'creation_draft_id' => $draft->id,
+            'order' => 2,
+        ]);
+
+        $screenshot3 = CreationDraftScreenshot::factory()->create([
+            'creation_draft_id' => $draft->id,
+            'order' => 3,
+        ]);
+
+        $creation = $this->service->convertDraftToCreation($draft);
+
+        $this->assertCount(3, $creation->screenshots);
+
+        $creationScreenshots = $creation->screenshots->sortBy('order')->values();
+
+        $this->assertEquals($screenshot1->picture_id, $creationScreenshots[0]->picture_id);
+        $this->assertEquals(1, $creationScreenshots[0]->order);
+
+        $this->assertEquals($screenshot2->picture_id, $creationScreenshots[1]->picture_id);
+        $this->assertEquals(2, $creationScreenshots[1]->order);
+
+        $this->assertEquals($screenshot3->picture_id, $creationScreenshots[2]->picture_id);
+        $this->assertEquals(3, $creationScreenshots[2]->order);
+    }
+
+    #[Test]
+    public function test_recreates_screenshots_with_correct_order_on_update()
+    {
+        $draft = CreationDraft::factory()->create();
+        $creation = Creation::factory()->create();
+
+        // Create initial screenshots in creation
+        $oldScreenshot1 = \App\Models\Screenshot::factory()->create([
+            'creation_id' => $creation->id,
+            'order' => 1,
+        ]);
+
+        $oldScreenshot2 = \App\Models\Screenshot::factory()->create([
+            'creation_id' => $creation->id,
+            'order' => 2,
+        ]);
+
+        // Create new screenshots in draft with different order
+        $draftScreenshot1 = CreationDraftScreenshot::factory()->create([
+            'creation_draft_id' => $draft->id,
+            'order' => 1,
+        ]);
+
+        $draftScreenshot2 = CreationDraftScreenshot::factory()->create([
+            'creation_draft_id' => $draft->id,
+            'order' => 2,
+        ]);
+
+        $draftScreenshot3 = CreationDraftScreenshot::factory()->create([
+            'creation_draft_id' => $draft->id,
+            'order' => 3,
+        ]);
+
+        $updatedCreation = $this->service->updateCreationFromDraft($draft, $creation);
+
+        // Old screenshots should be deleted
+        $this->assertDatabaseMissing('screenshots', ['id' => $oldScreenshot1->id]);
+        $this->assertDatabaseMissing('screenshots', ['id' => $oldScreenshot2->id]);
+
+        // New screenshots should exist with correct order
+        $this->assertCount(3, $updatedCreation->screenshots);
+
+        $creationScreenshots = $updatedCreation->screenshots->sortBy('order')->values();
+
+        $this->assertEquals($draftScreenshot1->picture_id, $creationScreenshots[0]->picture_id);
+        $this->assertEquals(1, $creationScreenshots[0]->order);
+
+        $this->assertEquals($draftScreenshot2->picture_id, $creationScreenshots[1]->picture_id);
+        $this->assertEquals(2, $creationScreenshots[1]->order);
+
+        $this->assertEquals($draftScreenshot3->picture_id, $creationScreenshots[2]->picture_id);
+        $this->assertEquals(3, $creationScreenshots[2]->order);
     }
 }

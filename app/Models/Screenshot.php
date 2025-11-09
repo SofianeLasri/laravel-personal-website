@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
  * @property int $creation_id
  * @property int $picture_id
  * @property int|null $caption_translation_key_id
+ * @property int $order
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property mixed $use_factory
@@ -32,6 +33,7 @@ class Screenshot extends Model
         'creation_id',
         'picture_id',
         'caption_translation_key_id',
+        'order',
     ];
 
     /**
@@ -56,5 +58,16 @@ class Screenshot extends Model
     public function captionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'caption_translation_key_id');
+    }
+
+    /**
+     * Scope a query to order screenshots by their order field.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<Screenshot>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<Screenshot>
+     */
+    public function scopeOrderByOrder($query)
+    {
+        return $query->orderBy('order');
     }
 }

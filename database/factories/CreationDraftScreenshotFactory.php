@@ -22,6 +22,7 @@ class CreationDraftScreenshotFactory extends Factory
             'creation_draft_id' => CreationDraft::factory(),
             'picture_id' => Picture::factory(),
             'caption_translation_key_id' => $this->faker->optional(0.7)->randomElement([TranslationKey::factory()->withTranslations()->create()]),
+            'order' => 1,
         ];
     }
 
@@ -29,6 +30,16 @@ class CreationDraftScreenshotFactory extends Factory
     {
         return $this->state([
             'caption_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
+        ]);
+    }
+
+    /**
+     * Set a specific order for the screenshot.
+     */
+    public function withOrder(int $order): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'order' => $order,
         ]);
     }
 }

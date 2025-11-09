@@ -55,9 +55,12 @@ class CreationDraftFactory extends Factory
     public function withScreenshots(int $count = 4): static
     {
         return $this->afterCreating(function (CreationDraft $creationDraft) use ($count) {
-            $creationDraft->screenshots()->createMany(
-                CreationDraftScreenshot::factory()->count($count)->make()->toArray()
-            );
+            CreationDraftScreenshot::factory()
+                ->count($count)
+                ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+                ->create([
+                    'creation_draft_id' => $creationDraft->id,
+                ]);
         });
     }
 

@@ -126,6 +126,7 @@ class CreationConversionService
                 'creation_id' => $creation->id,
                 'picture_id' => $draftScreenshot->picture_id,
                 'caption_translation_key_id' => $draftScreenshot->caption_translation_key_id,
+                'order' => $draftScreenshot->order,
             ]);
         }
     }

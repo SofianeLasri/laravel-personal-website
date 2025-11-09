@@ -32,9 +32,13 @@ class CreationDraftScreenshotController extends Controller
             $translation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $caption)->translation_key_id;
         }
 
+        // Get the max order value and add 1 for the new screenshot
+        $maxOrder = $creationDraft->screenshots()->max('order') ?? 0;
+
         $creationDraftScreenshot = $creationDraft->screenshots()->create([
             'picture_id' => $request->picture_id,
             'caption_translation_key_id' => $translation,
+            'order' => $maxOrder + 1,
         ])->load(['picture', 'captionTranslationKey.translations']);
 
         return response()->json($creationDraftScreenshot, Response::HTTP_CREATED);

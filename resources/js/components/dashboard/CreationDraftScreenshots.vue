@@ -18,8 +18,8 @@ import { Input } from '@/components/ui/input';
 import { useRoute } from '@/composables/useRoute';
 import { Screenshot } from '@/types';
 import axios from 'axios';
-import { Loader2, Pencil, Plus, Trash2 } from 'lucide-vue-next';
-import { onMounted, ref, watch } from 'vue';
+import { ChevronDown, ChevronUp, Loader2, Pencil, Plus, Trash2 } from 'lucide-vue-next';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const props = defineProps<{
     creationDraftId: number | null;
@@ -175,6 +175,87 @@ const getScreenshotCaption = (screenshot: Screenshot): string => {
     return translation?.text ?? '';
 };
 
+// Reordering functionality
+const sortedScreenshots = computed(() => {
+    return [...screenshots.value].sort((a, b) => a.order - b.order);
+});
+
+const reorderScreenshots = async (newOrder: Screenshot[]) => {
+    if (!props.creationDraftId) return;
+
+    loading.value = true;
+    error.value = null;
+
+    // Create backup for rollback
+    const backup = [...screenshots.value];
+
+    // Optimistic UI update
+    screenshots.value = newOrder;
+
+    try {
+        const reorderData = newOrder.map((screenshot, index) => ({
+            id: screenshot.id,
+            order: index + 1,
+        }));
+
+        const response = await axios.put(
+            route('dashboard.api.creation-drafts.draft-screenshots.reorder', {
+                creation_draft: props.creationDraftId,
+            }),
+            { screenshots: reorderData },
+        );
+
+        screenshots.value = response.data;
+    } catch (err) {
+        // Rollback on error
+        screenshots.value = backup;
+        error.value = "Erreur lors du réordonnancement des captures d'écran";
+        console.error(err);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const moveUp = async (screenshot: Screenshot) => {
+    const currentIndex = sortedScreenshots.value.findIndex((s) => s.id === screenshot.id);
+    if (currentIndex <= 0) return;
+
+    const newOrder = [...sortedScreenshots.value];
+    [newOrder[currentIndex - 1], newOrder[currentIndex]] = [newOrder[currentIndex], newOrder[currentIndex - 1]];
+
+    await reorderScreenshots(newOrder);
+};
+
+const moveDown = async (screenshot: Screenshot) => {
+    const currentIndex = sortedScreenshots.value.findIndex((s) => s.id === screenshot.id);
+    if (currentIndex >= sortedScreenshots.value.length - 1) return;
+
+    const newOrder = [...sortedScreenshots.value];
+    [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
+
+    await reorderScreenshots(newOrder);
+};
+
+const changeOrder = async (screenshot: Screenshot, newPosition: number) => {
+    const totalScreenshots = sortedScreenshots.value.length;
+
+    // Validate position
+    if (newPosition < 1 || newPosition > totalScreenshots) {
+        return;
+    }
+
+    const currentIndex = sortedScreenshots.value.findIndex((s) => s.id === screenshot.id);
+    const newIndex = newPosition - 1;
+
+    if (currentIndex === newIndex) return;
+
+    const newOrder = [...sortedScreenshots.value];
+    const [movedItem] = newOrder.splice(currentIndex, 1);
+    newOrder.splice(newIndex, 0, movedItem);
+
+    await reorderScreenshots(newOrder);
+};
+
 onMounted(() => {
     if (props.creationDraftId) {
         void fetchScreenshots();
@@ -209,13 +290,46 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                     </CardContent>
                 </Card>
 
-                <Card v-for="screenshot in screenshots" :key="screenshot.id" class="gap-0 overflow-hidden py-0">
+                <Card v-for="screenshot in sortedScreenshots" :key="screenshot.id" class="gap-0 overflow-hidden py-0">
                     <div class="bg-muted relative aspect-video">
                         <img
                             :src="`/storage/${screenshot.picture.path_original}`"
                             :alt="getScreenshotCaption(screenshot)"
                             class="h-full w-full object-cover"
                         />
+                        <!-- Order controls overlay -->
+                        <div class="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-background/90 p-1 shadow-md backdrop-blur-sm">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                class="h-6 w-6"
+                                :disabled="screenshot.order === 1 || loading"
+                                title="Monter"
+                                @click.stop="moveUp(screenshot)"
+                            >
+                                <ChevronUp class="h-4 w-4" />
+                            </Button>
+                            <Input
+                                :model-value="screenshot.order"
+                                type="number"
+                                :min="1"
+                                :max="sortedScreenshots.length"
+                                class="h-6 w-12 p-1 text-center text-xs"
+                                :disabled="loading"
+                                @blur="(e: Event) => changeOrder(screenshot, parseInt((e.target as HTMLInputElement).value))"
+                                @keyup.enter="(e: KeyboardEvent) => { (e.target as HTMLInputElement).blur(); }"
+                            />
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                class="h-6 w-6"
+                                :disabled="screenshot.order === sortedScreenshots.length || loading"
+                                title="Descendre"
+                                @click.stop="moveDown(screenshot)"
+                            >
+                                <ChevronDown class="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                     <CardContent class="p-4">
                         <div class="flex items-start justify-between">

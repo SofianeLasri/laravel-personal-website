@@ -127,7 +127,7 @@ class Creation extends Model
      */
     public function screenshots(): HasMany
     {
-        return $this->hasMany(Screenshot::class);
+        return $this->hasMany(Screenshot::class)->orderBy('order');
     }
 
     /**

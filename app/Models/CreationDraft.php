@@ -140,7 +140,7 @@ class CreationDraft extends Model
      */
     public function screenshots(): HasMany
     {
-        return $this->hasMany(CreationDraftScreenshot::class);
+        return $this->hasMany(CreationDraftScreenshot::class)->orderBy('order');
     }
 
     /**

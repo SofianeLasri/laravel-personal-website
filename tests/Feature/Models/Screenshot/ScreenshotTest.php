@@ -26,6 +26,7 @@ class ScreenshotTest extends TestCase
         $screenshot = Screenshot::factory()->create([
             'creation_id' => $creation->id,
             'picture_id' => $picture->id,
+            'order' => 1,
         ]);
 
         $this->assertDatabaseHas('screenshots', [
@@ -39,7 +40,10 @@ class ScreenshotTest extends TestCase
     public function it_belongs_to_a_creation()
     {
         $creation = Creation::factory()->create();
-        $screenshot = Screenshot::factory()->create(['creation_id' => $creation->id]);
+        $screenshot = Screenshot::factory()->create([
+            'creation_id' => $creation->id,
+            'order' => 1,
+        ]);
 
         $this->assertInstanceOf(Creation::class, $screenshot->creation);
         $this->assertEquals($creation->id, $screenshot->creation->id);
@@ -49,7 +53,10 @@ class ScreenshotTest extends TestCase
     public function it_has_a_picture()
     {
         $picture = Picture::factory()->create();
-        $screenshot = Screenshot::factory()->create(['picture_id' => $picture->id]);
+        $screenshot = Screenshot::factory()->create([
+            'picture_id' => $picture->id,
+            'order' => 1,
+        ]);
 
         $this->assertInstanceOf(Picture::class, $screenshot->picture);
         $this->assertEquals($picture->id, $screenshot->picture->id);
@@ -74,6 +81,7 @@ class ScreenshotTest extends TestCase
 
         $screenshot = Screenshot::factory()->create([
             'caption_translation_key_id' => $captionKey->id,
+            'order' => 1,
         ]);
 
         $this->assertEquals($captionKey->id, $screenshot->captionTranslationKey->id);
@@ -82,6 +90,7 @@ class ScreenshotTest extends TestCase
 
         $screenshotWithoutCaption = Screenshot::factory()->create([
             'caption_translation_key_id' => null,
+            'order' => 1,
         ]);
 
         $this->assertNull($screenshotWithoutCaption->captionTranslationKey);

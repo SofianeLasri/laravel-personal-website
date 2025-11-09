@@ -50,11 +50,15 @@ class CreationControllerTest extends TestCase
     {
         $draft = CreationDraft::factory()
             ->has(CreationDraftFeature::factory()->count(2), 'features')
-            ->has(CreationDraftScreenshot::factory()->count(3), 'screenshots')
             ->has(Technology::factory()->count(2), 'technologies')
             ->has(Person::factory()->count(1), 'people')
             ->has(Tag::factory()->count(1), 'tags')
             ->create();
+
+        CreationDraftScreenshot::factory()
+            ->count(3)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create(['creation_draft_id' => $draft->id]);
 
         $response = $this->postJson(route('dashboard.api.creations.store'), [
             'draft_id' => $draft->id,
@@ -170,11 +174,15 @@ class CreationControllerTest extends TestCase
     {
         $draft = CreationDraft::factory()
             ->hasFeatures(2)
-            ->hasScreenshots(3)
             ->hasTechnologies(2)
             ->hasPeople(1)
             ->hasTags(1)
             ->create();
+
+        CreationDraftScreenshot::factory()
+            ->count(3)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create(['creation_draft_id' => $draft->id]);
 
         $this->postJson(route('dashboard.api.creations.store'), ['draft_id' => $draft->id]);
 

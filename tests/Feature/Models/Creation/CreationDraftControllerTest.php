@@ -197,8 +197,12 @@ class CreationDraftControllerTest extends TestCase
     {
         $draft = CreationDraft::factory()
             ->hasFeatures(2)
-            ->hasScreenshots(3)
             ->create();
+
+        CreationDraftScreenshot::factory()
+            ->count(3)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create(['creation_draft_id' => $draft->id]);
 
         $response = $this->deleteJson(route('dashboard.api.creation-drafts.destroy', ['creation_draft' => $draft]));
 

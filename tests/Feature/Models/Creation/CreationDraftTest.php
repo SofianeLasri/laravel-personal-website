@@ -116,9 +116,12 @@ class CreationDraftTest extends TestCase
     public function it_can_have_screenshots()
     {
         $creationDraft = CreationDraft::factory()->create();
-        CreationDraftScreenshot::factory()->count(4)->create([
-            'creation_draft_id' => $creationDraft->id,
-        ]);
+        CreationDraftScreenshot::factory()
+            ->count(4)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create([
+                'creation_draft_id' => $creationDraft->id,
+            ]);
 
         $this->assertCount(4, $creationDraft->screenshots);
         $this->assertInstanceOf(CreationDraftScreenshot::class, $creationDraft->screenshots->first());
@@ -335,10 +338,13 @@ class CreationDraftTest extends TestCase
         ]);
 
         $captionKey = TranslationKey::factory()->create(['key' => 'screenshot.test.caption']);
-        Screenshot::factory()->count(2)->create([
-            'creation_id' => $creation->id,
-            'caption_translation_key_id' => $captionKey->id,
-        ]);
+        Screenshot::factory()
+            ->count(2)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create([
+                'creation_id' => $creation->id,
+                'caption_translation_key_id' => $captionKey->id,
+            ]);
 
         $technologies = Technology::factory()->count(3)->create();
         $people = Person::factory()->count(2)->create();
@@ -388,10 +394,13 @@ class CreationDraftTest extends TestCase
         ]);
 
         $captionKey = TranslationKey::factory()->create(['key' => 'screenshot.draft.caption']);
-        CreationDraftScreenshot::factory()->count(2)->create([
-            'creation_draft_id' => $draft->id,
-            'caption_translation_key_id' => $captionKey->id,
-        ]);
+        CreationDraftScreenshot::factory()
+            ->count(2)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create([
+                'creation_draft_id' => $draft->id,
+                'caption_translation_key_id' => $captionKey->id,
+            ]);
 
         $technologies = Technology::factory()->count(3)->create();
         $people = Person::factory()->count(2)->create();

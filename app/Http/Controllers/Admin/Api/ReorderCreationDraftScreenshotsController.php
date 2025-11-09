@@ -20,9 +20,10 @@ class ReorderCreationDraftScreenshotsController extends Controller
      */
     public function __invoke(ReorderCreationDraftScreenshotsRequest $request, CreationDraft $creationDraft): JsonResponse
     {
+        /** @var array<int, array{id: int, order: int}> $screenshots */
         $screenshots = $request->input('screenshots');
 
-        DB::transaction(function () use ($screenshots, $creationDraft) {
+        DB::transaction(function () use ($screenshots) {
             // First, set all orders to high temporary values to avoid unique constraint violations
             $screenshotIds = array_column($screenshots, 'id');
             CreationDraftScreenshot::whereIn('id', $screenshotIds)

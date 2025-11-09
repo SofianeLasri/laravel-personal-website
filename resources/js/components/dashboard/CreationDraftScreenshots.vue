@@ -316,8 +316,14 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                                 :max="sortedScreenshots.length"
                                 class="h-6 w-12 p-1 text-center text-xs"
                                 :disabled="loading"
-                                @blur="(e: Event) => changeOrder(screenshot, parseInt((e.target as HTMLInputElement).value))"
-                                @keyup.enter="(e: KeyboardEvent) => { (e.target as HTMLInputElement).blur(); }"
+                                @blur="(e: Event) => {
+                                    const target = e.target as HTMLInputElement | null;
+                                    if (target) changeOrder(screenshot, parseInt(target.value));
+                                }"
+                                @keyup.enter="(e: KeyboardEvent) => {
+                                    const target = e.target as HTMLInputElement | null;
+                                    if (target) target.blur();
+                                }"
                             />
                             <Button
                                 variant="ghost"

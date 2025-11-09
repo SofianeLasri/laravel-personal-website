@@ -292,6 +292,7 @@ class PublicControllersService
                 'id' => $screenshot->id,
                 'picture' => $this->formatPictureForSSR($screenshot->picture),
                 'caption' => $caption,
+                'order' => $screenshot->order,
             ];
         })->toArray();
 

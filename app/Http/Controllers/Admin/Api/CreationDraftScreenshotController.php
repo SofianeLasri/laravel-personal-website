@@ -9,6 +9,7 @@ use App\Models\CreationDraft;
 use App\Models\CreationDraftScreenshot;
 use App\Models\Translation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class CreationDraftScreenshotController extends Controller
@@ -32,10 +33,17 @@ class CreationDraftScreenshotController extends Controller
             $translation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $caption)->translation_key_id;
         }
 
-        $creationDraftScreenshot = $creationDraft->screenshots()->create([
-            'picture_id' => $request->picture_id,
-            'caption_translation_key_id' => $translation,
-        ])->load(['picture', 'captionTranslationKey.translations']);
+        $creationDraftScreenshot = DB::transaction(function () use ($creationDraft, $request, $translation) {
+            // Get the max order value and add 1 for the new screenshot
+            // Use lockForUpdate to prevent race conditions when calculating max order
+            $maxOrder = $creationDraft->screenshots()->lockForUpdate()->max('order') ?? 0;
+
+            return $creationDraft->screenshots()->create([
+                'picture_id' => $request->picture_id,
+                'caption_translation_key_id' => $translation,
+                'order' => $maxOrder + 1,
+            ])->load(['picture', 'captionTranslationKey.translations']);
+        });
 
         return response()->json($creationDraftScreenshot, Response::HTTP_CREATED);
     }

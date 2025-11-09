@@ -269,6 +269,7 @@ interface Screenshot {
     creation_draft_id: number;
     picture_id: number;
     caption_translation_key_id: number | null;
+    order: number;
     created_at: string;
     updated_at: string;
     picture: Picture;
@@ -441,6 +442,7 @@ interface SSRScreenshot {
     id: number;
     picture: SSRPicture;
     caption: string | null;
+    order: number;
 }
 
 interface SSRVideo {

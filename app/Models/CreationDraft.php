@@ -140,7 +140,7 @@ class CreationDraft extends Model
      */
     public function screenshots(): HasMany
     {
-        return $this->hasMany(CreationDraftScreenshot::class);
+        return $this->hasMany(CreationDraftScreenshot::class)->orderBy('order');
     }
 
     /**
@@ -210,6 +210,7 @@ class CreationDraft extends Model
                 'creation_draft_id' => $draft->id,
                 'picture_id' => $screenshot->picture_id,
                 'caption_translation_key_id' => $screenshot->caption_translation_key_id,
+                'order' => $screenshot->order,
             ]);
         }
 

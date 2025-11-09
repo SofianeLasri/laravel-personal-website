@@ -86,9 +86,12 @@ class CreationTest extends TestCase
     public function it_can_have_screenshots()
     {
         $creation = Creation::factory()->create();
-        Screenshot::factory()->count(4)->create([
-            'creation_id' => $creation->id,
-        ]);
+        Screenshot::factory()
+            ->count(4)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create([
+                'creation_id' => $creation->id,
+            ]);
 
         $this->assertCount(4, $creation->screenshots);
         $this->assertInstanceOf(Screenshot::class, $creation->screenshots->first());

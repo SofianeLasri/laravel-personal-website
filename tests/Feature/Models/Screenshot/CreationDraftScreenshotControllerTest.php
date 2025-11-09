@@ -34,9 +34,12 @@ class CreationDraftScreenshotControllerTest extends TestCase
     #[Test]
     public function test_index_returns_draft_screenshots(): void
     {
-        CreationDraftScreenshot::factory()->count(3)->create([
-            'creation_draft_id' => $this->draft->id,
-        ]);
+        CreationDraftScreenshot::factory()
+            ->count(3)
+            ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+            ->create([
+                'creation_draft_id' => $this->draft->id,
+            ]);
 
         $response = $this->getJson(route('dashboard.api.creation-drafts.draft-screenshots.index', $this->draft));
 
@@ -114,7 +117,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     #[Test]
     public function test_show_returns_specific_screenshot(): void
     {
-        $screenshot = CreationDraftScreenshot::factory()->create();
+        $screenshot = CreationDraftScreenshot::factory()->create(['order' => 1]);
 
         $response = $this->getJson(
             route('dashboard.api.draft-screenshots.show', $screenshot)
@@ -130,7 +133,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     #[Test]
     public function test_update_modifies_caption(): void
     {
-        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
+        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create(['order' => 1]);
 
         $this->putJson(
             route('dashboard.api.draft-screenshots.update', $screenshot),
@@ -150,7 +153,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     #[Test]
     public function test_update_with_no_caption_removes_caption_translation_id(): void
     {
-        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
+        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create(['order' => 1]);
 
         $response = $this->putJson(
             route('dashboard.api.draft-screenshots.update', $screenshot),
@@ -171,6 +174,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     {
         $screenshot = CreationDraftScreenshot::factory([
             'caption_translation_key_id' => null,
+            'order' => 1,
         ])->create();
 
         $response = $this->putJson(
@@ -194,7 +198,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     #[TestDox('Test that updating a screenshot that has a caption with no data will remove the caption')]
     public function test_update_removes_caption(): void
     {
-        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
+        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create(['order' => 1]);
 
         $this->putJson(
             route('dashboard.api.draft-screenshots.update', $screenshot),
@@ -211,7 +215,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     #[Test]
     public function test_destroy_deletes_screenshot(): void
     {
-        $screenshot = CreationDraftScreenshot::factory()->create();
+        $screenshot = CreationDraftScreenshot::factory()->create(['order' => 1]);
 
         $response = $this->delete(
             route('dashboard.api.draft-screenshots.destroy', $screenshot)
@@ -227,6 +231,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
         $otherDraft = CreationDraft::factory()->create();
         CreationDraftScreenshot::factory()->create([
             'creation_draft_id' => $this->draft->id,
+            'order' => 1,
         ]);
 
         $response = $this->getJson(
@@ -256,7 +261,7 @@ class CreationDraftScreenshotControllerTest extends TestCase
     #[Test]
     public function test_update_reuses_existing_translation_key(): void
     {
-        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create();
+        $screenshot = CreationDraftScreenshot::factory()->withCaption()->create(['order' => 1]);
         $originalKey = $screenshot->caption_translation_key_id;
 
         $this->putJson(

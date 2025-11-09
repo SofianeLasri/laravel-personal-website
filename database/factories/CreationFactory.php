@@ -52,9 +52,12 @@ class CreationFactory extends Factory
     public function withScreenshots(int $count = 4): static
     {
         return $this->afterCreating(function (Creation $creation) use ($count) {
-            Screenshot::factory()->count($count)->create([
-                'creation_id' => $creation->id,
-            ]);
+            Screenshot::factory()
+                ->count($count)
+                ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+                ->create([
+                    'creation_id' => $creation->id,
+                ]);
         });
     }
 
@@ -96,9 +99,13 @@ class CreationFactory extends Factory
                 'creation_id' => $creation->id,
             ]);
 
-            $screenshots = Screenshot::factory()->count(rand(2, 4))->create([
-                'creation_id' => $creation->id,
-            ]);
+            $screenshotCount = rand(2, 4);
+            $screenshots = Screenshot::factory()
+                ->count($screenshotCount)
+                ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
+                ->create([
+                    'creation_id' => $creation->id,
+                ]);
 
             foreach ([$creation->logo, $creation->coverImage] as $picture) {
                 if ($picture) {

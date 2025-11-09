@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\Api\ExperienceController;
 use App\Http\Controllers\Admin\Api\GameReviewDraftController;
 use App\Http\Controllers\Admin\Api\PersonController;
 use App\Http\Controllers\Admin\Api\PictureController;
+use App\Http\Controllers\Admin\Api\ReorderCreationDraftScreenshotsController;
 use App\Http\Controllers\Admin\Api\SocialMediaLinkController;
 use App\Http\Controllers\Admin\Api\TagController;
 use App\Http\Controllers\Admin\Api\TechnologyController;
@@ -249,6 +250,8 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::apiResource('game-review-drafts', GameReviewDraftController::class)->except(['index', 'create', 'edit']);
 
         Route::apiResource('creation-drafts.draft-features', CreationDraftFeatureController::class)->shallow();
+        Route::put('creation-drafts/{creation_draft}/draft-screenshots/reorder', ReorderCreationDraftScreenshotsController::class)
+            ->name('creation-drafts.draft-screenshots.reorder');
         Route::apiResource('creation-drafts.draft-screenshots', CreationDraftScreenshotController::class)->shallow();
         Route::apiResource('pictures', PictureController::class)->except('update');
         Route::post('pictures/{picture}/reoptimize', [PictureController::class, 'reoptimize'])

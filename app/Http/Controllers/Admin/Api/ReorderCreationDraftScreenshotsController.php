@@ -23,10 +23,10 @@ class ReorderCreationDraftScreenshotsController extends Controller
         $screenshots = $request->input('screenshots');
 
         DB::transaction(function () use ($screenshots, $creationDraft) {
-            // First, set all orders to negative values to avoid unique constraint violations
+            // First, set all orders to high temporary values to avoid unique constraint violations
             $screenshotIds = array_column($screenshots, 'id');
             CreationDraftScreenshot::whereIn('id', $screenshotIds)
-                ->update(['order' => DB::raw('id * -1')]);
+                ->update(['order' => DB::raw('id + 10000')]);
 
             // Then update each screenshot to its final order
             foreach ($screenshots as $screenshot) {

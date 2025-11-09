@@ -33,9 +33,6 @@ class ReorderCreationDraftScreenshotsRequest extends FormRequest
 
     /**
      * Configure the validator instance.
-     *
-     * @param  Validator  $validator
-     * @return void
      */
     public function withValidator(Validator $validator): void
     {
@@ -45,7 +42,7 @@ class ReorderCreationDraftScreenshotsRequest extends FormRequest
             }
 
             $creationDraft = $this->route('creation_draft');
-            if (!$creationDraft instanceof CreationDraft) {
+            if (! $creationDraft instanceof CreationDraft) {
                 return;
             }
 

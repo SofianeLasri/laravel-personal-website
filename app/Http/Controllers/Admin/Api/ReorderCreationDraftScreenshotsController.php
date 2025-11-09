@@ -13,10 +13,6 @@ class ReorderCreationDraftScreenshotsController extends Controller
 {
     /**
      * Reorder screenshots for a creation draft.
-     *
-     * @param  ReorderCreationDraftScreenshotsRequest  $request
-     * @param  CreationDraft  $creationDraft
-     * @return JsonResponse
      */
     public function __invoke(ReorderCreationDraftScreenshotsRequest $request, CreationDraft $creationDraft): JsonResponse
     {

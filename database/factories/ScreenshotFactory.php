@@ -7,7 +7,6 @@ use App\Models\Picture;
 use App\Models\Screenshot;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\Sequence;
 
 class ScreenshotFactory extends Factory
 {

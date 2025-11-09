@@ -20,7 +20,7 @@ return new class extends Migration
 
         $orderByCreation = [];
         foreach ($screenshots as $screenshot) {
-            if (!isset($orderByCreation[$screenshot->creation_id])) {
+            if (! isset($orderByCreation[$screenshot->creation_id])) {
                 $orderByCreation[$screenshot->creation_id] = 1;
             }
 
@@ -39,7 +39,7 @@ return new class extends Migration
 
         $orderByDraft = [];
         foreach ($draftScreenshots as $screenshot) {
-            if (!isset($orderByDraft[$screenshot->creation_draft_id])) {
+            if (! isset($orderByDraft[$screenshot->creation_draft_id])) {
                 $orderByDraft[$screenshot->creation_draft_id] = 1;
             }
 

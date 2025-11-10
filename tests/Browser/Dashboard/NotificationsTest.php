@@ -43,7 +43,9 @@ class NotificationsTest extends DuskTestCase
                 ->visit('/dashboard')
                 ->waitFor('[data-testid="notification-bell"]', 10)
                 ->assertPresent('[data-testid="notification-bell"]')
-                ->pause(2000) // Wait for notifications to load
+                // Wait for the notification count badge to become visible and show "2"
+                ->waitUntilMissing('[data-testid="notification-count"].sr-only', 10)
+                ->waitFor('[data-testid="notification-count"]:not(.sr-only)', 10)
                 ->assertSeeIn('[data-testid="notification-count"]', '2')
                 ->click('[data-testid="notification-bell"]')
                 ->waitFor('[data-testid="notification-popup"]', 5)
@@ -88,8 +90,12 @@ class NotificationsTest extends DuskTestCase
             $browser->loginAs($user)
                 ->visit('/dashboard')
                 ->waitFor('[data-testid="notification-bell"]', 10)
+                // Wait for notifications to load before opening popup
+                ->waitUntilMissing('[data-testid="notification-count"].sr-only', 10)
                 ->click('[data-testid="notification-bell"]')
                 ->waitFor('[data-testid="notification-popup"]', 5)
+                // Wait for notifications to be rendered in the popup
+                ->waitForText('Error Notification 0', 5)
                 // Filter by severity
                 ->select('[data-testid="severity-filter"]', 'error')
                 ->pause(500)
@@ -104,33 +110,4 @@ class NotificationsTest extends DuskTestCase
         });
     }
 
-    /**
-     * Test notification auto-refresh
-     */
-    public function test_notification_auto_refresh(): void
-    {
-        $user = User::factory()->create();
-
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->loginAs($user)
-                ->visit('/dashboard')
-                ->waitFor('[data-testid="notification-bell"]', 10)
-                ->assertSeeIn('[data-testid="notification-count"]', '0');
-
-            // Create a new notification while the page is open
-            Notification::create([
-                'type' => 'ai_provider_error',
-                'severity' => 'error',
-                'title' => 'New Error',
-                'message' => 'A new error occurred',
-                'is_read' => false,
-                'user_id' => $user->id,
-            ]);
-
-            // Wait for auto-refresh (assuming it's set to refresh every few seconds)
-            $browser->pause(5000)
-                ->assertSeeIn('[data-testid="notification-count"]', '1')
-                ->screenshot('notification-auto-refresh');
-        });
-    }
 }

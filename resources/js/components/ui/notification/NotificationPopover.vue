@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Bell } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
@@ -115,6 +115,11 @@ const loading = ref(false)
 const severityFilter = ref('')
 const modalOpen = ref(false)
 const selectedNotification = ref<Notification | null>(null)
+
+// Fetch notifications when component mounts
+onMounted(async () => {
+  await notificationStore.fetchNotifications()
+})
 
 const notifications = computed(() => notificationStore.notifications)
 const unreadCount = computed(() => notificationStore.unreadCount)

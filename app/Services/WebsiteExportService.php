@@ -31,6 +31,7 @@ class WebsiteExportService
         'tags',
         'pictures',
         'optimized_pictures',
+        'custom_emojis',
         'videos',
         'social_media_links',
         'technology_experiences',

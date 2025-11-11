@@ -166,7 +166,7 @@ const getViewCount = (postId: number): string => {
 };
 
 onMounted(() => {
-    loadViewCounts();
+    void loadViewCounts();
 });
 </script>
 
@@ -221,7 +221,7 @@ onMounted(() => {
                                 <Badge variant="outline">{{ post.type }}</Badge>
                                 <!--                                    <Badge variant="outline">{{ getTypeLabel(post.type) }}</Badge>-->
                             </TableCell>
-                            <TableCell>{{ post.category?.name || 'Non définie' }}</TableCell>
+                            <TableCell>{{ post.category ? getFrenchTranslation(post.category.name_translation_key) : 'Non définie' }}</TableCell>
                             <TableCell>{{ post.published_at ? new Date(post.published_at).toLocaleDateString('fr-FR') : '-' }}</TableCell>
                             <TableCell>
                                 <div v-if="viewCountsLoading" class="flex items-center justify-center">

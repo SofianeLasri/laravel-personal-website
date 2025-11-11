@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\BlogPostType;
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\Picture;
 use App\Models\TranslationKey;
 use App\Models\Video;
@@ -180,16 +180,16 @@ class BlogPostEditPageController extends Controller
                 continue;
             }
 
-            if ($content->content instanceof BlogContentMarkdown) {
+            if ($content->content instanceof ContentMarkdown) {
                 $content->content->load('translationKey.translations');
-            } elseif ($content->content instanceof BlogContentVideo) {
+            } elseif ($content->content instanceof ContentVideo) {
                 $content->content->load([
                     'video.coverPicture',
                 ]);
-            } elseif ($content->content instanceof BlogContentGallery) {
+            } elseif ($content->content instanceof ContentGallery) {
                 $content->content->load([
                     'pictures' => function ($query) {
-                        $query->orderBy('blog_content_gallery_pictures.order')
+                        $query->orderBy('content_gallery_pictures.order')
                             ->withPivot('caption_translation_key_id');
                     },
                 ]);

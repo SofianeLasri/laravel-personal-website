@@ -15,14 +15,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
-import type { BlogContentVideo, Video } from '@/types';
+import type { ContentVideo, Video } from '@/types';
 import axios from 'axios';
 import { Edit, FileVideo, ImageDown, Loader2, Plus, Trash2, Upload } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
 interface Props {
-    blogContentVideoId: number;
+    contentVideoId: number;
     locale: 'fr' | 'en';
 }
 
@@ -36,7 +36,7 @@ const emit = defineEmits<{
 const route = useRoute();
 
 // State
-const blogContentVideo = ref<BlogContentVideo | null>(null);
+const contentVideo = ref<ContentVideo | null>(null);
 const currentVideo = ref<Video | null>(null);
 const allVideos = ref<Video[]>([]);
 const loading = ref(false);
@@ -55,18 +55,18 @@ const isRemoveDialogOpen = ref(false);
 const videoManager = ref<InstanceType<typeof VideoManager> | null>(null);
 
 // Load blog content video data
-const loadBlogContentVideo = async () => {
-    if (!props.blogContentVideoId) return;
+const loadContentVideo = async () => {
+    if (!props.contentVideoId) return;
 
     loading.value = true;
     try {
         const response = await axios.get(
             route('dashboard.api.blog-content-video.show', {
-                blog_content_video: props.blogContentVideoId,
+                blog_content_video: props.contentVideoId,
             }),
         );
 
-        blogContentVideo.value = response.data;
+        contentVideo.value = response.data;
 
         // Load video details if video is attached
         if (response.data.video_id) {
@@ -118,7 +118,7 @@ const removeVideo = async () => {
         // Remove video from blog content video
         await axios.put(
             route('dashboard.api.blog-content-video.update', {
-                blog_content_video: props.blogContentVideoId,
+                blog_content_video: props.contentVideoId,
             }),
             {
                 video_id: null,
@@ -128,8 +128,8 @@ const removeVideo = async () => {
         );
 
         currentVideo.value = null;
-        if (blogContentVideo.value) {
-            blogContentVideo.value.video_id = null;
+        if (contentVideo.value) {
+            contentVideo.value.video_id = null;
         }
         emit('video-removed');
         toast.success('Vidéo retirée');
@@ -143,16 +143,16 @@ const removeVideo = async () => {
 
 // Save caption with debouncing
 const saveCaption = async () => {
-    if (!blogContentVideo.value) return;
+    if (!contentVideo.value) return;
 
     captionSaving.value = true;
     try {
         await axios.put(
             route('dashboard.api.blog-content-video.update', {
-                blog_content_video: props.blogContentVideoId,
+                blog_content_video: props.contentVideoId,
             }),
             {
-                video_id: blogContentVideo.value.video_id,
+                video_id: contentVideo.value.video_id,
                 caption: caption.value,
                 locale: props.locale,
             },
@@ -186,7 +186,7 @@ const handleVideoUploaded = async (video: Video) => {
     // Update blog content video with uploaded video
     await axios.put(
         route('dashboard.api.blog-content-video.update', {
-            blog_content_video: props.blogContentVideoId,
+            blog_content_video: props.contentVideoId,
         }),
         {
             video_id: video.id,
@@ -196,7 +196,7 @@ const handleVideoUploaded = async (video: Video) => {
     );
 
     // Reload data
-    await loadBlogContentVideo();
+    await loadContentVideo();
     emit('video-selected', video.id);
 };
 
@@ -204,7 +204,7 @@ const handleVideoSelected = async (videoId: number) => {
     // Update blog content video with selected video
     await axios.put(
         route('dashboard.api.blog-content-video.update', {
-            blog_content_video: props.blogContentVideoId,
+            blog_content_video: props.contentVideoId,
         }),
         {
             video_id: videoId,
@@ -214,7 +214,7 @@ const handleVideoSelected = async (videoId: number) => {
     );
 
     // Reload data
-    await loadBlogContentVideo();
+    await loadContentVideo();
     emit('video-selected', videoId);
 };
 
@@ -235,7 +235,7 @@ const openUploadModal = () => {
 
 // Lifecycle
 onMounted(() => {
-    void loadBlogContentVideo();
+    void loadContentVideo();
 });
 
 onUnmounted(() => {
@@ -246,10 +246,10 @@ onUnmounted(() => {
 
 // Watch for blog content video ID changes
 watch(
-    () => props.blogContentVideoId,
+    () => props.contentVideoId,
     async (newId, oldId) => {
         if (newId && newId !== oldId) {
-            await loadBlogContentVideo();
+            await loadContentVideo();
         }
     },
 );

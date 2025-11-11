@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\BlogContentGallery;
+use App\Models\ContentGallery;
 use App\Models\TranslationKey;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +34,7 @@ class BlogContentGalleryController extends Controller
 
         try {
             // Create the gallery
-            $gallery = BlogContentGallery::create();
+            $gallery = ContentGallery::create();
 
             // Attach pictures with captions if any provided
             if ($request->picture_ids && count($request->picture_ids) > 0) {
@@ -82,14 +82,14 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function show(BlogContentGallery $blogContentGallery): JsonResponse
+    public function show(ContentGallery $blogContentGallery): JsonResponse
     {
         $blogContentGallery->load('pictures');
 
         return response()->json($blogContentGallery);
     }
 
-    public function update(Request $request, BlogContentGallery $blogContentGallery): JsonResponse
+    public function update(Request $request, ContentGallery $blogContentGallery): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'picture_ids' => 'nullable|array',
@@ -112,7 +112,7 @@ class BlogContentGalleryController extends Controller
             // Gallery has no specific properties to update now
 
             // Delete old caption translation keys
-            $oldCaptionKeys = DB::table('blog_content_gallery_pictures')
+            $oldCaptionKeys = DB::table('content_gallery_pictures')
                 ->where('gallery_id', $blogContentGallery->id)
                 ->whereNotNull('caption_translation_key_id')
                 ->pluck('caption_translation_key_id');
@@ -175,7 +175,7 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function updatePictures(Request $request, BlogContentGallery $blogContentGallery): JsonResponse
+    public function updatePictures(Request $request, ContentGallery $blogContentGallery): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'pictures' => 'required|array',
@@ -196,7 +196,7 @@ class BlogContentGalleryController extends Controller
 
         try {
             // Delete old caption translation keys
-            $oldCaptionKeys = DB::table('blog_content_gallery_pictures')
+            $oldCaptionKeys = DB::table('content_gallery_pictures')
                 ->where('gallery_id', $blogContentGallery->id)
                 ->whereNotNull('caption_translation_key_id')
                 ->pluck('caption_translation_key_id');
@@ -257,13 +257,13 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function destroy(BlogContentGallery $blogContentGallery): JsonResponse
+    public function destroy(ContentGallery $blogContentGallery): JsonResponse
     {
         DB::beginTransaction();
 
         try {
             // Delete caption translation keys
-            $captionKeys = DB::table('blog_content_gallery_pictures')
+            $captionKeys = DB::table('content_gallery_pictures')
                 ->where('gallery_id', $blogContentGallery->id)
                 ->whereNotNull('caption_translation_key_id')
                 ->pluck('caption_translation_key_id');

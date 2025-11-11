@@ -98,13 +98,13 @@ class BlogPostControllerTest extends TestCase
             'text' => 'Ceci est le contenu du blog de test en français.',
         ]);
 
-        $markdownContent = \App\Models\BlogContentMarkdown::factory()->create([
+        $markdownContent = \App\Models\ContentMarkdown::factory()->create([
             'translation_key_id' => $contentTranslationKey->id,
         ]);
 
         \App\Models\BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => \App\Models\BlogContentMarkdown::class,
+            'content_type' => \App\Models\ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);
@@ -175,13 +175,13 @@ class BlogPostControllerTest extends TestCase
             'text' => 'Ceci est le contenu du blog de test en français.',
         ]);
 
-        $markdownContent = \App\Models\BlogContentMarkdown::factory()->create([
+        $markdownContent = \App\Models\ContentMarkdown::factory()->create([
             'translation_key_id' => $contentTranslationKey->id,
         ]);
 
         \App\Models\BlogPostContent::factory()->create([
             'blog_post_id' => $this->blogPost->id,
-            'content_type' => \App\Models\BlogContentMarkdown::class,
+            'content_type' => \App\Models\ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);

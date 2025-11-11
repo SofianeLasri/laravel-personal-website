@@ -1,10 +1,10 @@
 import EmojiSuggestionList, { type EmojiSuggestionItem } from '@/components/dashboard/EmojiSuggestionList.vue';
 import { nativeEmojis } from '@/data/native-emojis';
-import Suggestion, { type SuggestionOptions } from '@tiptap/suggestion';
-import axios from 'axios';
-import { type VueRenderer } from '@tiptap/vue-3';
 import { Extension } from '@tiptap/core';
 import { PluginKey } from '@tiptap/pm/state';
+import Suggestion, { type SuggestionOptions } from '@tiptap/suggestion';
+import { type VueRenderer } from '@tiptap/vue-3';
+import axios from 'axios';
 import tippy, { type Instance as TippyInstance } from 'tippy.js';
 
 interface CustomEmoji {
@@ -38,8 +38,7 @@ const getSuggestionItems = async (query: string): Promise<EmojiSuggestionItem[]>
     const matchingNativeEmojis = nativeEmojis
         .filter(
             (emoji) =>
-                emoji.name.toLowerCase().includes(lowercaseQuery) ||
-                emoji.keywords.some((keyword) => keyword.toLowerCase().includes(lowercaseQuery))
+                emoji.name.toLowerCase().includes(lowercaseQuery) || emoji.keywords.some((keyword) => keyword.toLowerCase().includes(lowercaseQuery)),
         )
         .slice(0, 10) // Limit to 10 native emojis
         .map((emoji) => ({
@@ -86,19 +85,14 @@ export const EmojiSuggestion = Extension.create({
                             .run();
                     } else {
                         // Insert custom emoji as :name:
-                        editor
-                            .chain()
-                            .focus()
-                            .deleteRange(range)
-                            .insertContent(`:${item.name}:`)
-                            .run();
+                        editor.chain().focus().deleteRange(range).insertContent(`:${item.name}:`).run();
                     }
                 },
 
                 allow: ({ state, range }) => {
                     const $from = state.doc.resolve(range.from);
                     const type = state.schema.nodes.codeBlock;
-                    const isInCodeBlock = Boolean($from.parent.type.spec.code) || ($from.parent.type === type);
+                    const isInCodeBlock = Boolean($from.parent.type.spec.code) || $from.parent.type === type;
 
                     return !isInCodeBlock;
                 },

@@ -3,9 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\BlogCategory;
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
 use App\Models\BlogPost;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
 use App\Models\Picture;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -60,12 +60,12 @@ class BlogPostFactory extends Factory
     {
         return $this->afterCreating(function (BlogPost $post) {
             $translationKey = TranslationKey::factory()->withTranslations()->create();
-            $markdown = BlogContentMarkdown::create([
+            $markdown = ContentMarkdown::create([
                 'translation_key_id' => $translationKey->id,
             ]);
 
             $post->contents()->create([
-                'content_type' => BlogContentMarkdown::class,
+                'content_type' => ContentMarkdown::class,
                 'content_id' => $markdown->id,
                 'order' => 1,
             ]);
@@ -83,21 +83,21 @@ class BlogPostFactory extends Factory
                 'en' => $this->faker->paragraphs(3, true),
             ])->create();
 
-            $introMarkdown = BlogContentMarkdown::create([
+            $introMarkdown = ContentMarkdown::create([
                 'translation_key_id' => $introTranslationKey->id,
             ]);
 
             $post->contents()->create([
-                'content_type' => BlogContentMarkdown::class,
+                'content_type' => ContentMarkdown::class,
                 'content_id' => $introMarkdown->id,
                 'order' => $order++,
             ]);
 
             // Create image gallery section
-            $gallery = BlogContentGallery::factory()->withPictures(4)->create();
+            $gallery = ContentGallery::factory()->withPictures(4)->create();
 
             $post->contents()->create([
-                'content_type' => BlogContentGallery::class,
+                'content_type' => ContentGallery::class,
                 'content_id' => $gallery->id,
                 'order' => $order++,
             ]);
@@ -108,12 +108,12 @@ class BlogPostFactory extends Factory
                 'en' => $this->faker->paragraphs(2, true),
             ])->create();
 
-            $conclusionMarkdown = BlogContentMarkdown::create([
+            $conclusionMarkdown = ContentMarkdown::create([
                 'translation_key_id' => $conclusionTranslationKey->id,
             ]);
 
             $post->contents()->create([
-                'content_type' => BlogContentMarkdown::class,
+                'content_type' => ContentMarkdown::class,
                 'content_id' => $conclusionMarkdown->id,
                 'order' => $order,
             ]);

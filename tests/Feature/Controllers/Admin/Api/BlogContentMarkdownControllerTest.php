@@ -3,7 +3,7 @@
 namespace Tests\Feature\Controllers\Admin\Api;
 
 use App\Http\Controllers\Admin\Api\BlogContentMarkdownController;
-use App\Models\BlogContentMarkdown;
+use App\Models\ContentMarkdown;
 use App\Models\Translation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,7 +46,7 @@ class BlogContentMarkdownControllerTest extends TestCase
                 ],
             ]);
 
-        $markdownContent = BlogContentMarkdown::first();
+        $markdownContent = ContentMarkdown::first();
         $this->assertNotNull($markdownContent);
 
         $this->assertDatabaseHas('translation_keys', [
@@ -76,7 +76,7 @@ class BlogContentMarkdownControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $markdownContent = BlogContentMarkdown::first();
+        $markdownContent = ContentMarkdown::first();
         $this->assertNotNull($markdownContent);
 
         $translations = Translation::where('translation_key_id', $markdownContent->translation_key_id)->get();
@@ -97,7 +97,7 @@ class BlogContentMarkdownControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $markdownContent = BlogContentMarkdown::first();
+        $markdownContent = ContentMarkdown::first();
         $this->assertNotNull($markdownContent);
 
         $translations = Translation::where('translation_key_id', $markdownContent->translation_key_id)->get();
@@ -137,7 +137,7 @@ class BlogContentMarkdownControllerTest extends TestCase
     #[Test]
     public function test_show_returns_markdown_content_with_relations()
     {
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
 
         $response = $this->getJson("/dashboard/api/blog-content-markdown/{$markdownContent->id}");
 
@@ -172,7 +172,7 @@ class BlogContentMarkdownControllerTest extends TestCase
     #[Test]
     public function test_update_modifies_french_translation()
     {
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-markdown/{$markdownContent->id}", [
             'content' => '## Updated French Content',
@@ -198,7 +198,7 @@ class BlogContentMarkdownControllerTest extends TestCase
     #[Test]
     public function test_update_modifies_english_translation()
     {
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-markdown/{$markdownContent->id}", [
             'content' => '## Updated English Content',
@@ -217,7 +217,7 @@ class BlogContentMarkdownControllerTest extends TestCase
     #[Test]
     public function test_update_validates_missing_content()
     {
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-markdown/{$markdownContent->id}", [
             'locale' => 'fr',
@@ -233,7 +233,7 @@ class BlogContentMarkdownControllerTest extends TestCase
     #[Test]
     public function test_update_validates_missing_locale()
     {
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-markdown/{$markdownContent->id}", [
             'content' => '# Updated Content',
@@ -246,7 +246,7 @@ class BlogContentMarkdownControllerTest extends TestCase
     #[Test]
     public function test_update_validates_invalid_locale()
     {
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-markdown/{$markdownContent->id}", [
             'content' => '# Updated Content',
@@ -271,7 +271,7 @@ class BlogContentMarkdownControllerTest extends TestCase
     #[Test]
     public function test_destroy_deletes_markdown_content_and_translations()
     {
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
         $translationKeyId = $markdownContent->translation_key_id;
 
         $response = $this->deleteJson("/dashboard/api/blog-content-markdown/{$markdownContent->id}");
@@ -281,7 +281,7 @@ class BlogContentMarkdownControllerTest extends TestCase
                 'message' => 'Markdown content deleted successfully',
             ]);
 
-        $this->assertDatabaseMissing('blog_content_markdown', [
+        $this->assertDatabaseMissing('content_markdowns', [
             'id' => $markdownContent->id,
         ]);
 

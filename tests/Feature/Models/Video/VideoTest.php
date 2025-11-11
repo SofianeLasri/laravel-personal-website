@@ -4,7 +4,7 @@ namespace Tests\Feature\Models\Video;
 
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
-use App\Models\BlogContentVideo;
+use App\Models\ContentVideo;
 use App\Models\Creation;
 use App\Models\Picture;
 use App\Models\Video;
@@ -155,8 +155,8 @@ class VideoTest extends TestCase
     public function test_video_has_many_blog_content_videos()
     {
         $video = Video::factory()->create();
-        $blogContentVideo1 = BlogContentVideo::factory()->create(['video_id' => $video->id]);
-        $blogContentVideo2 = BlogContentVideo::factory()->create(['video_id' => $video->id]);
+        $blogContentVideo1 = ContentVideo::factory()->create(['video_id' => $video->id]);
+        $blogContentVideo2 = ContentVideo::factory()->create(['video_id' => $video->id]);
 
         $this->assertCount(2, $video->blogContentVideos);
         $this->assertTrue($video->blogContentVideos->contains($blogContentVideo1));
@@ -180,7 +180,7 @@ class VideoTest extends TestCase
     public function test_video_blog_content_videos_relationship_can_be_loaded()
     {
         $video = Video::factory()->create();
-        BlogContentVideo::factory()->create(['video_id' => $video->id]);
+        ContentVideo::factory()->create(['video_id' => $video->id]);
 
         $loadedVideo = Video::with('blogContentVideos')->find($video->id);
 

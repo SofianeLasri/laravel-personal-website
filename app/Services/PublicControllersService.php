@@ -11,12 +11,12 @@ use App\Enums\TechnologyType;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
 use App\Models\BlogCategory;
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
 use App\Models\Certification;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\Creation;
 use App\Models\Experience;
 use App\Models\Feature;
@@ -796,7 +796,7 @@ class PublicControllersService
             'category.nameTranslationKey.translations',
             'coverPicture',
             'contents' => function ($query) {
-                $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
+                $query->where('content_type', ContentMarkdown::class)->orderBy('order');
             },
             'contents.content.translationKey.translations',
         ])
@@ -896,7 +896,7 @@ class PublicControllersService
     {
         // Get first markdown content ordered by position
         $firstTextContent = $blogPost->contents
-            ->where('content_type', BlogContentMarkdown::class)
+            ->where('content_type', ContentMarkdown::class)
             ->sortBy('order')
             ->first();
 
@@ -907,7 +907,7 @@ class PublicControllersService
         $markdownContent = $firstTextContent->content;
 
         // Ensure content is BlogContentMarkdown type
-        if (! $markdownContent instanceof BlogContentMarkdown) {
+        if (! $markdownContent instanceof ContentMarkdown) {
             return '';
         }
 
@@ -974,7 +974,7 @@ class PublicControllersService
             'category.nameTranslationKey.translations',
             'coverPicture',
             'contents' => function ($query) {
-                $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
+                $query->where('content_type', ContentMarkdown::class)->orderBy('order');
             },
             'contents.content.translationKey.translations',
         ]);
@@ -1111,9 +1111,9 @@ class PublicControllersService
             'contents.content' => function ($query) {
                 // Load different relations based on content type
                 $query->morphWith([
-                    BlogContentMarkdown::class => ['translationKey.translations'],
-                    BlogContentGallery::class => ['pictures'],
-                    BlogContentVideo::class => ['video.coverPicture', 'captionTranslationKey.translations'],
+                    ContentMarkdown::class => ['translationKey.translations'],
+                    ContentGallery::class => ['pictures'],
+                    ContentVideo::class => ['video.coverPicture', 'captionTranslationKey.translations'],
                 ]);
             },
             'gameReview.coverPicture',
@@ -1141,7 +1141,7 @@ class PublicControllersService
             ];
 
             // Handle different content types
-            if ($content->content_type === BlogContentMarkdown::class && $content->content instanceof BlogContentMarkdown) {
+            if ($content->content_type === ContentMarkdown::class && $content->content instanceof ContentMarkdown) {
                 $markdownContent = $content->content->translationKey ?
                     $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
@@ -1151,7 +1151,7 @@ class PublicControllersService
                     // Fallback to original markdown if emoji resolution fails
                     $result['markdown'] = $markdownContent;
                 }
-            } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
+            } elseif ($content->content_type === ContentGallery::class && $content->content instanceof ContentGallery) {
                 // Get caption translation keys from the pivot data
                 $captionTranslationKeyIds = $content->content->pictures
                     ->pluck('pivot.caption_translation_key_id')
@@ -1186,7 +1186,7 @@ class PublicControllersService
                         return $formattedPicture;
                     })->toArray(),
                 ];
-            } elseif ($content->content_type === BlogContentVideo::class && $content->content instanceof BlogContentVideo) {
+            } elseif ($content->content_type === ContentVideo::class && $content->content instanceof ContentVideo) {
                 $video = $content->content->video;
 
                 if ($video && $video->status === VideoStatus::READY && $video->visibility === VideoVisibility::PUBLIC) {
@@ -1208,7 +1208,7 @@ class PublicControllersService
         // Generate excerpt from first markdown content
         $excerpt = '';
         $firstMarkdownContent = $contents->first(function ($content) {
-            return $content['content_type'] === BlogContentMarkdown::class;
+            return $content['content_type'] === ContentMarkdown::class;
         });
 
         if ($firstMarkdownContent && isset($firstMarkdownContent['markdown'])) {
@@ -1287,9 +1287,9 @@ class PublicControllersService
             'contents.content' => function ($query) {
                 // Load different relations based on content type
                 $query->morphWith([
-                    BlogContentMarkdown::class => ['translationKey.translations'],
-                    BlogContentGallery::class => ['pictures'],
-                    BlogContentVideo::class => ['video.coverPicture', 'captionTranslationKey.translations'],
+                    ContentMarkdown::class => ['translationKey.translations'],
+                    ContentGallery::class => ['pictures'],
+                    ContentVideo::class => ['video.coverPicture', 'captionTranslationKey.translations'],
                 ]);
             },
             'gameReviewDraft.coverPicture',
@@ -1311,7 +1311,7 @@ class PublicControllersService
             ];
 
             // Handle different content types
-            if ($content->content_type === BlogContentMarkdown::class && $content->content instanceof BlogContentMarkdown) {
+            if ($content->content_type === ContentMarkdown::class && $content->content instanceof ContentMarkdown) {
                 $markdownContent = $content->content->translationKey ?
                     $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
@@ -1321,7 +1321,7 @@ class PublicControllersService
                     // Fallback to original markdown if emoji resolution fails
                     $result['markdown'] = $markdownContent;
                 }
-            } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
+            } elseif ($content->content_type === ContentGallery::class && $content->content instanceof ContentGallery) {
                 // Get caption translation keys from the pivot data
                 $captionTranslationKeyIds = $content->content->pictures
                     ->pluck('pivot.caption_translation_key_id')
@@ -1356,7 +1356,7 @@ class PublicControllersService
                         return $formattedPicture;
                     })->toArray(),
                 ];
-            } elseif ($content->content_type === BlogContentVideo::class && $content->content instanceof BlogContentVideo) {
+            } elseif ($content->content_type === ContentVideo::class && $content->content instanceof ContentVideo) {
                 $video = $content->content->video;
 
                 // For preview, show all videos regardless of visibility (but still check if ready)
@@ -1379,7 +1379,7 @@ class PublicControllersService
         // Generate excerpt from first markdown content
         $excerpt = '';
         $firstMarkdownContent = $contents->first(function ($content) {
-            return $content['content_type'] === BlogContentMarkdown::class;
+            return $content['content_type'] === ContentMarkdown::class;
         });
 
         if ($firstMarkdownContent && isset($firstMarkdownContent['markdown'])) {

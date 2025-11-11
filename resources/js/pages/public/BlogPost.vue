@@ -84,7 +84,7 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
                     <template v-for="(content, index) in blogPost.contents" :key="content.id">
                         <!-- Markdown Content -->
                         <div
-                            v-if="content.content_type === 'App\\Models\\BlogContentMarkdown' && content.markdown"
+                            v-if="content.content_type === 'App\\Models\\ContentMarkdown' && content.markdown"
                             class="min-w-0"
                             :class="[index === 0 ? 'first-paragraph-large' : '']"
                         >
@@ -93,15 +93,12 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
 
                         <!-- Gallery Content -->
                         <BlogImageGallery
-                            v-else-if="content.content_type === 'App\\Models\\BlogContentGallery' && content.gallery"
+                            v-else-if="content.content_type === 'App\\Models\\ContentGallery' && content.gallery"
                             :pictures="content.gallery.pictures"
                         />
 
                         <!-- Video Content -->
-                        <BlogVideoPlayer
-                            v-else-if="content.content_type === 'App\\Models\\BlogContentVideo' && content.video"
-                            :video="content.video"
-                        />
+                        <BlogVideoPlayer v-else-if="content.content_type === 'App\\Models\\ContentVideo' && content.video" :video="content.video" />
                     </template>
                 </div>
 

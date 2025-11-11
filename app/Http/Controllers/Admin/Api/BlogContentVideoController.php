@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\BlogContentVideo;
+use App\Models\ContentVideo;
 use App\Models\TranslationKey;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,7 +48,7 @@ class BlogContentVideoController extends Controller
         }
 
         // Create the video content
-        $videoContent = BlogContentVideo::create([
+        $videoContent = ContentVideo::create([
             'video_id' => $request->video_id,
             'caption_translation_key_id' => $captionTranslationKey?->id,
         ]);
@@ -58,14 +58,14 @@ class BlogContentVideoController extends Controller
         return response()->json($videoContent, 201);
     }
 
-    public function show(BlogContentVideo $blogContentVideo): JsonResponse
+    public function show(ContentVideo $blogContentVideo): JsonResponse
     {
         $blogContentVideo->load(['video', 'captionTranslationKey.translations']);
 
         return response()->json($blogContentVideo);
     }
 
-    public function update(Request $request, BlogContentVideo $blogContentVideo): JsonResponse
+    public function update(Request $request, ContentVideo $blogContentVideo): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'video_id' => 'nullable|integer|exists:videos,id',
@@ -132,7 +132,7 @@ class BlogContentVideoController extends Controller
         return response()->json($blogContentVideo);
     }
 
-    public function destroy(BlogContentVideo $blogContentVideo): JsonResponse
+    public function destroy(ContentVideo $blogContentVideo): JsonResponse
     {
         // Delete caption translation key if exists
         if ($blogContentVideo->captionTranslationKey) {

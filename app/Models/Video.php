@@ -63,10 +63,10 @@ class Video extends Model
     }
 
     /**
-     * @return HasMany<BlogContentVideo, $this>
+     * @return HasMany<ContentVideo, $this>
      */
     public function blogContentVideos(): HasMany
     {
-        return $this->hasMany(BlogContentVideo::class);
+        return $this->hasMany(ContentVideo::class);
     }
 }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Models\Blog;
 
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
 use App\Models\BlogPostDraft;
 use App\Models\BlogPostDraftContent;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -32,13 +32,13 @@ class BlogPostDraftContentTest extends TestCase
     #[Test]
     public function it_has_a_polymorphic_content_relationship(): void
     {
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
         $content = BlogPostDraftContent::factory()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
         ]);
 
-        $this->assertInstanceOf(BlogContentMarkdown::class, $content->content);
+        $this->assertInstanceOf(ContentMarkdown::class, $content->content);
         $this->assertEquals($markdown->id, $content->content->id);
     }
 
@@ -47,8 +47,8 @@ class BlogPostDraftContentTest extends TestCase
     {
         $content = BlogPostDraftContent::factory()->markdown()->create();
 
-        $this->assertEquals(BlogContentMarkdown::class, $content->content_type);
-        $this->assertInstanceOf(BlogContentMarkdown::class, $content->content);
+        $this->assertEquals(ContentMarkdown::class, $content->content_type);
+        $this->assertInstanceOf(ContentMarkdown::class, $content->content);
     }
 
     #[Test]
@@ -56,8 +56,8 @@ class BlogPostDraftContentTest extends TestCase
     {
         $content = BlogPostDraftContent::factory()->gallery()->create();
 
-        $this->assertEquals(BlogContentGallery::class, $content->content_type);
-        $this->assertInstanceOf(BlogContentGallery::class, $content->content);
+        $this->assertEquals(ContentGallery::class, $content->content_type);
+        $this->assertInstanceOf(ContentGallery::class, $content->content);
     }
 
     #[Test]
@@ -65,8 +65,8 @@ class BlogPostDraftContentTest extends TestCase
     {
         $content = BlogPostDraftContent::factory()->video()->create();
 
-        $this->assertEquals(BlogContentVideo::class, $content->content_type);
-        $this->assertInstanceOf(BlogContentVideo::class, $content->content);
+        $this->assertEquals(ContentVideo::class, $content->content_type);
+        $this->assertInstanceOf(ContentVideo::class, $content->content);
     }
 
     #[Test]
@@ -88,7 +88,7 @@ class BlogPostDraftContentTest extends TestCase
     public function it_casts_fields_correctly(): void
     {
         $content = BlogPostDraftContent::factory()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => 123,
             'order' => 5,
         ]);
@@ -151,9 +151,9 @@ class BlogPostDraftContentTest extends TestCase
         $content = BlogPostDraftContent::factory()->create();
 
         $this->assertContains($content->content_type, [
-            BlogContentMarkdown::class,
-            BlogContentGallery::class,
-            BlogContentVideo::class,
+            ContentMarkdown::class,
+            ContentGallery::class,
+            ContentVideo::class,
         ]);
     }
 
@@ -161,11 +161,11 @@ class BlogPostDraftContentTest extends TestCase
     public function it_persists_all_fields_to_database(): void
     {
         $draft = BlogPostDraft::factory()->create();
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
 
         $content = BlogPostDraftContent::create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 3,
         ]);
@@ -173,7 +173,7 @@ class BlogPostDraftContentTest extends TestCase
         $retrieved = BlogPostDraftContent::find($content->id);
 
         $this->assertEquals($draft->id, $retrieved->blog_post_draft_id);
-        $this->assertEquals(BlogContentMarkdown::class, $retrieved->content_type);
+        $this->assertEquals(ContentMarkdown::class, $retrieved->content_type);
         $this->assertEquals($markdown->id, $retrieved->content_id);
         $this->assertEquals(3, $retrieved->order);
     }
@@ -181,9 +181,9 @@ class BlogPostDraftContentTest extends TestCase
     #[Test]
     public function it_loads_polymorphic_content_correctly(): void
     {
-        $gallery = BlogContentGallery::factory()->create();
+        $gallery = ContentGallery::factory()->create();
         $content = BlogPostDraftContent::factory()->create([
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
         ]);
 
@@ -191,7 +191,7 @@ class BlogPostDraftContentTest extends TestCase
 
         $this->assertNotNull($retrieved->content);
         $this->assertEquals($gallery->id, $retrieved->content->id);
-        $this->assertInstanceOf(BlogContentGallery::class, $retrieved->content);
+        $this->assertInstanceOf(ContentGallery::class, $retrieved->content);
     }
 
     #[Test]
@@ -219,11 +219,11 @@ class BlogPostDraftContentTest extends TestCase
     #[Test]
     public function it_can_update_content_relationship(): void
     {
-        $markdown1 = BlogContentMarkdown::factory()->create();
-        $markdown2 = BlogContentMarkdown::factory()->create();
+        $markdown1 = ContentMarkdown::factory()->create();
+        $markdown2 = ContentMarkdown::factory()->create();
 
         $content = BlogPostDraftContent::factory()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown1->id,
         ]);
 
@@ -261,8 +261,8 @@ class BlogPostDraftContentTest extends TestCase
         $this->assertEquals(2, $content2->order);
         $this->assertEquals(3, $content3->order);
 
-        $this->assertInstanceOf(BlogContentMarkdown::class, $content1->content);
-        $this->assertInstanceOf(BlogContentGallery::class, $content2->content);
-        $this->assertInstanceOf(BlogContentVideo::class, $content3->content);
+        $this->assertInstanceOf(ContentMarkdown::class, $content1->content);
+        $this->assertInstanceOf(ContentGallery::class, $content2->content);
+        $this->assertInstanceOf(ContentVideo::class, $content3->content);
     }
 }

@@ -40,9 +40,9 @@ class WebsiteExportService
 
         // Blog tables (reference tables)
         'blog_categories',
-        'blog_content_markdown',
-        'blog_content_galleries',
-        'blog_content_videos',
+        'content_markdowns',
+        'content_galleries',
+        'content_videos',
 
         // Content tables (depend on reference tables)
         'translations',
@@ -68,7 +68,7 @@ class WebsiteExportService
         'creation_draft_person',
         'creation_draft_tag',
         'creation_draft_video',
-        'blog_content_gallery_pictures',
+        'content_gallery_pictures',
 
         // Metadata tables
         'user_agent_metadata',

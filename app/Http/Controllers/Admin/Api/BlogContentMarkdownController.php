@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\BlogContentMarkdown;
+use App\Models\ContentMarkdown;
 use App\Models\TranslationKey;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,7 +45,7 @@ class BlogContentMarkdownController extends Controller
         }
 
         // Create the markdown content
-        $markdownContent = BlogContentMarkdown::create([
+        $markdownContent = ContentMarkdown::create([
             'translation_key_id' => $translationKey->id,
         ]);
 
@@ -54,14 +54,14 @@ class BlogContentMarkdownController extends Controller
         return response()->json($markdownContent, 201);
     }
 
-    public function show(BlogContentMarkdown $blogContentMarkdown): JsonResponse
+    public function show(ContentMarkdown $blogContentMarkdown): JsonResponse
     {
         $blogContentMarkdown->load('translationKey.translations');
 
         return response()->json($blogContentMarkdown);
     }
 
-    public function update(Request $request, BlogContentMarkdown $blogContentMarkdown): JsonResponse
+    public function update(Request $request, ContentMarkdown $blogContentMarkdown): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'content' => 'required|string',
@@ -89,7 +89,7 @@ class BlogContentMarkdownController extends Controller
         return response()->json($blogContentMarkdown);
     }
 
-    public function destroy(BlogContentMarkdown $blogContentMarkdown): JsonResponse
+    public function destroy(ContentMarkdown $blogContentMarkdown): JsonResponse
     {
         // Delete translation key and its translations
         $translationKey = $blogContentMarkdown->translationKey;

@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
     'update:open': [value: boolean];
-    'select': [emoji: string];
+    select: [emoji: string];
 }>();
 
 // State
@@ -97,7 +97,7 @@ watch(
     () => props.open,
     (newValue) => {
         isOpen.value = newValue;
-    }
+    },
 );
 
 watch(isOpen, (newValue) => {
@@ -131,12 +131,7 @@ onMounted(() => {
                 </div>
 
                 <div class="p-3">
-                    <Input
-                        v-model="searchQuery"
-                        placeholder="Rechercher un emoji..."
-                        class="mb-3"
-                        @keydown.enter.prevent
-                    />
+                    <Input v-model="searchQuery" placeholder="Rechercher un emoji..." class="mb-3" @keydown.enter.prevent />
                 </div>
 
                 <!-- Native Emojis Tab -->
@@ -156,9 +151,7 @@ onMounted(() => {
                         </div>
                     </div>
 
-                    <div v-if="filteredNativeEmojis.length === 0" class="py-8 text-center text-sm text-muted-foreground">
-                        Aucun emoji trouvé
-                    </div>
+                    <div v-if="filteredNativeEmojis.length === 0" class="text-muted-foreground py-8 text-center text-sm">Aucun emoji trouvé</div>
 
                     <div v-else class="grid grid-cols-8 gap-1">
                         <button
@@ -189,9 +182,7 @@ onMounted(() => {
                         </p>
                     </div>
 
-                    <div v-else-if="filteredCustomEmojis.length === 0" class="py-8 text-center text-sm text-muted-foreground">
-                        Aucun emoji trouvé
-                    </div>
+                    <div v-else-if="filteredCustomEmojis.length === 0" class="text-muted-foreground py-8 text-center text-sm">Aucun emoji trouvé</div>
 
                     <div v-else class="grid grid-cols-8 gap-1">
                         <button
@@ -202,12 +193,7 @@ onMounted(() => {
                             :title="`:${emoji.name}:`"
                             @click="selectCustomEmoji(emoji)"
                         >
-                            <img
-                                :src="emoji.preview_url"
-                                :alt="emoji.name"
-                                class="h-8 w-8 object-contain"
-                                loading="lazy"
-                            />
+                            <img :src="emoji.preview_url" :alt="emoji.name" class="h-8 w-8 object-contain" loading="lazy" />
                         </button>
                     </div>
                 </TabsContent>

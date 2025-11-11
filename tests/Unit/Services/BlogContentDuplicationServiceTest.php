@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\Picture;
 use App\Models\TranslationKey;
 use App\Models\Video;
@@ -33,7 +33,7 @@ class BlogContentDuplicationServiceTest extends TestCase
         $originalTranslationKey->translations()->create(['locale' => 'en', 'text' => 'Original English text']);
         $originalTranslationKey->translations()->create(['locale' => 'fr', 'text' => 'Texte français original']);
 
-        $originalMarkdown = BlogContentMarkdown::factory()->create([
+        $originalMarkdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $originalTranslationKey->id,
         ]);
 
@@ -71,7 +71,7 @@ class BlogContentDuplicationServiceTest extends TestCase
         $captionKey2->translations()->create(['locale' => 'en', 'text' => 'Caption 2']);
 
         // Create original gallery
-        $originalGallery = BlogContentGallery::factory()->create([
+        $originalGallery = ContentGallery::factory()->create([
             'layout' => 'grid',
             'columns' => 3,
         ]);
@@ -123,7 +123,7 @@ class BlogContentDuplicationServiceTest extends TestCase
         $captionKey->translations()->create(['locale' => 'en', 'text' => 'Video caption']);
 
         // Create original video content
-        $originalVideoContent = BlogContentVideo::factory()->create([
+        $originalVideoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => $captionKey->id,
         ]);
@@ -149,7 +149,7 @@ class BlogContentDuplicationServiceTest extends TestCase
     {
         // Create video content without caption
         $video = Video::factory()->create();
-        $originalVideoContent = BlogContentVideo::factory()->create([
+        $originalVideoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => null,
         ]);
@@ -171,7 +171,7 @@ class BlogContentDuplicationServiceTest extends TestCase
         TranslationKey::factory()->create(['key' => 'unique.key_copy_1']);
 
         $originalKey = TranslationKey::factory()->create(['key' => 'unique.key.original']);
-        $originalMarkdown = BlogContentMarkdown::factory()->create([
+        $originalMarkdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $originalKey->id,
         ]);
 
@@ -188,13 +188,13 @@ class BlogContentDuplicationServiceTest extends TestCase
         // Create markdown content
         $markdownTranslationKey = TranslationKey::factory()->create(['key' => 'markdown.content']);
         $markdownTranslationKey->translations()->create(['locale' => 'en', 'text' => 'Markdown text']);
-        $markdownContent = BlogContentMarkdown::factory()->create([
+        $markdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownTranslationKey->id,
         ]);
 
         // Create gallery content
         $picture = Picture::factory()->create();
-        $galleryContent = BlogContentGallery::factory()->create([
+        $galleryContent = ContentGallery::factory()->create([
             'layout' => 'masonry',
             'columns' => 2,
         ]);
@@ -202,7 +202,7 @@ class BlogContentDuplicationServiceTest extends TestCase
 
         // Create video content
         $video = Video::factory()->create();
-        $videoContent = BlogContentVideo::factory()->create([
+        $videoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
@@ -210,17 +210,17 @@ class BlogContentDuplicationServiceTest extends TestCase
         $blogPostDraft = \App\Models\BlogPostDraft::factory()->create();
         $contents = collect([
             (object) [
-                'content_type' => BlogContentMarkdown::class,
+                'content_type' => ContentMarkdown::class,
                 'content' => $markdownContent,
                 'order' => 1,
             ],
             (object) [
-                'content_type' => BlogContentGallery::class,
+                'content_type' => ContentGallery::class,
                 'content' => $galleryContent,
                 'order' => 2,
             ],
             (object) [
-                'content_type' => BlogContentVideo::class,
+                'content_type' => ContentVideo::class,
                 'content' => $videoContent,
                 'order' => 3,
             ],
@@ -233,23 +233,23 @@ class BlogContentDuplicationServiceTest extends TestCase
         $this->assertCount(3, $newContents);
 
         // Assert markdown content was duplicated correctly
-        $this->assertEquals(BlogContentMarkdown::class, $newContents[0]['content_type']);
+        $this->assertEquals(ContentMarkdown::class, $newContents[0]['content_type']);
         $this->assertEquals(1, $newContents[0]['order']);
-        $markdownDuplicate = BlogContentMarkdown::find($newContents[0]['content_id']);
+        $markdownDuplicate = ContentMarkdown::find($newContents[0]['content_id']);
         $this->assertNotNull($markdownDuplicate);
         $this->assertNotEquals($markdownContent->id, $markdownDuplicate->id);
 
         // Assert gallery content was duplicated correctly
-        $this->assertEquals(BlogContentGallery::class, $newContents[1]['content_type']);
+        $this->assertEquals(ContentGallery::class, $newContents[1]['content_type']);
         $this->assertEquals(2, $newContents[1]['order']);
-        $galleryDuplicate = BlogContentGallery::find($newContents[1]['content_id']);
+        $galleryDuplicate = ContentGallery::find($newContents[1]['content_id']);
         $this->assertNotNull($galleryDuplicate);
         $this->assertNotEquals($galleryContent->id, $galleryDuplicate->id);
 
         // Assert video content was duplicated correctly
-        $this->assertEquals(BlogContentVideo::class, $newContents[2]['content_type']);
+        $this->assertEquals(ContentVideo::class, $newContents[2]['content_type']);
         $this->assertEquals(3, $newContents[2]['order']);
-        $videoDuplicate = BlogContentVideo::find($newContents[2]['content_id']);
+        $videoDuplicate = ContentVideo::find($newContents[2]['content_id']);
         $this->assertNotNull($videoDuplicate);
         $this->assertNotEquals($videoContent->id, $videoDuplicate->id);
     }
@@ -258,14 +258,14 @@ class BlogContentDuplicationServiceTest extends TestCase
     {
         // Create markdown content
         $markdownTranslationKey = TranslationKey::factory()->create(['key' => 'markdown.content']);
-        $markdownContent = BlogContentMarkdown::factory()->create([
+        $markdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownTranslationKey->id,
         ]);
 
         // Create contents collection with an unknown content type
         $contents = collect([
             (object) [
-                'content_type' => BlogContentMarkdown::class,
+                'content_type' => ContentMarkdown::class,
                 'content' => $markdownContent,
                 'order' => 1,
             ],
@@ -281,7 +281,7 @@ class BlogContentDuplicationServiceTest extends TestCase
 
         // Assert only the markdown content was duplicated (unknown type skipped)
         $this->assertCount(1, $newContents);
-        $this->assertEquals(BlogContentMarkdown::class, $newContents[0]['content_type']);
+        $this->assertEquals(ContentMarkdown::class, $newContents[0]['content_type']);
         $this->assertEquals(1, $newContents[0]['order']);
     }
 
@@ -292,7 +292,7 @@ class BlogContentDuplicationServiceTest extends TestCase
         $picture2 = Picture::factory()->create();
 
         // Create gallery without captions
-        $originalGallery = BlogContentGallery::factory()->create([
+        $originalGallery = ContentGallery::factory()->create([
             'layout' => 'grid',
             'columns' => 2,
         ]);
@@ -330,7 +330,7 @@ class BlogContentDuplicationServiceTest extends TestCase
     public function test_duplicates_empty_gallery()
     {
         // Create empty gallery
-        $originalGallery = BlogContentGallery::factory()->create([
+        $originalGallery = ContentGallery::factory()->create([
             'layout' => 'carousel',
             'columns' => 1,
         ]);
@@ -356,7 +356,7 @@ class BlogContentDuplicationServiceTest extends TestCase
         TranslationKey::factory()->create(['key' => 'test.key_copy_2']);
 
         // Create markdown with the original key
-        $originalMarkdown = BlogContentMarkdown::factory()->create([
+        $originalMarkdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $originalKey->id,
         ]);
 

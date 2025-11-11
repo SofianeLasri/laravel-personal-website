@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Database\Factories\BlogContentVideoFactory;
+use Database\Factories\ContentVideoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,9 +20,9 @@ use Illuminate\Support\Carbon;
  * @property-read Video|null $video
  * @property-read TranslationKey|null $captionTranslationKey
  */
-class BlogContentVideo extends Model
+class ContentVideo extends Model
 {
-    /** @use HasFactory<BlogContentVideoFactory> */
+    /** @use HasFactory<ContentVideoFactory> */
     use HasFactory;
 
     protected $fillable = [

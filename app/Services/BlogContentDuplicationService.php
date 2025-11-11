@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
 use App\Models\BlogPostContent;
 use App\Models\BlogPostDraftContent;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\TranslationKey;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,7 +19,7 @@ class BlogContentDuplicationService
     /**
      * Duplicate a markdown content with its translation key
      */
-    public function duplicateMarkdownContent(BlogContentMarkdown $originalContent): BlogContentMarkdown
+    public function duplicateMarkdownContent(ContentMarkdown $originalContent): ContentMarkdown
     {
         return DB::transaction(function () use ($originalContent) {
             // Duplicate the translation key with all its translations
@@ -31,7 +31,7 @@ class BlogContentDuplicationService
             $newTranslationKey = $this->duplicateTranslationKey($translationKey);
 
             // Create new markdown content
-            return BlogContentMarkdown::create([
+            return ContentMarkdown::create([
                 'translation_key_id' => $newTranslationKey->id,
             ]);
         });
@@ -40,11 +40,11 @@ class BlogContentDuplicationService
     /**
      * Duplicate a gallery content with its picture relationships
      */
-    public function duplicateGalleryContent(BlogContentGallery $originalContent): BlogContentGallery
+    public function duplicateGalleryContent(ContentGallery $originalContent): ContentGallery
     {
         return DB::transaction(function () use ($originalContent) {
             // Create new gallery content
-            $newGallery = BlogContentGallery::create([
+            $newGallery = ContentGallery::create([
                 'layout' => $originalContent->layout,
                 'columns' => $originalContent->columns,
             ]);
@@ -76,7 +76,7 @@ class BlogContentDuplicationService
     /**
      * Duplicate a video content with its caption translation
      */
-    public function duplicateVideoContent(BlogContentVideo $originalContent): BlogContentVideo
+    public function duplicateVideoContent(ContentVideo $originalContent): ContentVideo
     {
         return DB::transaction(function () use ($originalContent) {
             $data = [
@@ -94,7 +94,7 @@ class BlogContentDuplicationService
                 $data['caption_translation_key_id'] = $newCaptionTranslationKey->id;
             }
 
-            return BlogContentVideo::create($data);
+            return ContentVideo::create($data);
         });
     }
 
@@ -123,11 +123,11 @@ class BlogContentDuplicationService
             }
 
             try {
-                if ($contentType === BlogContentMarkdown::class && $content instanceof BlogContentMarkdown) {
+                if ($contentType === ContentMarkdown::class && $content instanceof ContentMarkdown) {
                     $newContent = $this->duplicateMarkdownContent($content);
-                } elseif ($contentType === BlogContentGallery::class && $content instanceof BlogContentGallery) {
+                } elseif ($contentType === ContentGallery::class && $content instanceof ContentGallery) {
                     $newContent = $this->duplicateGalleryContent($content);
-                } elseif ($contentType === BlogContentVideo::class && $content instanceof BlogContentVideo) {
+                } elseif ($contentType === ContentVideo::class && $content instanceof ContentVideo) {
                     $newContent = $this->duplicateVideoContent($content);
                 } else {
                     // Skip unknown content types

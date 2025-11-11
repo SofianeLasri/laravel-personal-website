@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ExtendedLoggedRequest as LoggedRequest;
 use App\Services\Analytics\FilteredRequestQueryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -80,7 +79,7 @@ class RequestLogController extends Controller
 
         // Bot filter: convert 'true'/'false' string to boolean, 'all' to null (no filtering)
         $botFilter = $isBot === 'all' ? null : ($isBot === 'true');
-        $queryService->applyBotFilters($query, $botFilter === null ? null : !$botFilter);
+        $queryService->applyBotFilters($query, $botFilter === null ? null : ! $botFilter);
 
         $queryService->applyUserAgentFilters($query, $includeUserAgents, $excludeUserAgents);
         $queryService->applyIpFilters($query, $includeIps, $excludeIps);

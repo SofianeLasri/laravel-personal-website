@@ -5,9 +5,9 @@ namespace Tests\Feature\Controllers\Public;
 use App\Enums\BlogPostType;
 use App\Enums\CategoryColor;
 use App\Models\BlogCategory;
-use App\Models\BlogContentMarkdown;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
+use App\Models\ContentMarkdown;
 use App\Models\Picture;
 use App\Models\SocialMediaLink;
 use App\Models\Translation;
@@ -99,13 +99,13 @@ class BlogHomeControllerTest extends TestCase
             'text' => 'Ceci est le contenu du blog de test en français.',
         ]);
 
-        $markdownContent = BlogContentMarkdown::factory()->create([
+        $markdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $contentTranslationKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);

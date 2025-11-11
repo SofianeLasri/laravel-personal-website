@@ -35,9 +35,6 @@ class BlogPostAnalyticsController extends Controller
      *     "3": 0
      *   }
      * }
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getViews(Request $request): JsonResponse
     {
@@ -103,9 +100,7 @@ class BlogPostAnalyticsController extends Controller
      *   ]
      * }
      *
-     * @param Request $request
-     * @param int $id Blog post ID
-     * @return JsonResponse
+     * @param  int  $id  Blog post ID
      */
     public function getDetailedAnalytics(Request $request, int $id): JsonResponse
     {

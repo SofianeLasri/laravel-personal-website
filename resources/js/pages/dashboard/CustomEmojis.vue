@@ -2,14 +2,7 @@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -123,7 +116,7 @@ const resetCreateForm = () => {
 // Create emoji
 const createEmoji = async () => {
     if (!createForm.value.file) {
-        createFormErrors.value.file = 'L\'image est requise';
+        createFormErrors.value.file = "L'image est requise";
         return;
     }
 
@@ -151,9 +144,9 @@ const createEmoji = async () => {
         if (axios.isAxiosError(err) && err.response?.data?.errors) {
             createFormErrors.value = err.response.data.errors;
         } else if (axios.isAxiosError(err)) {
-            error.value = err.response?.data?.message ?? 'Erreur lors de la création de l\'emoji';
+            error.value = err.response?.data?.message ?? "Erreur lors de la création de l'emoji";
         } else {
-            error.value = 'Erreur lors de la création de l\'emoji';
+            error.value = "Erreur lors de la création de l'emoji";
         }
     } finally {
         loading.value = false;
@@ -181,7 +174,7 @@ const deleteEmoji = async () => {
         emojiToDelete.value = null;
         await loadEmojis();
     } catch (err) {
-        error.value = 'Erreur lors de la suppression de l\'emoji';
+        error.value = "Erreur lors de la suppression de l'emoji";
         console.error(err);
     } finally {
         loading.value = false;
@@ -191,17 +184,13 @@ const deleteEmoji = async () => {
 // Get emoji preview URL
 const getEmojiPreviewUrl = (emoji: CustomEmoji): string => {
     // Try to get thumbnail WebP first
-    const webpThumbnail = emoji.picture.optimized_pictures?.find(
-        (opt) => opt.format === 'webp' && opt.size === 'thumbnail'
-    );
+    const webpThumbnail = emoji.picture.optimized_pictures?.find((opt) => opt.format === 'webp' && opt.size === 'thumbnail');
     if (webpThumbnail) {
         return `/storage/${webpThumbnail.path}`;
     }
 
     // Fallback to PNG thumbnail
-    const pngThumbnail = emoji.picture.optimized_pictures?.find(
-        (opt) => opt.format === 'png' && opt.size === 'thumbnail'
-    );
+    const pngThumbnail = emoji.picture.optimized_pictures?.find((opt) => opt.format === 'png' && opt.size === 'thumbnail');
     if (pngThumbnail) {
         return `/storage/${pngThumbnail.path}`;
     }
@@ -224,9 +213,7 @@ onMounted(() => {
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold">Emojis personnalisés</h1>
-                    <p class="text-muted-foreground mt-2">
-                        Gérez vos emojis personnalisés pour les articles de blog
-                    </p>
+                    <p class="text-muted-foreground mt-2">Gérez vos emojis personnalisés pour les articles de blog</p>
                 </div>
                 <Button @click="showCreateDialog = true">
                     <Plus class="mr-2 h-4 w-4" />
@@ -248,9 +235,7 @@ onMounted(() => {
             <Card>
                 <CardHeader>
                     <CardTitle>Emojis disponibles</CardTitle>
-                    <CardDescription>
-                        Utilisez la syntaxe <code class="bg-muted rounded px-1">:emoji_name:</code> dans vos articles
-                    </CardDescription>
+                    <CardDescription> Utilisez la syntaxe <code class="bg-muted rounded px-1">:emoji_name:</code> dans vos articles </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div v-if="loading && !hasEmojis" class="flex items-center justify-center py-8">
@@ -274,17 +259,13 @@ onMounted(() => {
                             class="border-input hover:border-primary group relative flex flex-col items-center gap-2 rounded-lg border p-4 transition-colors"
                         >
                             <div class="bg-muted flex h-16 w-16 items-center justify-center rounded-md">
-                                <img
-                                    :src="getEmojiPreviewUrl(emoji)"
-                                    :alt="emoji.name"
-                                    class="h-full w-full object-contain"
-                                />
+                                <img :src="getEmojiPreviewUrl(emoji)" :alt="emoji.name" class="h-full w-full object-contain" />
                             </div>
                             <code class="text-sm">:{{ emoji.name }}:</code>
                             <Button
                                 variant="destructive"
                                 size="icon"
-                                class="absolute right-2 top-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                                class="absolute top-2 right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
                                 @click="confirmDelete(emoji)"
                             >
                                 <Trash2 class="h-3 w-3" />
@@ -300,9 +281,7 @@ onMounted(() => {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Ajouter un emoji personnalisé</DialogTitle>
-                    <DialogDescription>
-                        Uploadez une image et donnez-lui un nom unique
-                    </DialogDescription>
+                    <DialogDescription> Uploadez une image et donnez-lui un nom unique </DialogDescription>
                 </DialogHeader>
 
                 <div class="space-y-4">
@@ -318,24 +297,15 @@ onMounted(() => {
                         <p v-if="createFormErrors.name" class="text-destructive text-sm">
                             {{ createFormErrors.name[0] }}
                         </p>
-                        <p class="text-muted-foreground text-xs">
-                            Lettres, chiffres et underscores uniquement
-                        </p>
+                        <p class="text-muted-foreground text-xs">Lettres, chiffres et underscores uniquement</p>
                     </div>
 
                     <!-- File Input -->
                     <div class="space-y-2">
                         <Label>Image</Label>
                         <div class="flex items-center gap-4">
-                            <div
-                                class="border-input bg-muted flex h-20 w-20 items-center justify-center overflow-hidden rounded-md border"
-                            >
-                                <img
-                                    v-if="previewUrl"
-                                    :src="previewUrl"
-                                    alt="Preview"
-                                    class="h-full w-full object-contain"
-                                />
+                            <div class="border-input bg-muted flex h-20 w-20 items-center justify-center overflow-hidden rounded-md border">
+                                <img v-if="previewUrl" :src="previewUrl" alt="Preview" class="h-full w-full object-contain" />
                                 <ImageIcon v-else class="text-muted-foreground h-8 w-8" />
                             </div>
                             <div class="flex flex-col gap-2">
@@ -373,8 +343,7 @@ onMounted(() => {
                     <DialogTitle>Supprimer l'emoji</DialogTitle>
                     <DialogDescription>
                         Êtes-vous sûr de vouloir supprimer l'emoji
-                        <code class="bg-muted rounded px-1">:{{ emojiToDelete?.name }}:</code> ?
-                        Cette action est irréversible.
+                        <code class="bg-muted rounded px-1">:{{ emojiToDelete?.name }}:</code> ? Cette action est irréversible.
                     </DialogDescription>
                 </DialogHeader>
 

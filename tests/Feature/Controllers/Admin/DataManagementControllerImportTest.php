@@ -676,7 +676,7 @@ class DataManagementControllerImportTest extends TestCase
         // Verify content relationships
         $this->assertDatabaseHas('blog_post_contents', [
             'blog_post_id' => $post->id,
-            'content_type' => 'App\Models\BlogContentMarkdown',
+            'content_type' => 'App\Models\ContentMarkdown',
         ]);
     }
 
@@ -811,7 +811,7 @@ class DataManagementControllerImportTest extends TestCase
             [
                 'id' => 1,
                 'blog_post_id' => 1,
-                'content_type' => 'App\Models\BlogContentMarkdown',
+                'content_type' => 'App\Models\ContentMarkdown',
                 'content_id' => 1,
                 'order' => 0,
                 'created_at' => now()->toISOString(),

@@ -38,6 +38,7 @@
         "@tiptap/extension-underline": "^2.11.7",
         "@tiptap/pm": "^2.11.7",
         "@tiptap/starter-kit": "^2.11.7",
+        "@tiptap/suggestion": "^2.27.1",
         "@tiptap/vue-3": "^2.11.7",
         "@types/sortablejs": "^1.15.8",
         "@vee-validate/zod": "^4.15.0",

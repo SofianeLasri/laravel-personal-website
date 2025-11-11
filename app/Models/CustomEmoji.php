@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -21,6 +22,8 @@ class CustomEmoji extends Model
 {
     /** @use HasFactory<CustomEmojiFactory> */
     use HasFactory;
+
+    protected $table = 'custom_emojis';
 
     protected $fillable = [
         'name',
@@ -43,13 +46,20 @@ class CustomEmoji extends Model
     public function getOptimizedPicturesForRendering(): Collection
     {
         $formats = config('emoji.formats', ['webp', 'png']);
-        $size = config('emoji.size', 'thumbnail');
+        $variant = config('emoji.variant', 'thumbnail');
 
-        return $this->picture->optimizedPictures()
+        $query = $this->picture->optimizedPictures()
             ->whereIn('format', $formats)
-            ->where('size', $size)
-            ->orderByRaw('FIELD(format, '. implode(',', array_map(fn($f) => "'$f'", $formats)) .')')
-            ->get();
+            ->where('variant', $variant);
+
+        // Use FIELD() for MySQL, fall back to regular ordering for SQLite
+        if (config('database.default') === 'mysql') {
+            $query->orderByRaw('FIELD(format, '. implode(',', array_map(fn($f) => "'$f'", $formats)) .')');
+        } else {
+            $query->orderBy('format');
+        }
+
+        return $query->get();
     }
 
     /**

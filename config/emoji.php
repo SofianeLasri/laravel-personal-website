@@ -14,20 +14,20 @@ return [
     | Note: WebP is recommended over AVIF due to Imagick transparency issues.
     |
     */
-    'formats' => ['webp', 'png'],
+    'formats' => ['webp', 'jpg'],
 
     /*
     |--------------------------------------------------------------------------
-    | Picture Size Variant
+    | Picture Variant
     |--------------------------------------------------------------------------
     |
-    | Which Picture size variant to use for emoji rendering.
-    | Available sizes: 'thumbnail', 'small', 'medium', 'large', 'full'
+    | Which Picture variant to use for emoji rendering.
+    | Available variants: 'thumbnail', 'small', 'medium', 'large', 'full'
     |
     | Recommended: 'thumbnail' (150px) for inline emoji usage
     |
     */
-    'size' => 'thumbnail',
+    'variant' => 'thumbnail',
 
     /*
     |--------------------------------------------------------------------------

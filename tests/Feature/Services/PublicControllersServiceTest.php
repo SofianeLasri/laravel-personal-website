@@ -23,6 +23,7 @@ use App\Models\Technology;
 use App\Models\TechnologyExperience;
 use App\Models\Translation;
 use App\Models\TranslationKey;
+use App\Services\CustomEmojiResolverService;
 use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -40,7 +41,7 @@ class PublicControllersServiceTest extends TestCase
     {
         Creation::factory()->withTechnologies(5)->count(3)->create();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->calcCreationCountByTechnology();
 
         $this->assertCount(15, $result);
@@ -59,7 +60,7 @@ class PublicControllersServiceTest extends TestCase
             'type' => ExperienceType::EMPLOI,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getDevelopmentStats();
 
         $this->assertArrayHasKey('yearsOfExperience', $result);
@@ -87,7 +88,7 @@ class PublicControllersServiceTest extends TestCase
             'type' => 'website',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getLaravelCreations();
 
         $this->assertCount(3, $result);
@@ -101,7 +102,7 @@ class PublicControllersServiceTest extends TestCase
             'type' => 'website',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getLaravelCreations();
 
         $this->assertCount(0, $result);
@@ -112,7 +113,7 @@ class PublicControllersServiceTest extends TestCase
     {
         Creation::factory()->withTechnologies()->count(3)->create();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getCreations();
 
         $this->assertCount(3, $result);
@@ -131,7 +132,7 @@ class PublicControllersServiceTest extends TestCase
             $creation->technologies()->attach($technology);
         })->create();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatTechnologyForSSR($technology);
 
         $this->assertEquals($technology->id, $result['id']);
@@ -147,7 +148,7 @@ class PublicControllersServiceTest extends TestCase
     {
         TechnologyExperience::factory()->count(3)->create();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getTechnologyExperiences();
 
         $this->assertCount(3, $result);
@@ -160,7 +161,7 @@ class PublicControllersServiceTest extends TestCase
             ->withTechnologies()
             ->create();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getExperiences();
 
         $this->assertCount(3, $result);
@@ -171,7 +172,7 @@ class PublicControllersServiceTest extends TestCase
     #[Test]
     public function test_format_date_with_string(): void
     {
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
 
         $date = '01/04/2025';
         $result = $service->formatDate($date);
@@ -183,7 +184,7 @@ class PublicControllersServiceTest extends TestCase
     #[Test]
     public function test_format_date_with_carbon_object(): void
     {
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
 
         $date = now();
         $result = $service->formatDate($date);
@@ -195,7 +196,7 @@ class PublicControllersServiceTest extends TestCase
     #[Test]
     public function test_format_date_returns_null_if_date_is_null(): void
     {
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
 
         $result = $service->formatDate(null);
 
@@ -212,7 +213,7 @@ class PublicControllersServiceTest extends TestCase
             'ended_at' => now()->addMonth(),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRShort($creation);
 
         $this->assertEquals($creation->id, $result['id']);
@@ -269,7 +270,7 @@ class PublicControllersServiceTest extends TestCase
 
         $creation->refresh();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertEquals($creation->external_url, $result['externalUrl']);
@@ -375,7 +376,7 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'English description',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatTechnologyForSSR($technology);
 
         $this->assertEquals('English description', $result['description']);
@@ -402,7 +403,7 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'Description française',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatTechnologyForSSR($technology);
 
         $this->assertEquals('Description française', $result['description']);
@@ -419,7 +420,7 @@ class PublicControllersServiceTest extends TestCase
         // Remove all translations
         $technology->descriptionTranslationKey->translations()->delete();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatTechnologyForSSR($technology);
 
         $this->assertEquals('', $result['description']);
@@ -441,7 +442,7 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'English short description',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRShort($creation);
 
         $this->assertEquals('English short description', $result['shortDescription']);
@@ -463,7 +464,7 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'English full description',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertEquals('English full description', $result['fullDescription']);
@@ -499,7 +500,7 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'English full description',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getExperiences();
 
         $this->assertEquals('English title', $result[0]['title']);
@@ -523,7 +524,7 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'English tech experience description',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getTechnologyExperiences();
 
         $this->assertEquals('English tech experience description', $result[0]['description']);
@@ -570,7 +571,7 @@ class PublicControllersServiceTest extends TestCase
             'api.github.com/repos/owner/repo/languages' => Http::response($mockLanguagesResponse, 200),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('githubData', $result);
@@ -606,7 +607,7 @@ class PublicControllersServiceTest extends TestCase
             'source_code_url' => null,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('githubData', $result);
@@ -623,7 +624,7 @@ class PublicControllersServiceTest extends TestCase
             'source_code_url' => 'https://gitlab.com/owner/repo',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('githubData', $result);
@@ -644,7 +645,7 @@ class PublicControllersServiceTest extends TestCase
             'api.github.com/repos/owner/nonexistent' => Http::response(null, 404),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('githubData', $result);
@@ -665,7 +666,7 @@ class PublicControllersServiceTest extends TestCase
             'api.github.com/repos/owner/private-repo' => Http::response(['message' => 'Not Found'], 404),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('githubData', $result);
@@ -688,7 +689,7 @@ class PublicControllersServiceTest extends TestCase
             ], 403),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('githubData', $result);
@@ -706,7 +707,7 @@ class PublicControllersServiceTest extends TestCase
             'height' => 1080,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatPictureForSSR($picture);
 
         $this->assertEquals('test.jpg', $result['filename']);
@@ -738,7 +739,7 @@ class PublicControllersServiceTest extends TestCase
             'cover_picture_id' => $coverPicture->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatVideoForSSR($video);
 
         $this->assertEquals($video->id, $result['id']);
@@ -758,7 +759,7 @@ class PublicControllersServiceTest extends TestCase
         // Sort by date desc as the service does
         $certifications = $certifications->sortByDesc('date')->values();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getCertifications();
 
         $this->assertCount(3, $result);
@@ -793,7 +794,7 @@ class PublicControllersServiceTest extends TestCase
             'type' => ExperienceType::FORMATION,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getExperiencesByType(ExperienceType::EMPLOI);
 
         $this->assertCount(2, $result);
@@ -814,7 +815,7 @@ class PublicControllersServiceTest extends TestCase
             'type' => ExperienceType::FORMATION,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getExperiencesByType(ExperienceType::FORMATION);
 
         $this->assertCount(3, $result);
@@ -835,7 +836,7 @@ class PublicControllersServiceTest extends TestCase
             'type' => ExperienceType::FORMATION,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getCertificationsCareerData();
 
         $this->assertArrayHasKey('certifications', $result);
@@ -860,7 +861,7 @@ class PublicControllersServiceTest extends TestCase
             'picture_id' => $picture->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCertificationForSSR($certification);
 
         $this->assertEquals($certification->id, $result['id']);
@@ -881,7 +882,7 @@ class PublicControllersServiceTest extends TestCase
             'picture_id' => null,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCertificationForSSR($certification);
 
         $this->assertNull($result['picture']);
@@ -895,7 +896,7 @@ class PublicControllersServiceTest extends TestCase
             'logo_id' => $logo->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatExperienceForSSR($experience);
 
         $this->assertEquals($experience->id, $result['id']);
@@ -917,7 +918,7 @@ class PublicControllersServiceTest extends TestCase
         // Experience factory includes a logo by default
         $experience = Experience::factory()->create();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatExperienceForSSR($experience);
 
         // Factory creates logo by default, so it should not be null
@@ -932,7 +933,7 @@ class PublicControllersServiceTest extends TestCase
             'ended_at' => now(),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatExperienceForSSR($experience);
 
         $this->assertNotNull($result['endedAt']);
@@ -946,7 +947,7 @@ class PublicControllersServiceTest extends TestCase
             'ended_at' => null,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatExperienceForSSR($experience);
 
         $this->assertNull($result['endedAt']);
@@ -973,7 +974,7 @@ class PublicControllersServiceTest extends TestCase
             ]);
         }
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostsForPublicHome();
 
         $this->assertCount(3, $result);
@@ -1015,7 +1016,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatBlogPostForSSRShort($post);
 
         $this->assertEquals($post->id, $result['id']);
@@ -1054,7 +1055,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatBlogPostForSSRHero($post);
 
         $this->assertEquals($post->id, $result['id']);
@@ -1070,7 +1071,7 @@ class PublicControllersServiceTest extends TestCase
             'category_id' => $category->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatBlogPostForSSRShort($post);
 
         $this->assertEquals('', $result['excerpt']);
@@ -1090,7 +1091,7 @@ class PublicControllersServiceTest extends TestCase
             'category_id' => $category2->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostsForIndex(['category' => 'tech'], 10);
 
         $this->assertEquals(3, $result['total']);
@@ -1126,7 +1127,7 @@ class PublicControllersServiceTest extends TestCase
             'title_translation_key_id' => $post2TitleKey->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostsForIndex(['search' => 'Laravel'], 10);
 
         $this->assertEquals(1, $result['total']);
@@ -1147,7 +1148,7 @@ class PublicControllersServiceTest extends TestCase
             'created_at' => now()->subDays(1),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostsForIndex(['sort' => 'oldest'], 10);
 
         $this->assertEquals($oldPost->id, $result['data'][0]['id']);
@@ -1183,7 +1184,7 @@ class PublicControllersServiceTest extends TestCase
         ]);
 
         app()->setLocale('en');
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostsForIndex(['sort' => 'alphabetical'], 10);
 
         $this->assertEquals($postA->id, $result['data'][0]['id']);
@@ -1197,7 +1198,7 @@ class PublicControllersServiceTest extends TestCase
             'category_id' => $category->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostsForIndex([], 10);
 
         $this->assertEquals(10, $result['per_page']);
@@ -1211,7 +1212,7 @@ class PublicControllersServiceTest extends TestCase
     {
         $categories = BlogCategory::factory()->count(3)->create();
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogCategories();
 
         $this->assertCount(3, $result);
@@ -1237,7 +1238,7 @@ class PublicControllersServiceTest extends TestCase
             'category_id' => $category2->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogCategoriesWithCounts();
 
         $this->assertCount(2, $result);
@@ -1278,7 +1279,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('test-post');
 
         $this->assertNotNull($result);
@@ -1292,7 +1293,7 @@ class PublicControllersServiceTest extends TestCase
     #[Test]
     public function test_get_blog_post_by_slug_not_found(): void
     {
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('non-existent-slug');
 
         $this->assertNull($result);
@@ -1338,7 +1339,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('test-post-gallery');
 
         $this->assertNotNull($result);
@@ -1369,7 +1370,7 @@ class PublicControllersServiceTest extends TestCase
             'platforms' => ['PC', 'PS5', 'Xbox'],
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('test-game-review');
 
         $this->assertNotNull($result);
@@ -1415,7 +1416,7 @@ class PublicControllersServiceTest extends TestCase
             ], 200),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('packagistData', $result);
@@ -1436,7 +1437,7 @@ class PublicControllersServiceTest extends TestCase
             'packagist.org/packages/vendor/nonexistent.json' => Http::response(null, 404),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('packagistData', $result);
@@ -1450,7 +1451,7 @@ class PublicControllersServiceTest extends TestCase
             'external_url' => 'https://example.com',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('packagistData', $result);
@@ -1469,7 +1470,7 @@ class PublicControllersServiceTest extends TestCase
         $creation = Creation::factory()->create();
         $creation->people()->attach($person);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertCount(1, $result['people']);
@@ -1483,7 +1484,7 @@ class PublicControllersServiceTest extends TestCase
     {
         Creation::factory()->count(3)->create(['type' => 'website']);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getDevelopmentStats();
 
         $this->assertEquals(3, $result['count']);
@@ -1501,7 +1502,7 @@ class PublicControllersServiceTest extends TestCase
         BlogPost::factory()->count(3)->create(['category_id' => $category2->id]);
         BlogPost::factory()->count(1)->create(['category_id' => $category3->id]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostsForIndex(['category' => ['tech', 'gaming']], 10);
 
         $this->assertEquals(5, $result['total']);
@@ -1528,7 +1529,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatBlogPostForSSRShort($post);
 
         $this->assertStringNotContainsString('#', $result['excerpt']);
@@ -1551,7 +1552,7 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'English description',
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatTechnologyForSSR($technology);
 
         $this->assertEquals('English description', $result['description']);
@@ -1568,7 +1569,7 @@ class PublicControllersServiceTest extends TestCase
             'api.github.com/repos/owner/repo' => Http::response(null, 500),
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
         $this->assertArrayHasKey('githubData', $result);
@@ -1600,7 +1601,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatBlogPostForSSRShort($post);
 
         // When no space is found, it should truncate at maxLength
@@ -1629,7 +1630,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatBlogPostForSSRShort($post);
 
         $this->assertEquals('', $result['excerpt']);
@@ -1670,7 +1671,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('test-post-with-video');
 
         $this->assertNotNull($result);
@@ -1710,7 +1711,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('test-post-private-video');
 
         $this->assertNotNull($result);
@@ -1745,7 +1746,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('test-post-transcoding-video');
 
         $this->assertNotNull($result);
@@ -1791,7 +1792,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('test-post-video-caption');
 
         $this->assertNotNull($result);
@@ -1821,7 +1822,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostBySlug('test-post-video-no-caption');
 
         $this->assertNotNull($result);
@@ -1857,7 +1858,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);
@@ -1877,7 +1878,7 @@ class PublicControllersServiceTest extends TestCase
             'category_id' => $category->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertArrayHasKey('isPreview', $result);
@@ -1923,7 +1924,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);
@@ -1962,7 +1963,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);
@@ -1999,7 +2000,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);
@@ -2026,7 +2027,7 @@ class PublicControllersServiceTest extends TestCase
             'platforms' => ['PC', 'PS5'],
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);
@@ -2045,7 +2046,7 @@ class PublicControllersServiceTest extends TestCase
             'category_id' => $category->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);
@@ -2102,7 +2103,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 3,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);
@@ -2152,7 +2153,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertEquals('English Draft Title', $result['title']);
@@ -2196,7 +2197,7 @@ class PublicControllersServiceTest extends TestCase
             'order' => 1,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);
@@ -2215,7 +2216,7 @@ class PublicControllersServiceTest extends TestCase
             'cover_picture_id' => $coverPicture->id,
         ]);
 
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->getBlogPostDraftForPreview($draft);
 
         $this->assertNotNull($result);

@@ -68,6 +68,7 @@
         "tailwindcss": "^4.1.1",
         "tailwindcss-animate": "^1.0.7",
         "tailwindcss-motion": "^1.1.0",
+        "tippy.js": "^6.3.7",
         "tiptap-markdown": "^0.8.10",
         "typescript": "^5.2.2",
         "vee-validate": "^4.15.0",

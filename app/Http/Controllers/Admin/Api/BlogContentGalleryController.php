@@ -112,7 +112,7 @@ class BlogContentGalleryController extends Controller
             // Gallery has no specific properties to update now
 
             // Delete old caption translation keys
-            $oldCaptionKeys = DB::table('blog_content_gallery_pictures')
+            $oldCaptionKeys = DB::table('content_gallery_pictures')
                 ->where('gallery_id', $blogContentGallery->id)
                 ->whereNotNull('caption_translation_key_id')
                 ->pluck('caption_translation_key_id');
@@ -196,7 +196,7 @@ class BlogContentGalleryController extends Controller
 
         try {
             // Delete old caption translation keys
-            $oldCaptionKeys = DB::table('blog_content_gallery_pictures')
+            $oldCaptionKeys = DB::table('content_gallery_pictures')
                 ->where('gallery_id', $blogContentGallery->id)
                 ->whereNotNull('caption_translation_key_id')
                 ->pluck('caption_translation_key_id');
@@ -263,7 +263,7 @@ class BlogContentGalleryController extends Controller
 
         try {
             // Delete caption translation keys
-            $captionKeys = DB::table('blog_content_gallery_pictures')
+            $captionKeys = DB::table('content_gallery_pictures')
                 ->where('gallery_id', $blogContentGallery->id)
                 ->whereNotNull('caption_translation_key_id')
                 ->pluck('caption_translation_key_id');

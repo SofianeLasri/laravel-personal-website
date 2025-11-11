@@ -43,7 +43,7 @@ class BlogContentGalleryControllerTest extends TestCase
                 'pictures',
             ]);
 
-        $this->assertDatabaseCount('blog_content_galleries', 1);
+        $this->assertDatabaseCount('content_galleries', 1);
         $gallery = ContentGallery::first();
         $this->assertNotNull($gallery);
         $this->assertCount(0, $gallery->pictures);
@@ -378,7 +378,7 @@ class BlogContentGalleryControllerTest extends TestCase
             ->assertJson(['message' => 'Gallery deleted successfully']);
 
         // Vérifier que la galerie est supprimée
-        $this->assertDatabaseMissing('blog_content_galleries', ['id' => $gallery->id]);
+        $this->assertDatabaseMissing('content_galleries', ['id' => $gallery->id]);
 
         // Vérifier que les clés de traduction sont supprimées
         foreach ($captionKeys as $keyId) {
@@ -403,7 +403,7 @@ class BlogContentGalleryControllerTest extends TestCase
             ->assertJson(['message' => 'Gallery deleted successfully']);
 
         // Vérifier que la galerie est supprimée
-        $this->assertDatabaseMissing('blog_content_galleries', ['id' => $gallery->id]);
+        $this->assertDatabaseMissing('content_galleries', ['id' => $gallery->id]);
     }
 
     #[Test]

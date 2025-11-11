@@ -173,7 +173,7 @@ class BlogContentServiceTest extends TestCase
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('blog_post_draft_contents', ['id' => $content->id]);
-        $this->assertDatabaseMissing('blog_content_markdown', ['id' => $markdown->id]);
+        $this->assertDatabaseMissing('content_markdowns', ['id' => $markdown->id]);
     }
 
     #[Test]
@@ -328,7 +328,7 @@ class BlogContentServiceTest extends TestCase
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('blog_post_draft_contents', ['id' => $content->id]);
-        $this->assertDatabaseMissing('blog_content_galleries', ['id' => $gallery->id]);
+        $this->assertDatabaseMissing('content_galleries', ['id' => $gallery->id]);
         $this->assertEquals(0, $gallery->pictures()->count());
     }
 
@@ -348,7 +348,7 @@ class BlogContentServiceTest extends TestCase
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('blog_post_draft_contents', ['id' => $content->id]);
-        $this->assertDatabaseMissing('blog_content_videos', ['id' => $videoContent->id]);
+        $this->assertDatabaseMissing('content_videos', ['id' => $videoContent->id]);
     }
 
     #[Test]
@@ -367,7 +367,7 @@ class BlogContentServiceTest extends TestCase
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('blog_post_contents', ['id' => $content->id]);
-        $this->assertDatabaseMissing('blog_content_markdown', ['id' => $markdown->id]);
+        $this->assertDatabaseMissing('content_markdowns', ['id' => $markdown->id]);
     }
 
     #[Test]

@@ -281,7 +281,7 @@ class BlogContentMarkdownControllerTest extends TestCase
                 'message' => 'Markdown content deleted successfully',
             ]);
 
-        $this->assertDatabaseMissing('blog_content_markdown', [
+        $this->assertDatabaseMissing('content_markdowns', [
             'id' => $markdownContent->id,
         ]);
 

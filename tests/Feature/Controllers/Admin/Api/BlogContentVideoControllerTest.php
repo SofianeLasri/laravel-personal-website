@@ -463,7 +463,7 @@ class BlogContentVideoControllerTest extends TestCase
                 'message' => 'Video content deleted successfully',
             ]);
 
-        $this->assertDatabaseMissing('blog_content_videos', [
+        $this->assertDatabaseMissing('content_videos', [
             'id' => $videoContent->id,
         ]);
 
@@ -488,7 +488,7 @@ class BlogContentVideoControllerTest extends TestCase
                 'message' => 'Video content deleted successfully',
             ]);
 
-        $this->assertDatabaseMissing('blog_content_videos', [
+        $this->assertDatabaseMissing('content_videos', [
             'id' => $videoContent->id,
         ]);
     }

@@ -48,7 +48,7 @@ class BlogContentApiTest extends TestCase
             ],
         ]);
 
-        $this->assertDatabaseHas('blog_content_markdown', [
+        $this->assertDatabaseHas('content_markdowns', [
             'id' => $response->json('id'),
         ]);
     }
@@ -108,7 +108,7 @@ class BlogContentApiTest extends TestCase
             ],
         ]);
 
-        $this->assertDatabaseHas('blog_content_markdown', [
+        $this->assertDatabaseHas('content_markdowns', [
             'id' => $response->json('id'),
         ]);
     }

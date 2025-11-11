@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\Api\TechnologyExperienceController;
 use App\Http\Controllers\Admin\Api\VideoController;
 use App\Http\Controllers\Admin\ApiRequestLogController;
 use App\Http\Controllers\Admin\BlogCategoriesPageController;
+use App\Http\Controllers\Admin\BlogPostAnalyticsController;
 use App\Http\Controllers\Admin\BlogPostDraftsPageController;
 use App\Http\Controllers\Admin\BlogPostEditPageController;
 use App\Http\Controllers\Admin\BlogPostsPageController;
@@ -271,6 +272,13 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::get('custom-emojis-for-editor', [CustomEmojiController::class, 'forEditor'])
             ->name('custom-emojis.for-editor');
         Route::apiResource('blog-posts', AdminBlogPostController::class)->only(['index', 'store']);
+
+        // Blog post analytics routes
+        Route::get('blog-posts/views', [BlogPostAnalyticsController::class, 'getViews'])
+            ->name('blog-posts.views');
+        Route::get('blog-posts/{id}/analytics', [BlogPostAnalyticsController::class, 'getDetailedAnalytics'])
+            ->whereNumber('id')
+            ->name('blog-posts.analytics');
         Route::apiResources([
             'certifications' => CertificationController::class,
             'creations' => CreationController::class,

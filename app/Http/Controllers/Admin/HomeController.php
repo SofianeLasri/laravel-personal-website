@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\Analytics\VisitStatsService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,13 +20,14 @@ class HomeController extends Controller
         return Inertia::render('dashboard/Dashboard');
     }
 
-    public function stats(Request $request): JsonResponse
+    public function stats(Request $request, VisitStatsService $visitStatsService): JsonResponse
     {
         $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
         ]);
 
+        // Build list of excluded routes (dashboard, login, etc.)
         $excludedRoutes = [
             'dashboard',
             'login',
@@ -35,7 +37,6 @@ class HomeController extends Controller
         ];
 
         $routes = Route::getRoutes()->getRoutes();
-
         $individualExcludedRoutes = [];
         foreach ($routes as $route) {
             if (Str::startsWith($route->uri, $excludedRoutes)) {
@@ -43,109 +44,48 @@ class HomeController extends Controller
             }
         }
 
-        $visits = LoggedRequest::select([
-            'logged_requests.url_id',
-            'logged_requests.referer_url_id',
-            'logged_requests.origin_url_id',
-            'logged_requests.ip_address_id',
-            'ip_address_metadata.country_code',
-            'logged_requests.created_at',
-            'urls.url',
-            'referer_url.url as referer_url',
-            'origin_url.url as origin_url'])
-            ->distinct(['logged_requests.url_id', 'logged_requests.ip_address_id'])
-            ->join('urls', 'logged_requests.url_id', '=', 'urls.id')
-            ->leftJoin('urls as referer_url', 'logged_requests.referer_url_id', '=', 'referer_url.id')
-            ->leftJoin('urls as origin_url', 'logged_requests.origin_url_id', '=', 'origin_url.id')
-            ->join('user_agent_metadata', 'logged_requests.user_agent_id', '=', 'user_agent_metadata.user_agent_id')
-            ->join('ip_address_metadata', 'logged_requests.ip_address_id', '=', 'ip_address_metadata.ip_address_id')
-            ->join('ip_addresses', 'logged_requests.ip_address_id', '=', 'ip_addresses.id')
-            ->whereLike('urls.url', config('app.url').'%')
-            ->whereNotIn('urls.url', $individualExcludedRoutes)
-            ->where('user_agent_metadata.is_bot', false)
-            ->where('logged_requests.is_bot_by_frequency', false)
-            ->where('logged_requests.is_bot_by_user_agent', false)
-            ->where('logged_requests.is_bot_by_parameters', false)
-            ->where('status_code', 200)
-            ->whereNull('logged_requests.user_id')
-            ->whereNotIn('ip_addresses.id', function ($query) {
-                $query->select('ip_addresses.id')
-                    ->from('ip_addresses')
-                    ->join('logged_requests', 'logged_requests.ip_address_id', '=', 'ip_addresses.id')
-                    ->whereNotNull('logged_requests.user_id');
-            })
-            ->get();
-
-        $now = now();
-        $totalVisitsPastTwentyFourHours = $visits->where('created_at', '>=', $now->copy()->subDay())->count();
-        $totalVisitsPastSevenDays = $visits->where('created_at', '>=', $now->copy()->subDays(7))->count();
-        $totalVisitsPastThirtyDays = $visits->where('created_at', '>=', $now->copy()->subDays(30))->count();
-        $totalVisitsAllTime = $visits->count();
-
-        $periods = [
-            now()->format('Y-m-d') => 'Aujourd\'hui',
-            now()->subDay()->format('Y-m-d') => 'Hier',
-            now()->subDays(7)->format('Y-m-d') => 'Les 7 derniers jours',
-            now()->subDays(30)->format('Y-m-d') => 'Les 30 derniers jours',
-            now()->startOfMonth()->format('Y-m-d') => 'Ce mois-ci',
-            now()->subMonth()->startOfMonth()->format('Y-m-d') => 'Le mois dernier',
+        // Prepare filters for analytics queries
+        $filters = [
+            'url_pattern' => config('app.url').'%',
+            'excluded_urls' => $individualExcludedRoutes,
         ];
 
-        if ($visits->isNotEmpty()) {
-            $periods[$visits->min('created_at')->format('Y-m-d')] = 'Depuis le début';
-        }
+        // Get all visits for period calculations
+        $visits = $visitStatsService->getUniqueVisits($filters);
 
+        // Calculate totals by period
+        $totalsByPeriods = $visitStatsService->getTotalVisitsByPeriods($filters);
+
+        // Get available periods for selector
+        $periods = $visitStatsService->getAvailablePeriods($visits);
+
+        // Get selected date range
         $startDate = $request->input('start_date', now()->subDays(30)->format('Y-m-d'));
         $dateEnd = $request->input('end_date', now()->format('Y-m-d'));
 
-        $selectedPeriod = $startDate;
+        // Apply date filters for detailed stats
+        $filters['date_from'] = $startDate;
+        $filters['date_to'] = $dateEnd;
 
-        // Now, all the stats are calculated for the selected period
-        $visitsPerDay = $visits->where('created_at', '>=', $startDate)
-            ->where('created_at', '<=', $dateEnd)
-            ->groupBy(fn ($visit) => Carbon::parse($visit->created_at)->format('Y-m-d'))
-            ->map(fn ($group) => ['date' => $group->first()->created_at->format('Y-m-d'), 'count' => $group->count()])
-            ->values();
-
-        $visitsByCountry = $visits->where('created_at', '>=', $startDate)
-            ->where('created_at', '<=', $dateEnd)
-            ->groupBy('country_code')
-            ->map(fn ($group, $country) => ['country_code' => $country, 'count' => $group->count()])
-            ->values();
-
-        $mostVisitedPages = $visits->where('created_at', '>=', $startDate)
-            ->where('created_at', '<=', $dateEnd)
-            ->groupBy('url')
-            ->map(fn ($group, $url) => ['url' => $url, 'count' => $group->count()])
-            ->sortByDesc('count')
-            ->values();
-
-        $bestsReferrers = $visits->where('created_at', '>=', $startDate)
-            ->where('created_at', '<=', $dateEnd)
-            ->groupBy('referer_url')
-            ->map(fn ($group, $url) => ['url' => $url, 'count' => $group->count()])
-            ->sortByDesc('count')
-            ->values();
-
-        $bestOrigins = $visits->where('created_at', '>=', $startDate)
-            ->where('created_at', '<=', $dateEnd)
-            ->groupBy('origin_url')
-            ->map(fn ($group, $url) => ['url' => $url, 'count' => $group->count()])
-            ->sortByDesc('count')
-            ->values();
+        // Get aggregated statistics for the selected period
+        $visitsPerDay = $visitStatsService->getVisitsGroupedByDay($filters);
+        $visitsByCountry = $visitStatsService->getVisitsGroupedByCountry($filters);
+        $mostVisitedPages = $visitStatsService->getMostVisitedPages($filters);
+        $bestsReferrers = $visitStatsService->getBestReferrers($filters);
+        $bestOrigins = $visitStatsService->getBestOrigins($filters);
 
         return response()->json([
-            'totalVisitsPastTwentyFourHours' => $totalVisitsPastTwentyFourHours,
-            'totalVisitsPastSevenDays' => $totalVisitsPastSevenDays,
-            'totalVisitsPastThirtyDays' => $totalVisitsPastThirtyDays,
-            'totalVisitsAllTime' => $totalVisitsAllTime,
+            'totalVisitsPastTwentyFourHours' => $totalsByPeriods['past_24h'],
+            'totalVisitsPastSevenDays' => $totalsByPeriods['past_7d'],
+            'totalVisitsPastThirtyDays' => $totalsByPeriods['past_30d'],
+            'totalVisitsAllTime' => $totalsByPeriods['all_time'],
             'visitsPerDay' => $visitsPerDay,
             'visitsByCountry' => $visitsByCountry,
             'mostVisitedPages' => $mostVisitedPages,
             'bestsReferrers' => $bestsReferrers,
             'bestOrigins' => $bestOrigins,
             'periods' => $periods,
-            'selectedPeriod' => $selectedPeriod,
+            'selectedPeriod' => $startDate,
         ]);
     }
 }

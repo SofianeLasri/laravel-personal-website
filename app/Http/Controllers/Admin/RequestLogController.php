@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExtendedLoggedRequest as LoggedRequest;
+use App\Services\Analytics\FilteredRequestQueryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ use Inertia\Response;
 
 class RequestLogController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, FilteredRequestQueryService $queryService): Response
     {
         $request->validate([
             'per_page' => 'nullable|integer|min:1|max:100',
@@ -31,6 +32,7 @@ class RequestLogController extends Controller
             'exclude_connected_users_ips' => 'nullable|boolean',
         ]);
 
+        // Extract filter parameters
         $perPage = $request->get('per_page', 15);
         $search = $request->get('search');
         $isBot = $request->get('is_bot', 'all');
@@ -42,22 +44,16 @@ class RequestLogController extends Controller
         $dateTo = $request->get('date_to');
         $excludeConnectedUsersIps = $request->boolean('exclude_connected_users_ips', false);
 
-        $query = LoggedRequest::with([
-            'ipAddress',
-            'userAgent',
-            'mimeType',
-            'url',
-            'refererUrl',
-            'originUrl',
-        ])
-            ->leftJoin('ip_addresses', 'logged_requests.ip_address_id', '=', 'ip_addresses.id')
-            ->leftJoin('user_agents', 'logged_requests.user_agent_id', '=', 'user_agents.id')
-            ->leftJoin('urls', 'logged_requests.url_id', '=', 'urls.id')
-            ->leftJoin('urls as referer_urls', 'logged_requests.referer_url_id', '=', 'referer_urls.id')
-            ->leftJoin('urls as origin_urls', 'logged_requests.origin_url_id', '=', 'origin_urls.id')
-            ->leftJoin('mime_types', 'logged_requests.mime_type_id', '=', 'mime_types.id')
-            ->leftJoin('ip_address_metadata', 'ip_addresses.id', '=', 'ip_address_metadata.ip_address_id')
-            ->leftJoin('user_agent_metadata', 'user_agents.id', '=', 'user_agent_metadata.user_agent_id')
+        // Build base query with all necessary joins and selects
+        $query = $queryService->buildBaseQuery()
+            ->with([
+                'ipAddress',
+                'userAgent',
+                'mimeType',
+                'url',
+                'refererUrl',
+                'originUrl',
+            ])
             ->select([
                 'logged_requests.*',
                 'ip_addresses.ip as ip_address',
@@ -79,78 +75,20 @@ class RequestLogController extends Controller
             ])
             ->orderBy('logged_requests.created_at', 'desc');
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('ip_addresses.ip', 'like', "%{$search}%")
-                    ->orWhere('urls.url', 'like', "%{$search}%")
-                    ->orWhere('user_agents.user_agent', 'like', "%{$search}%")
-                    ->orWhere('logged_requests.method', 'like', "%{$search}%")
-                    ->orWhere('logged_requests.status_code', 'like', "%{$search}%");
-            });
-        }
+        // Apply filters using the unified service methods
+        $queryService->applySearchFilter($query, $search);
 
-        // Bot status filter (combining old and new detection)
-        if ($isBot !== 'all') {
-            $query->where(function ($q) use ($isBot) {
-                if ($isBot === 'true') {
-                    $q->where('user_agent_metadata.is_bot', true)
-                        ->orWhere('logged_requests.is_bot_by_frequency', true)
-                        ->orWhere('logged_requests.is_bot_by_user_agent', true)
-                        ->orWhere('logged_requests.is_bot_by_parameters', true);
-                } else {
-                    $q->where(function ($subQ) {
-                        $subQ->whereNull('user_agent_metadata.is_bot')
-                            ->orWhere('user_agent_metadata.is_bot', false);
-                    })
-                        ->where('logged_requests.is_bot_by_frequency', false)
-                        ->where('logged_requests.is_bot_by_user_agent', false)
-                        ->where('logged_requests.is_bot_by_parameters', false);
-                }
-            });
-        }
+        // Bot filter: convert 'true'/'false' string to boolean, 'all' to null (no filtering)
+        $botFilter = $isBot === 'all' ? null : ($isBot === 'true');
+        $queryService->applyBotFilters($query, $botFilter === null ? null : !$botFilter);
 
-        // Include specific user agents
-        if (! empty($includeUserAgents)) {
-            $query->where(function ($q) use ($includeUserAgents) {
-                foreach ($includeUserAgents as $userAgent) {
-                    $q->orWhere('user_agents.user_agent', 'like', "%{$userAgent}%");
-                }
-            });
-        }
+        $queryService->applyUserAgentFilters($query, $includeUserAgents, $excludeUserAgents);
+        $queryService->applyIpFilters($query, $includeIps, $excludeIps);
+        $queryService->applyDateRangeFilter($query, $dateFrom, $dateTo);
 
-        // Exclude specific user agents
-        if (! empty($excludeUserAgents)) {
-            foreach ($excludeUserAgents as $userAgent) {
-                $query->where('user_agents.user_agent', 'not like', "%{$userAgent}%");
-            }
-        }
-
-        // Include specific IP addresses
-        if (! empty($includeIps)) {
-            $query->whereIn('ip_addresses.ip', $includeIps);
-        }
-
-        // Exclude specific IP addresses
-        if (! empty($excludeIps)) {
-            $query->whereNotIn('ip_addresses.ip', $excludeIps);
-        }
-
-        // Date range filter
-        if ($dateFrom) {
-            $query->where('logged_requests.created_at', '>=', $dateFrom);
-        }
-        if ($dateTo) {
-            $query->where('logged_requests.created_at', '<=', $dateTo.' 23:59:59');
-        }
-
-        // Exclude connected users' IP addresses
+        // Apply authenticated users filter if requested
         if ($excludeConnectedUsersIps) {
-            $query->whereNotIn('logged_requests.ip_address_id', function ($subquery) {
-                $subquery->select('lr.ip_address_id')
-                    ->from('logged_requests as lr')
-                    ->whereNotNull('lr.user_id')
-                    ->distinct();
-            });
+            $queryService->applyAuthenticatedUserFilters($query, true);
         }
 
         $requests = $query->paginate($perPage);

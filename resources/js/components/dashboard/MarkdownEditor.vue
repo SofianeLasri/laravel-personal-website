@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import EmojiPicker from '@/components/dashboard/EmojiPicker.vue';
+import { EmojiSuggestion } from '@/extensions/emoji-suggestion';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import StarterKit from '@tiptap/starter-kit';
@@ -43,6 +45,7 @@ const editor = useEditor({
             transformPastedText: true,
             transformCopiedText: true,
         }),
+        EmojiSuggestion,
     ],
     editable: !props.disabled,
     onUpdate: ({ editor }) => {
@@ -143,6 +146,10 @@ const cancelLink = () => {
 
 const isActive = (type: string, options = {}) => {
     return editor.value?.isActive(type, options) ?? false;
+};
+
+const insertEmoji = (emoji: string) => {
+    editor.value?.chain().focus().insertContent(emoji).run();
 };
 </script>
 
@@ -250,6 +257,8 @@ const isActive = (type: string, options = {}) => {
                 <span class="font-mono">```</span>
                 <Code />
             </Button>
+
+            <EmojiPicker v-if="!rawMode" @select="insertEmoji" />
 
             <Button
                 size="sm"

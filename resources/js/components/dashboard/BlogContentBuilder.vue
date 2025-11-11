@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import BlogContentGalleryManager from '@/components/dashboard/BlogContentGalleryManager.vue';
 import BlogContentVideoManager from '@/components/dashboard/BlogContentVideoManager.vue';
+import MarkdownEditor from '@/components/dashboard/MarkdownEditor.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
 import type { BlogContent, Picture, Video } from '@/types';
 import axios from 'axios';
@@ -509,18 +509,17 @@ defineExpose({
                                 <div v-else-if="savingStatus[content.content_id] === 'error'" class="text-red-600">⚠ Erreur de sauvegarde</div>
                             </div>
                         </div>
-                        <Textarea
-                            :value="
+                        <MarkdownEditor
+                            :model-value="
                                 contentCache[content.content_id] ??
                                 (content.content?.translation_key?.translations?.find((t) => t.locale === locale)?.text || '')
                             "
                             placeholder="Écrivez votre contenu en Markdown..."
-                            class="min-h-[200px] font-mono"
                             :data-testid="`markdown-textarea-${content.content_id}`"
-                            @input="(e: Event) => updateMarkdownContent(content.content_id, (e.target as HTMLTextAreaElement).value)"
+                            @update:model-value="(value: string) => updateMarkdownContent(content.content_id, value)"
                         />
-                        <p class="text-muted-foreground text-xs">
-                            Vous pouvez utiliser la syntaxe Markdown : **gras**, *italique*, [lien](url), etc.
+                        <p class="text-muted-foreground mt-2 text-xs">
+                            Utilisez la syntaxe Markdown et insérez des emojis avec le bouton <span class="font-semibold">😊</span> ou en tapant <code class="bg-muted rounded px-1">:emoji_name:</code>
                         </p>
                     </div>
 

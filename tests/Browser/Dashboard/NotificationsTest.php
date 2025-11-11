@@ -109,5 +109,4 @@ class NotificationsTest extends DuskTestCase
                 ->screenshot('notification-filtering');
         });
     }
-
 }

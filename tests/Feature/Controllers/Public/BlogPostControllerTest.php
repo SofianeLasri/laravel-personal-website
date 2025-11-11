@@ -10,6 +10,7 @@ use App\Models\Picture;
 use App\Models\SocialMediaLink;
 use App\Models\Translation;
 use App\Models\TranslationKey;
+use App\Services\CustomEmojiResolverService;
 use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -225,7 +226,7 @@ class BlogPostControllerTest extends TestCase
         $this->assertNotNull($foundPost, 'Should find blog post by slug in database');
 
         // Test the service directly
-        $service = new PublicControllersService;
+        $service = new PublicControllersService(new CustomEmojiResolverService);
         $serviceResult = $service->getBlogPostBySlug($this->blogPost->slug);
         $this->assertNotNull($serviceResult, 'Service should find the blog post');
 

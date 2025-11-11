@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\ScreenshotFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -63,8 +64,8 @@ class Screenshot extends Model
     /**
      * Scope a query to order screenshots by their order field.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<Screenshot>  $query
-     * @return \Illuminate\Database\Eloquent\Builder<Screenshot>
+     * @param  Builder<Screenshot>  $query
+     * @return Builder<Screenshot>
      */
     public function scopeOrderByOrder($query)
     {

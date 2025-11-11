@@ -16,7 +16,6 @@ use App\Models\BlogContentMarkdown;
 use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
-use App\Models\BlogPostDraftContent;
 use App\Models\Certification;
 use App\Models\Creation;
 use App\Models\Experience;
@@ -29,6 +28,7 @@ use App\Models\TechnologyExperience;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\Video;
+use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -43,6 +43,8 @@ class PublicControllersService
 
     private PackagistService $packagistService;
 
+    private CustomEmojiResolverService $emojiResolver;
+
     private const DEVELOPMENT_TYPES = [
         CreationType::PORTFOLIO,
         CreationType::LIBRARY,
@@ -56,13 +58,14 @@ class PublicControllersService
      */
     private array $creationCountByTechnology;
 
-    public function __construct()
+    public function __construct(CustomEmojiResolverService $emojiResolver)
     {
         $this->locale = app()->getLocale();
         $this->fallbackLocale = config('app.fallback_locale');
         $this->creationCountByTechnology = $this->calcCreationCountByTechnology();
         $this->gitHubService = new GitHubService;
         $this->packagistService = new PackagistService;
+        $this->emojiResolver = $emojiResolver;
     }
 
     /**
@@ -1141,7 +1144,13 @@ class PublicControllersService
             if ($content->content_type === BlogContentMarkdown::class && $content->content instanceof BlogContentMarkdown) {
                 $markdownContent = $content->content->translationKey ?
                     $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
-                $result['markdown'] = $markdownContent;
+                // Resolve custom emojis (:emoji_name:) to HTML picture tags
+                try {
+                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+                } catch (Exception $e) {
+                    // Fallback to original markdown if emoji resolution fails
+                    $result['markdown'] = $markdownContent;
+                }
             } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
                 // Get caption translation keys from the pivot data
                 $captionTranslationKeyIds = $content->content->pictures
@@ -1305,7 +1314,13 @@ class PublicControllersService
             if ($content->content_type === BlogContentMarkdown::class && $content->content instanceof BlogContentMarkdown) {
                 $markdownContent = $content->content->translationKey ?
                     $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
-                $result['markdown'] = $markdownContent;
+                // Resolve custom emojis (:emoji_name:) to HTML picture tags
+                try {
+                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+                } catch (Exception $e) {
+                    // Fallback to original markdown if emoji resolution fails
+                    $result['markdown'] = $markdownContent;
+                }
             } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
                 // Get caption translation keys from the pivot data
                 $captionTranslationKeyIds = $content->content->pictures

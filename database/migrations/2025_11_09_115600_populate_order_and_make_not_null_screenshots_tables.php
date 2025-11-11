@@ -68,13 +68,21 @@ return new class extends Migration
     public function down(): void
     {
         // Remove unique constraints
-        Schema::table('screenshots', function (Blueprint $table) {
-            $table->dropUnique('unique_creation_order');
-        });
+        try {
+            Schema::table('screenshots', function (Blueprint $table) {
+                $table->dropUnique('unique_creation_order');
+            });
+        } catch (Exception) {
+            // Index doesn't exist, skip
+        }
 
-        Schema::table('creation_draft_screenshots', function (Blueprint $table) {
-            $table->dropUnique('unique_draft_order');
-        });
+        try {
+            Schema::table('creation_draft_screenshots', function (Blueprint $table) {
+                $table->dropUnique('unique_draft_order');
+            });
+        } catch (Exception) {
+            // Index doesn't exist, skip
+        }
 
         // Make order nullable again
         Schema::table('screenshots', function (Blueprint $table) {

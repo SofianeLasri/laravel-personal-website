@@ -72,12 +72,4 @@ class SetLocaleFromAcceptLanguage
         // Return the highest quality language code
         return array_key_first($languages) ?: 'en';
     }
-
-    /**
-     * Check if the given language code is French.
-     */
-    private function isFrench(string $languageCode): bool
-    {
-        return $languageCode === 'fr';
-    }
 }

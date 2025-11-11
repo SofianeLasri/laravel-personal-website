@@ -446,6 +446,23 @@ body * {
         @apply my-4 h-auto max-w-full rounded-lg;
     }
 
+    /* Custom inline emojis */
+    & .inline-emoji,
+    & picture.inline-emoji {
+        @apply inline-block align-middle;
+        height: 1.5em;
+        width: auto;
+    }
+
+    & .inline-emoji img,
+    & picture.inline-emoji img {
+        @apply inline-block;
+        height: 100%;
+        width: auto;
+        margin: 0;
+        border-radius: 0;
+    }
+
     /* Code blocks */
     & pre {
         @apply relative my-4 w-full min-w-0 overflow-x-auto rounded-lg border border-gray-200 bg-gray-50;

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Api\CreationController;
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
 use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
+use App\Http\Controllers\Admin\Api\CustomEmojiController;
 use App\Http\Controllers\Admin\Api\ExperienceController;
 use App\Http\Controllers\Admin\Api\GameReviewDraftController;
 use App\Http\Controllers\Admin\Api\PersonController;
@@ -199,6 +200,10 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
     Route::get('/blog-categories', [BlogCategoriesPageController::class, 'index'])
         ->name('blog-categories.index');
 
+    Route::get('/custom-emojis', function () {
+        return inertia('dashboard/CustomEmojis');
+    })->name('custom-emojis.index');
+
     Route::name('api.')->prefix('api')->group(function () {
         // Notifications routes
         Route::get('notifications', [NotificationController::class, 'index'])
@@ -260,6 +265,11 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
             ->name('pictures.health');
         Route::post('pictures/{picture}/rotate', [PictureController::class, 'rotate'])
             ->name('pictures.rotate');
+
+        // Custom emojis routes
+        Route::apiResource('custom-emojis', CustomEmojiController::class)->except('update');
+        Route::get('custom-emojis-for-editor', [CustomEmojiController::class, 'forEditor'])
+            ->name('custom-emojis.for-editor');
         Route::apiResource('blog-posts', AdminBlogPostController::class)->only(['index', 'store']);
         Route::apiResources([
             'certifications' => CertificationController::class,

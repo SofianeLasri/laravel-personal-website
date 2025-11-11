@@ -53,33 +53,6 @@ interface GalleryImage {
     caption: string;
     order: number;
 }
-
-interface BlogContent {
-    id?: number;
-    content_type: string;
-    content_id: number;
-    order: number;
-    content?: {
-        id: number;
-        translation_key?: {
-            translations: Array<{
-                locale: string;
-                text: string;
-            }>;
-        };
-        pictures?: Array<{
-            id: number;
-            path_original: string;
-            path_medium: string;
-            path_small: string;
-            pivot?: {
-                order: number;
-                caption_translation_key_id?: number;
-            };
-        }>;
-    };
-}
-
 interface Props {
     draftId: number; // Now required since we only show this component when draft exists
     contents: Content[];

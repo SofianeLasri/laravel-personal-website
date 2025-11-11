@@ -21,6 +21,7 @@ import {
     LinkIcon,
     Logs,
     NotebookPenIcon,
+    Smile,
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
@@ -108,6 +109,11 @@ const mainNavItems: NavItem[] = [
         title: 'Traductions',
         href: route('dashboard.translations.index', undefined, false),
         icon: Languages,
+    },
+    {
+        title: 'Emojis',
+        href: route('dashboard.custom-emojis.index', undefined, false),
+        icon: Smile,
     },
     {
         title: 'Requêtes',

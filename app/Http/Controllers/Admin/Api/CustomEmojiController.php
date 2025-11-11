@@ -50,6 +50,9 @@ class CustomEmojiController extends Controller
      */
     public function store(CustomEmojiRequest $request): JsonResponse
     {
+        /** @var Picture|null $picture */
+        $picture = null;
+
         try {
             // Upload and optimize the picture
             $picture = $this->uploadedFilesService->storeAndOptimizeUploadedPicture(
@@ -68,7 +71,7 @@ class CustomEmojiController extends Controller
             return response()->json($emoji, Response::HTTP_CREATED);
         } catch (Exception $e) {
             // Clean up uploaded picture if emoji creation failed
-            if (isset($picture) && $picture instanceof Picture) {
+            if ($picture !== null) {
                 $picture->delete();
             }
 

@@ -27,14 +27,38 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('screenshots', function (Blueprint $table) {
-            $table->dropIndex(['order']);
-            $table->dropColumn('order');
-        });
+        // Drop index if it exists
+        try {
+            Schema::table('screenshots', function (Blueprint $table) {
+                $table->dropIndex('screenshots_order_index');
+            });
+        } catch (\Exception) {
+            // Index doesn't exist, skip
+        }
 
-        Schema::table('creation_draft_screenshots', function (Blueprint $table) {
-            $table->dropIndex(['order']);
-            $table->dropColumn('order');
-        });
+        try {
+            Schema::table('creation_draft_screenshots', function (Blueprint $table) {
+                $table->dropIndex('creation_draft_screenshots_order_index');
+            });
+        } catch (\Exception) {
+            // Index doesn't exist, skip
+        }
+
+        // Drop columns if they exist
+        try {
+            Schema::table('screenshots', function (Blueprint $table) {
+                $table->dropColumn('order');
+            });
+        } catch (\Exception) {
+            // Column doesn't exist, skip
+        }
+
+        try {
+            Schema::table('creation_draft_screenshots', function (Blueprint $table) {
+                $table->dropColumn('order');
+            });
+        } catch (\Exception) {
+            // Column doesn't exist, skip
+        }
     }
 };

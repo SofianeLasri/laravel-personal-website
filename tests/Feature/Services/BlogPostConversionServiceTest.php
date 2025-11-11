@@ -5,9 +5,9 @@ namespace Tests\Feature\Services;
 use App\Enums\BlogPostType;
 use App\Enums\GameReviewRating;
 use App\Models\BlogCategory;
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
@@ -55,13 +55,13 @@ class BlogPostConversionServiceTest extends TestCase
         $markdownKey = TranslationKey::factory()->create(['key' => 'original.content']);
         $markdownKey->translations()->create(['locale' => 'en', 'text' => 'Original content']);
 
-        $markdownContent = BlogContentMarkdown::factory()->create([
+        $markdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);
@@ -78,7 +78,7 @@ class BlogPostConversionServiceTest extends TestCase
 
         // Verify draft content is independent
         $draftMarkdownContent = $draftContent->content;
-        $this->assertInstanceOf(BlogContentMarkdown::class, $draftMarkdownContent);
+        $this->assertInstanceOf(ContentMarkdown::class, $draftMarkdownContent);
         $this->assertNotEquals($markdownContent->id, $draftMarkdownContent->id);
 
         // Verify translation keys are different
@@ -106,13 +106,13 @@ class BlogPostConversionServiceTest extends TestCase
         $markdownKey = TranslationKey::factory()->create(['key' => 'original.content']);
         $markdownKey->translations()->create(['locale' => 'en', 'text' => 'Original content']);
 
-        $markdownContent = BlogContentMarkdown::factory()->create([
+        $markdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);
@@ -149,13 +149,13 @@ class BlogPostConversionServiceTest extends TestCase
         $markdownKey = TranslationKey::factory()->create(['key' => 'draft.content']);
         $markdownKey->translations()->create(['locale' => 'en', 'text' => 'Draft content']);
 
-        $markdownContent = BlogContentMarkdown::factory()->create([
+        $markdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);
@@ -172,7 +172,7 @@ class BlogPostConversionServiceTest extends TestCase
 
         // Verify published content is independent
         $publishedMarkdownContent = $publishedContent->content;
-        $this->assertInstanceOf(BlogContentMarkdown::class, $publishedMarkdownContent);
+        $this->assertInstanceOf(ContentMarkdown::class, $publishedMarkdownContent);
         $this->assertNotEquals($markdownContent->id, $publishedMarkdownContent->id);
 
         // Verify translation keys are different
@@ -201,13 +201,13 @@ class BlogPostConversionServiceTest extends TestCase
         $oldMarkdownKey = TranslationKey::factory()->create(['key' => 'old.content']);
         $oldMarkdownKey->translations()->create(['locale' => 'en', 'text' => 'Old content']);
 
-        $oldMarkdownContent = BlogContentMarkdown::factory()->create([
+        $oldMarkdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $oldMarkdownKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $existingPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $oldMarkdownContent->id,
             'order' => 1,
         ]);
@@ -225,13 +225,13 @@ class BlogPostConversionServiceTest extends TestCase
         $newMarkdownKey = TranslationKey::factory()->create(['key' => 'new.content']);
         $newMarkdownKey->translations()->create(['locale' => 'en', 'text' => 'New content']);
 
-        $newMarkdownContent = BlogContentMarkdown::factory()->create([
+        $newMarkdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $newMarkdownKey->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $newMarkdownContent->id,
             'order' => 1,
         ]);
@@ -247,7 +247,7 @@ class BlogPostConversionServiceTest extends TestCase
         $this->assertEquals($existingPost->id, $updatedPost->id);
 
         // Verify old content was cleaned up
-        $this->assertNull(BlogContentMarkdown::find($oldContentId));
+        $this->assertNull(ContentMarkdown::find($oldContentId));
         $this->assertNull(TranslationKey::find($oldTranslationKeyId));
 
         // Verify new content exists and is independent
@@ -592,7 +592,7 @@ class BlogPostConversionServiceTest extends TestCase
 
         $picture = Picture::factory()->create();
 
-        $galleryContent = BlogContentGallery::factory()->create();
+        $galleryContent = ContentGallery::factory()->create();
 
         $captionKey = TranslationKey::factory()->create(['key' => 'original.caption']);
         $captionKey->translations()->create(['locale' => 'en', 'text' => 'Original caption']);
@@ -604,7 +604,7 @@ class BlogPostConversionServiceTest extends TestCase
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $galleryContent->id,
             'order' => 1,
         ]);
@@ -613,11 +613,11 @@ class BlogPostConversionServiceTest extends TestCase
 
         $this->assertCount(1, $draft->contents);
         $draftContent = $draft->contents->first();
-        $this->assertEquals(BlogContentGallery::class, $draftContent->content_type);
+        $this->assertEquals(ContentGallery::class, $draftContent->content_type);
         $this->assertNotEquals($galleryContent->id, $draftContent->content_id);
 
         $draftGallery = $draftContent->content;
-        $this->assertInstanceOf(BlogContentGallery::class, $draftGallery);
+        $this->assertInstanceOf(ContentGallery::class, $draftGallery);
         $this->assertNotEquals($galleryContent->id, $draftGallery->id);
 
         $this->assertCount(1, $draftGallery->pictures);
@@ -649,14 +649,14 @@ class BlogPostConversionServiceTest extends TestCase
         $captionKey = TranslationKey::factory()->create(['key' => 'original.video.caption']);
         $captionKey->translations()->create(['locale' => 'en', 'text' => 'Original video caption']);
 
-        $videoContent = BlogContentVideo::factory()->create([
+        $videoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => $captionKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => 1,
         ]);
@@ -665,11 +665,11 @@ class BlogPostConversionServiceTest extends TestCase
 
         $this->assertCount(1, $draft->contents);
         $draftContent = $draft->contents->first();
-        $this->assertEquals(BlogContentVideo::class, $draftContent->content_type);
+        $this->assertEquals(ContentVideo::class, $draftContent->content_type);
         $this->assertNotEquals($videoContent->id, $draftContent->content_id);
 
         $draftVideo = $draftContent->content;
-        $this->assertInstanceOf(BlogContentVideo::class, $draftVideo);
+        $this->assertInstanceOf(ContentVideo::class, $draftVideo);
         $this->assertNotEquals($videoContent->id, $draftVideo->id);
         $this->assertEquals($video->id, $draftVideo->video_id);
 
@@ -697,7 +697,7 @@ class BlogPostConversionServiceTest extends TestCase
         $oldCaptionKey = TranslationKey::factory()->create(['key' => 'old.caption']);
         $oldCaptionKey->translations()->create(['locale' => 'en', 'text' => 'Old caption']);
 
-        $oldGallery = BlogContentGallery::factory()->create();
+        $oldGallery = ContentGallery::factory()->create();
         $oldGallery->pictures()->attach($picture->id, [
             'order' => 1,
             'caption_translation_key_id' => $oldCaptionKey->id,
@@ -705,7 +705,7 @@ class BlogPostConversionServiceTest extends TestCase
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $existingPost->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $oldGallery->id,
             'order' => 1,
         ]);
@@ -724,7 +724,7 @@ class BlogPostConversionServiceTest extends TestCase
         $newCaptionKey = TranslationKey::factory()->create(['key' => 'new.caption']);
         $newCaptionKey->translations()->create(['locale' => 'en', 'text' => 'New caption']);
 
-        $newGallery = BlogContentGallery::factory()->create();
+        $newGallery = ContentGallery::factory()->create();
         $newGallery->pictures()->attach($picture->id, [
             'order' => 1,
             'caption_translation_key_id' => $newCaptionKey->id,
@@ -732,7 +732,7 @@ class BlogPostConversionServiceTest extends TestCase
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $newGallery->id,
             'order' => 1,
         ]);
@@ -742,12 +742,12 @@ class BlogPostConversionServiceTest extends TestCase
 
         $updatedPost = $this->conversionService->convertDraftToBlogPost($draft);
 
-        $this->assertNull(BlogContentGallery::find($oldGalleryId));
+        $this->assertNull(ContentGallery::find($oldGalleryId));
         $this->assertNull(TranslationKey::find($oldCaptionKeyId));
 
         $this->assertCount(1, $updatedPost->contents);
         $updatedContent = $updatedPost->contents->first();
-        $this->assertEquals(BlogContentGallery::class, $updatedContent->content_type);
+        $this->assertEquals(ContentGallery::class, $updatedContent->content_type);
         $this->assertNotEquals($newGallery->id, $updatedContent->content_id);
 
         $updatedGallery = $updatedContent->content;
@@ -773,14 +773,14 @@ class BlogPostConversionServiceTest extends TestCase
         $oldCaptionKey = TranslationKey::factory()->create(['key' => 'old.video.caption']);
         $oldCaptionKey->translations()->create(['locale' => 'en', 'text' => 'Old video caption']);
 
-        $oldVideoContent = BlogContentVideo::factory()->create([
+        $oldVideoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => $oldCaptionKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $existingPost->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $oldVideoContent->id,
             'order' => 1,
         ]);
@@ -799,14 +799,14 @@ class BlogPostConversionServiceTest extends TestCase
         $newCaptionKey = TranslationKey::factory()->create(['key' => 'new.video.caption']);
         $newCaptionKey->translations()->create(['locale' => 'en', 'text' => 'New video caption']);
 
-        $newVideoContent = BlogContentVideo::factory()->create([
+        $newVideoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => $newCaptionKey->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $newVideoContent->id,
             'order' => 1,
         ]);
@@ -816,12 +816,12 @@ class BlogPostConversionServiceTest extends TestCase
 
         $updatedPost = $this->conversionService->convertDraftToBlogPost($draft);
 
-        $this->assertNull(BlogContentVideo::find($oldVideoContentId));
+        $this->assertNull(ContentVideo::find($oldVideoContentId));
         $this->assertNull(TranslationKey::find($oldCaptionKeyId));
 
         $this->assertCount(1, $updatedPost->contents);
         $updatedContent = $updatedPost->contents->first();
-        $this->assertEquals(BlogContentVideo::class, $updatedContent->content_type);
+        $this->assertEquals(ContentVideo::class, $updatedContent->content_type);
         $this->assertNotEquals($newVideoContent->id, $updatedContent->content_id);
 
         $updatedVideoContent = $updatedContent->content;
@@ -846,11 +846,11 @@ class BlogPostConversionServiceTest extends TestCase
         $markdownKey = TranslationKey::factory()->create(['key' => 'draft.markdown']);
         $markdownKey->translations()->create(['locale' => 'en', 'text' => 'Draft markdown content']);
 
-        $markdownContent = BlogContentMarkdown::factory()->create([
+        $markdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
 
-        $gallery = BlogContentGallery::factory()->create();
+        $gallery = ContentGallery::factory()->create();
         $picture = Picture::factory()->create();
 
         $galleryCaptionKey = TranslationKey::factory()->create(['key' => 'draft.gallery.caption']);
@@ -865,28 +865,28 @@ class BlogPostConversionServiceTest extends TestCase
         $videoCaptionKey = TranslationKey::factory()->create(['key' => 'draft.video.caption']);
         $videoCaptionKey->translations()->create(['locale' => 'en', 'text' => 'Video caption']);
 
-        $videoContent = BlogContentVideo::factory()->create([
+        $videoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => $videoCaptionKey->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
             'order' => 2,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => 3,
         ]);
@@ -898,17 +898,17 @@ class BlogPostConversionServiceTest extends TestCase
         $publishedContents = $publishedPost->contents->sortBy('order');
 
         $markdownPublished = $publishedContents->first();
-        $this->assertEquals(BlogContentMarkdown::class, $markdownPublished->content_type);
+        $this->assertEquals(ContentMarkdown::class, $markdownPublished->content_type);
         $this->assertNotEquals($markdownContent->id, $markdownPublished->content_id);
         $this->assertEquals('Draft markdown content', $markdownPublished->content->translationKey->translations->first()->text);
 
         $galleryPublished = $publishedContents->skip(1)->first();
-        $this->assertEquals(BlogContentGallery::class, $galleryPublished->content_type);
+        $this->assertEquals(ContentGallery::class, $galleryPublished->content_type);
         $this->assertNotEquals($gallery->id, $galleryPublished->content_id);
         $this->assertCount(1, $galleryPublished->content->pictures);
 
         $videoPublished = $publishedContents->skip(2)->first();
-        $this->assertEquals(BlogContentVideo::class, $videoPublished->content_type);
+        $this->assertEquals(ContentVideo::class, $videoPublished->content_type);
         $this->assertNotEquals($videoContent->id, $videoPublished->content_id);
         $this->assertEquals($video->id, $videoPublished->content->video_id);
         $this->assertEquals('Video caption', $videoPublished->content->captionTranslationKey->translations->first()->text);
@@ -1067,14 +1067,14 @@ class BlogPostConversionServiceTest extends TestCase
         ]);
 
         $video = Video::factory()->create();
-        $videoContent = BlogContentVideo::factory()->create([
+        $videoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => null,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => 1,
         ]);
@@ -1085,7 +1085,7 @@ class BlogPostConversionServiceTest extends TestCase
         $draftContent = $draft->contents->first();
         $draftVideo = $draftContent->content;
 
-        $this->assertInstanceOf(BlogContentVideo::class, $draftVideo);
+        $this->assertInstanceOf(ContentVideo::class, $draftVideo);
         $this->assertEquals($video->id, $draftVideo->video_id);
         $this->assertNull($draftVideo->caption_translation_key_id);
     }
@@ -1103,14 +1103,14 @@ class BlogPostConversionServiceTest extends TestCase
         ]);
 
         $video = Video::factory()->create();
-        $oldVideoContent = BlogContentVideo::factory()->create([
+        $oldVideoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => null,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $existingPost->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $oldVideoContent->id,
             'order' => 1,
         ]);
@@ -1130,7 +1130,7 @@ class BlogPostConversionServiceTest extends TestCase
 
         $updatedPost = $this->conversionService->convertDraftToBlogPost($draft);
 
-        $this->assertNull(BlogContentVideo::find($oldVideoContentId));
+        $this->assertNull(ContentVideo::find($oldVideoContentId));
         $this->assertCount(0, $updatedPost->contents);
     }
 
@@ -1149,14 +1149,14 @@ class BlogPostConversionServiceTest extends TestCase
         $picture1 = Picture::factory()->create();
         $picture2 = Picture::factory()->create();
 
-        $galleryContent = BlogContentGallery::factory()->create();
+        $galleryContent = ContentGallery::factory()->create();
 
         $galleryContent->pictures()->attach($picture1->id, ['order' => 1, 'caption_translation_key_id' => null]);
         $galleryContent->pictures()->attach($picture2->id, ['order' => 2, 'caption_translation_key_id' => null]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $galleryContent->id,
             'order' => 1,
         ]);
@@ -1167,7 +1167,7 @@ class BlogPostConversionServiceTest extends TestCase
         $draftContent = $draft->contents->first();
         $draftGallery = $draftContent->content;
 
-        $this->assertInstanceOf(BlogContentGallery::class, $draftGallery);
+        $this->assertInstanceOf(ContentGallery::class, $draftGallery);
         $this->assertCount(2, $draftGallery->pictures);
 
         foreach ($draftGallery->pictures as $picture) {
@@ -1250,14 +1250,14 @@ class BlogPostConversionServiceTest extends TestCase
             'cover_picture_id' => null,
         ]);
 
-        $videoContent = BlogContentVideo::factory()->create([
+        $videoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => null,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => 1,
         ]);
@@ -1289,14 +1289,14 @@ class BlogPostConversionServiceTest extends TestCase
             'cover_picture_id' => $coverPicture->id,
         ]);
 
-        $videoContent = BlogContentVideo::factory()->create([
+        $videoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => null,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => 1,
         ]);
@@ -1325,14 +1325,14 @@ class BlogPostConversionServiceTest extends TestCase
         ]);
 
         // Create video content without video
-        $videoContent = BlogContentVideo::factory()->create([
+        $videoContent = ContentVideo::factory()->create([
             'video_id' => null,
             'caption_translation_key_id' => null,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => 1,
         ]);

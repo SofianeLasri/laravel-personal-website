@@ -2,14 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\BlogContentVideo;
+use App\Models\ContentVideo;
 use App\Models\TranslationKey;
 use App\Models\Video;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class BlogContentVideoFactory extends Factory
+class ContentVideoFactory extends Factory
 {
-    protected $model = BlogContentVideo::class;
+    protected $model = ContentVideo::class;
 
     public function definition(): array
     {

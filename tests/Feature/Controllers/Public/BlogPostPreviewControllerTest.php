@@ -5,7 +5,7 @@ namespace Tests\Feature\Controllers\Public;
 use App\Enums\BlogPostType;
 use App\Http\Controllers\Public\BlogPostPreviewController;
 use App\Models\BlogCategory;
-use App\Models\BlogContentMarkdown;
+use App\Models\ContentMarkdown;
 use App\Models\BlogPostDraft;
 use App\Models\BlogPostDraftContent;
 use App\Models\BlogPostPreviewToken;
@@ -72,13 +72,13 @@ class BlogPostPreviewControllerTest extends TestCase
             'text' => 'Contenu de test en français',
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create([
+        $markdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $contentKey->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);

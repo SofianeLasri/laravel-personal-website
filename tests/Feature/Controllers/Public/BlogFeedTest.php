@@ -3,7 +3,7 @@
 namespace Tests\Feature\Controllers\Public;
 
 use App\Models\BlogCategory;
-use App\Models\BlogContentMarkdown;
+use App\Models\ContentMarkdown;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
 use App\Models\Picture;
@@ -229,13 +229,13 @@ class BlogFeedTest extends TestCase
             'text' => 'This is the test content. It contains enough text to test the excerpt extraction for the RSS feed.',
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create([
+        $markdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $contentKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);

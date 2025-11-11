@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\BlogContentGallery;
+use App\Models\ContentGallery;
 use App\Models\TranslationKey;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +34,7 @@ class BlogContentGalleryController extends Controller
 
         try {
             // Create the gallery
-            $gallery = BlogContentGallery::create();
+            $gallery = ContentGallery::create();
 
             // Attach pictures with captions if any provided
             if ($request->picture_ids && count($request->picture_ids) > 0) {
@@ -82,14 +82,14 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function show(BlogContentGallery $blogContentGallery): JsonResponse
+    public function show(ContentGallery $blogContentGallery): JsonResponse
     {
         $blogContentGallery->load('pictures');
 
         return response()->json($blogContentGallery);
     }
 
-    public function update(Request $request, BlogContentGallery $blogContentGallery): JsonResponse
+    public function update(Request $request, ContentGallery $blogContentGallery): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'picture_ids' => 'nullable|array',
@@ -175,7 +175,7 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function updatePictures(Request $request, BlogContentGallery $blogContentGallery): JsonResponse
+    public function updatePictures(Request $request, ContentGallery $blogContentGallery): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'pictures' => 'required|array',
@@ -257,7 +257,7 @@ class BlogContentGalleryController extends Controller
         }
     }
 
-    public function destroy(BlogContentGallery $blogContentGallery): JsonResponse
+    public function destroy(ContentGallery $blogContentGallery): JsonResponse
     {
         DB::beginTransaction();
 

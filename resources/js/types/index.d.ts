@@ -133,7 +133,7 @@ interface BlogCategory {
     name_translation_key: TranslationKey;
 }
 
-interface BlogContentMarkdown {
+interface ContentMarkdown {
     id: number;
     translation_key_id: number;
     created_at: string;
@@ -141,7 +141,7 @@ interface BlogContentMarkdown {
     translation_key?: TranslationKey;
 }
 
-interface BlogContentGallery {
+interface ContentGallery {
     id: number;
     layout?: string;
     columns?: number;
@@ -150,7 +150,7 @@ interface BlogContentGallery {
     pictures?: Picture[];
 }
 
-interface BlogContentVideo {
+interface ContentVideo {
     id: number;
     video_id: number | null;
     caption_translation_key_id: number | null;
@@ -160,7 +160,7 @@ interface BlogContentVideo {
     caption_translation_key?: TranslationKey;
 }
 
-type BlogContent = BlogContentMarkdown | BlogContentGallery | BlogContentVideo;
+type Content = ContentMarkdown | ContentGallery | ContentVideo;
 
 interface BlogPostDraftWithAllRelations {
     id: number;

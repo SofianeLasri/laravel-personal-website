@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\BlogContentMarkdown;
+use App\Models\ContentMarkdown;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class BlogContentMarkdownFactory extends Factory
+class ContentMarkdownFactory extends Factory
 {
-    protected $model = BlogContentMarkdown::class;
+    protected $model = ContentMarkdown::class;
 
     public function definition(): array
     {

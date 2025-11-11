@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\BlogContentGallery;
+use App\Models\ContentGallery;
 use App\Models\Picture;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class BlogContentGalleryFactory extends Factory
+class ContentGalleryFactory extends Factory
 {
-    protected $model = BlogContentGallery::class;
+    protected $model = ContentGallery::class;
 
     public function definition(): array
     {
@@ -19,7 +19,7 @@ class BlogContentGalleryFactory extends Factory
 
     public function withPictures(int $count = 3): static
     {
-        return $this->afterCreating(function (BlogContentGallery $gallery) use ($count) {
+        return $this->afterCreating(function (ContentGallery $gallery) use ($count) {
             $pictures = Picture::factory()->count($count)->create();
 
             foreach ($pictures as $index => $picture) {

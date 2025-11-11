@@ -68,7 +68,7 @@ class BlogContentApiTest extends TestCase
         $response = $this->actingAs($this->user)
             ->postJson('/dashboard/api/blog-post-draft-contents', [
                 'blog_post_draft_id' => $this->draft->id,
-                'content_type' => 'App\\Models\\BlogContentMarkdown',
+                'content_type' => 'App\\Models\\ContentMarkdown',
                 'content_id' => $markdownResponse->json('id'),
                 'order' => 1,
             ]);
@@ -84,7 +84,7 @@ class BlogContentApiTest extends TestCase
 
         $this->assertDatabaseHas('blog_post_draft_contents', [
             'blog_post_draft_id' => $this->draft->id,
-            'content_type' => 'App\\Models\\BlogContentMarkdown',
+            'content_type' => 'App\\Models\\ContentMarkdown',
             'content_id' => $markdownResponse->json('id'),
         ]);
     }
@@ -128,7 +128,7 @@ class BlogContentApiTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->postJson('/dashboard/api/blog-post-draft-contents', [
-                'content_type' => 'App\\Models\\BlogContentMarkdown',
+                'content_type' => 'App\\Models\\ContentMarkdown',
                 'content_id' => 1,
                 'order' => 1,
             ]);

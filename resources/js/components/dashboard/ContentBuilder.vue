@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import BlogContentGalleryManager from '@/components/dashboard/BlogContentGalleryManager.vue';
-import BlogContentVideoManager from '@/components/dashboard/BlogContentVideoManager.vue';
+import ContentGalleryManager from '@/components/dashboard/ContentGalleryManager.vue';
+import ContentVideoManager from '@/components/dashboard/ContentVideoManager.vue';
 import MarkdownEditor from '@/components/dashboard/MarkdownEditor.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useRoute } from '@/composables/useRoute';
-import type { BlogContent, Picture, Video } from '@/types';
+import type { Content, Picture, Video } from '@/types';
 import axios from 'axios';
 import { GripVertical, Image, Text, Trash2, Video as VideoIcon } from 'lucide-vue-next';
 import Sortable from 'sortablejs';
@@ -82,7 +82,7 @@ interface BlogContent {
 
 interface Props {
     draftId: number; // Now required since we only show this component when draft exists
-    contents: BlogContent[];
+    contents: Content[];
     pictures: Picture[];
     videos: Video[];
     locale: 'fr' | 'en';
@@ -91,12 +91,12 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 
-const localContents = ref<BlogContent[]>([...props.contents]);
+const localContents = ref<Content[]>([...props.contents]);
 const sortableInstance = ref<Sortable | null>(null);
 const contentListRef = ref<HTMLElement | null>(null);
 
 // Refs for gallery managers
-const galleryRefs = ref<Record<number, InstanceType<typeof BlogContentGalleryManager>>>({});
+const galleryRefs = ref<Record<number, InstanceType<typeof ContentGalleryManager>>>({});
 
 // Cache local pour les contenus en cours d'édition
 const contentCache = ref<Record<number, string>>({});
@@ -186,7 +186,7 @@ const addContent = async (type: string) => {
         }
 
         let contentId: number;
-        let newContent: BlogContent;
+        let newContent: Content;
 
         // Create the content based on type
         if (type === 'markdown') {
@@ -226,10 +226,10 @@ const addContent = async (type: string) => {
             blog_post_draft_id: props.draftId,
             content_type:
                 type === 'markdown'
-                    ? 'App\\Models\\BlogContentMarkdown'
+                    ? 'App\\Models\\ContentMarkdown'
                     : type === 'gallery'
-                      ? 'App\\Models\\BlogContentGallery'
-                      : 'App\\Models\\BlogContentVideo',
+                      ? 'App\\Models\\ContentGallery'
+                      : 'App\\Models\\ContentVideo',
             content_id: contentId,
             order: localContents.value.length + 1,
         });
@@ -371,7 +371,7 @@ const updateMarkdownContent = (contentId: number, text: string) => {
 };
 
 const updateGalleryComplete = (contentId: number, images: GalleryImage[]) => {
-    // This method is handled by the BlogContentGalleryManager component itself
+    // This method is handled by the ContentGalleryManager component itself
     // We just need to refresh the content to show updated data
     // Gallery updates are managed automatically by the child component
     void contentId;
@@ -384,9 +384,9 @@ const getContentTypeLabel = (type: string) => {
 };
 
 const getContentTypeFromClass = (className: string): string => {
-    if (className.includes('BlogContentMarkdown')) return 'markdown';
-    if (className.includes('BlogContentGallery')) return 'gallery';
-    if (className.includes('BlogContentVideo')) return 'video';
+    if (className.includes('ContentMarkdown')) return 'markdown';
+    if (className.includes('ContentGallery')) return 'gallery';
+    if (className.includes('ContentVideo')) return 'video';
     return 'unknown';
 };
 
@@ -398,7 +398,7 @@ const getTranslatedCaption = (captionTranslationKey: TranslationKey | undefined,
     return translation?.text ?? '';
 };
 
-// Transform gallery data for the BlogContentGalleryManager
+// Transform gallery data for the ContentGalleryManager
 const transformGalleryImages = (content: { pictures?: PictureWithPivot[] }): GalleryImage[] => {
     if (!content?.pictures) return [];
 
@@ -525,9 +525,9 @@ defineExpose({
 
                     <!-- Gallery Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'gallery'" class="space-y-2">
-                        <BlogContentGalleryManager
+                        <ContentGalleryManager
                             :ref="
-                                (el: InstanceType<typeof BlogContentGalleryManager> | null) => {
+                                (el: InstanceType<typeof ContentGalleryManager> | null) => {
                                     if (el) galleryRefs[content.content_id] = el;
                                 }
                             "
@@ -540,7 +540,7 @@ defineExpose({
 
                     <!-- Video Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'video'" class="space-y-2">
-                        <BlogContentVideoManager
+                        <ContentVideoManager
                             :blog-content-video-id="content.content.id"
                             :locale="locale"
                             @video-selected="() => {}"

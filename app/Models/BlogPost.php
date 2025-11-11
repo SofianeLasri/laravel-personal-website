@@ -151,7 +151,7 @@ class BlogPost extends Model implements Feedable
             'category.nameTranslationKey.translations',
             'coverPicture',
             'contents' => function ($query) {
-                $query->where('content_type', BlogContentMarkdown::class)->orderBy('order');
+                $query->where('content_type', ContentMarkdown::class)->orderBy('order');
             },
             'contents.content.translationKey.translations',
         ])
@@ -244,7 +244,7 @@ class BlogPost extends Model implements Feedable
     {
         // Get first markdown content
         $firstTextContent = $this->contents
-            ->where('content_type', BlogContentMarkdown::class)
+            ->where('content_type', ContentMarkdown::class)
             ->sortBy('order')
             ->first();
 
@@ -256,7 +256,7 @@ class BlogPost extends Model implements Feedable
         $markdownContent = $firstTextContent->content;
 
         // Ensure content is BlogContentMarkdown and has translation key
-        if (! ($markdownContent instanceof BlogContentMarkdown)) {
+        if (! ($markdownContent instanceof ContentMarkdown)) {
             return '';
         }
 

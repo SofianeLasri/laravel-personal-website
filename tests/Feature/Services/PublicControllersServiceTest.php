@@ -8,9 +8,9 @@ use App\Enums\GameReviewRating;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
 use App\Models\BlogCategory;
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
@@ -965,10 +965,10 @@ class PublicControllersServiceTest extends TestCase
 
         // Create markdown content for each post
         foreach ($posts as $post) {
-            $markdown = BlogContentMarkdown::factory()->create();
+            $markdown = ContentMarkdown::factory()->create();
             BlogPostContent::factory()->create([
                 'blog_post_id' => $post->id,
-                'content_type' => BlogContentMarkdown::class,
+                'content_type' => ContentMarkdown::class,
                 'content_id' => $markdown->id,
                 'order' => 1,
             ]);
@@ -1005,13 +1005,13 @@ class PublicControllersServiceTest extends TestCase
             'text' => str_repeat('This is a test content. ', 20),
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create([
+        $markdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -1044,13 +1044,13 @@ class PublicControllersServiceTest extends TestCase
             'text' => str_repeat('This is a test content for hero section. ', 20),
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create([
+        $markdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -1268,13 +1268,13 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'This is the blog content.',
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create([
+        $markdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -1309,7 +1309,7 @@ class PublicControllersServiceTest extends TestCase
         ]);
 
         // Add gallery content
-        $gallery = BlogContentGallery::factory()->create();
+        $gallery = ContentGallery::factory()->create();
         $pictures = \App\Models\Picture::factory()->count(3)->create();
 
         foreach ($pictures as $index => $picture) {
@@ -1334,7 +1334,7 @@ class PublicControllersServiceTest extends TestCase
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
             'order' => 1,
         ]);
@@ -1344,7 +1344,7 @@ class PublicControllersServiceTest extends TestCase
 
         $this->assertNotNull($result);
         $this->assertCount(1, $result['contents']);
-        $this->assertEquals(BlogContentGallery::class, $result['contents'][0]['content_type']);
+        $this->assertEquals(ContentGallery::class, $result['contents'][0]['content_type']);
         $this->assertArrayHasKey('gallery', $result['contents'][0]);
         $this->assertCount(3, $result['contents'][0]['gallery']['pictures']);
         $this->assertEquals('Gallery caption', $result['contents'][0]['gallery']['pictures'][0]['caption']);
@@ -1521,10 +1521,10 @@ class PublicControllersServiceTest extends TestCase
             'text' => '# Header **bold** _italic_ `code` text',
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create(['translation_key_id' => $markdownKey->id]);
+        $markdown = ContentMarkdown::factory()->create(['translation_key_id' => $markdownKey->id]);
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -1593,10 +1593,10 @@ class PublicControllersServiceTest extends TestCase
             'text' => $longWord,
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create(['translation_key_id' => $markdownKey->id]);
+        $markdown = ContentMarkdown::factory()->create(['translation_key_id' => $markdownKey->id]);
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -1622,10 +1622,10 @@ class PublicControllersServiceTest extends TestCase
             'text' => '',
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create(['translation_key_id' => $markdownKey->id]);
+        $markdown = ContentMarkdown::factory()->create(['translation_key_id' => $markdownKey->id]);
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -1651,7 +1651,7 @@ class PublicControllersServiceTest extends TestCase
             'bunny_video_id' => 'test-video-123',
         ]);
 
-        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+        $blogContentVideo = \App\Models\ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
@@ -1666,7 +1666,7 @@ class PublicControllersServiceTest extends TestCase
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_type' => \App\Models\ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 1,
         ]);
@@ -1676,7 +1676,7 @@ class PublicControllersServiceTest extends TestCase
 
         $this->assertNotNull($result);
         $this->assertCount(1, $result['contents']);
-        $this->assertEquals(\App\Models\BlogContentVideo::class, $result['contents'][0]['content_type']);
+        $this->assertEquals(\App\Models\ContentVideo::class, $result['contents'][0]['content_type']);
         $this->assertArrayHasKey('video', $result['contents'][0]);
         $this->assertEquals($video->id, $result['contents'][0]['video']['id']);
         $this->assertEquals('test-video-123', $result['contents'][0]['video']['bunnyVideoId']);
@@ -1700,13 +1700,13 @@ class PublicControllersServiceTest extends TestCase
             'visibility' => VideoVisibility::PRIVATE,
         ]);
 
-        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+        $blogContentVideo = \App\Models\ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_type' => \App\Models\ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 1,
         ]);
@@ -1735,13 +1735,13 @@ class PublicControllersServiceTest extends TestCase
             'visibility' => VideoVisibility::PUBLIC,
         ]);
 
-        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+        $blogContentVideo = \App\Models\ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_type' => \App\Models\ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 1,
         ]);
@@ -1767,7 +1767,7 @@ class PublicControllersServiceTest extends TestCase
         ]);
 
         $video = \App\Models\Video::factory()->readyAndPublic()->create();
-        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+        $blogContentVideo = \App\Models\ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
@@ -1787,7 +1787,7 @@ class PublicControllersServiceTest extends TestCase
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_type' => \App\Models\ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 1,
         ]);
@@ -1810,14 +1810,14 @@ class PublicControllersServiceTest extends TestCase
         ]);
 
         $video = \App\Models\Video::factory()->readyAndPublic()->create();
-        $blogContentVideo = \App\Models\BlogContentVideo::factory()->create([
+        $blogContentVideo = \App\Models\ContentVideo::factory()->create([
             'video_id' => $video->id,
             'caption_translation_key_id' => null,
         ]);
 
         BlogPostContent::factory()->create([
             'blog_post_id' => $post->id,
-            'content_type' => \App\Models\BlogContentVideo::class,
+            'content_type' => \App\Models\ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 1,
         ]);
@@ -1847,13 +1847,13 @@ class PublicControllersServiceTest extends TestCase
             'text' => 'This is the draft blog content.',
         ]);
 
-        $markdown = BlogContentMarkdown::factory()->create([
+        $markdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -1894,7 +1894,7 @@ class PublicControllersServiceTest extends TestCase
         ]);
 
         // Add gallery content
-        $gallery = BlogContentGallery::factory()->create();
+        $gallery = ContentGallery::factory()->create();
         $pictures = \App\Models\Picture::factory()->count(3)->create();
 
         foreach ($pictures as $index => $picture) {
@@ -1919,7 +1919,7 @@ class PublicControllersServiceTest extends TestCase
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
             'order' => 1,
         ]);
@@ -1929,7 +1929,7 @@ class PublicControllersServiceTest extends TestCase
 
         $this->assertNotNull($result);
         $this->assertCount(1, $result['contents']);
-        $this->assertEquals(BlogContentGallery::class, $result['contents'][0]['content_type']);
+        $this->assertEquals(ContentGallery::class, $result['contents'][0]['content_type']);
         $this->assertArrayHasKey('gallery', $result['contents'][0]);
         $this->assertCount(3, $result['contents'][0]['gallery']['pictures']);
         $this->assertEquals('Draft gallery caption', $result['contents'][0]['gallery']['pictures'][0]['caption']);
@@ -1952,13 +1952,13 @@ class PublicControllersServiceTest extends TestCase
             'bunny_video_id' => 'test-private-123',
         ]);
 
-        $blogContentVideo = BlogContentVideo::factory()->create([
+        $blogContentVideo = ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 1,
         ]);
@@ -1989,13 +1989,13 @@ class PublicControllersServiceTest extends TestCase
             'visibility' => VideoVisibility::PUBLIC,
         ]);
 
-        $blogContentVideo = BlogContentVideo::factory()->create([
+        $blogContentVideo = ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 1,
         ]);
@@ -2070,35 +2070,35 @@ class PublicControllersServiceTest extends TestCase
             'locale' => 'en',
             'text' => 'First markdown block',
         ]);
-        $markdown = BlogContentMarkdown::factory()->create([
+        $markdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
 
         // Add gallery content (order 2)
-        $gallery = BlogContentGallery::factory()->create();
+        $gallery = ContentGallery::factory()->create();
         $picture = \App\Models\Picture::factory()->create();
         $gallery->pictures()->attach($picture->id, ['order' => 0]);
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
             'order' => 2,
         ]);
 
         // Add video content (order 3)
         $video = \App\Models\Video::factory()->readyAndPublic()->create();
-        $blogContentVideo = BlogContentVideo::factory()->create([
+        $blogContentVideo = ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 3,
         ]);
@@ -2111,9 +2111,9 @@ class PublicControllersServiceTest extends TestCase
         $this->assertEquals(1, $result['contents'][0]['order']);
         $this->assertEquals(2, $result['contents'][1]['order']);
         $this->assertEquals(3, $result['contents'][2]['order']);
-        $this->assertEquals(BlogContentMarkdown::class, $result['contents'][0]['content_type']);
-        $this->assertEquals(BlogContentGallery::class, $result['contents'][1]['content_type']);
-        $this->assertEquals(BlogContentVideo::class, $result['contents'][2]['content_type']);
+        $this->assertEquals(ContentMarkdown::class, $result['contents'][0]['content_type']);
+        $this->assertEquals(ContentGallery::class, $result['contents'][1]['content_type']);
+        $this->assertEquals(ContentVideo::class, $result['contents'][2]['content_type']);
         $this->assertTrue($result['isPreview']);
     }
 
@@ -2143,12 +2143,12 @@ class PublicControllersServiceTest extends TestCase
             'locale' => 'en',
             'text' => 'English draft content',
         ]);
-        $markdown = BlogContentMarkdown::factory()->create([
+        $markdown = ContentMarkdown::factory()->create([
             'translation_key_id' => $markdownKey->id,
         ]);
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -2172,7 +2172,7 @@ class PublicControllersServiceTest extends TestCase
         ]);
 
         $video = \App\Models\Video::factory()->readyAndPublic()->create();
-        $blogContentVideo = BlogContentVideo::factory()->create([
+        $blogContentVideo = ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
@@ -2192,7 +2192,7 @@ class PublicControllersServiceTest extends TestCase
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $blogContentVideo->id,
             'order' => 1,
         ]);

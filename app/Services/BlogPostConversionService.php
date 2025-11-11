@@ -6,9 +6,9 @@ use App\Enums\BlogPostType;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
 use App\Jobs\TranslateToEnglishJob;
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
@@ -230,7 +230,7 @@ class BlogPostConversionService
     {
         // Load all video contents with their videos
         $videoContents = $draft->contents()
-            ->where('content_type', BlogContentVideo::class)
+            ->where('content_type', ContentVideo::class)
             ->with('content.video')
             ->get();
 
@@ -239,7 +239,7 @@ class BlogPostConversionService
         foreach ($videoContents as $content) {
             $videoContent = $content->content;
 
-            if (! $videoContent instanceof BlogContentVideo) {
+            if (! $videoContent instanceof ContentVideo) {
                 continue;
             }
 
@@ -343,14 +343,14 @@ class BlogPostConversionService
 
         if ($content) {
             // Handle specific cleanup based on content type
-            if ($content instanceof BlogContentMarkdown) {
+            if ($content instanceof ContentMarkdown) {
                 // Delete translation key and its translations
                 $translationKey = $content->translationKey;
                 if ($translationKey instanceof TranslationKey) {
                     $translationKey->translations()->delete();
                     $translationKey->delete();
                 }
-            } elseif ($content instanceof BlogContentGallery) {
+            } elseif ($content instanceof ContentGallery) {
                 // Detach pictures and delete caption translation keys
                 foreach ($content->pictures as $picture) {
                     if ($picture->pivot->caption_translation_key_id) {
@@ -362,7 +362,7 @@ class BlogPostConversionService
                     }
                 }
                 $content->pictures()->detach();
-            } elseif ($content instanceof BlogContentVideo) {
+            } elseif ($content instanceof ContentVideo) {
                 // Delete caption translation key if it exists
                 if ($content->caption_translation_key_id) {
                     $content->captionTranslationKey?->translations()?->delete();

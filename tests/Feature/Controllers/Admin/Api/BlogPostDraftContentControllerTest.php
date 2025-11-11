@@ -3,9 +3,9 @@
 namespace Tests\Feature\Controllers\Admin\Api;
 
 use App\Http\Controllers\Admin\Api\BlogPostDraftContentController;
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\BlogPostDraft;
 use App\Models\BlogPostDraftContent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,7 +29,7 @@ class BlogPostDraftContentControllerTest extends TestCase
     public function store_creates_draft_content_with_automatic_order()
     {
         $draft = BlogPostDraft::factory()->create();
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
 
         // Create existing content with orders
         BlogPostDraftContent::factory()->forBlogPostDraft($draft)->create(['order' => 1]);
@@ -37,7 +37,7 @@ class BlogPostDraftContentControllerTest extends TestCase
 
         $response = $this->postJson(route('dashboard.api.blog-post-draft-contents.store'), [
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
         ]);
 
@@ -54,14 +54,14 @@ class BlogPostDraftContentControllerTest extends TestCase
             ])
             ->assertJson([
                 'blog_post_draft_id' => $draft->id,
-                'content_type' => BlogContentMarkdown::class,
+                'content_type' => ContentMarkdown::class,
                 'content_id' => $markdown->id,
                 'order' => 3, // Should be max order + 1
             ]);
 
         $this->assertDatabaseHas('blog_post_draft_contents', [
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 3,
         ]);
@@ -71,11 +71,11 @@ class BlogPostDraftContentControllerTest extends TestCase
     public function store_creates_draft_content_with_specified_order()
     {
         $draft = BlogPostDraft::factory()->create();
-        $gallery = BlogContentGallery::factory()->create();
+        $gallery = ContentGallery::factory()->create();
 
         $response = $this->postJson(route('dashboard.api.blog-post-draft-contents.store'), [
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
             'order' => 5,
         ]);
@@ -83,14 +83,14 @@ class BlogPostDraftContentControllerTest extends TestCase
         $response->assertCreated()
             ->assertJson([
                 'blog_post_draft_id' => $draft->id,
-                'content_type' => BlogContentGallery::class,
+                'content_type' => ContentGallery::class,
                 'content_id' => $gallery->id,
                 'order' => 5,
             ]);
 
         $this->assertDatabaseHas('blog_post_draft_contents', [
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
             'order' => 5,
         ]);
@@ -119,11 +119,11 @@ class BlogPostDraftContentControllerTest extends TestCase
     #[Test]
     public function store_fails_with_non_existent_blog_post_draft()
     {
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
 
         $response = $this->postJson(route('dashboard.api.blog-post-draft-contents.store'), [
             'blog_post_draft_id' => 99999,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
         ]);
 
@@ -140,11 +140,11 @@ class BlogPostDraftContentControllerTest extends TestCase
     public function store_loads_content_relationship()
     {
         $draft = BlogPostDraft::factory()->create();
-        $video = BlogContentVideo::factory()->create();
+        $video = ContentVideo::factory()->create();
 
         $response = $this->postJson(route('dashboard.api.blog-post-draft-contents.store'), [
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $video->id,
         ]);
 
@@ -239,9 +239,9 @@ class BlogPostDraftContentControllerTest extends TestCase
     #[Test]
     public function update_loads_content_relationship()
     {
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
         $draftContent = BlogPostDraftContent::factory()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
         ]);
 

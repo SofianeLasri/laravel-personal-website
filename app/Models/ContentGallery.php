@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Database\Factories\BlogContentGalleryFactory;
+use Database\Factories\ContentGalleryFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,9 +16,9 @@ use Illuminate\Support\Carbon;
  * @property int|null $pictures_count
  * @property-read Collection|Picture[] $pictures
  */
-class BlogContentGallery extends Model
+class ContentGallery extends Model
 {
-    /** @use HasFactory<BlogContentGalleryFactory> */
+    /** @use HasFactory<ContentGalleryFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -31,8 +31,8 @@ class BlogContentGallery extends Model
      */
     public function pictures(): BelongsToMany
     {
-        return $this->belongsToMany(Picture::class, 'blog_content_gallery_pictures', 'gallery_id', 'picture_id')
+        return $this->belongsToMany(Picture::class, 'content_gallery_pictures', 'gallery_id', 'picture_id')
             ->withPivot('order', 'caption_translation_key_id')
-            ->orderBy('blog_content_gallery_pictures.order');
+            ->orderBy('content_gallery_pictures.order');
     }
 }

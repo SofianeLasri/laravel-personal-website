@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Controllers\Admin\Api;
 
-use App\Http\Controllers\Admin\Api\BlogContentVideoController;
-use App\Models\BlogContentVideo;
+use App\Http\Controllers\Admin\Api\ContentVideoController;
+use App\Models\ContentVideo;
 use App\Models\User;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 
-#[CoversClass(BlogContentVideoController::class)]
+#[CoversClass(ContentVideoController::class)]
 class BlogContentVideoControllerTest extends TestCase
 {
     use ActsAsUser, RefreshDatabase;
@@ -51,7 +51,7 @@ class BlogContentVideoControllerTest extends TestCase
                 ],
             ]);
 
-        $videoContent = BlogContentVideo::first();
+        $videoContent = ContentVideo::first();
         $this->assertNotNull($videoContent);
         $this->assertEquals($video->id, $videoContent->video_id);
         $this->assertNotNull($videoContent->caption_translation_key_id);
@@ -85,7 +85,7 @@ class BlogContentVideoControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $videoContent = BlogContentVideo::first();
+        $videoContent = ContentVideo::first();
         $this->assertNotNull($videoContent);
         $this->assertEquals($video->id, $videoContent->video_id);
         $this->assertNull($videoContent->caption_translation_key_id);
@@ -104,7 +104,7 @@ class BlogContentVideoControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $videoContent = BlogContentVideo::first();
+        $videoContent = ContentVideo::first();
         $this->assertNotNull($videoContent);
         $this->assertEquals($video->id, $videoContent->video_id);
         $this->assertNull($videoContent->caption_translation_key_id);
@@ -123,7 +123,7 @@ class BlogContentVideoControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $videoContent = BlogContentVideo::first();
+        $videoContent = ContentVideo::first();
         $this->assertNotNull($videoContent);
         $this->assertEquals($video->id, $videoContent->video_id);
         $this->assertNull($videoContent->caption_translation_key_id);
@@ -139,7 +139,7 @@ class BlogContentVideoControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $videoContent = BlogContentVideo::first();
+        $videoContent = ContentVideo::first();
         $this->assertNotNull($videoContent);
         $this->assertNull($videoContent->video_id);
         $this->assertNotNull($videoContent->caption_translation_key_id);
@@ -208,7 +208,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_show_returns_video_content_with_relations()
     {
-        $videoContent = BlogContentVideo::factory()->withCaption()->create();
+        $videoContent = ContentVideo::factory()->withCaption()->create();
 
         $response = $this->getJson("/dashboard/api/blog-content-video/{$videoContent->id}");
 
@@ -245,7 +245,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_modifies_video_id()
     {
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
         $newVideo = Video::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
@@ -262,7 +262,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_adds_caption_to_content_without_caption()
     {
-        $videoContent = BlogContentVideo::factory()->withoutCaption()->create();
+        $videoContent = ContentVideo::factory()->withoutCaption()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
             'caption' => 'New caption added',
@@ -296,7 +296,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_modifies_existing_caption_french()
     {
-        $videoContent = BlogContentVideo::factory()->withCaption()->create();
+        $videoContent = ContentVideo::factory()->withCaption()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
             'caption' => 'Updated French caption',
@@ -315,7 +315,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_modifies_existing_caption_english()
     {
-        $videoContent = BlogContentVideo::factory()->withCaption()->create();
+        $videoContent = ContentVideo::factory()->withCaption()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
             'caption' => 'Updated English caption',
@@ -334,7 +334,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_removes_caption_with_empty_string()
     {
-        $videoContent = BlogContentVideo::factory()->withCaption()->create();
+        $videoContent = ContentVideo::factory()->withCaption()->create();
         $translationKeyId = $videoContent->caption_translation_key_id;
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
@@ -359,7 +359,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_removes_caption_with_null()
     {
-        $videoContent = BlogContentVideo::factory()->withCaption()->create();
+        $videoContent = ContentVideo::factory()->withCaption()->create();
         $translationKeyId = $videoContent->caption_translation_key_id;
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
@@ -384,7 +384,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_validates_missing_locale()
     {
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
             'caption' => 'Test caption',
@@ -400,7 +400,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_validates_invalid_locale()
     {
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
             'caption' => 'Test caption',
@@ -414,7 +414,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_validates_invalid_video_id()
     {
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
             'video_id' => 99999,
@@ -428,7 +428,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_update_validates_caption_too_long()
     {
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-video/{$videoContent->id}", [
             'caption' => str_repeat('a', 501),
@@ -453,7 +453,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_destroy_deletes_video_content_with_caption()
     {
-        $videoContent = BlogContentVideo::factory()->withCaption()->create();
+        $videoContent = ContentVideo::factory()->withCaption()->create();
         $translationKeyId = $videoContent->caption_translation_key_id;
 
         $response = $this->deleteJson("/dashboard/api/blog-content-video/{$videoContent->id}");
@@ -479,7 +479,7 @@ class BlogContentVideoControllerTest extends TestCase
     #[Test]
     public function test_destroy_deletes_video_content_without_caption()
     {
-        $videoContent = BlogContentVideo::factory()->withoutCaption()->create();
+        $videoContent = ContentVideo::factory()->withoutCaption()->create();
 
         $response = $this->deleteJson("/dashboard/api/blog-content-video/{$videoContent->id}");
 

@@ -6,9 +6,9 @@ use App\Enums\BlogPostType;
 use App\Enums\GameReviewRating;
 use App\Http\Controllers\Admin\BlogPostEditPageController;
 use App\Models\BlogCategory;
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
@@ -57,10 +57,10 @@ class BlogPostEditPageControllerTest extends TestCase
         ]);
 
         // Add content
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);
@@ -110,10 +110,10 @@ class BlogPostEditPageControllerTest extends TestCase
         ]);
 
         // Add content to blog post
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);
@@ -242,13 +242,13 @@ class BlogPostEditPageControllerTest extends TestCase
         $draft = BlogPostDraft::factory()->create();
         $translationKey = TranslationKey::factory()->withTranslations()->create();
 
-        $markdownContent = BlogContentMarkdown::factory()->create([
+        $markdownContent = ContentMarkdown::factory()->create([
             'translation_key_id' => $translationKey->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
         ]);
 
@@ -260,7 +260,7 @@ class BlogPostEditPageControllerTest extends TestCase
         // Verify the content was loaded properly
         $this->assertDatabaseHas('blog_post_draft_contents', [
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
         ]);
     }
 
@@ -275,13 +275,13 @@ class BlogPostEditPageControllerTest extends TestCase
             'cover_picture_id' => $coverPicture->id,
         ]);
 
-        $videoContent = BlogContentVideo::factory()->create([
+        $videoContent = ContentVideo::factory()->create([
             'video_id' => $video->id,
         ]);
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
         ]);
 
@@ -300,7 +300,7 @@ class BlogPostEditPageControllerTest extends TestCase
         $this->loginAsAdmin();
 
         $draft = BlogPostDraft::factory()->create();
-        $gallery = BlogContentGallery::factory()->create();
+        $gallery = ContentGallery::factory()->create();
 
         // Add pictures with captions
         $pictures = Picture::factory()->count(3)->create();
@@ -314,7 +314,7 @@ class BlogPostEditPageControllerTest extends TestCase
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
         ]);
 
@@ -337,7 +337,7 @@ class BlogPostEditPageControllerTest extends TestCase
         // Create content with null content reference (edge case)
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $draft->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => 99999, // Non-existing ID
         ]);
 
@@ -447,26 +447,26 @@ class BlogPostEditPageControllerTest extends TestCase
         $blogPost = BlogPost::factory()->create();
 
         // Add different content types
-        $markdownContent = BlogContentMarkdown::factory()->create();
+        $markdownContent = ContentMarkdown::factory()->create();
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdownContent->id,
             'order' => 1,
         ]);
 
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => 2,
         ]);
 
-        $galleryContent = BlogContentGallery::factory()->create();
+        $galleryContent = ContentGallery::factory()->create();
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $galleryContent->id,
             'order' => 3,
         ]);
@@ -480,9 +480,9 @@ class BlogPostEditPageControllerTest extends TestCase
         $this->assertEquals(3, $draft->contents()->count());
 
         $contents = $draft->contents()->orderBy('order')->get();
-        $this->assertEquals(BlogContentMarkdown::class, $contents[0]->content_type);
-        $this->assertEquals(BlogContentVideo::class, $contents[1]->content_type);
-        $this->assertEquals(BlogContentGallery::class, $contents[2]->content_type);
+        $this->assertEquals(ContentMarkdown::class, $contents[0]->content_type);
+        $this->assertEquals(ContentVideo::class, $contents[1]->content_type);
+        $this->assertEquals(ContentGallery::class, $contents[2]->content_type);
     }
 
     #[Test]
@@ -511,18 +511,18 @@ class BlogPostEditPageControllerTest extends TestCase
         $blogPost = BlogPost::factory()->create();
 
         // Add contents with specific order
-        $content1 = BlogContentMarkdown::factory()->create();
+        $content1 = ContentMarkdown::factory()->create();
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $content1->id,
             'order' => 5,
         ]);
 
-        $content2 = BlogContentMarkdown::factory()->create();
+        $content2 = ContentMarkdown::factory()->create();
         BlogPostContent::factory()->create([
             'blog_post_id' => $blogPost->id,
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $content2->id,
             'order' => 3,
         ]);

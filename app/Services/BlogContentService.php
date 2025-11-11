@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
@@ -22,12 +22,12 @@ class BlogContentService
      */
     public function createMarkdownContent(BlogPostDraft $draft, int $translationKeyId, int $order): BlogPostDraftContent
     {
-        $markdown = BlogContentMarkdown::create([
+        $markdown = ContentMarkdown::create([
             'translation_key_id' => $translationKeyId,
         ]);
 
         return $draft->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => $order,
         ]);
@@ -40,7 +40,7 @@ class BlogContentService
      */
     public function createGalleryContent(BlogPostDraft $draft, array $galleryData, int $order): BlogPostDraftContent
     {
-        $gallery = BlogContentGallery::create([
+        $gallery = ContentGallery::create([
             'layout' => $galleryData['layout'],
             'columns' => $galleryData['columns'] ?? null,
         ]);
@@ -54,7 +54,7 @@ class BlogContentService
         }
 
         return $draft->contents()->create([
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
             'order' => $order,
         ]);
@@ -69,13 +69,13 @@ class BlogContentService
         int $order,
         ?int $captionTranslationKeyId = null
     ): BlogPostDraftContent {
-        $videoContent = BlogContentVideo::create([
+        $videoContent = ContentVideo::create([
             'video_id' => $videoId,
             'caption_translation_key_id' => $captionTranslationKeyId,
         ]);
 
         return $draft->contents()->create([
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => $order,
         ]);
@@ -84,7 +84,7 @@ class BlogContentService
     /**
      * Update markdown content
      */
-    public function updateMarkdownContent(BlogContentMarkdown $markdown, int $translationKeyId): BlogContentMarkdown
+    public function updateMarkdownContent(ContentMarkdown $markdown, int $translationKeyId): ContentMarkdown
     {
         $markdown->update([
             'translation_key_id' => $translationKeyId,
@@ -100,7 +100,7 @@ class BlogContentService
      *
      * @param  array<string, mixed>  $updateData
      */
-    public function updateGalleryContent(BlogContentGallery $gallery, array $updateData): BlogContentGallery
+    public function updateGalleryContent(ContentGallery $gallery, array $updateData): ContentGallery
     {
         $gallery->update([
             'layout' => $updateData['layout'],
@@ -125,10 +125,10 @@ class BlogContentService
      * Update video content
      */
     public function updateVideoContent(
-        BlogContentVideo $videoContent,
+        ContentVideo $videoContent,
         int $videoId,
         ?int $captionTranslationKeyId = null
-    ): BlogContentVideo {
+    ): ContentVideo {
         $videoContent->update([
             'video_id' => $videoId,
             'caption_translation_key_id' => $captionTranslationKeyId,
@@ -165,7 +165,7 @@ class BlogContentService
         return DB::transaction(function () use ($content): bool {
             // Delete the actual content
             if ($content->content) {
-                if ($content->content instanceof BlogContentGallery) {
+                if ($content->content instanceof ContentGallery) {
                     $content->content->pictures()->detach();
                 }
                 $content->content->delete();
@@ -186,19 +186,19 @@ class BlogContentService
 
             // Duplicate the actual content
             switch ($content->content_type) {
-                case BlogContentMarkdown::class:
+                case ContentMarkdown::class:
                     $original = $content->content;
-                    if ($original instanceof BlogContentMarkdown) {
-                        $newContent = BlogContentMarkdown::create([
+                    if ($original instanceof ContentMarkdown) {
+                        $newContent = ContentMarkdown::create([
                             'translation_key_id' => $original->translation_key_id,
                         ]);
                     }
                     break;
 
-                case BlogContentGallery::class:
+                case ContentGallery::class:
                     $original = $content->content;
-                    if ($original instanceof BlogContentGallery) {
-                        $newContent = BlogContentGallery::create([
+                    if ($original instanceof ContentGallery) {
+                        $newContent = ContentGallery::create([
                             'layout' => $original->layout,
                             'columns' => $original->columns,
                         ]);
@@ -217,10 +217,10 @@ class BlogContentService
                     }
                     break;
 
-                case BlogContentVideo::class:
+                case ContentVideo::class:
                     $original = $content->content;
-                    if ($original instanceof BlogContentVideo) {
-                        $newContent = BlogContentVideo::create([
+                    if ($original instanceof ContentVideo) {
+                        $newContent = ContentVideo::create([
                             'video_id' => $original->video_id,
                             'caption_translation_key_id' => $original->caption_translation_key_id,
                         ]);

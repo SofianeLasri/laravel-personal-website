@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BlogContentBuilder from '@/components/dashboard/BlogContentBuilder.vue';
+import ContentBuilder from '@/components/dashboard/ContentBuilder.vue';
 import BlogPostPreviewTokenManager from '@/components/dashboard/BlogPostPreviewTokenManager.vue';
 import CategoryQuickCreate from '@/components/dashboard/CategoryQuickCreate.vue';
 import GameReviewEditor from '@/components/dashboard/GameReviewEditor.vue';
@@ -48,7 +48,7 @@ const isSubmitting = ref(false);
 const isPublishing = ref(false);
 const currentBlogPostDraft = ref<BlogPostDraftWithAllRelations | null>(null);
 
-// Ref for BlogContentBuilder to access saveAllGalleries method
+// Ref for ContentBuilder to access saveAllGalleries method
 const blogContentBuilderRef = ref<{ saveAllGalleries?: () => Promise<void> } | null>(null);
 
 if (props.blogPostDraft) {
@@ -412,7 +412,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                             Cette mesure évite la création de contenus orphelins dans la base de données.
                         </p>
                     </div>
-                    <BlogContentBuilder
+                    <ContentBuilder
                         v-else
                         ref="blogContentBuilderRef"
                         :draft-id="currentBlogPostDraft?.id"

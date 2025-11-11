@@ -3,7 +3,7 @@
 namespace Tests\Feature\Controllers\Admin;
 
 use App\Http\Controllers\Admin\VideosPageController;
-use App\Models\BlogContentVideo;
+use App\Models\ContentVideo;
 use App\Models\BlogPostDraft;
 use App\Models\BlogPostDraftContent;
 use App\Models\Creation;
@@ -168,12 +168,12 @@ class VideosPageControllerTest extends TestCase
             'slug' => 'test-blog-post',
         ]);
 
-        $blogContentVideo = BlogContentVideo::factory()->create();
+        $blogContentVideo = ContentVideo::factory()->create();
         $video = $blogContentVideo->video;
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $blogPostDraft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $blogContentVideo->id,
         ]);
 
@@ -207,7 +207,7 @@ class VideosPageControllerTest extends TestCase
             'slug' => 'test-blog-post',
         ]);
 
-        $blogContentVideo = BlogContentVideo::factory()->create();
+        $blogContentVideo = ContentVideo::factory()->create();
         $video = $blogContentVideo->video;
 
         // Link video to creation
@@ -216,7 +216,7 @@ class VideosPageControllerTest extends TestCase
         // Link video to blog post
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $blogPostDraft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $blogContentVideo->id,
         ]);
 
@@ -281,12 +281,12 @@ class VideosPageControllerTest extends TestCase
             'slug' => 'test-blog-post',
         ]);
 
-        $blogContentVideo = BlogContentVideo::factory()->create();
+        $blogContentVideo = ContentVideo::factory()->create();
         $video = $blogContentVideo->video;
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $blogPostDraft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $blogContentVideo->id,
         ]);
 
@@ -315,12 +315,12 @@ class VideosPageControllerTest extends TestCase
             'slug' => '',
         ]);
 
-        $blogContentVideo = BlogContentVideo::factory()->create();
+        $blogContentVideo = ContentVideo::factory()->create();
         $video = $blogContentVideo->video;
 
         BlogPostDraftContent::factory()->create([
             'blog_post_draft_id' => $blogPostDraft->id,
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $blogContentVideo->id,
         ]);
 

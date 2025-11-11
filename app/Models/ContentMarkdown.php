@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Database\Factories\BlogContentMarkdownFactory;
+use Database\Factories\ContentMarkdownFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,12 +16,12 @@ use Illuminate\Support\Carbon;
  * @property int|null $translation_keys_count
  * @property-read TranslationKey|null $translationKey
  */
-class BlogContentMarkdown extends Model
+class ContentMarkdown extends Model
 {
-    /** @use HasFactory<BlogContentMarkdownFactory> */
+    /** @use HasFactory<ContentMarkdownFactory> */
     use HasFactory;
 
-    protected $table = 'blog_content_markdown';
+    protected $table = 'content_markdowns';
 
     protected $fillable = [
         'translation_key_id',

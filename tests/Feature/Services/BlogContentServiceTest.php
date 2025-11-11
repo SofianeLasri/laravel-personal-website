@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
-use App\Models\BlogContentGallery;
-use App\Models\BlogContentMarkdown;
-use App\Models\BlogContentVideo;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
 use App\Models\Picture;
@@ -40,9 +40,9 @@ class BlogContentServiceTest extends TestCase
         $content = $this->service->createMarkdownContent($draft, $translationKey->id, 1);
 
         $this->assertNotNull($content);
-        $this->assertEquals(BlogContentMarkdown::class, $content->content_type);
+        $this->assertEquals(ContentMarkdown::class, $content->content_type);
         $this->assertEquals(1, $content->order);
-        $this->assertInstanceOf(BlogContentMarkdown::class, $content->content);
+        $this->assertInstanceOf(ContentMarkdown::class, $content->content);
         $this->assertEquals($translationKey->id, $content->content->translation_key_id);
     }
 
@@ -61,9 +61,9 @@ class BlogContentServiceTest extends TestCase
         $content = $this->service->createGalleryContent($draft, $galleryData, 2);
 
         $this->assertNotNull($content);
-        $this->assertEquals(BlogContentGallery::class, $content->content_type);
+        $this->assertEquals(ContentGallery::class, $content->content_type);
         $this->assertEquals(2, $content->order);
-        $this->assertInstanceOf(BlogContentGallery::class, $content->content);
+        $this->assertInstanceOf(ContentGallery::class, $content->content);
         $this->assertEquals('grid', $content->content->layout);
         $this->assertEquals(3, $content->content->columns);
         $this->assertCount(3, $content->content->pictures);
@@ -79,9 +79,9 @@ class BlogContentServiceTest extends TestCase
         $content = $this->service->createVideoContent($draft, $video->id, 3, $captionKey->id);
 
         $this->assertNotNull($content);
-        $this->assertEquals(BlogContentVideo::class, $content->content_type);
+        $this->assertEquals(ContentVideo::class, $content->content_type);
         $this->assertEquals(3, $content->order);
-        $this->assertInstanceOf(BlogContentVideo::class, $content->content);
+        $this->assertInstanceOf(ContentVideo::class, $content->content);
         $this->assertEquals($video->id, $content->content->video_id);
         $this->assertEquals($captionKey->id, $content->content->caption_translation_key_id);
     }
@@ -89,7 +89,7 @@ class BlogContentServiceTest extends TestCase
     #[Test]
     public function it_updates_markdown_content(): void
     {
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
         $newTranslationKey = TranslationKey::factory()->create();
 
         $updated = $this->service->updateMarkdownContent($markdown, $newTranslationKey->id);
@@ -100,7 +100,7 @@ class BlogContentServiceTest extends TestCase
     #[Test]
     public function it_updates_gallery_content(): void
     {
-        $gallery = BlogContentGallery::factory()->create(['layout' => 'grid', 'columns' => 2]);
+        $gallery = ContentGallery::factory()->create(['layout' => 'grid', 'columns' => 2]);
         $oldPictures = Picture::factory()->count(2)->create();
         $gallery->pictures()->attach($oldPictures);
 
@@ -125,19 +125,19 @@ class BlogContentServiceTest extends TestCase
         $draft = BlogPostDraft::factory()->create();
 
         $content1 = $draft->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => 1,
             'order' => 1,
         ]);
 
         $content2 = $draft->contents()->create([
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => 1,
             'order' => 2,
         ]);
 
         $content3 = $draft->contents()->create([
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => 1,
             'order' => 3,
         ]);
@@ -161,10 +161,10 @@ class BlogContentServiceTest extends TestCase
     public function it_deletes_content_block(): void
     {
         $draft = BlogPostDraft::factory()->create();
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
 
         $content = $draft->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -180,10 +180,10 @@ class BlogContentServiceTest extends TestCase
     public function it_duplicates_content_block(): void
     {
         $draft = BlogPostDraft::factory()->create();
-        $originalMarkdown = BlogContentMarkdown::factory()->create();
+        $originalMarkdown = ContentMarkdown::factory()->create();
 
         $originalContent = $draft->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $originalMarkdown->id,
             'order' => 1,
         ]);
@@ -196,7 +196,7 @@ class BlogContentServiceTest extends TestCase
         $this->assertEquals(2, $duplicate->order);
 
         $duplicatedMarkdown = $duplicate->content;
-        $this->assertInstanceOf(BlogContentMarkdown::class, $duplicatedMarkdown);
+        $this->assertInstanceOf(ContentMarkdown::class, $duplicatedMarkdown);
         $this->assertEquals($originalMarkdown->translation_key_id, $duplicatedMarkdown->translation_key_id);
     }
 
@@ -206,13 +206,13 @@ class BlogContentServiceTest extends TestCase
         $draft = BlogPostDraft::factory()->create();
 
         $draft->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => 1,
             'order' => 1,
         ]);
 
         $draft->contents()->create([
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => 1,
             'order' => 2,
         ]);
@@ -235,7 +235,7 @@ class BlogContentServiceTest extends TestCase
     #[Test]
     public function it_updates_video_content(): void
     {
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
         $newVideo = Video::factory()->create();
         $newCaptionKey = TranslationKey::factory()->create();
 
@@ -248,7 +248,7 @@ class BlogContentServiceTest extends TestCase
     #[Test]
     public function it_updates_video_content_with_null_caption(): void
     {
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
         $newVideo = Video::factory()->create();
 
         $updated = $this->service->updateVideoContent($videoContent, $newVideo->id, null);
@@ -261,12 +261,12 @@ class BlogContentServiceTest extends TestCase
     public function it_creates_post_content(): void
     {
         $post = BlogPost::factory()->create();
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
 
-        $content = $this->service->createPostContent($post, BlogContentMarkdown::class, $markdown->id, 1);
+        $content = $this->service->createPostContent($post, ContentMarkdown::class, $markdown->id, 1);
 
         $this->assertNotNull($content);
-        $this->assertEquals(BlogContentMarkdown::class, $content->content_type);
+        $this->assertEquals(ContentMarkdown::class, $content->content_type);
         $this->assertEquals($markdown->id, $content->content_id);
         $this->assertEquals(1, $content->order);
         $this->assertEquals($post->id, $content->blog_post_id);
@@ -278,19 +278,19 @@ class BlogContentServiceTest extends TestCase
         $post = BlogPost::factory()->create();
 
         $content1 = $post->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => 1,
             'order' => 1,
         ]);
 
         $content2 = $post->contents()->create([
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => 1,
             'order' => 2,
         ]);
 
         $content3 = $post->contents()->create([
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => 1,
             'order' => 3,
         ]);
@@ -314,12 +314,12 @@ class BlogContentServiceTest extends TestCase
     public function it_deletes_gallery_content_block(): void
     {
         $draft = BlogPostDraft::factory()->create();
-        $gallery = BlogContentGallery::factory()->create();
+        $gallery = ContentGallery::factory()->create();
         $pictures = Picture::factory()->count(2)->create();
         $gallery->pictures()->attach($pictures->pluck('id')->toArray());
 
         $content = $draft->contents()->create([
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $gallery->id,
             'order' => 1,
         ]);
@@ -336,10 +336,10 @@ class BlogContentServiceTest extends TestCase
     public function it_deletes_video_content_block(): void
     {
         $draft = BlogPostDraft::factory()->create();
-        $videoContent = BlogContentVideo::factory()->create();
+        $videoContent = ContentVideo::factory()->create();
 
         $content = $draft->contents()->create([
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $videoContent->id,
             'order' => 1,
         ]);
@@ -355,10 +355,10 @@ class BlogContentServiceTest extends TestCase
     public function it_deletes_published_post_content_block(): void
     {
         $post = BlogPost::factory()->create();
-        $markdown = BlogContentMarkdown::factory()->create();
+        $markdown = ContentMarkdown::factory()->create();
 
         $content = $post->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $markdown->id,
             'order' => 1,
         ]);
@@ -374,7 +374,7 @@ class BlogContentServiceTest extends TestCase
     public function it_duplicates_gallery_content_block(): void
     {
         $draft = BlogPostDraft::factory()->create();
-        $originalGallery = BlogContentGallery::factory()->create(['layout' => 'grid', 'columns' => 3]);
+        $originalGallery = ContentGallery::factory()->create(['layout' => 'grid', 'columns' => 3]);
         $pictures = Picture::factory()->count(2)->create();
 
         $pictureData = [];
@@ -387,7 +387,7 @@ class BlogContentServiceTest extends TestCase
         $originalGallery->pictures()->attach($pictureData);
 
         $originalContent = $draft->contents()->create([
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $originalGallery->id,
             'order' => 1,
         ]);
@@ -400,7 +400,7 @@ class BlogContentServiceTest extends TestCase
         $this->assertEquals(2, $duplicate->order);
 
         $duplicatedGallery = $duplicate->content;
-        $this->assertInstanceOf(BlogContentGallery::class, $duplicatedGallery);
+        $this->assertInstanceOf(ContentGallery::class, $duplicatedGallery);
         $this->assertEquals($originalGallery->layout, $duplicatedGallery->layout);
         $this->assertEquals($originalGallery->columns, $duplicatedGallery->columns);
         $this->assertCount(2, $duplicatedGallery->pictures);
@@ -414,10 +414,10 @@ class BlogContentServiceTest extends TestCase
     public function it_duplicates_video_content_block(): void
     {
         $draft = BlogPostDraft::factory()->create();
-        $originalVideo = BlogContentVideo::factory()->create();
+        $originalVideo = ContentVideo::factory()->create();
 
         $originalContent = $draft->contents()->create([
-            'content_type' => BlogContentVideo::class,
+            'content_type' => ContentVideo::class,
             'content_id' => $originalVideo->id,
             'order' => 1,
         ]);
@@ -430,7 +430,7 @@ class BlogContentServiceTest extends TestCase
         $this->assertEquals(2, $duplicate->order);
 
         $duplicatedVideo = $duplicate->content;
-        $this->assertInstanceOf(BlogContentVideo::class, $duplicatedVideo);
+        $this->assertInstanceOf(ContentVideo::class, $duplicatedVideo);
         $this->assertEquals($originalVideo->video_id, $duplicatedVideo->video_id);
         $this->assertEquals($originalVideo->caption_translation_key_id, $duplicatedVideo->caption_translation_key_id);
     }
@@ -439,10 +439,10 @@ class BlogContentServiceTest extends TestCase
     public function it_duplicates_published_post_content_block(): void
     {
         $post = BlogPost::factory()->create();
-        $originalMarkdown = BlogContentMarkdown::factory()->create();
+        $originalMarkdown = ContentMarkdown::factory()->create();
 
         $originalContent = $post->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => $originalMarkdown->id,
             'order' => 1,
         ]);
@@ -455,7 +455,7 @@ class BlogContentServiceTest extends TestCase
         $this->assertEquals(2, $duplicate->order);
 
         $duplicatedMarkdown = $duplicate->content;
-        $this->assertInstanceOf(BlogContentMarkdown::class, $duplicatedMarkdown);
+        $this->assertInstanceOf(ContentMarkdown::class, $duplicatedMarkdown);
         $this->assertEquals($originalMarkdown->translation_key_id, $duplicatedMarkdown->translation_key_id);
     }
 
@@ -473,9 +473,9 @@ class BlogContentServiceTest extends TestCase
         $content = $this->service->createGalleryContent($draft, $galleryData, 1);
 
         $this->assertNotNull($content);
-        $this->assertEquals(BlogContentGallery::class, $content->content_type);
+        $this->assertEquals(ContentGallery::class, $content->content_type);
         $this->assertEquals(1, $content->order);
-        $this->assertInstanceOf(BlogContentGallery::class, $content->content);
+        $this->assertInstanceOf(ContentGallery::class, $content->content);
         $this->assertEquals('grid', $content->content->layout);
         $this->assertEquals(3, $content->content->columns);
         $this->assertCount(0, $content->content->pictures);
@@ -490,9 +490,9 @@ class BlogContentServiceTest extends TestCase
         $content = $this->service->createVideoContent($draft, $video->id, 1);
 
         $this->assertNotNull($content);
-        $this->assertEquals(BlogContentVideo::class, $content->content_type);
+        $this->assertEquals(ContentVideo::class, $content->content_type);
         $this->assertEquals(1, $content->order);
-        $this->assertInstanceOf(BlogContentVideo::class, $content->content);
+        $this->assertInstanceOf(ContentVideo::class, $content->content);
         $this->assertEquals($video->id, $content->content->video_id);
         $this->assertNull($content->content->caption_translation_key_id);
     }
@@ -500,7 +500,7 @@ class BlogContentServiceTest extends TestCase
     #[Test]
     public function it_updates_gallery_content_with_empty_pictures(): void
     {
-        $gallery = BlogContentGallery::factory()->create(['layout' => 'grid', 'columns' => 2]);
+        $gallery = ContentGallery::factory()->create(['layout' => 'grid', 'columns' => 2]);
         $oldPictures = Picture::factory()->count(2)->create();
         $gallery->pictures()->attach($oldPictures);
 
@@ -523,7 +523,7 @@ class BlogContentServiceTest extends TestCase
         $post = BlogPost::factory()->create();
 
         $post->contents()->create([
-            'content_type' => BlogContentMarkdown::class,
+            'content_type' => ContentMarkdown::class,
             'content_id' => 1,
             'order' => 1,
         ]);
@@ -547,10 +547,10 @@ class BlogContentServiceTest extends TestCase
     public function it_duplicates_gallery_content_without_pictures(): void
     {
         $draft = BlogPostDraft::factory()->create();
-        $originalGallery = BlogContentGallery::factory()->create(['layout' => 'grid', 'columns' => 3]);
+        $originalGallery = ContentGallery::factory()->create(['layout' => 'grid', 'columns' => 3]);
 
         $originalContent = $draft->contents()->create([
-            'content_type' => BlogContentGallery::class,
+            'content_type' => ContentGallery::class,
             'content_id' => $originalGallery->id,
             'order' => 1,
         ]);
@@ -563,7 +563,7 @@ class BlogContentServiceTest extends TestCase
         $this->assertEquals(2, $duplicate->order);
 
         $duplicatedGallery = $duplicate->content;
-        $this->assertInstanceOf(BlogContentGallery::class, $duplicatedGallery);
+        $this->assertInstanceOf(ContentGallery::class, $duplicatedGallery);
         $this->assertEquals($originalGallery->layout, $duplicatedGallery->layout);
         $this->assertEquals($originalGallery->columns, $duplicatedGallery->columns);
         $this->assertCount(0, $duplicatedGallery->pictures);

@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Controllers\Admin\Api;
 
-use App\Http\Controllers\Admin\Api\BlogContentGalleryController;
-use App\Models\BlogContentGallery;
+use App\Http\Controllers\Admin\Api\ContentGalleryController;
+use App\Models\ContentGallery;
 use App\Models\Picture;
 use App\Models\TranslationKey;
 use App\Models\User;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 
-#[CoversClass(BlogContentGalleryController::class)]
+#[CoversClass(ContentGalleryController::class)]
 class BlogContentGalleryControllerTest extends TestCase
 {
     use ActsAsUser, RefreshDatabase;
@@ -44,7 +44,7 @@ class BlogContentGalleryControllerTest extends TestCase
             ]);
 
         $this->assertDatabaseCount('blog_content_galleries', 1);
-        $gallery = BlogContentGallery::first();
+        $gallery = ContentGallery::first();
         $this->assertNotNull($gallery);
         $this->assertCount(0, $gallery->pictures);
     }
@@ -62,7 +62,7 @@ class BlogContentGalleryControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $gallery = BlogContentGallery::first();
+        $gallery = ContentGallery::first();
         $this->assertCount(3, $gallery->pictures);
 
         // Vérifier l'ordre des images
@@ -87,7 +87,7 @@ class BlogContentGalleryControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $gallery = BlogContentGallery::first();
+        $gallery = ContentGallery::first();
         $this->assertCount(2, $gallery->pictures);
 
         // Vérifier les captions
@@ -128,14 +128,14 @@ class BlogContentGalleryControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $gallery = BlogContentGallery::first();
+        $gallery = ContentGallery::first();
         $this->assertCount(0, $gallery->pictures);
     }
 
     #[Test]
     public function show_returns_gallery_with_pictures()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $pictures = Picture::factory()->count(2)->create();
 
         foreach ($pictures as $index => $picture) {
@@ -168,7 +168,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_replaces_gallery_pictures()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $oldPictures = Picture::factory()->count(2)->create();
 
         // Attacher les anciennes images avec des captions
@@ -205,7 +205,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_removes_all_pictures()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $pictures = Picture::factory()->count(2)->create();
 
         foreach ($pictures as $index => $picture) {
@@ -227,7 +227,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_fails_with_validation_errors()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
 
         $response = $this->putJson("/dashboard/api/blog-content-gallery/{$gallery->id}", [
             'picture_ids' => ['invalid'],
@@ -241,7 +241,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_with_null_values_removes_all_pictures()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $pictures = Picture::factory()->count(2)->create();
 
         foreach ($pictures as $index => $picture) {
@@ -263,7 +263,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_pictures_updates_pictures_order_and_captions()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $pictures = Picture::factory()->count(3)->create();
 
         // Attacher les images initiales
@@ -304,7 +304,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_pictures_fails_with_validation_errors()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
 
         $response = $this->putJson("/dashboard/api/blog-content-galleries/{$gallery->id}/pictures", [
             'pictures' => [
@@ -320,7 +320,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_pictures_requires_pictures_array()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
 
         $response = $this->putJson("/dashboard/api/blog-content-galleries/{$gallery->id}/pictures", [
             'locale' => 'fr',
@@ -333,7 +333,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_pictures_with_minimum_required_fields()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $picture = Picture::factory()->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-galleries/{$gallery->id}/pictures", [
@@ -355,7 +355,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function destroy_deletes_gallery_with_caption_cleanup()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $pictures = Picture::factory()->count(2)->create();
 
         // Ajouter des images avec des captions
@@ -395,7 +395,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function destroy_empty_gallery_success()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
 
         $response = $this->deleteJson("/dashboard/api/blog-content-gallery/{$gallery->id}");
 
@@ -419,7 +419,7 @@ class BlogContentGalleryControllerTest extends TestCase
 
         $response->assertCreated();
 
-        $gallery = BlogContentGallery::first();
+        $gallery = ContentGallery::first();
 
         // Vérifier qu'aucune clé de traduction n'a été créée
         foreach ($gallery->pictures as $picture) {
@@ -432,7 +432,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_with_mixed_captions_handles_correctly()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $pictures = Picture::factory()->count(3)->create();
 
         $response = $this->putJson("/dashboard/api/blog-content-gallery/{$gallery->id}", [
@@ -462,7 +462,7 @@ class BlogContentGalleryControllerTest extends TestCase
     #[Test]
     public function update_pictures_with_empty_caption_removes_translation_key()
     {
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
         $picture = Picture::factory()->create();
 
         // Attacher avec une caption
@@ -499,7 +499,7 @@ class BlogContentGalleryControllerTest extends TestCase
     {
         $this->app['auth']->forgetGuards();
 
-        $gallery = BlogContentGallery::create();
+        $gallery = ContentGallery::create();
 
         // Test store
         $response = $this->postJson('/dashboard/api/blog-content-gallery', [

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 use Throwable;
 
 class BlogPostConversionService
@@ -37,7 +38,7 @@ class BlogPostConversionService
         return DB::transaction(function () use ($blogPost) {
             $titleTranslationKey = $blogPost->titleTranslationKey;
             if (! $titleTranslationKey) {
-                throw new \RuntimeException('Blog post missing title translation key');
+                throw new RuntimeException('Blog post missing title translation key');
             }
 
             // Create draft from published post
@@ -91,7 +92,7 @@ class BlogPostConversionService
         if ($gameReview->pros_translation_key_id) {
             $prosTranslationKey = $gameReview->prosTranslationKey;
             if (! $prosTranslationKey) {
-                throw new \RuntimeException('Game review missing pros translation key');
+                throw new RuntimeException('Game review missing pros translation key');
             }
             $gameReviewDraftData['pros_translation_key_id'] = $this->duplicateTranslationKey($prosTranslationKey)->id;
         }
@@ -99,7 +100,7 @@ class BlogPostConversionService
         if ($gameReview->cons_translation_key_id) {
             $consTranslationKey = $gameReview->consTranslationKey;
             if (! $consTranslationKey) {
-                throw new \RuntimeException('Game review missing cons translation key');
+                throw new RuntimeException('Game review missing cons translation key');
             }
             $gameReviewDraftData['cons_translation_key_id'] = $this->duplicateTranslationKey($consTranslationKey)->id;
         }

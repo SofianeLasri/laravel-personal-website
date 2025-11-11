@@ -12,6 +12,7 @@ use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
 use App\Models\BlogPostDraftContent;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 use Throwable;
 
 class BlogContentService
@@ -233,11 +234,11 @@ class BlogContentService
                 : $content->blogPost;
 
             if (! $parent) {
-                throw new \RuntimeException('Parent blog post or draft not found');
+                throw new RuntimeException('Parent blog post or draft not found');
             }
 
             if (! $newContent) {
-                throw new \RuntimeException('Failed to duplicate content');
+                throw new RuntimeException('Failed to duplicate content');
             }
 
             // Get the max order value

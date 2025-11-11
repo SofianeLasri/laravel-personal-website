@@ -34,7 +34,7 @@ class BlogCategoryFactory extends Factory
      */
     public function withNames(array $names, ?CategoryColor $color = null): static
     {
-        return $this->state(function (array $attributes) use ($names, $color): array {
+        return $this->state(function () use ($names, $color): array {
             // Use French name for slug if available, otherwise use the first name
             $frenchName = $names['fr'] ?? (string) reset($names);
             $slug = Str::slug($frenchName).'-'.uniqid();

@@ -6,6 +6,7 @@ use App\Models\Notification;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 
 class NotificationsMarkReadCommand extends Command
 {
@@ -75,7 +76,7 @@ class NotificationsMarkReadCommand extends Command
 
         // Show breakdown by type and severity
         $breakdown = clone $query;
-        /** @var \Illuminate\Support\Collection<int, object{type: string, severity: string, count: int}> $typeBreakdown */
+        /** @var Collection<int, object{type: string, severity: string, count: int}> $typeBreakdown */
         $typeBreakdown = $breakdown->selectRaw('type, severity, count(*) as count')
             ->groupBy('type', 'severity')
             ->get();
@@ -144,7 +145,7 @@ class NotificationsMarkReadCommand extends Command
             $this->info("Remaining unread notifications: {$remainingUnread}");
 
             // Show breakdown of remaining
-            /** @var \Illuminate\Support\Collection<int, object{severity: string, count: int}> $remainingBreakdown */
+            /** @var Collection<int, object{severity: string, count: int}> $remainingBreakdown */
             $remainingBreakdown = Notification::where('is_read', false)
                 ->selectRaw('severity, count(*) as count')
                 ->groupBy('severity')

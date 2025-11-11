@@ -16,7 +16,6 @@ use App\Models\BlogContentMarkdown;
 use App\Models\BlogContentVideo;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
-use App\Models\BlogPostDraftContent;
 use App\Models\Certification;
 use App\Models\Creation;
 use App\Models\Experience;
@@ -29,6 +28,7 @@ use App\Models\TechnologyExperience;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\Video;
+use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -1147,7 +1147,7 @@ class PublicControllersService
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
                 try {
                     $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // Fallback to original markdown if emoji resolution fails
                     $result['markdown'] = $markdownContent;
                 }
@@ -1317,7 +1317,7 @@ class PublicControllersService
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
                 try {
                     $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // Fallback to original markdown if emoji resolution fails
                     $result['markdown'] = $markdownContent;
                 }

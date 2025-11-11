@@ -60,7 +60,7 @@ class NotificationFactory extends Factory
      */
     public function unread(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'is_read' => false,
                 'read_at' => null,
@@ -73,7 +73,7 @@ class NotificationFactory extends Factory
      */
     public function read(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'is_read' => true,
                 'read_at' => $this->faker->dateTimeBetween('-7 days', 'now'),
@@ -86,7 +86,7 @@ class NotificationFactory extends Factory
      */
     public function persistent(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'is_persistent' => true,
             ];
@@ -98,7 +98,7 @@ class NotificationFactory extends Factory
      */
     public function fromAiProvider(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'source' => Notification::SOURCE_AI_PROVIDER,
                 'title' => 'AI Provider: '.$this->faker->sentence(3),
@@ -116,7 +116,7 @@ class NotificationFactory extends Factory
      */
     public function withAction(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'action_url' => $this->faker->url(),
                 'action_label' => $this->faker->words(2, true),
@@ -129,7 +129,7 @@ class NotificationFactory extends Factory
      */
     public function expiring(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'expires_at' => $this->faker->dateTimeBetween('now', '+1 hour'),
             ];
@@ -141,7 +141,7 @@ class NotificationFactory extends Factory
      */
     public function expired(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'expires_at' => $this->faker->dateTimeBetween('-7 days', '-1 hour'),
             ];
@@ -153,7 +153,7 @@ class NotificationFactory extends Factory
      */
     public function success(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'type' => Notification::TYPE_SUCCESS,
                 'title' => 'Success: '.$this->faker->sentence(3),
@@ -166,7 +166,7 @@ class NotificationFactory extends Factory
      */
     public function error(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'type' => Notification::TYPE_ERROR,
                 'title' => 'Error: '.$this->faker->sentence(3),
@@ -179,7 +179,7 @@ class NotificationFactory extends Factory
      */
     public function warning(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'type' => Notification::TYPE_WARNING,
                 'title' => 'Warning: '.$this->faker->sentence(3),
@@ -192,7 +192,7 @@ class NotificationFactory extends Factory
      */
     public function info(): Factory
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'type' => Notification::TYPE_INFO,
                 'title' => 'Info: '.$this->faker->sentence(3),

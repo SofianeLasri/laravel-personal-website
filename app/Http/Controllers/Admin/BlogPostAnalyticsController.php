@@ -61,7 +61,7 @@ class BlogPostAnalyticsController extends Controller
         // Build URLs for each blog post
         $urlMap = [];
         foreach ($blogPosts as $id => $blogPost) {
-            $urlMap[$id] = route('public.blog-post', ['slug' => $blogPost->slug]);
+            $urlMap[$id] = route('public.blog.post', ['slug' => $blogPost->slug]);
         }
 
         // Get view counts for all URLs at once (more efficient than looping)
@@ -115,7 +115,7 @@ class BlogPostAnalyticsController extends Controller
         ]);
 
         $blogPost = BlogPost::findOrFail($id);
-        $url = route('public.blog-post', ['slug' => $blogPost->slug]);
+        $url = route('public.blog.post', ['slug' => $blogPost->slug]);
 
         $dateFrom = $validated['date_from'] ?? null;
         $dateTo = $validated['date_to'] ?? null;

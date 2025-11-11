@@ -147,11 +147,13 @@ const createEmoji = async () => {
         showCreateDialog.value = false;
         resetCreateForm();
         await loadEmojis();
-    } catch (err: any) {
-        if (err.response?.data?.errors) {
+    } catch (err: unknown) {
+        if (axios.isAxiosError(err) && err.response?.data?.errors) {
             createFormErrors.value = err.response.data.errors;
+        } else if (axios.isAxiosError(err)) {
+            error.value = err.response?.data?.message ?? 'Erreur lors de la création de l\'emoji';
         } else {
-            error.value = err.response?.data?.message || 'Erreur lors de la création de l\'emoji';
+            error.value = 'Erreur lors de la création de l\'emoji';
         }
     } finally {
         loading.value = false;
@@ -359,7 +361,7 @@ onMounted(() => {
 
                 <DialogFooter>
                     <Button variant="outline" @click="showCreateDialog = false">Annuler</Button>
-                    <Button @click="createEmoji" :disabled="loading">Créer</Button>
+                    <Button :disabled="loading" @click="createEmoji">Créer</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -378,7 +380,7 @@ onMounted(() => {
 
                 <DialogFooter>
                     <Button variant="outline" @click="showDeleteDialog = false">Annuler</Button>
-                    <Button variant="destructive" @click="deleteEmoji" :disabled="loading">Supprimer</Button>
+                    <Button variant="destructive" :disabled="loading" @click="deleteEmoji">Supprimer</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

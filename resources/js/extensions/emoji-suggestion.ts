@@ -3,7 +3,7 @@ import { nativeEmojis } from '@/data/native-emojis';
 import Suggestion, { type SuggestionOptions } from '@tiptap/suggestion';
 import axios from 'axios';
 import { type VueRenderer } from '@tiptap/vue-3';
-import { type Editor, Extension } from '@tiptap/core';
+import { Extension } from '@tiptap/core';
 import { PluginKey } from '@tiptap/pm/state';
 import tippy, { type Instance as TippyInstance } from 'tippy.js';
 
@@ -82,7 +82,7 @@ export const EmojiSuggestion = Extension.create({
                             .chain()
                             .focus()
                             .deleteRange(range)
-                            .insertContent(item.emoji || '')
+                            .insertContent(item.emoji ?? '')
                             .run();
                     } else {
                         // Insert custom emoji as :name:
@@ -97,14 +97,14 @@ export const EmojiSuggestion = Extension.create({
 
                 allow: ({ state, range }) => {
                     const $from = state.doc.resolve(range.from);
-                    const type = state.schema.nodes['codeBlock'];
-                    const isInCodeBlock = !!$from.parent.type.spec.code || ($from.parent.type === type);
+                    const type = state.schema.nodes.codeBlock;
+                    const isInCodeBlock = Boolean($from.parent.type.spec.code) || ($from.parent.type === type);
 
                     return !isInCodeBlock;
                 },
 
-                items: async ({ query }) => {
-                    return await getSuggestionItems(query);
+                items: ({ query }) => {
+                    return getSuggestionItems(query);
                 },
 
                 render: () => {

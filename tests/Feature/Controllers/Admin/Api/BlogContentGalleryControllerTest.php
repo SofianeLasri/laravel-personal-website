@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Controllers\Admin\Api;
 
-use App\Http\Controllers\Admin\Api\ContentGalleryController;
+use App\Http\Controllers\Admin\Api\BlogContentGalleryController;
 use App\Models\ContentGallery;
 use App\Models\Picture;
 use App\Models\TranslationKey;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 
-#[CoversClass(ContentGalleryController::class)]
+#[CoversClass(BlogContentGalleryController::class)]
 class BlogContentGalleryControllerTest extends TestCase
 {
     use ActsAsUser, RefreshDatabase;

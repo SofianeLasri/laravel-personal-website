@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Controllers\Admin\Api;
 
-use App\Http\Controllers\Admin\Api\ContentVideoController;
+use App\Http\Controllers\Admin\Api\BlogContentVideoController;
 use App\Models\ContentVideo;
 use App\Models\User;
 use App\Models\Video;
@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 
-#[CoversClass(ContentVideoController::class)]
+#[CoversClass(BlogContentVideoController::class)]
 class BlogContentVideoControllerTest extends TestCase
 {
     use ActsAsUser, RefreshDatabase;

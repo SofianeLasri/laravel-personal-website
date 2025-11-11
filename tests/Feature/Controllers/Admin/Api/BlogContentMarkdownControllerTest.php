@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Controllers\Admin\Api;
 
-use App\Http\Controllers\Admin\Api\ContentMarkdownController;
+use App\Http\Controllers\Admin\Api\BlogContentMarkdownController;
 use App\Models\ContentMarkdown;
 use App\Models\Translation;
 use App\Models\User;
@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\ActsAsUser;
 
-#[CoversClass(ContentMarkdownController::class)]
+#[CoversClass(BlogContentMarkdownController::class)]
 class BlogContentMarkdownControllerTest extends TestCase
 {
     use ActsAsUser, RefreshDatabase;

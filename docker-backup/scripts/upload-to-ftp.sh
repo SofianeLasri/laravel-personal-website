@@ -59,7 +59,6 @@ log_message "Starting FTP upload for backup: $BACKUP_NAME"
 log_message "Testing FTP connection..."
 
 if curl --connect-timeout "$FTP_TIMEOUT" \
-       --ftp-pasv \
        --user "$FTP_USERNAME:$FTP_PASSWORD" \
        "ftp://$FTP_HOST:$FTP_PORT/" \
        --list-only \
@@ -85,7 +84,6 @@ upload_with_curl() {
 
     log_message "Attempting upload with curl: $filename"
     if curl --connect-timeout "$FTP_TIMEOUT" \
-           --ftp-pasv \
            --user "$FTP_USERNAME:$FTP_PASSWORD" \
            --upload-file "$file" \
            "$remote_url" \
@@ -111,7 +109,6 @@ upload_with_curl_direct() {
     local remote_url="ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/$remote_filename"
 
     if curl --connect-timeout "$FTP_TIMEOUT" \
-           --ftp-pasv \
            --user "$FTP_USERNAME:$FTP_PASSWORD" \
            --upload-file "$file" \
            "$remote_url" \
@@ -183,7 +180,6 @@ fi
 # Verify upload by listing remote directory
 log_message "Verifying upload..."
 if curl --connect-timeout "$FTP_TIMEOUT" \
-       --ftp-pasv \
        --user "$FTP_USERNAME:$FTP_PASSWORD" \
        "ftp://$FTP_HOST:$FTP_PORT$FTP_PATH/" \
        --list-only \

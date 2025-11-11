@@ -298,7 +298,7 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                             class="h-full w-full object-cover"
                         />
                         <!-- Order controls overlay -->
-                        <div class="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-background/90 p-1 shadow-md backdrop-blur-sm">
+                        <div class="bg-background/90 absolute top-2 right-2 flex items-center gap-1 rounded-md p-1 shadow-md backdrop-blur-sm">
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -316,14 +316,18 @@ watch([() => props.creationDraftId, () => props.locale], async ([newDraftId, new
                                 :max="sortedScreenshots.length"
                                 class="h-6 w-12 p-1 text-center text-xs"
                                 :disabled="loading"
-                                @blur="(e: Event) => {
-                                    const target = e.target as HTMLInputElement | null;
-                                    if (target) changeOrder(screenshot, parseInt(target.value));
-                                }"
-                                @keyup.enter="(e: KeyboardEvent) => {
-                                    const target = e.target as HTMLInputElement | null;
-                                    if (target) target.blur();
-                                }"
+                                @blur="
+                                    (e: Event) => {
+                                        const target = e.target as HTMLInputElement | null;
+                                        if (target) changeOrder(screenshot, parseInt(target.value));
+                                    }
+                                "
+                                @keyup.enter="
+                                    (e: KeyboardEvent) => {
+                                        const target = e.target as HTMLInputElement | null;
+                                        if (target) target.blur();
+                                    }
+                                "
                             />
                             <Button
                                 variant="ghost"

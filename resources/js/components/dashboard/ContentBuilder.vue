@@ -492,7 +492,8 @@ defineExpose({
                             @update:model-value="(value: string) => updateMarkdownContent(content.content_id, value)"
                         />
                         <p class="text-muted-foreground mt-2 text-xs">
-                            Utilisez la syntaxe Markdown et insérez des emojis avec le bouton <span class="font-semibold">😊</span> ou en tapant <code class="bg-muted rounded px-1">:emoji_name:</code>
+                            Utilisez la syntaxe Markdown et insérez des emojis avec le bouton <span class="font-semibold">😊</span> ou en tapant
+                            <code class="bg-muted rounded px-1">:emoji_name:</code>
                         </p>
                     </div>
 

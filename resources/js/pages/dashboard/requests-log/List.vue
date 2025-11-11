@@ -219,7 +219,12 @@ const paginationInfo = computed(() => {
 });
 
 const isDetectedAsBot = (request: RequestLog): boolean => {
-    return (request.is_bot ?? false) || (request.is_bot_by_frequency ?? false) || (request.is_bot_by_user_agent ?? false) || (request.is_bot_by_parameters ?? false);
+    return (
+        (request.is_bot ?? false) ||
+        (request.is_bot_by_frequency ?? false) ||
+        (request.is_bot_by_user_agent ?? false) ||
+        (request.is_bot_by_parameters ?? false)
+    );
 };
 
 const getBotDetectionReasons = (request: RequestLog): string[] => {

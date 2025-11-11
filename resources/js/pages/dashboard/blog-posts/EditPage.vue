@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import ContentBuilder from '@/components/dashboard/ContentBuilder.vue';
 import BlogPostPreviewTokenManager from '@/components/dashboard/BlogPostPreviewTokenManager.vue';
 import CategoryQuickCreate from '@/components/dashboard/CategoryQuickCreate.vue';
+import ContentBuilder from '@/components/dashboard/ContentBuilder.vue';
 import GameReviewEditor from '@/components/dashboard/GameReviewEditor.vue';
 import Heading from '@/components/dashboard/Heading.vue';
 import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';

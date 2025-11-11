@@ -221,11 +221,15 @@ onMounted(() => {
                                 <Badge variant="outline">{{ post.type }}</Badge>
                                 <!--                                    <Badge variant="outline">{{ getTypeLabel(post.type) }}</Badge>-->
                             </TableCell>
-                            <TableCell>{{ post.category && post.category.name_translation_key ? getFrenchTranslation(post.category.name_translation_key) : 'Non définie' }}</TableCell>
+                            <TableCell>{{
+                                post.category && post.category.name_translation_key
+                                    ? getFrenchTranslation(post.category.name_translation_key)
+                                    : 'Non définie'
+                            }}</TableCell>
                             <TableCell>{{ post.published_at ? new Date(post.published_at).toLocaleDateString('fr-FR') : '-' }}</TableCell>
                             <TableCell>
                                 <div v-if="viewCountsLoading" class="flex items-center justify-center">
-                                    <Loader2 class="h-4 w-4 animate-spin text-muted-foreground" />
+                                    <Loader2 class="text-muted-foreground h-4 w-4 animate-spin" />
                                 </div>
                                 <div v-else class="flex items-center justify-center font-medium">
                                     {{ getViewCount(post.id) }}

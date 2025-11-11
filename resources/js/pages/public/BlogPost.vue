@@ -98,10 +98,7 @@ const pageImage = props.blogPost.coverImage?.webp.large || '/opengraph-image-120
                         />
 
                         <!-- Video Content -->
-                        <BlogVideoPlayer
-                            v-else-if="content.content_type === 'App\\Models\\ContentVideo' && content.video"
-                            :video="content.video"
-                        />
+                        <BlogVideoPlayer v-else-if="content.content_type === 'App\\Models\\ContentVideo' && content.video" :video="content.video" />
                     </template>
                 </div>
 

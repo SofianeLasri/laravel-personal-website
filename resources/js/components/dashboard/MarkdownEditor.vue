@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import EmojiPicker from '@/components/dashboard/EmojiPicker.vue';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import EmojiPicker from '@/components/dashboard/EmojiPicker.vue';
 import { EmojiSuggestion } from '@/extensions/emoji-suggestion';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';

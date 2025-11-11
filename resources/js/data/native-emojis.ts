@@ -450,8 +450,7 @@ export const searchEmojis = (query: string): NativeEmoji[] => {
     const lowercaseQuery = query.toLowerCase();
     return nativeEmojis.filter(
         (emoji) =>
-            emoji.name.toLowerCase().includes(lowercaseQuery) ||
-            emoji.keywords.some((keyword) => keyword.toLowerCase().includes(lowercaseQuery))
+            emoji.name.toLowerCase().includes(lowercaseQuery) || emoji.keywords.some((keyword) => keyword.toLowerCase().includes(lowercaseQuery)),
     );
 };
 

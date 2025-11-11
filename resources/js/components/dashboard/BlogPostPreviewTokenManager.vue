@@ -83,12 +83,15 @@ const revokePreviewToken = async () => {
 const copyToClipboard = () => {
     if (!previewToken.value) return;
 
-    void navigator.clipboard.writeText(previewToken.value.url).then(() => {
-        toast.success('Lien copié dans le presse-papier');
-    }).catch((error: unknown) => {
-        console.error('Error copying to clipboard:', error);
-        toast.error('Erreur lors de la copie du lien');
-    });
+    void navigator.clipboard
+        .writeText(previewToken.value.url)
+        .then(() => {
+            toast.success('Lien copié dans le presse-papier');
+        })
+        .catch((error: unknown) => {
+            console.error('Error copying to clipboard:', error);
+            toast.error('Erreur lors de la copie du lien');
+        });
 };
 
 const openPreview = () => {
@@ -141,7 +144,7 @@ onMounted(() => {
             </div>
 
             <div class="flex items-center justify-between text-xs">
-                <div class="flex items-center gap-1 text-muted-foreground">
+                <div class="text-muted-foreground flex items-center gap-1">
                     <Clock class="h-3.5 w-3.5" />
                     <span>Expire {{ previewToken.expires_at_human }}</span>
                 </div>

@@ -62,7 +62,7 @@ watch(
     () => props.items,
     () => {
         selectedIndex.value = 0;
-    }
+    },
 );
 
 onMounted(() => {
@@ -75,15 +75,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div
-        class="border-input bg-popover text-popover-foreground z-50 max-h-[300px] w-64 overflow-y-auto rounded-md border shadow-md"
-    >
+    <div class="border-input bg-popover text-popover-foreground z-50 max-h-[300px] w-64 overflow-y-auto rounded-md border shadow-md">
         <div v-if="items.length === 0" class="text-muted-foreground p-3 text-sm">Aucun emoji trouvé</div>
         <button
             v-for="(item, index) in items"
             :key="`${item.type}-${item.name}`"
             type="button"
-            class="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-accent"
+            class="hover:bg-accent flex w-full items-center gap-3 px-3 py-2 text-left transition-colors"
             :class="{
                 'bg-accent': index === selectedIndex,
             }"
@@ -93,13 +91,7 @@ onBeforeUnmount(() => {
             <span v-if="item.type === 'native'" class="text-2xl">{{ item.emoji }}</span>
 
             <!-- Custom emoji -->
-            <img
-                v-else
-                :src="item.preview_url"
-                :alt="item.name"
-                class="h-6 w-6 object-contain"
-                loading="lazy"
-            />
+            <img v-else :src="item.preview_url" :alt="item.name" class="h-6 w-6 object-contain" loading="lazy" />
 
             <span class="font-mono text-sm">:{{ item.name }}:</span>
         </button>

@@ -61,7 +61,7 @@
         "prosemirror-state": "^1.4.3",
         "prosemirror-view": "^1.39.1",
         "radix-vue": "^1.9.17",
-        "reka-ui": "^2.4.1",
+        "reka-ui": "^2.6.0",
         "slugify": "^1.6.6",
         "sortablejs": "^1.15.6",
         "tailwind-merge": "^2.6.0",

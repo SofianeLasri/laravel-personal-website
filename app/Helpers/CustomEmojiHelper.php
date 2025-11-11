@@ -21,7 +21,8 @@ class CustomEmojiHelper
 
         // Use FIELD() for MySQL, fall back to regular ordering for SQLite
         if (config('database.default') === 'mysql') {
-            $query->orderByRaw('FIELD(format, '.implode(',', array_map(fn ($f) => "'$f'", $formats)).')');
+            $placeholders = implode(',', array_fill(0, count($formats), '?'));
+            $query->orderByRaw("FIELD(format, $placeholders)", $formats);
         } else {
             $query->orderBy('format');
         }

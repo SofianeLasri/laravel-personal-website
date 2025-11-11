@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomEmojiRequest;
 use App\Models\CustomEmoji;
 use App\Models\Picture;
+use App\Services\CustomEmojiResolverService;
 use App\Services\UploadedFilesService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -68,6 +69,9 @@ class CustomEmojiController extends Controller
             // Load relationships for response
             $emoji->load(['picture.optimizedPictures']);
 
+            // Clear emoji cache so new emoji appears immediately
+            CustomEmojiResolverService::clearCache();
+
             return response()->json($emoji, Response::HTTP_CREATED);
         } catch (Exception $e) {
             // Clean up uploaded picture if emoji creation failed
@@ -76,7 +80,7 @@ class CustomEmojiController extends Controller
             }
 
             return response()->json([
-                'message' => 'Erreur lors de la création de l\'emoji: '.$e->getMessage(),
+                'message' => __('emoji.creation_error', ['error' => $e->getMessage()]),
             ], 500);
         }
     }
@@ -104,6 +108,9 @@ class CustomEmojiController extends Controller
 
         // Delete the emoji (cascade will delete the picture)
         $emoji->delete();
+
+        // Clear emoji cache so deleted emoji no longer appears
+        CustomEmojiResolverService::clearCache();
 
         return response()->noContent();
     }

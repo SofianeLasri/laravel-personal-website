@@ -1145,7 +1145,12 @@ class PublicControllersService
                 $markdownContent = $content->content->translationKey ?
                     $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
-                $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+                try {
+                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+                } catch (\Exception $e) {
+                    // Fallback to original markdown if emoji resolution fails
+                    $result['markdown'] = $markdownContent;
+                }
             } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
                 // Get caption translation keys from the pivot data
                 $captionTranslationKeyIds = $content->content->pictures
@@ -1310,7 +1315,12 @@ class PublicControllersService
                 $markdownContent = $content->content->translationKey ?
                     $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
-                $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+                try {
+                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+                } catch (\Exception $e) {
+                    // Fallback to original markdown if emoji resolution fails
+                    $result['markdown'] = $markdownContent;
+                }
             } elseif ($content->content_type === BlogContentGallery::class && $content->content instanceof BlogContentGallery) {
                 // Get caption translation keys from the pivot data
                 $captionTranslationKeyIds = $content->content->pictures

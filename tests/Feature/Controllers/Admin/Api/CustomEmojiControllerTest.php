@@ -268,7 +268,7 @@ class CustomEmojiControllerTest extends TestCase
 
         $response->assertStatus(500)
             ->assertJson([
-                'message' => 'Erreur lors de la création de l\'emoji: Upload failed',
+                'message' => 'Erreur lors de la création de l\'emoji : Upload failed',
             ]);
 
         $this->assertDatabaseMissing('custom_emojis', [

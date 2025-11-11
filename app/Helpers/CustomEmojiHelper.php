@@ -68,7 +68,7 @@ class CustomEmojiHelper
         }
 
         // Build final picture tag
-        $sourcesHtml = implode("\n  ", $sources);
+        $sourcesHtml = implode('', $sources);
         $imgTag = sprintf(
             '<img src="%s" alt="%s" class="inline-emoji" loading="lazy" />',
             htmlspecialchars($fallbackUrl ?? '', ENT_QUOTES, 'UTF-8'),
@@ -76,7 +76,7 @@ class CustomEmojiHelper
         );
 
         return sprintf(
-            '<picture class="inline-emoji">'."\n  %s\n  %s\n".'</picture>',
+            '<picture class="inline-emoji">%s%s</picture>',
             $sourcesHtml,
             $imgTag
         );

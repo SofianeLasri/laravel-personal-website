@@ -39,6 +39,7 @@ class WebsiteExportServiceTest extends TestCase
         $this->assertContains('technologies', $tables);
         $this->assertContains('creations', $tables);
         $this->assertContains('pictures', $tables);
+        $this->assertContains('custom_emojis', $tables);
 
         $usersIndex = array_search('users', $tables);
         $creationTechnologyIndex = array_search('creation_technology', $tables);

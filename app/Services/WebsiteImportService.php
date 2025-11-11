@@ -29,6 +29,7 @@ class WebsiteImportService
         'translation_keys',
         'pictures',
         'optimized_pictures',
+        'custom_emojis',
         'people',
         'tags',
         'videos',

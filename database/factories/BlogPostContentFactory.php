@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\BlogPost;
+use App\Models\BlogPostContent;
 use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
 use App\Models\ContentVideo;
-use App\Models\BlogPost;
-use App\Models\BlogPostContent;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BlogPostContentFactory extends Factory

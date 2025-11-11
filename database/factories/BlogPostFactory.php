@@ -3,9 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
-use App\Models\BlogPost;
 use App\Models\Picture;
 use App\Models\TranslationKey;
 use Illuminate\Database\Eloquent\Factories\Factory;

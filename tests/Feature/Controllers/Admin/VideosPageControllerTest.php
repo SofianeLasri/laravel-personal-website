@@ -3,9 +3,9 @@
 namespace Tests\Feature\Controllers\Admin;
 
 use App\Http\Controllers\Admin\VideosPageController;
-use App\Models\ContentVideo;
 use App\Models\BlogPostDraft;
 use App\Models\BlogPostDraftContent;
+use App\Models\ContentVideo;
 use App\Models\Creation;
 use App\Models\Picture;
 use App\Models\Video;

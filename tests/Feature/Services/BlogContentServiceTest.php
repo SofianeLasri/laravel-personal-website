@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
+use App\Models\BlogPost;
+use App\Models\BlogPostDraft;
 use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
 use App\Models\ContentVideo;
-use App\Models\BlogPost;
-use App\Models\BlogPostDraft;
 use App\Models\Picture;
 use App\Models\TranslationKey;
 use App\Models\Video;

@@ -30,8 +30,8 @@ import type { BlogPostWithAllRelations, BreadcrumbItem, TranslationKey } from '@
 import { compareValues, type SortDirection } from '@/utils/sorting';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
-import { ArrowDown, ArrowUp, Edit, MoreHorizontal, Trash2 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { ArrowDown, ArrowUp, Edit, Eye, Loader2, MoreHorizontal, Trash2 } from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue';
 
 interface Props {
     blogPosts: BlogPostWithAllRelations[];
@@ -127,6 +127,47 @@ const navigateToDraftEdit = () => {
     }
     showDraftAlert.value = false;
 };
+
+// View counts functionality
+const viewCounts = ref<Record<number, number>>({});
+const viewCountsLoading = ref(true);
+const viewCountsError = ref(false);
+
+const loadViewCounts = async () => {
+    viewCountsLoading.value = true;
+    viewCountsError.value = false;
+
+    try {
+        const blogPostIds = props.blogPosts.map((post) => post.id);
+
+        const response = await axios.get(route('dashboard.api.blog-posts.views'), {
+            params: {
+                ids: blogPostIds,
+            },
+        });
+
+        viewCounts.value = response.data.views;
+    } catch (error) {
+        console.error('Error loading view counts:', error);
+        viewCountsError.value = true;
+    } finally {
+        viewCountsLoading.value = false;
+    }
+};
+
+const getViewCount = (postId: number): string => {
+    if (viewCountsLoading.value) {
+        return '';
+    }
+    if (viewCountsError.value) {
+        return '-';
+    }
+    return viewCounts.value[postId]?.toString() || '0';
+};
+
+onMounted(() => {
+    loadViewCounts();
+});
 </script>
 
 <template>
@@ -163,6 +204,12 @@ const navigateToDraftEdit = () => {
                                     <ArrowDown v-if="sortColumn === 'published_at' && sortDirection === 'desc'" class="ml-1 h-4 w-4" />
                                 </div>
                             </TableHead>
+                            <TableHead class="w-[100px]">
+                                <div class="flex items-center">
+                                    <Eye class="mr-1 h-4 w-4" />
+                                    Vues
+                                </div>
+                            </TableHead>
                             <TableHead class="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -176,6 +223,14 @@ const navigateToDraftEdit = () => {
                             </TableCell>
                             <TableCell>{{ post.category?.name || 'Non définie' }}</TableCell>
                             <TableCell>{{ post.published_at ? new Date(post.published_at).toLocaleDateString('fr-FR') : '-' }}</TableCell>
+                            <TableCell>
+                                <div v-if="viewCountsLoading" class="flex items-center justify-center">
+                                    <Loader2 class="h-4 w-4 animate-spin text-muted-foreground" />
+                                </div>
+                                <div v-else class="flex items-center justify-center font-medium">
+                                    {{ getViewCount(post.id) }}
+                                </div>
+                            </TableCell>
                             <TableCell class="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger as-child>

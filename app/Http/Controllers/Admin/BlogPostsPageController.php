@@ -13,7 +13,7 @@ class BlogPostsPageController extends Controller
     {
         $articles = BlogPost::with([
             'titleTranslationKey.translations',
-            'category',
+            'category.nameTranslationKey.translations',
             'coverPicture',
             'drafts',
         ])->get();

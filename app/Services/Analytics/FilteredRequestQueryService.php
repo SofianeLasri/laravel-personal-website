@@ -48,8 +48,8 @@ class FilteredRequestQueryService
      * - URL parameter analysis (random strings, attack patterns)
      * - Legacy is_bot flag from user_agent_metadata
      *
-     * @param Builder<LoggedRequest> $query The query builder instance
-     * @param bool $excludeBots True to exclude bots (default), false to only include bots, null for no filtering
+     * @param  Builder<LoggedRequest>  $query  The query builder instance
+     * @param  bool  $excludeBots  True to exclude bots (default), false to only include bots, null for no filtering
      * @return Builder<LoggedRequest>
      */
     public function applyBotFilters(Builder $query, ?bool $excludeBots = true): Builder
@@ -92,13 +92,13 @@ class FilteredRequestQueryService
      * 2. Indirect: Exclude ALL requests from IPs that have EVER been used by authenticated users
      *    This prevents counting pre-auth visits from the same IP as "unique visitors"
      *
-     * @param Builder<LoggedRequest> $query The query builder instance
-     * @param bool $excludeAuthUsers True to exclude authenticated users (default), false to disable filtering
+     * @param  Builder<LoggedRequest>  $query  The query builder instance
+     * @param  bool  $excludeAuthUsers  True to exclude authenticated users (default), false to disable filtering
      * @return Builder<LoggedRequest>
      */
     public function applyAuthenticatedUserFilters(Builder $query, bool $excludeAuthUsers = true): Builder
     {
-        if (!$excludeAuthUsers) {
+        if (! $excludeAuthUsers) {
             return $query;
         }
 
@@ -117,8 +117,8 @@ class FilteredRequestQueryService
     /**
      * Apply status code filter (e.g., successful responses only).
      *
-     * @param Builder<LoggedRequest> $query The query builder instance
-     * @param array<int, int> $statusCodes Array of HTTP status codes to include (default: [200, 304])
+     * @param  Builder<LoggedRequest>  $query  The query builder instance
+     * @param  array<int, int>  $statusCodes  Array of HTTP status codes to include (default: [200, 304])
      * @return Builder<LoggedRequest>
      */
     public function applyStatusCodeFilter(Builder $query, array $statusCodes = [200, 304]): Builder
@@ -133,9 +133,9 @@ class FilteredRequestQueryService
     /**
      * Apply date range filter.
      *
-     * @param Builder<LoggedRequest> $query The query builder instance
-     * @param string|null $dateFrom Start date (YYYY-MM-DD format)
-     * @param string|null $dateTo End date (YYYY-MM-DD format)
+     * @param  Builder<LoggedRequest>  $query  The query builder instance
+     * @param  string|null  $dateFrom  Start date (YYYY-MM-DD format)
+     * @param  string|null  $dateTo  End date (YYYY-MM-DD format)
      * @return Builder<LoggedRequest>
      */
     public function applyDateRangeFilter(Builder $query, ?string $dateFrom = null, ?string $dateTo = null): Builder
@@ -147,7 +147,7 @@ class FilteredRequestQueryService
 
         if ($dateTo) {
             // @phpstan-ignore argument.type (Column exists in table)
-            $query->where('logged_requests.created_at', '<=', $dateTo . ' 23:59:59');
+            $query->where('logged_requests.created_at', '<=', $dateTo.' 23:59:59');
         }
 
         return $query;
@@ -156,9 +156,9 @@ class FilteredRequestQueryService
     /**
      * Apply URL filter (include specific URL pattern or exclude URLs).
      *
-     * @param Builder<LoggedRequest> $query The query builder instance
-     * @param string|null $urlPattern URL pattern to match (supports LIKE wildcards)
-     * @param array<int, string>|null $excludedUrls Array of URLs to exclude (exact match)
+     * @param  Builder<LoggedRequest>  $query  The query builder instance
+     * @param  string|null  $urlPattern  URL pattern to match (supports LIKE wildcards)
+     * @param  array<int, string>|null  $excludedUrls  Array of URLs to exclude (exact match)
      * @return Builder<LoggedRequest>
      */
     public function applyUrlFilter(Builder $query, ?string $urlPattern = null, ?array $excludedUrls = null): Builder
@@ -167,7 +167,7 @@ class FilteredRequestQueryService
             $query->where('urls.url', 'like', $urlPattern);
         }
 
-        if (!empty($excludedUrls)) {
+        if (! empty($excludedUrls)) {
             $query->whereNotIn('urls.url', $excludedUrls);
         }
 
@@ -177,18 +177,18 @@ class FilteredRequestQueryService
     /**
      * Apply IP address filters (include or exclude specific IPs).
      *
-     * @param Builder<LoggedRequest> $query The query builder instance
-     * @param array<int, string>|null $includeIps Array of IP addresses to include (exact match)
-     * @param array<int, string>|null $excludeIps Array of IP addresses to exclude (exact match)
+     * @param  Builder<LoggedRequest>  $query  The query builder instance
+     * @param  array<int, string>|null  $includeIps  Array of IP addresses to include (exact match)
+     * @param  array<int, string>|null  $excludeIps  Array of IP addresses to exclude (exact match)
      * @return Builder<LoggedRequest>
      */
     public function applyIpFilters(Builder $query, ?array $includeIps = null, ?array $excludeIps = null): Builder
     {
-        if (!empty($includeIps)) {
+        if (! empty($includeIps)) {
             $query->whereIn('ip_addresses.ip', $includeIps);
         }
 
-        if (!empty($excludeIps)) {
+        if (! empty($excludeIps)) {
             $query->whereNotIn('ip_addresses.ip', $excludeIps);
         }
 
@@ -198,14 +198,14 @@ class FilteredRequestQueryService
     /**
      * Apply user agent filters (include or exclude based on user agent strings).
      *
-     * @param Builder<LoggedRequest> $query The query builder instance
-     * @param array<int, string>|null $includeUserAgents Array of user agent patterns to include (partial match)
-     * @param array<int, string>|null $excludeUserAgents Array of user agent patterns to exclude (partial match)
+     * @param  Builder<LoggedRequest>  $query  The query builder instance
+     * @param  array<int, string>|null  $includeUserAgents  Array of user agent patterns to include (partial match)
+     * @param  array<int, string>|null  $excludeUserAgents  Array of user agent patterns to exclude (partial match)
      * @return Builder<LoggedRequest>
      */
     public function applyUserAgentFilters(Builder $query, ?array $includeUserAgents = null, ?array $excludeUserAgents = null): Builder
     {
-        if (!empty($includeUserAgents)) {
+        if (! empty($includeUserAgents)) {
             $query->where(function ($q) use ($includeUserAgents) {
                 foreach ($includeUserAgents as $userAgent) {
                     $q->orWhere('user_agents.user_agent', 'like', "%{$userAgent}%");
@@ -213,7 +213,7 @@ class FilteredRequestQueryService
             });
         }
 
-        if (!empty($excludeUserAgents)) {
+        if (! empty($excludeUserAgents)) {
             foreach ($excludeUserAgents as $userAgent) {
                 $query->where('user_agents.user_agent', 'not like', "%{$userAgent}%");
             }
@@ -225,13 +225,13 @@ class FilteredRequestQueryService
     /**
      * Apply search filter across multiple fields (IP, URL, user agent, method, status code).
      *
-     * @param Builder<LoggedRequest> $query The query builder instance
-     * @param string|null $search Search term
+     * @param  Builder<LoggedRequest>  $query  The query builder instance
+     * @param  string|null  $search  Search term
      * @return Builder<LoggedRequest>
      */
     public function applySearchFilter(Builder $query, ?string $search = null): Builder
     {
-        if (!$search) {
+        if (! $search) {
             return $query;
         }
 
@@ -248,9 +248,9 @@ class FilteredRequestQueryService
      * Build a query to count unique visitors (unique IPs).
      * Applies standard filters for clean analytics: no bots, no authenticated users.
      *
-     * @param string $url The URL to count visits for (exact match)
-     * @param string|null $dateFrom Optional start date
-     * @param string|null $dateTo Optional end date
+     * @param  string  $url  The URL to count visits for (exact match)
+     * @param  string|null  $dateFrom  Optional start date
+     * @param  string|null  $dateTo  Optional end date
      * @return Builder<LoggedRequest> Query ready to execute with ->count(DB::raw('DISTINCT ip_addresses.id'))
      */
     public function buildUniqueVisitorsQuery(string $url, ?string $dateFrom = null, ?string $dateTo = null): Builder

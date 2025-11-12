@@ -449,36 +449,25 @@ class PublicControllersServiceTest extends TestCase
     }
 
     #[Test]
-    public function test_creation_translation_fallback_for_content_blocks(): void
+    public function test_creation_translation_fallback_for_full_description(): void
     {
         app()->setLocale('es');
         config(['app.fallback_locale' => 'en']);
 
         $creation = Creation::factory()->create();
 
-        // Create content markdown with only English translation
-        $translationKey = TranslationKey::factory()->create();
+        // Create only English translation for full description
+        $creation->fullDescriptionTranslationKey->translations()->delete();
         Translation::factory()->create([
-            'translation_key_id' => $translationKey->id,
+            'translation_key_id' => $creation->fullDescriptionTranslationKey->id,
             'locale' => 'en',
-            'text' => 'English markdown content',
-        ]);
-
-        $markdownContent = ContentMarkdown::factory()->create([
-            'translation_key_id' => $translationKey->id,
-        ]);
-
-        $creation->contents()->create([
-            'content_type' => ContentMarkdown::class,
-            'content_id' => $markdownContent->id,
-            'order' => 1,
+            'text' => 'English full description',
         ]);
 
         $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
 
-        $this->assertCount(1, $result['contents']);
-        $this->assertEquals('English markdown content', $result['contents'][0]['markdown']);
+        $this->assertEquals('English full description', $result['fullDescription']);
     }
 
     #[Test]

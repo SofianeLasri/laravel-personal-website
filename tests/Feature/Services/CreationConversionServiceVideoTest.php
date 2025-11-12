@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Services;
 
-use App\Models\ContentMarkdown;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\Video;
@@ -25,15 +24,6 @@ class CreationConversionServiceVideoTest extends TestCase
     public function test_convert_draft_to_creation_copies_videos(): void
     {
         $draft = CreationDraft::factory()->create();
-
-        // Add content block (required)
-        $markdownContent = ContentMarkdown::factory()->create();
-        $draft->contents()->create([
-            'content_type' => ContentMarkdown::class,
-            'content_id' => $markdownContent->id,
-            'order' => 1,
-        ]);
-
         $videos = Video::factory()->count(3)->create();
 
         $draft->videos()->sync($videos->pluck('id'));
@@ -53,14 +43,6 @@ class CreationConversionServiceVideoTest extends TestCase
     {
         $draft = CreationDraft::factory()->create();
 
-        // Add content block (required)
-        $markdownContent = ContentMarkdown::factory()->create();
-        $draft->contents()->create([
-            'content_type' => ContentMarkdown::class,
-            'content_id' => $markdownContent->id,
-            'order' => 1,
-        ]);
-
         $creation = $this->service->convertDraftToCreation($draft);
 
         $this->assertInstanceOf(Creation::class, $creation);
@@ -76,15 +58,6 @@ class CreationConversionServiceVideoTest extends TestCase
         $draft = CreationDraft::factory()->create([
             'original_creation_id' => $existingCreation->id,
         ]);
-
-        // Add content block (required)
-        $markdownContent = ContentMarkdown::factory()->create();
-        $draft->contents()->create([
-            'content_type' => ContentMarkdown::class,
-            'content_id' => $markdownContent->id,
-            'order' => 1,
-        ]);
-
         $newVideos = Video::factory()->count(3)->create();
         $draft->videos()->sync($newVideos->pluck('id'));
 

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Models\Creation;
 
 use App\Enums\CreationType;
-use App\Models\ContentMarkdown;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\CreationDraftFeature;
@@ -271,14 +270,6 @@ class CreationDraftTest extends TestCase
             'type' => CreationType::GAME,
         ]);
 
-        // Add content block (required)
-        $markdownContent = ContentMarkdown::factory()->create();
-        $draft->contents()->create([
-            'content_type' => ContentMarkdown::class,
-            'content_id' => $markdownContent->id,
-            'order' => 1,
-        ]);
-
         $updatedCreation = $draft->updateCreation($existingCreation);
 
         $this->assertEquals('Updated Name', $updatedCreation->name);
@@ -391,14 +382,6 @@ class CreationDraftTest extends TestCase
             'slug' => 'test-complete-draft',
             'short_description_translation_key_id' => $shortDescKey->id,
             'full_description_translation_key_id' => $fullDescKey->id,
-        ]);
-
-        // Add content block (required)
-        $markdownContent = ContentMarkdown::factory()->create();
-        $draft->contents()->create([
-            'content_type' => ContentMarkdown::class,
-            'content_id' => $markdownContent->id,
-            'order' => 1,
         ]);
 
         $featureTitleKey = TranslationKey::factory()->create(['key' => 'feature.draft.title']);

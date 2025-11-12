@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AppLogo from '@/components/dashboard/AppLogo.vue';
-import AppLogoIcon from '@/components/dashboard/AppLogoIcon.vue';
-import Breadcrumbs from '@/components/dashboard/Breadcrumbs.vue';
-import UserMenuContent from '@/components/dashboard/UserMenuContent.vue';
+import AppLogo from '@/components/dashboard/shared/branding/AppLogo.vue';
+import AppLogoIcon from '@/components/dashboard/shared/branding/AppLogoIcon.vue';
+import Breadcrumbs from '@/components/dashboard/shared/layout/Breadcrumbs.vue';
+import UserMenuContent from '@/components/dashboard/shared/navigation/UserMenuContent.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';

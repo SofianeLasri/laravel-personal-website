@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import EmojiPicker from '@/components/dashboard/EmojiPicker.vue';
+import EmojiPicker from '@/components/dashboard/content/EmojiPicker.vue';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';

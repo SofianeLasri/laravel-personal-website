@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
 
-import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
+import HeadingSmall from '@/components/dashboard/shared/ui/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,

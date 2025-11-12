@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppLogoIcon from '@/components/dashboard/AppLogoIcon.vue';
+import AppLogoIcon from '@/components/dashboard/shared/branding/AppLogoIcon.vue';
 import { Link } from '@inertiajs/vue3';
 
 defineProps<{

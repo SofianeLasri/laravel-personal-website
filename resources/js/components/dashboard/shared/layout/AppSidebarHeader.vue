@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Breadcrumbs from '@/components/dashboard/Breadcrumbs.vue';
+import Breadcrumbs from '@/components/dashboard/shared/layout/Breadcrumbs.vue';
 import NotificationPopover from '@/components/ui/notification/NotificationPopover.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItemType } from '@/types';

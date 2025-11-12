@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Pagination from '@/components/dashboard/Pagination.vue';
-import TranslationCell from '@/components/dashboard/TranslationCell.vue';
+import TranslationCell from '@/components/dashboard/forms/TranslationCell.vue';
+import Pagination from '@/components/dashboard/shared/ui/Pagination.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

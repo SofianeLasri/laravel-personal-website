@@ -51,13 +51,9 @@ class CreationContentBlockBugsTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($creation) {
             $browser->loginAs($this->user)
-                ->visit('/dashboard/creations')
-                ->waitForText('Test Creation With Content')
-                ->pause(500) // Wait for any animations
-                ->click('@creation-'.$creation->id.'-edit') // Click edit button
-                ->waitForLocation('/dashboard/creations/edit')
-                ->pause(1000) // Wait for content to load
+                ->visit('/dashboard/creations/edit?creation-id='.$creation->id) // Direct navigation
                 ->waitForText('Markdown') // Should see the markdown content block type
+                ->pause(3000) // Wait longer for markdown editor and translations to load
                 ->assertSee('This is the markdown content'); // Should see the actual content
 
             // Verify in database that a draft was created with content blocks

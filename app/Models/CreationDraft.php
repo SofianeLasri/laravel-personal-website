@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CreationType;
+use App\Services\BlogContentDuplicationService;
 use App\Services\CreationConversionService;
 use Database\Factories\CreationDraftFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -222,6 +223,26 @@ class CreationDraft extends Model
                 'caption_translation_key_id' => $screenshot->caption_translation_key_id,
                 'order' => $screenshot->order,
             ]);
+        }
+
+        // Copy content blocks
+        $duplicationService = app(BlogContentDuplicationService::class);
+        foreach ($creation->contents()->with('content')->orderBy('order')->get() as $creationContent) {
+            // Duplicate the content entity
+            $newContent = match (get_class($creationContent->content)) {
+                ContentMarkdown::class => $duplicationService->duplicateMarkdownContent($creationContent->content),
+                ContentGallery::class => $duplicationService->duplicateGalleryContent($creationContent->content),
+                ContentVideo::class => $duplicationService->duplicateVideoContent($creationContent->content),
+                default => null,
+            };
+
+            if ($newContent) {
+                $draft->contents()->create([
+                    'content_type' => $creationContent->content_type,
+                    'content_id' => $newContent->id,
+                    'order' => $creationContent->order,
+                ]);
+            }
         }
 
         $draft->technologies()->attach($creation->technologies()->pluck('technologies.id'));

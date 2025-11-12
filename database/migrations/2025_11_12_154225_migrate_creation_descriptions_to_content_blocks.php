@@ -17,7 +17,9 @@ return new class extends Migration
     {
         // Migrate Creation descriptions
         DB::transaction(function () {
-            $creations = Creation::whereNotNull('full_description_translation_key_id')->get();
+            $creations = Creation::whereNotNull('full_description_translation_key_id')
+                ->whereDoesntHave('contents')
+                ->get();
 
             foreach ($creations as $creation) {
                 // Create ContentMarkdown entry
@@ -36,7 +38,9 @@ return new class extends Migration
 
         // Migrate CreationDraft descriptions
         DB::transaction(function () {
-            $drafts = CreationDraft::whereNotNull('full_description_translation_key_id')->get();
+            $drafts = CreationDraft::whereNotNull('full_description_translation_key_id')
+                ->whereDoesntHave('contents')
+                ->get();
 
             foreach ($drafts as $draft) {
                 // Create ContentMarkdown entry

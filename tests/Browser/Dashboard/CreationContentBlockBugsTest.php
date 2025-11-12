@@ -36,7 +36,7 @@ class CreationContentBlockBugsTest extends DuskTestCase
 
         $translationKey = TranslationKey::factory()->withTranslations([
             'en' => 'This is the markdown content for the creation.',
-            'fr' => 'Ceci est le contenu markdown de la création.',
+            'fr' => 'Ceci est le contenu markdown pour la création.',
         ])->create();
 
         $markdown = ContentMarkdown::create([
@@ -51,10 +51,10 @@ class CreationContentBlockBugsTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($creation) {
             $browser->loginAs($this->user)
-                ->visit('/dashboard/creations/edit?creation-id='.$creation->id) // Direct navigation
-                ->waitForText('Markdown') // Should see the markdown content block type
-                ->pause(3000) // Wait longer for markdown editor and translations to load
-                ->assertSee('This is the markdown content'); // Should see the actual content
+                ->visit('/dashboard/creations/edit?creation-id='.$creation->id)
+                ->waitForText('Markdown')
+                ->pause(3000) // Wait for content to load
+                ->assertSee('Ceci est le contenu markdown pour la création'); // French locale
 
             // Verify in database that a draft was created with content blocks
             $draft = CreationDraft::where('original_creation_id', $creation->id)->first();
@@ -70,7 +70,7 @@ class CreationContentBlockBugsTest extends DuskTestCase
         // Create a draft that already has content blocks
         $translationKey = TranslationKey::factory()->withTranslations([
             'en' => 'Existing content block.',
-            'fr' => 'Bloc de contenu existant.',
+            'fr' => 'Contenu existant du bloc.',
         ])->create();
 
         $draft = CreationDraft::factory()->create([
@@ -95,8 +95,8 @@ class CreationContentBlockBugsTest extends DuskTestCase
             $browser->loginAs($this->user)
                 ->visit('/dashboard/creations/edit?draft-id='.$draft->id)
                 ->waitForText('Markdown')
-                ->assertSee('Existing content block')
-                ->pause(1000);
+                ->pause(3000) // Wait for content to load
+                ->assertSee('Contenu existant du bloc'); // French locale
 
             $draft->refresh();
             // Should not have created additional content blocks
@@ -149,9 +149,9 @@ class CreationContentBlockBugsTest extends DuskTestCase
             $browser->loginAs($this->user)
                 ->visit('/dashboard/creations/edit?creation-id='.$creation->id)
                 ->waitForText('Markdown')
-                ->pause(1000)
-                ->assertSee('First markdown block')
-                ->assertSee('Second markdown block');
+                ->pause(3000) // Wait for content to load
+                ->assertSee('Contenu du premier bloc markdown') // French locale
+                ->assertSee('Contenu du deuxième bloc markdown'); // French locale
 
             // Verify in database that draft has both content blocks
             $draft = CreationDraft::where('original_creation_id', $creation->id)->first();

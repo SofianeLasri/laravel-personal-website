@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BlogImageGallery from '@/components/public/Blog/BlogImageGallery.vue';
+import BlogVideoPlayer from '@/components/public/Blog/BlogVideoPlayer.vue';
 import GitHubStats from '@/components/public/GitHubStats.vue';
 import LightShape from '@/components/public/LightShape.vue';
 import MarkdownViewer from '@/components/public/MarkdownViewer.vue';
@@ -103,7 +105,29 @@ if (props.creation.screenshots.length > 0) {
                 <div class="content-sections mt-8" data-testid="project-content">
                     <section id="description" class="flex w-full min-w-0 flex-col" data-testid="description-section">
                         <ContentSectionTitle>{{ t('project.description') }}</ContentSectionTitle>
-                        <MarkdownViewer :source="creation.fullDescription" data-testid="project-description" />
+
+                        <!-- Content Blocks -->
+                        <div class="flex min-w-0 flex-col gap-8">
+                            <template v-for="(content, index) in creation.contents" :key="content.id">
+                                <!-- Markdown Content -->
+                                <div
+                                    v-if="content.content_type === 'App\\Models\\ContentMarkdown' && content.markdown"
+                                    class="min-w-0"
+                                    :class="[index === 0 ? 'first-paragraph-large' : '']"
+                                >
+                                    <MarkdownViewer :source="content.markdown" data-testid="project-description" />
+                                </div>
+
+                                <!-- Gallery Content -->
+                                <BlogImageGallery
+                                    v-else-if="content.content_type === 'App\\Models\\ContentGallery' && content.gallery"
+                                    :pictures="content.gallery.pictures"
+                                />
+
+                                <!-- Video Content -->
+                                <BlogVideoPlayer v-else-if="content.content_type === 'App\\Models\\ContentVideo' && content.video" :video="content.video" />
+                            </template>
+                        </div>
                     </section>
 
                     <section v-if="creation.features.length > 0" id="features" class="mt-16 flex flex-col gap-8" data-testid="features-section">

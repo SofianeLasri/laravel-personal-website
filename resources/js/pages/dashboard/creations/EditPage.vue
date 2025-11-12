@@ -5,7 +5,7 @@ import CreationDraftScreenshots from '@/components/dashboard/creations/CreationD
 import CreationDraftTags from '@/components/dashboard/creations/CreationDraftTags.vue';
 import CreationDraftTechnologies from '@/components/dashboard/creations/CreationDraftTechnologies.vue';
 import CreationDraftVideos from '@/components/dashboard/creations/CreationDraftVideos.vue';
-import MarkdownEditor from '@/components/dashboard/forms/MarkdownEditor.vue';
+import ContentBuilder from '@/components/dashboard/media/ContentBuilder.vue';
 import PictureInput from '@/components/dashboard/media/PictureInput.vue';
 import Heading from '@/components/dashboard/shared/ui/Heading.vue';
 import HeadingSmall from '@/components/dashboard/shared/ui/HeadingSmall.vue';
@@ -27,7 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, TranslationKey } from '@/types';
+import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, Picture, TranslationKey, Video } from '@/types';
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -40,6 +40,8 @@ import * as z from 'zod';
 
 const props = defineProps<{
     creationDraft?: CreationDraftWithTranslations;
+    pictures: Picture[];
+    videos: Video[];
 }>();
 const route = useRoute();
 
@@ -58,6 +60,9 @@ const creationTypes = Object.keys(creationTypeLabels) as CreationType[];
 const isSubmitting = ref(false);
 const isPublishing = ref(false);
 const currentCreationDraft = ref<CreationDraftWithTranslations | null>(null);
+
+// Ref for ContentBuilder to access saveAllGalleries method
+const creationContentBuilderRef = ref<{ saveAllGalleries?: () => Promise<void> } | null>(null);
 
 if (props.creationDraft) {
     currentCreationDraft.value = props.creationDraft;
@@ -99,7 +104,6 @@ const formSchema = toTypedSchema(
             .string()
             .max(160, 'La description courte ne doit pas dépasser 160 caractères')
             .min(1, 'La description courte est requise'),
-        full_description_content: z.string().min(1, 'La description complète est requise'),
         featured: z.boolean().default(false),
         started_at: z.string().min(1, 'La date de début est requise'),
         ended_at: z.string().nullable(),
@@ -113,14 +117,9 @@ const getContentForLocale = (translationKey: TranslationKey | undefined, targetL
 };
 
 let shortDescriptionContent = '';
-let fullDescriptionContent = '';
 
 if (currentCreationDraft.value?.short_description_translation_key) {
     shortDescriptionContent = getContentForLocale(currentCreationDraft.value.short_description_translation_key, locale.value);
-}
-
-if (currentCreationDraft.value?.full_description_translation_key) {
-    fullDescriptionContent = getContentForLocale(currentCreationDraft.value.full_description_translation_key, locale.value);
 }
 
 const { isFieldDirty, handleSubmit, setFieldValue, meta } = useForm({
@@ -135,7 +134,6 @@ const { isFieldDirty, handleSubmit, setFieldValue, meta } = useForm({
         type: currentCreationDraft.value?.type ?? creationTypes[0],
         locale: locale.value,
         short_description_content: shortDescriptionContent,
-        full_description_content: fullDescriptionContent,
         featured: currentCreationDraft.value?.featured ?? false,
         started_at: currentCreationDraft.value?.started_at ? currentCreationDraft.value.started_at.split('T')[0] : today,
         ended_at: currentCreationDraft.value?.ended_at ? currentCreationDraft.value.ended_at.split('T')[0] : null,
@@ -165,11 +163,7 @@ watch(nameField, (newName) => {
 const updateContentForLocale = (newLocale: string) => {
     if (currentCreationDraft.value) {
         const newShortDesc = getContentForLocale(currentCreationDraft.value.short_description_translation_key, newLocale);
-
-        const newFullDesc = getContentForLocale(currentCreationDraft.value.full_description_translation_key, newLocale);
-
         setFieldValue('short_description_content', newShortDesc);
-        setFieldValue('full_description_content', newFullDesc);
     }
 
     setFieldValue('locale', newLocale);
@@ -202,6 +196,11 @@ const onSubmit = handleSubmit(async (formValues) => {
     isSubmitting.value = true;
 
     try {
+        // Save all galleries before submitting the form
+        if (creationContentBuilderRef.value?.saveAllGalleries) {
+            await creationContentBuilderRef.value.saveAllGalleries();
+        }
+
         const processedFormValues = {
             ...formValues,
             ended_at: formValues.ended_at === '' ? null : formValues.ended_at,
@@ -473,17 +472,28 @@ onMounted(() => {
                 </FormField>
             </div>
 
-            <div class="mb-4">
-                <FormField v-slot="{ componentField }" name="full_description_content">
-                    <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                            <MarkdownEditor v-bind="componentField" placeholder="Commencez à écrire..." />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
+            <HeadingSmall
+                title="Contenu"
+                description="Gérez les blocs de contenu de votre création (markdown, galeries d'images, vidéos)."
+            />
+
+            <div v-if="!currentCreationDraft?.id" class="mb-4 rounded-lg border border-dashed p-4">
+                <p class="text-sm text-muted-foreground">
+                    Veuillez d'abord créer le brouillon en remplissant les informations de base ci-dessus. Vous pourrez ensuite ajouter du contenu.
+                </p>
             </div>
+
+            <ContentBuilder
+                v-else
+                ref="creationContentBuilderRef"
+                :draft-id="currentCreationDraft?.id"
+                :contents="currentCreationDraft?.contents || []"
+                :pictures="pictures"
+                :videos="videos"
+                :locale="locale"
+                entity-type="creation"
+                data-testid="content-builder"
+            />
 
             <div class="flex space-x-4">
                 <Button type="submit" :disabled="isSubmitting">

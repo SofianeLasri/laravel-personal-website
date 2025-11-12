@@ -252,23 +252,96 @@ class PublicControllersService
      *     endedAtFormatted: string|null,
      *     type: CreationType,
      *     shortDescription: string|null,
-     *     fullDescription: string|null,
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}, video?: array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string, caption: string|null}}>,
      *     externalUrl: string|null,
      *     sourceCodeUrl: string|null,
      *     features: array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
-     *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string}>,
+     *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string, order: int}>,
      *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
      *     people: array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
-     *     videos: array<int, array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>}
+     *     videos: array<int, array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
+     *     githubData: array{name: string, description: string|null, stars: int, forks: int, watchers: int, language: string|null, topics: array<int, string>, license: string|null, updated_at: string, created_at: string, open_issues: int, default_branch: string, size: int, url: string, homepage: string|null}|null,
+     *     githubLanguages: array<string, int>|null,
+     *     packagistData: array{name: string, description: string|null, downloads: int, daily_downloads: int, monthly_downloads: int, stars: int, dependents: int, suggesters: int, type: string|null, repository: string|null, github_stars: int|null, github_watchers: int|null, github_forks: int|null, github_open_issues: int|null, language: string|null, license: array<int, string>|null, latest_version: string|null, latest_stable_version: string|null, created_at: string|null, updated_at: string|null, url: string, maintainers: array<int, array{name: string, avatar_url: string|null}>, php_version: string|null, laravel_version: string|null}|null}
      */
     public function formatCreationForSSRFull(Creation $creation): array
     {
         $response = $this->formatCreationForSSRShort($creation);
 
-        $fullDescription = $creation->fullDescriptionTranslationKey ?
-            $this->getTranslationWithFallback($creation->fullDescriptionTranslationKey->translations) : null;
+        // Format contents
+        $contents = $creation->contents->map(function ($content) {
+            $result = [
+                'id' => $content->id,
+                'order' => $content->order,
+                'content_type' => $content->content_type,
+            ];
 
-        $response['fullDescription'] = $fullDescription;
+            // Handle different content types
+            if ($content->content_type === ContentMarkdown::class && $content->content instanceof ContentMarkdown) {
+                $markdownContent = $content->content->translationKey ?
+                    $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
+                // Resolve custom emojis (:emoji_name:) to HTML picture tags
+                try {
+                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+                } catch (Exception $e) {
+                    // Fallback to original markdown if emoji resolution fails
+                    $result['markdown'] = $markdownContent;
+                }
+            } elseif ($content->content_type === ContentGallery::class && $content->content instanceof ContentGallery) {
+                // Get caption translation keys from the pivot data
+                $captionTranslationKeyIds = $content->content->pictures
+                    ->pluck('pivot.caption_translation_key_id')
+                    ->filter()
+                    ->unique();
+
+                // Load translation keys with their translations if any captions exist
+                $captionTranslations = [];
+                if ($captionTranslationKeyIds->isNotEmpty()) {
+                    $translationKeys = TranslationKey::with('translations')
+                        ->whereIn('id', $captionTranslationKeyIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    foreach ($translationKeys as $key => $translationKey) {
+                        $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
+                    }
+                }
+
+                $result['gallery'] = [
+                    'id' => $content->content->id,
+                    'pictures' => $content->content->pictures->map(function (Picture $picture) use ($captionTranslations) {
+                        $formattedPicture = $this->formatPictureForSSR($picture);
+
+                        // Add caption if it exists in the pivot data
+                        /** @phpstan-ignore-next-line Property pivot exists on Picture when loaded through BelongsToMany */
+                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
+                        if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
+                            $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
+                        }
+
+                        return $formattedPicture;
+                    })->toArray(),
+                ];
+            } elseif ($content->content_type === ContentVideo::class && $content->content instanceof ContentVideo) {
+                $video = $content->content->video;
+
+                if ($video && $video->status === VideoStatus::READY && $video->visibility === VideoVisibility::PUBLIC) {
+                    $caption = null;
+                    if ($content->content->captionTranslationKey) {
+                        $caption = $this->getTranslationWithFallback($content->content->captionTranslationKey->translations);
+                    }
+
+                    $formattedVideo = $this->formatVideoForSSR($video);
+                    $formattedVideo['caption'] = $caption;
+
+                    $result['video'] = $formattedVideo;
+                }
+            }
+
+            return $result;
+        });
+
+        $response['contents'] = $contents->toArray();
         $response['externalUrl'] = $creation->external_url;
         $response['sourceCodeUrl'] = $creation->source_code_url;
         $response['features'] = $creation->features->map(function (Feature $feature) {

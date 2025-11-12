@@ -53,12 +53,20 @@ interface GalleryImage {
     caption: string;
     order: number;
 }
+interface ContentRoutes {
+    store: string; // Route name for creating content pivot
+    destroy: string; // Route name for destroying content pivot
+    reorder: string; // Route name for reordering contents
+}
+
 interface Props {
     draftId: number; // Now required since we only show this component when draft exists
     contents: Content[];
     pictures: Picture[];
     videos: Video[];
     locale: 'fr' | 'en';
+    contentRoutes: ContentRoutes; // Routes for content management
+    entityType: 'blog' | 'creation'; // Type of entity (blog or creation)
 }
 
 const props = defineProps<Props>();
@@ -194,9 +202,10 @@ const addContent = async (type: string) => {
             return;
         }
 
-        // Add to blog post draft contents
-        const response = await axios.post(route('dashboard.api.blog-post-draft-contents.store'), {
-            blog_post_draft_id: props.draftId,
+        // Add to draft contents (blog or creation)
+        const draftIdKey = props.entityType === 'blog' ? 'blog_post_draft_id' : 'creation_draft_id';
+        const response = await axios.post(route(props.contentRoutes.store), {
+            [draftIdKey]: props.draftId,
             content_type:
                 type === 'markdown'
                     ? 'App\\Models\\ContentMarkdown'
@@ -249,9 +258,11 @@ const removeContent = async (index: number) => {
     }
 
     try {
+        const contentParamKey =
+            props.entityType === 'blog' ? 'blog_post_draft_content' : 'creation_draft_content';
         await axios.delete(
-            route('dashboard.api.blog-post-draft-contents.destroy', {
-                blog_post_draft_content: content.id,
+            route(props.contentRoutes.destroy, {
+                [contentParamKey]: content.id,
             }),
         );
 
@@ -273,9 +284,15 @@ const updateContentOrder = async () => {
     });
 
     try {
-        await axios.post(route('dashboard.api.blog-post-draft-contents.reorder', { blog_post_draft: props.draftId }), {
-            content_ids: localContents.value.map((c) => c.id),
-        });
+        const draftParamKey = props.entityType === 'blog' ? 'blog_post_draft' : 'creation_draft';
+        await axios.post(
+            route(props.contentRoutes.reorder, {
+                [draftParamKey]: props.draftId,
+            }),
+            {
+                content_ids: localContents.value.map((c) => c.id),
+            },
+        );
     } catch (error: unknown) {
         console.error('Erreur lors de la réorganisation:', error);
         toast.error('Erreur lors de la réorganisation');

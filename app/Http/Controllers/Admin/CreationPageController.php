@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Creation;
 use App\Models\CreationDraft;
+use App\Models\Picture;
+use App\Models\Video;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -51,10 +53,23 @@ class CreationPageController extends Controller
             $creationDraft = CreationDraft::fromCreation($creation);
         }
 
-        $creationDraft?->load(['shortDescriptionTranslationKey.translations', 'fullDescriptionTranslationKey.translations']);
+        $creationDraft?->load([
+            'shortDescriptionTranslationKey.translations',
+            'fullDescriptionTranslationKey.translations',
+            'contents.content',
+        ]);
+
+        // Get all pictures and videos for content selection
+        $pictures = Picture::with('optimizedPictures')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $videos = Video::orderBy('created_at', 'desc')->get();
 
         return Inertia::render('dashboard/creations/EditPage', [
             'creationDraft' => $creationDraft,
+            'pictures' => $pictures,
+            'videos' => $videos,
         ]);
     }
 }

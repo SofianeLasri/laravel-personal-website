@@ -420,6 +420,12 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                         :pictures="pictures"
                         :videos="videos"
                         :locale="locale"
+                        :content-routes="{
+                            store: 'dashboard.api.blog-post-draft-contents.store',
+                            destroy: 'dashboard.api.blog-post-draft-contents.destroy',
+                            reorder: 'dashboard.api.blog-post-draft-contents.reorder'
+                        }"
+                        entity-type="blog"
                         data-testid="content-builder"
                     />
                 </div>

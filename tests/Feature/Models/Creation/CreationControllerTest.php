@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models\Creation;
 
 use App\Http\Controllers\Admin\Api\CreationController;
+use App\Models\ContentMarkdown;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\CreationDraftFeature;
@@ -54,6 +55,14 @@ class CreationControllerTest extends TestCase
             ->has(Person::factory()->count(1), 'people')
             ->has(Tag::factory()->count(1), 'tags')
             ->create();
+
+        // Add content block (required)
+        $markdownContent = ContentMarkdown::factory()->create();
+        $draft->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdownContent->id,
+            'order' => 1,
+        ]);
 
         CreationDraftScreenshot::factory()
             ->count(3)
@@ -179,6 +188,14 @@ class CreationControllerTest extends TestCase
             ->hasTags(1)
             ->create();
 
+        // Add content block (required)
+        $markdownContent = ContentMarkdown::factory()->create();
+        $draft->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdownContent->id,
+            'order' => 1,
+        ]);
+
         CreationDraftScreenshot::factory()
             ->count(3)
             ->sequence(fn ($sequence) => ['order' => $sequence->index + 1])
@@ -201,6 +218,14 @@ class CreationControllerTest extends TestCase
         $draft = CreationDraft::factory()->create([
             'started_at' => '2025-01-01',
             'ended_at' => '2025-12-31',
+        ]);
+
+        // Add content block (required)
+        $markdownContent = ContentMarkdown::factory()->create();
+        $draft->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdownContent->id,
+            'order' => 1,
         ]);
 
         $response = $this->postJson(route('dashboard.api.creations.store'), ['draft_id' => $draft->id]);

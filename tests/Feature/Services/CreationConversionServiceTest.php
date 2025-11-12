@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use App\Models\ContentMarkdown;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\CreationDraftFeature;
@@ -10,6 +11,7 @@ use App\Models\Person;
 use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\TranslationKey;
+use App\Services\ContentDuplicationService;
 use App\Services\CreationConversionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -27,7 +29,20 @@ class CreationConversionServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new CreationConversionService;
+        $this->service = new CreationConversionService(app(ContentDuplicationService::class));
+    }
+
+    /**
+     * Helper method to add content to a draft
+     */
+    protected function addContentToDraft(CreationDraft $draft): void
+    {
+        $markdownContent = ContentMarkdown::factory()->create();
+        $draft->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdownContent->id,
+            'order' => 1,
+        ]);
     }
 
     #[Test]
@@ -39,6 +54,9 @@ class CreationConversionServiceTest extends TestCase
             ->has(Person::factory()->count(1), 'people')
             ->has(Tag::factory()->count(1), 'tags')
             ->create();
+
+        // Add content (required)
+        $this->addContentToDraft($draft);
 
         // Add screenshots with proper sequence
         CreationDraftScreenshot::factory()
@@ -92,6 +110,9 @@ class CreationConversionServiceTest extends TestCase
             ->has(Tag::factory()->count(2), 'tags')
             ->create();
 
+        // Add content (required)
+        $this->addContentToDraft($draft);
+
         // Add screenshots with proper sequence
         CreationDraftScreenshot::factory()
             ->count(4)
@@ -123,6 +144,9 @@ class CreationConversionServiceTest extends TestCase
             ->has(CreationDraftFeature::factory()->count(1), 'features')
             ->create();
 
+        // Add content (required)
+        $this->addContentToDraft($draft);
+
         // Add screenshot with proper sequence
         CreationDraftScreenshot::factory()
             ->create([
@@ -145,6 +169,9 @@ class CreationConversionServiceTest extends TestCase
             'source_code_url' => null,
         ]);
 
+        // Add content (required)
+        $this->addContentToDraft($draft);
+
         $creation = $this->service->convertDraftToCreation($draft);
 
         $this->assertNull($creation->ended_at);
@@ -156,6 +183,9 @@ class CreationConversionServiceTest extends TestCase
     public function test_sync_relationships_with_empty_values()
     {
         $draft = CreationDraft::factory()->create();
+        // Add content (required)
+        $this->addContentToDraft($draft);
+
         $creation = Creation::factory()->create();
 
         $this->service->syncRelationships($draft, $creation);
@@ -176,6 +206,9 @@ class CreationConversionServiceTest extends TestCase
         $draft = CreationDraft::factory()->create();
         $draft->features()->save($draftFeature);
 
+        // Add content (required)
+        $this->addContentToDraft($draft);
+
         $creation = $this->service->convertDraftToCreation($draft);
 
         $feature = $creation->features->first();
@@ -194,6 +227,9 @@ class CreationConversionServiceTest extends TestCase
 
         $draft = CreationDraft::factory()->create();
         $draft->screenshots()->save($draftScreenshot);
+
+        // Add content (required)
+        $this->addContentToDraft($draft);
 
         $creation = $this->service->convertDraftToCreation($draft);
 
@@ -215,6 +251,9 @@ class CreationConversionServiceTest extends TestCase
 
         $newTechnologies = Technology::factory()->count(3)->create();
         $draft->technologies()->sync($newTechnologies);
+
+        // Add content (required)
+        $this->addContentToDraft($draft);
 
         $this->service->convertDraftToCreation($draft);
 
@@ -241,6 +280,9 @@ class CreationConversionServiceTest extends TestCase
     public function test_preserves_screenshot_order_on_conversion()
     {
         $draft = CreationDraft::factory()->create();
+
+        // Add content (required)
+        $this->addContentToDraft($draft);
 
         // Create screenshots with specific order
         $screenshot1 = CreationDraftScreenshot::factory()->create([
@@ -278,6 +320,9 @@ class CreationConversionServiceTest extends TestCase
     public function test_recreates_screenshots_with_correct_order_on_update()
     {
         $draft = CreationDraft::factory()->create();
+        // Add content (required)
+        $this->addContentToDraft($draft);
+
         $creation = Creation::factory()->create();
 
         // Create initial screenshots in creation

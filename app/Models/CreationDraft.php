@@ -54,6 +54,7 @@ use Illuminate\Validation\ValidationException;
  * @property-read Collection|Person[] $people
  * @property-read Collection|Tag[] $tags
  * @property-read Collection|Video[] $videos
+ * @property-read Collection|CreationDraftContent[] $contents
  */
 class CreationDraft extends Model
 {
@@ -173,6 +174,14 @@ class CreationDraft extends Model
     public function videos(): BelongsToMany
     {
         return $this->belongsToMany(Video::class, 'creation_draft_video');
+    }
+
+    /**
+     * @return HasMany<CreationDraftContent, $this>
+     */
+    public function contents(): HasMany
+    {
+        return $this->hasMany(CreationDraftContent::class)->orderBy('order');
     }
 
     /**

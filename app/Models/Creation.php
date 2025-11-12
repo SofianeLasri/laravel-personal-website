@@ -49,6 +49,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection|Person[] $people
  * @property-read Collection|Tag[] $tags
  * @property-read Collection|Video[] $videos
+ * @property-read Collection|CreationContent[] $contents
  * @property-read Collection|CreationDraft[] $drafts
  */
 class Creation extends Model
@@ -160,6 +161,14 @@ class Creation extends Model
     public function videos(): BelongsToMany
     {
         return $this->belongsToMany(Video::class);
+    }
+
+    /**
+     * @return HasMany<CreationContent, $this>
+     */
+    public function contents(): HasMany
+    {
+        return $this->hasMany(CreationContent::class)->orderBy('order');
     }
 
     /**

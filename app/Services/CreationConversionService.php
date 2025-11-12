@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Enums\CreationType;
+use App\Models\ContentGallery;
+use App\Models\ContentMarkdown;
+use App\Models\ContentVideo;
 use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\Feature;
@@ -13,6 +16,10 @@ use Illuminate\Validation\ValidationException;
 
 class CreationConversionService
 {
+    public function __construct(
+        protected BlogContentDuplicationService $contentDuplicationService
+    ) {}
+
     /**
      * @throws ValidationException
      */
@@ -26,10 +33,12 @@ class CreationConversionService
 
             $this->recreateFeatures($draft, $creation);
             $this->recreateScreenshots($draft, $creation);
+            $this->recreateContents($draft, $creation);
         } else {
             $creation = Creation::create($this->mapDraftAttributes($draft));
             $this->createFeatures($draft, $creation);
             $this->createScreenshots($draft, $creation);
+            $this->createContents($draft, $creation);
         }
         $this->syncRelationships($draft, $creation);
 
@@ -48,6 +57,7 @@ class CreationConversionService
         $this->syncRelationships($draft, $creation);
         $this->recreateFeatures($draft, $creation);
         $this->recreateScreenshots($draft, $creation);
+        $this->recreateContents($draft, $creation);
 
         return $creation->refresh();
     }
@@ -135,5 +145,53 @@ class CreationConversionService
     {
         $creation->screenshots()->delete();
         $this->createScreenshots($draft, $creation);
+    }
+
+    private function createContents(CreationDraft $draft, Creation $creation): void
+    {
+        foreach ($draft->contents()->with('content')->orderBy('order')->get() as $draftContent) {
+            // Duplicate the content (markdown/gallery/video)
+            $newContent = $this->duplicateContent($draftContent->content);
+
+            // Create the creation content pivot
+            $creation->contents()->create([
+                'content_type' => $draftContent->content_type,
+                'content_id' => $newContent->id,
+                'order' => $draftContent->order,
+            ]);
+        }
+    }
+
+    private function recreateContents(CreationDraft $draft, Creation $creation): void
+    {
+        // Delete old content blocks and their associated content entities
+        foreach ($creation->contents as $content) {
+            if ($content->content) {
+                // Delete the actual content (markdown/gallery/video)
+                if ($content->content instanceof ContentGallery) {
+                    $content->content->pictures()->detach();
+                }
+                $content->content->delete();
+            }
+        }
+        $creation->contents()->delete();
+
+        $this->createContents($draft, $creation);
+    }
+
+    /**
+     * Duplicate a content entity (markdown/gallery/video)
+     *
+     * @param  ContentMarkdown|ContentGallery|ContentVideo  $content
+     * @return ContentMarkdown|ContentGallery|ContentVideo
+     */
+    private function duplicateContent($content)
+    {
+        return match (get_class($content)) {
+            ContentMarkdown::class => $this->contentDuplicationService->duplicateMarkdownContent($content),
+            ContentGallery::class => $this->contentDuplicationService->duplicateGalleryContent($content),
+            ContentVideo::class => $this->contentDuplicationService->duplicateVideoContent($content),
+            default => throw new \RuntimeException('Unknown content type: '.get_class($content)),
+        };
     }
 }

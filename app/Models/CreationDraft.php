@@ -39,6 +39,7 @@ use Illuminate\Validation\ValidationException;
  * @property int|null $full_description_translation_keys_count
  * @property int|null $features_count
  * @property int|null $screenshots_count
+ * @property int|null $contents_count
  * @property int|null $technologies_count
  * @property int|null $people_count
  * @property int|null $tags_count
@@ -50,6 +51,7 @@ use Illuminate\Validation\ValidationException;
  * @property-read TranslationKey|null $fullDescriptionTranslationKey
  * @property-read Collection|CreationDraftFeature[] $features
  * @property-read Collection|CreationDraftScreenshot[] $screenshots
+ * @property-read Collection|CreationDraftContent[] $contents
  * @property-read Collection|Technology[] $technologies
  * @property-read Collection|Person[] $people
  * @property-read Collection|Tag[] $tags
@@ -141,6 +143,14 @@ class CreationDraft extends Model
     public function screenshots(): HasMany
     {
         return $this->hasMany(CreationDraftScreenshot::class)->orderBy('order');
+    }
+
+    /**
+     * @return HasMany<CreationDraftContent, $this>
+     */
+    public function contents(): HasMany
+    {
+        return $this->hasMany(CreationDraftContent::class)->orderBy('order');
     }
 
     /**

@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\BlogPost;
-use App\Models\BlogPostContent;
-use App\Models\BlogPostDraft;
-use App\Models\BlogPostDraftContent;
 use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
 use App\Models\ContentVideo;
+use App\Models\Creation;
+use App\Models\CreationContent;
+use App\Models\CreationDraft;
+use App\Models\CreationDraftContent;
 use Throwable;
 
 /**
- * Blog-specific content service that delegates to ContentManagementService
- * Provides type-safe wrapper for blog content operations
+ * Creation-specific content service that delegates to ContentManagementService
+ * Provides type-safe wrapper for creation content operations
  */
-class BlogContentService
+class CreationContentService
 {
     public function __construct(
         protected ContentManagementService $contentManagementService
@@ -26,7 +26,7 @@ class BlogContentService
     /**
      * Create markdown content for a draft
      */
-    public function createMarkdownContent(BlogPostDraft $draft, int $translationKeyId, int $order): BlogPostDraftContent
+    public function createMarkdownContent(CreationDraft $draft, int $translationKeyId, int $order): CreationDraftContent
     {
         return $this->contentManagementService->createMarkdownContent($draft, $translationKeyId, $order);
     }
@@ -36,7 +36,7 @@ class BlogContentService
      *
      * @param  array<string, mixed>  $galleryData
      */
-    public function createGalleryContent(BlogPostDraft $draft, array $galleryData, int $order): BlogPostDraftContent
+    public function createGalleryContent(CreationDraft $draft, array $galleryData, int $order): CreationDraftContent
     {
         return $this->contentManagementService->createGalleryContent($draft, $galleryData, $order);
     }
@@ -45,11 +45,11 @@ class BlogContentService
      * Create video content for a draft
      */
     public function createVideoContent(
-        BlogPostDraft $draft,
+        CreationDraft $draft,
         int $videoId,
         int $order,
         ?int $captionTranslationKeyId = null
-    ): BlogPostDraftContent {
+    ): CreationDraftContent {
         return $this->contentManagementService->createVideoContent($draft, $videoId, $order, $captionTranslationKeyId);
     }
 
@@ -89,7 +89,7 @@ class BlogContentService
      *
      * @throws Throwable
      */
-    public function reorderContent(BlogPostDraft|BlogPost $parent, array $newOrder): void
+    public function reorderContent(CreationDraft|Creation $parent, array $newOrder): void
     {
         $this->contentManagementService->reorderContent($parent, $newOrder);
     }
@@ -97,7 +97,7 @@ class BlogContentService
     /**
      * Delete a content block
      */
-    public function deleteContent(BlogPostDraftContent|BlogPostContent $content): bool
+    public function deleteContent(CreationDraftContent|CreationContent $content): bool
     {
         return $this->contentManagementService->deleteContent($content);
     }
@@ -105,7 +105,7 @@ class BlogContentService
     /**
      * Duplicate a content block
      */
-    public function duplicateContent(BlogPostDraftContent|BlogPostContent $content): BlogPostDraftContent|BlogPostContent
+    public function duplicateContent(CreationDraftContent|CreationContent $content): CreationDraftContent|CreationContent
     {
         return $this->contentManagementService->duplicateContent($content);
     }
@@ -113,17 +113,17 @@ class BlogContentService
     /**
      * Validate content structure
      */
-    public function validateContentStructure(BlogPostDraft|BlogPost $parent): bool
+    public function validateContentStructure(CreationDraft|Creation $parent): bool
     {
         return $this->contentManagementService->validateContentStructure($parent);
     }
 
     /**
-     * Create content for published post (used during publishing)
+     * Create content for published creation (used during publishing)
      */
-    public function createPostContent(BlogPost $post, string $contentType, int $contentId, int $order): BlogPostContent
+    public function createCreationContent(Creation $creation, string $contentType, int $contentId, int $order): CreationContent
     {
-        return $post->contents()->create([
+        return $creation->contents()->create([
             'content_type' => $contentType,
             'content_id' => $contentId,
             'order' => $order,

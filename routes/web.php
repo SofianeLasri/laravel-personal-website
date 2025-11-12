@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\Api\BlogPostDraftController;
 use App\Http\Controllers\Admin\Api\BlogPostPreviewTokenController;
 use App\Http\Controllers\Admin\Api\CertificationController;
 use App\Http\Controllers\Admin\Api\CreationController;
+use App\Http\Controllers\Admin\Api\CreationDraftContentController;
 use App\Http\Controllers\Admin\Api\CreationDraftController;
 use App\Http\Controllers\Admin\Api\CreationDraftFeatureController;
 use App\Http\Controllers\Admin\Api\CreationDraftScreenshotController;
@@ -251,6 +252,11 @@ Route::name('dashboard.')->prefix('dashboard')->middleware(['auth', 'verified'])
         Route::put('blog-content-galleries/{blog_content_gallery}/pictures', [BlogContentGalleryController::class, 'updatePictures'])
             ->name('blog-content-galleries.update-pictures');
         Route::apiResource('blog-content-video', BlogContentVideoController::class)->except(['index']);
+
+        // Creation draft content routes
+        Route::apiResource('creation-draft-contents', CreationDraftContentController::class)->except(['index', 'show']);
+        Route::post('creation-drafts/{creation_draft}/contents/reorder', [CreationDraftContentController::class, 'reorder'])
+            ->name('creation-draft-contents.reorder');
 
         // Game review draft routes
         Route::apiResource('game-review-drafts', GameReviewDraftController::class)->except(['index', 'create', 'edit']);

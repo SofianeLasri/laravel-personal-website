@@ -3,7 +3,9 @@
 namespace Database\Factories;
 
 use App\Enums\CreationType;
+use App\Models\ContentMarkdown;
 use App\Models\Creation;
+use App\Models\CreationContent;
 use App\Models\Feature;
 use App\Models\OptimizedPicture;
 use App\Models\Person;
@@ -126,6 +128,28 @@ class CreationFactory extends Factory
 
             $tags = Tag::factory()->count(rand(2, 4))->create();
             $creation->tags()->attach($tags);
+        });
+    }
+
+    /**
+     * Create content blocks for the creation.
+     *
+     * @param  int  $count  Number of markdown content blocks to create
+     * @return $this
+     */
+    public function withContentBlocks(int $count = 1): static
+    {
+        return $this->afterCreating(function (Creation $creation) use ($count) {
+            for ($i = 0; $i < $count; $i++) {
+                $contentMarkdown = ContentMarkdown::factory()->create();
+
+                CreationContent::create([
+                    'creation_id' => $creation->id,
+                    'content_type' => ContentMarkdown::class,
+                    'content_id' => $contentMarkdown->id,
+                    'order' => $i + 1,
+                ]);
+            }
         });
     }
 

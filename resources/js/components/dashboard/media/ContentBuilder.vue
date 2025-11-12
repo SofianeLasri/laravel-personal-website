@@ -59,12 +59,9 @@ interface Props {
     pictures: Picture[];
     videos: Video[];
     locale: 'fr' | 'en';
-    entityType?: 'blog' | 'creation'; // Type of entity (blog or creation)
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    entityType: 'blog',
-});
+const props = defineProps<Props>();
 const route = useRoute();
 
 const localContents = ref<Content[]>([...props.contents]);
@@ -197,13 +194,9 @@ const addContent = async (type: string) => {
             return;
         }
 
-        // Add to draft contents (blog or creation)
-        const storeRouteName =
-            props.entityType === 'creation' ? 'dashboard.api.creation-draft-contents.store' : 'dashboard.api.blog-post-draft-contents.store';
-        const draftIdKey = props.entityType === 'creation' ? 'creation_draft_id' : 'blog_post_draft_id';
-
-        const response = await axios.post(route(storeRouteName), {
-            [draftIdKey]: props.draftId,
+        // Add to blog post draft contents
+        const response = await axios.post(route('dashboard.api.blog-post-draft-contents.store'), {
+            blog_post_draft_id: props.draftId,
             content_type:
                 type === 'markdown'
                     ? 'App\\Models\\ContentMarkdown'
@@ -256,15 +249,9 @@ const removeContent = async (index: number) => {
     }
 
     try {
-        const destroyRouteName =
-            props.entityType === 'creation'
-                ? 'dashboard.api.creation-draft-contents.destroy'
-                : 'dashboard.api.blog-post-draft-contents.destroy';
-        const paramKey = props.entityType === 'creation' ? 'creation_draft_content' : 'blog_post_draft_content';
-
         await axios.delete(
-            route(destroyRouteName, {
-                [paramKey]: content.id,
+            route('dashboard.api.blog-post-draft-contents.destroy', {
+                blog_post_draft_content: content.id,
             }),
         );
 
@@ -286,13 +273,7 @@ const updateContentOrder = async () => {
     });
 
     try {
-        const reorderRouteName =
-            props.entityType === 'creation'
-                ? 'dashboard.api.creation-draft-contents.reorder'
-                : 'dashboard.api.blog-post-draft-contents.reorder';
-        const paramKey = props.entityType === 'creation' ? 'creation_draft' : 'blog_post_draft';
-
-        await axios.post(route(reorderRouteName, { [paramKey]: props.draftId }), {
+        await axios.post(route('dashboard.api.blog-post-draft-contents.reorder', { blog_post_draft: props.draftId }), {
             content_ids: localContents.value.map((c) => c.id),
         });
     } catch (error: unknown) {

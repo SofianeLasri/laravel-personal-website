@@ -214,32 +214,9 @@ interface CreationDraft {
     original_creation_id: number | null;
 }
 
-interface CreationDraftContent {
-    id: number;
-    creation_draft_id: number;
-    content_type: string;
-    content_id: number;
-    order: number;
-    created_at: string;
-    updated_at: string;
-    content?: Content;
-}
-
-interface CreationContent {
-    id: number;
-    creation_id: number;
-    content_type: string;
-    content_id: number;
-    order: number;
-    created_at: string;
-    updated_at: string;
-    content?: Content;
-}
-
 interface CreationDraftWithTranslations extends CreationDraft {
     short_description_translation_key: TranslationKey;
     full_description_translation_key: TranslationKey;
-    contents?: CreationDraftContent[];
 }
 
 interface Picture {
@@ -360,24 +337,7 @@ interface SSRSimplifiedCreation {
 }
 
 interface SSRFullCreation extends SSRSimplifiedCreation {
-    contents: Array<{
-        id: number;
-        order: number;
-        content_type: string;
-        markdown?: string;
-        gallery?: {
-            id: number;
-            pictures: SSRPicture[];
-        };
-        video?: {
-            id: number;
-            bunnyVideoId: string;
-            name: string;
-            coverPicture: SSRPicture;
-            libraryId: string;
-            caption: string | null;
-        };
-    }>;
+    fullDescription: string;
     externalUrl: string | null;
     sourceCodeUrl: string | null;
     features: SSRFeature[];

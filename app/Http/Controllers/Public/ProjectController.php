@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Models\ContentGallery;
-use App\Models\ContentMarkdown;
-use App\Models\ContentVideo;
 use App\Models\Creation;
 use App\Models\SocialMediaLink;
 use App\Services\PublicControllersService;
@@ -24,32 +21,8 @@ class ProjectController extends PublicController
             return redirect()->route('public.projects.show', ['slug' => $legacyMappings[$slug]], 301);
         }
 
-        $creation = Creation::with([
-            'shortDescriptionTranslationKey.translations',
-            'fullDescriptionTranslationKey.translations',
-            'logo',
-            'coverImage',
-            'technologies.iconPicture',
-            'technologies.descriptionTranslationKey.translations',
-            'features.picture',
-            'features.titleTranslationKey.translations',
-            'features.descriptionTranslationKey.translations',
-            'screenshots.picture',
-            'screenshots.captionTranslationKey.translations',
-            'people.picture',
-            'videos.coverPicture',
-            'contents' => function ($query) {
-                $query->orderBy('order');
-            },
-            'contents.content' => function ($query) {
-                // Load different relations based on content type
-                $query->morphWith([
-                    ContentMarkdown::class => ['translationKey.translations'],
-                    ContentGallery::class => ['pictures'],
-                    ContentVideo::class => ['video.coverPicture', 'captionTranslationKey.translations'],
-                ]);
-            },
-        ])->where('slug', $slug)->firstOrFail();
+        $creation = Creation::where('slug', $slug)->firstOrFail()
+            ->withRelationshipAutoloading();
 
         $formattedCreation = $this->service->formatCreationForSSRFull($creation);
 

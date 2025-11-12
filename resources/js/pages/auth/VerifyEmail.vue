@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TextLink from '@/components/dashboard/TextLink.vue';
+import TextLink from '@/components/dashboard/shared/ui/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { useRoute } from '@/composables/useRoute';
 import AuthLayout from '@/layouts/AuthLayout.vue';

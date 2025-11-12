@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Heading from '@/components/dashboard/Heading.vue';
-import PictureInput from '@/components/dashboard/PictureInput.vue';
+import PictureInput from '@/components/dashboard/media/PictureInput.vue';
+import Heading from '@/components/dashboard/shared/ui/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';

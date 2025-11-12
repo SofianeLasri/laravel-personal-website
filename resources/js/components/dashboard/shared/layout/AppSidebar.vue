@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import NavFooter from '@/components/dashboard/NavFooter.vue';
-import NavMain from '@/components/dashboard/NavMain.vue';
-import NavUser from '@/components/dashboard/NavUser.vue';
+import AppLogo from '@/components/dashboard/shared/branding/AppLogo.vue';
+import NavFooter from '@/components/dashboard/shared/navigation/NavFooter.vue';
+import NavMain from '@/components/dashboard/shared/navigation/NavMain.vue';
+import NavUser from '@/components/dashboard/shared/navigation/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { useRoute } from '@/composables/useRoute';
 import { type NavItem } from '@/types';
@@ -23,7 +24,6 @@ import {
     NotebookPenIcon,
     Smile,
 } from 'lucide-vue-next';
-import AppLogo from './AppLogo.vue';
 
 const route = useRoute();
 

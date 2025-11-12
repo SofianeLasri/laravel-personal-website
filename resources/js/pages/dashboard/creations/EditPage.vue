@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import CreationDraftFeatures from '@/components/dashboard/CreationDraftFeatures.vue';
-import CreationDraftPeople from '@/components/dashboard/CreationDraftPeople.vue';
-import CreationDraftScreenshots from '@/components/dashboard/CreationDraftScreenshots.vue';
-import CreationDraftTags from '@/components/dashboard/CreationDraftTags.vue';
-import CreationDraftTechnologies from '@/components/dashboard/CreationDraftTechnologies.vue';
-import CreationDraftVideos from '@/components/dashboard/CreationDraftVideos.vue';
-import Heading from '@/components/dashboard/Heading.vue';
-import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
-import MarkdownEditor from '@/components/dashboard/MarkdownEditor.vue';
-import PictureInput from '@/components/dashboard/PictureInput.vue';
+import CreationDraftFeatures from '@/components/dashboard/creations/CreationDraftFeatures.vue';
+import CreationDraftPeople from '@/components/dashboard/creations/CreationDraftPeople.vue';
+import CreationDraftScreenshots from '@/components/dashboard/creations/CreationDraftScreenshots.vue';
+import CreationDraftTags from '@/components/dashboard/creations/CreationDraftTags.vue';
+import CreationDraftTechnologies from '@/components/dashboard/creations/CreationDraftTechnologies.vue';
+import CreationDraftVideos from '@/components/dashboard/creations/CreationDraftVideos.vue';
+import MarkdownEditor from '@/components/dashboard/forms/MarkdownEditor.vue';
+import PictureInput from '@/components/dashboard/media/PictureInput.vue';
+import Heading from '@/components/dashboard/shared/ui/Heading.vue';
+import HeadingSmall from '@/components/dashboard/shared/ui/HeadingSmall.vue';
 import {
     AlertDialog,
     AlertDialogAction,

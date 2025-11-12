@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import BlogPostPreviewTokenManager from '@/components/dashboard/BlogPostPreviewTokenManager.vue';
-import CategoryQuickCreate from '@/components/dashboard/CategoryQuickCreate.vue';
-import ContentBuilder from '@/components/dashboard/ContentBuilder.vue';
-import GameReviewEditor from '@/components/dashboard/GameReviewEditor.vue';
-import Heading from '@/components/dashboard/Heading.vue';
-import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
-import PictureInput from '@/components/dashboard/PictureInput.vue';
+import BlogPostPreviewTokenManager from '@/components/dashboard/blog/BlogPostPreviewTokenManager.vue';
+import CategoryQuickCreate from '@/components/dashboard/blog/CategoryQuickCreate.vue';
+import GameReviewEditor from '@/components/dashboard/blog/GameReviewEditor.vue';
+import ContentBuilder from '@/components/dashboard/media/ContentBuilder.vue';
+import PictureInput from '@/components/dashboard/media/PictureInput.vue';
+import Heading from '@/components/dashboard/shared/ui/Heading.vue';
+import HeadingSmall from '@/components/dashboard/shared/ui/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';

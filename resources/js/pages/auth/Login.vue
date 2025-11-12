@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import InputError from '@/components/dashboard/InputError.vue';
-import TextLink from '@/components/dashboard/TextLink.vue';
+import InputError from '@/components/dashboard/shared/ui/InputError.vue';
+import TextLink from '@/components/dashboard/shared/ui/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';

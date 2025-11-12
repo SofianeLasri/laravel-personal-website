@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Heading from '@/components/dashboard/Heading.vue';
-import VideoManager from '@/components/dashboard/VideoManager.vue';
+import VideoManager from '@/components/dashboard/media/VideoManager.vue';
+import Heading from '@/components/dashboard/shared/ui/Heading.vue';
 import {
     AlertDialog,
     AlertDialogAction,

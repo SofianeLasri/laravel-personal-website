@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Heading from '@/components/dashboard/Heading.vue';
+import Heading from '@/components/dashboard/shared/ui/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useRoute } from '@/composables/useRoute';

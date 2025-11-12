@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 
-import AppearanceTabs from '@/components/dashboard/AppearanceTabs.vue';
-import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
+import AppearanceTabs from '@/components/dashboard/shared/ui/AppearanceTabs.vue';
+import HeadingSmall from '@/components/dashboard/shared/ui/HeadingSmall.vue';
 import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/AppLayout.vue';

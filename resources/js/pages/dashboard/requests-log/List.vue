@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Heading from '@/components/dashboard/Heading.vue';
+import Heading from '@/components/dashboard/shared/ui/Heading.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

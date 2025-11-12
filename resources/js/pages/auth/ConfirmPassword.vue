@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InputError from '@/components/dashboard/InputError.vue';
+import InputError from '@/components/dashboard/shared/ui/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

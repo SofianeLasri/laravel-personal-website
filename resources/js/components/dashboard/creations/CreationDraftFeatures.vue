@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import HeadingSmall from '@/components/dashboard/HeadingSmall.vue';
-import PictureInput from '@/components/dashboard/PictureInput.vue';
+import PictureInput from '@/components/dashboard/media/PictureInput.vue';
+import HeadingSmall from '@/components/dashboard/shared/ui/HeadingSmall.vue';
 import {
     AlertDialog,
     AlertDialogAction,

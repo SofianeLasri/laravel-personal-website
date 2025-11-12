@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import ContentGalleryManager from '@/components/dashboard/ContentGalleryManager.vue';
-import ContentVideoManager from '@/components/dashboard/ContentVideoManager.vue';
-import MarkdownEditor from '@/components/dashboard/MarkdownEditor.vue';
+import MarkdownEditor from '@/components/dashboard/forms/MarkdownEditor.vue';
+import ContentGalleryManager from '@/components/dashboard/media/ContentGalleryManager.vue';
+import ContentVideoManager from '@/components/dashboard/media/ContentVideoManager.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';

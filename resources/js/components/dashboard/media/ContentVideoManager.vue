@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import VideoManager from '@/components/dashboard/VideoManager.vue';
+import VideoManager from '@/components/dashboard/media/VideoManager.vue';
 import {
     AlertDialog,
     AlertDialogAction,

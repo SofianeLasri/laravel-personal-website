@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PictureInput from '@/components/dashboard/PictureInput.vue';
+import PictureInput from '@/components/dashboard/media/PictureInput.vue';
 import {
     AlertDialog,
     AlertDialogAction,

@@ -1,4 +1,4 @@
-import EmojiSuggestionList, { type EmojiSuggestionItem } from '@/components/dashboard/EmojiSuggestionList.vue';
+import EmojiSuggestionList, { type EmojiSuggestionItem } from '@/components/dashboard/content/EmojiSuggestionList.vue';
 import { nativeEmojis } from '@/data/native-emojis';
 import { Extension } from '@tiptap/core';
 import { PluginKey } from '@tiptap/pm/state';

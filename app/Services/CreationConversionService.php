@@ -42,7 +42,7 @@ class CreationConversionService
         }
         $this->syncRelationships($draft, $creation);
 
-        return $creation;
+        return $creation->refresh();
     }
 
     /**

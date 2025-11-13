@@ -56,7 +56,6 @@ class CreationDraftControllerTest extends TestCase
             'type' => 'website',
             'started_at' => '2025-01-01',
             'short_description_content' => 'Short desc',
-            'full_description_content' => 'Full desc',
             'featured' => true,
             'people' => [$person->id],
             'technologies' => [$technology->id],
@@ -87,8 +86,7 @@ class CreationDraftControllerTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors([
                 'name', 'slug', 'type',
-                'started_at', 'short_description_content',
-                'full_description_content', 'locale',
+                'started_at', 'short_description_content', 'locale',
             ]);
     }
 
@@ -102,7 +100,6 @@ class CreationDraftControllerTest extends TestCase
             'type' => 'library',
             'started_at' => '2025-01-01',
             'short_description_content' => 'Short',
-            'full_description_content' => 'Full',
         ];
 
         $response = $this->postJson(route('dashboard.api.creation-drafts.store'), $data);
@@ -137,7 +134,6 @@ class CreationDraftControllerTest extends TestCase
             'type' => 'game',
             'started_at' => '2025-02-01',
             'short_description_content' => 'Nouvelle description courte',
-            'full_description_content' => 'Nouvelle description longue',
             'people' => [$newPerson->id],
         ];
 
@@ -175,7 +171,6 @@ class CreationDraftControllerTest extends TestCase
             'type' => 'portfolio',
             'started_at' => '2025-01-01',
             'short_description_content' => 'Short',
-            'full_description_content' => 'Full',
             'people' => [$newPerson->id],
             'technologies' => [$newTechnology->id],
             'tags' => [$newTag->id],
@@ -225,7 +220,6 @@ class CreationDraftControllerTest extends TestCase
             'type' => 'tool',
             'started_at' => '2025-01-01',
             'short_description_content' => 'Updated text',
-            'full_description_content' => 'Updated full text',
         ];
 
         $this->putJson(route('dashboard.api.creation-drafts.show', ['creation_draft' => $draft]), $data);
@@ -244,7 +238,6 @@ class CreationDraftControllerTest extends TestCase
             'type' => 'library',
             'started_at' => '2025-01-01',
             'short_description_content' => 'Short',
-            'full_description_content' => 'Full',
         ];
 
         $response = $this->postJson(route('dashboard.api.creation-drafts.index'), $data);
@@ -265,7 +258,6 @@ class CreationDraftControllerTest extends TestCase
             'type' => 'portfolio',
             'started_at' => '2025-01-01',
             'short_description_content' => 'Short',
-            'full_description_content' => 'Full',
             'people' => [999],
             'technologies' => [999],
             'tags' => [999],
@@ -288,7 +280,6 @@ class CreationDraftControllerTest extends TestCase
             'type' => 'portfolio',
             'started_at' => '2025-01-01',
             'short_description_content' => 'Short',
-            'full_description_content' => 'Full',
             'original_creation_id' => $creation->id,
         ];
 
@@ -312,7 +303,6 @@ class CreationDraftControllerTest extends TestCase
             'started_at' => '2025-03-20',
             'ended_at' => '2025-12-31',
             'short_description_content' => 'Short',
-            'full_description_content' => 'Full',
         ];
 
         $this->postJson(route('dashboard.api.creation-drafts.index'), $data);

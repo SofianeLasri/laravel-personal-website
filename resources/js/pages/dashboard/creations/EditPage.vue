@@ -163,7 +163,6 @@ const updateContentForLocale = (newLocale: string) => {
         setFieldValue('short_description_content', newShortDesc);
     }
 
-    setFieldValue('locale', newLocale);
     locale.value = newLocale;
 };
 
@@ -305,21 +304,24 @@ onMounted(() => {
             <!-- Locale -->
             <div class="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <FormField v-slot="{ componentField }" name="locale">
-                    <FormItem v-bind="componentField">
+                    <FormItem>
                         <FormLabel>Langue</FormLabel>
-
-                        <Select v-model="locale" @update:model-value="handleLocaleChange">
-                            <FormControl>
+                        <FormControl>
+                            <Select
+                                :model-value="componentField.modelValue"
+                                @update:model-value="(value) => { componentField['onUpdate:modelValue'](value); handleLocaleChange(value); }"
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sélectionner une langue" />
                                 </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="fr">Français</SelectItem>
-                                <SelectItem value="en">Anglais</SelectItem>
-                            </SelectContent>
-                        </Select>
+                                <SelectContent>
+                                    <SelectItem value="fr">Français</SelectItem>
+                                    <SelectItem value="en">Anglais</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
                         <FormDescription> La langue dans laquelle seront enregistrés les champs traductibles. </FormDescription>
+                        <FormMessage />
                     </FormItem>
                 </FormField>
             </div>
@@ -402,11 +404,11 @@ onMounted(() => {
                             <FormLabel>Type de création</FormLabel>
                             <FormControl>
                                 <Select v-bind="componentField">
-                                    <SelectTrigger>
+                                    <SelectTrigger data-testid="creation-type-selector">
                                         <SelectValue placeholder="Sélectionner un type de création" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem v-for="type in creationTypes" :key="type" :value="type">
+                                        <SelectItem v-for="type in creationTypes" :key="type" :value="type" :data-testid="`type-${type}`">
                                             {{ getTypeLabel(type) }}
                                         </SelectItem>
                                     </SelectContent>

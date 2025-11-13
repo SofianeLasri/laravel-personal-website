@@ -532,7 +532,7 @@ defineExpose({
                     <!-- Video Content -->
                     <div v-if="getContentTypeFromClass(content.content_type) === 'video'" class="space-y-2">
                         <ContentVideoManager
-                            :blog-content-video-id="content.content.id"
+                            :content-video-id="content.content.id"
                             :locale="locale"
                             @video-selected="() => {}"
                             @video-removed="() => {}"

@@ -56,7 +56,7 @@ class CreationPageController extends Controller
         $creationDraft?->load([
             'shortDescriptionTranslationKey.translations',
             'fullDescriptionTranslationKey.translations',
-            'contents.content.translationKey.translations',
+            'contents.content',
         ]);
 
         // Get all pictures and videos for content selection

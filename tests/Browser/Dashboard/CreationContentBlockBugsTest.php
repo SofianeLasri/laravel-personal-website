@@ -163,4 +163,55 @@ class CreationContentBlockBugsTest extends DuskTestCase
             $this->assertEquals(2, $contents[1]->order);
         });
     }
+
+    #[Test]
+    public function it_loads_markdown_content_in_editor_when_editing_draft(): void
+    {
+        $markdownContent = "## Test Heading\n\nThis is a test paragraph with **bold** and *italic* text.\n\n- List item 1\n- List item 2";
+
+        $translationKey = TranslationKey::factory()->withTranslations([
+            'en' => $markdownContent,
+            'fr' => "## Titre de test\n\nCeci est un paragraphe de test avec du texte **gras** et *italique*.\n\n- Élément 1\n- Élément 2",
+        ])->create();
+
+        $draft = CreationDraft::factory()->create([
+            'name' => 'Draft With Markdown Content',
+        ]);
+
+        $markdown = ContentMarkdown::create([
+            'translation_key_id' => $translationKey->id,
+        ]);
+
+        $draft->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 1,
+        ]);
+
+        $this->browse(function (Browser $browser) use ($draft) {
+            $browser->loginAs($this->user)
+                ->visit('/dashboard/creations/edit?draft-id='.$draft->id)
+                ->waitForText('Markdown')
+                ->pause(2000); // Wait for content to load
+
+            // Verify content is visible in the editor (visual mode)
+            $browser->assertSee('Titre de test') // French locale
+                ->assertSee('Ceci est un paragraphe de test');
+
+            // Switch to raw mode and verify the raw markdown is loaded
+            $browser->click('[data-testid="toggle-raw-mode"]')
+                ->pause(500)
+                ->assertVisible('.raw-markdown-editor');
+
+            // Get the textarea value and verify it contains the markdown
+            $textareaValue = $browser->script(
+                'return document.querySelector(".raw-markdown-editor").value;'
+            )[0];
+
+            $this->assertStringContainsString('## Titre de test', $textareaValue, 'Raw markdown editor should contain the heading');
+            $this->assertStringContainsString('**gras**', $textareaValue, 'Raw markdown editor should contain bold markdown syntax');
+            $this->assertStringContainsString('*italique*', $textareaValue, 'Raw markdown editor should contain italic markdown syntax');
+            $this->assertStringContainsString('- Élément 1', $textareaValue, 'Raw markdown editor should contain list items');
+        });
+    }
 }

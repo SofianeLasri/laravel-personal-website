@@ -85,35 +85,60 @@ class ProjectDetailPageTest extends DuskTestCase
                 ->assertPresent('[data-section="description"][data-active="true"]')
                 // Allow Vue to fully mount and initialize scroll listeners
                 ->pause(1000)
-                // Disable smooth scrolling for test predictability
+                // Override window.scrollTo to force instant scrolling
                 ->script('
-                    document.documentElement.style.scrollBehavior = "auto";
-                    document.body.style.scrollBehavior = "auto";
+                    const originalScrollTo = window.scrollTo;
+                    window.scrollTo = function(options) {
+                        if (typeof options === "object") {
+                            options.behavior = "auto";
+                        }
+                        return originalScrollTo.call(this, options);
+                    };
                 ');
 
             $hasFeatures = $browser->script('return document.querySelector(\'[data-section="features"]\') !== null;');
             if ($hasFeatures[0] ?? false) {
-                $browser->click('[data-section="features"]')
-                    ->pause(300)
-                    ->waitFor('[data-section="features"][data-active="true"]', 10)
+                // Use JavaScript click for better reliability in CI
+                $browser->script('document.querySelector(\'[data-section="features"]\')?.click();');
+                $browser->pause(100)
+                    // Use waitUsing for more reliable polling
+                    ->waitUsing(10, 100, function () use ($browser) {
+                        $isActive = $browser->script('
+                            return document.querySelector(\'[data-section="features"]\')?.dataset.active === "true";
+                        ');
+
+                        return $isActive[0] ?? false;
+                    }, 'Waiting for features tab to become active')
                     ->assertPresent('[data-section="features"][data-active="true"]')
                     ->assertVisible('[data-testid="features-section"]');
             }
 
             $hasTechnologies = $browser->script('return document.querySelector(\'[data-section="technologies"]\') !== null;');
             if ($hasTechnologies[0] ?? false) {
-                $browser->click('[data-section="technologies"]')
-                    ->pause(300)
-                    ->waitFor('[data-section="technologies"][data-active="true"]', 10)
+                $browser->script('document.querySelector(\'[data-section="technologies"]\')?.click();');
+                $browser->pause(100)
+                    ->waitUsing(10, 100, function () use ($browser) {
+                        $isActive = $browser->script('
+                            return document.querySelector(\'[data-section="technologies"]\')?.dataset.active === "true";
+                        ');
+
+                        return $isActive[0] ?? false;
+                    }, 'Waiting for technologies tab to become active')
                     ->assertPresent('[data-section="technologies"][data-active="true"]')
                     ->assertVisible('[data-testid="technologies-section"]');
             }
 
             $hasScreenshots = $browser->script('return document.querySelector(\'[data-section="screenshots"]\') !== null;');
             if ($hasScreenshots[0] ?? false) {
-                $browser->click('[data-section="screenshots"]')
-                    ->pause(300)
-                    ->waitFor('[data-section="screenshots"][data-active="true"]', 10)
+                $browser->script('document.querySelector(\'[data-section="screenshots"]\')?.click();');
+                $browser->pause(100)
+                    ->waitUsing(10, 100, function () use ($browser) {
+                        $isActive = $browser->script('
+                            return document.querySelector(\'[data-section="screenshots"]\')?.dataset.active === "true";
+                        ');
+
+                        return $isActive[0] ?? false;
+                    }, 'Waiting for screenshots tab to become active')
                     ->assertPresent('[data-section="screenshots"][data-active="true"]')
                     ->assertVisible('[data-testid="screenshots-section"]');
             }

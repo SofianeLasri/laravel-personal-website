@@ -2226,4 +2226,445 @@ class PublicControllersServiceTest extends TestCase
         $this->assertEquals($coverPicture->filename, $result['coverImage']['filename']);
         $this->assertTrue($result['isPreview']);
     }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_content_markdown_block(): void
+    {
+        $creation = Creation::factory()->create();
+
+        // Create a markdown content block
+        $translationKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $translationKey->id,
+            'locale' => 'en',
+            'text' => 'This is markdown content with :custom_emoji:',
+        ]);
+
+        $markdown = ContentMarkdown::create([
+            'translation_key_id' => $translationKey->id,
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 1,
+        ]);
+
+        $emojiResolverMock = $this->createMock(CustomEmojiResolverService::class);
+        $emojiResolverMock->expects($this->once())
+            ->method('resolveEmojisInMarkdown')
+            ->with('This is markdown content with :custom_emoji:')
+            ->willReturn('This is markdown content with <picture>...</picture>');
+
+        $service = new PublicControllersService($emojiResolverMock);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertCount(1, $result['contents']);
+        $this->assertEquals(ContentMarkdown::class, $result['contents'][0]['content_type']);
+        $this->assertEquals(1, $result['contents'][0]['order']);
+        $this->assertEquals('This is markdown content with <picture>...</picture>', $result['contents'][0]['markdown']);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_content_markdown_emoji_resolution_failure(): void
+    {
+        $creation = Creation::factory()->create();
+
+        // Create a markdown content block
+        $translationKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $translationKey->id,
+            'locale' => 'en',
+            'text' => 'This is markdown content with :broken_emoji:',
+        ]);
+
+        $markdown = ContentMarkdown::create([
+            'translation_key_id' => $translationKey->id,
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 1,
+        ]);
+
+        $emojiResolverMock = $this->createMock(CustomEmojiResolverService::class);
+        $emojiResolverMock->expects($this->once())
+            ->method('resolveEmojisInMarkdown')
+            ->with('This is markdown content with :broken_emoji:')
+            ->willThrowException(new \Exception('Emoji not found'));
+
+        $service = new PublicControllersService($emojiResolverMock);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        // Should fallback to original markdown when emoji resolution fails
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertCount(1, $result['contents']);
+        $this->assertEquals('This is markdown content with :broken_emoji:', $result['contents'][0]['markdown']);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_content_markdown_translation_fallback(): void
+    {
+        app()->setLocale('es'); // Set a locale that doesn't have translations
+        config(['app.fallback_locale' => 'en']);
+
+        $creation = Creation::factory()->create();
+
+        // Create a markdown content block with only English translation
+        $translationKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $translationKey->id,
+            'locale' => 'en',
+            'text' => 'English markdown content',
+        ]);
+
+        $markdown = ContentMarkdown::create([
+            'translation_key_id' => $translationKey->id,
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        // Should fallback to English when Spanish is not available
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertEquals('English markdown content', $result['contents'][0]['markdown']);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_content_gallery_block_with_captions(): void
+    {
+        $creation = Creation::factory()->create();
+
+        // Create pictures with captions
+        $picture1 = \App\Models\Picture::factory()->create();
+        $picture2 = \App\Models\Picture::factory()->create();
+
+        $captionKey1 = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey1->id,
+            'locale' => 'en',
+            'text' => 'Caption for picture 1',
+        ]);
+
+        $captionKey2 = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey2->id,
+            'locale' => 'en',
+            'text' => 'Caption for picture 2',
+        ]);
+
+        // Create gallery
+        $gallery = ContentGallery::create([
+            'layout' => 'grid',
+            'columns' => 3,
+        ]);
+
+        // Attach pictures with captions
+        $gallery->pictures()->attach([
+            $picture1->id => [
+                'order' => 1,
+                'caption_translation_key_id' => $captionKey1->id,
+            ],
+            $picture2->id => [
+                'order' => 2,
+                'caption_translation_key_id' => $captionKey2->id,
+            ],
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentGallery::class,
+            'content_id' => $gallery->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertCount(1, $result['contents']);
+        $this->assertEquals(ContentGallery::class, $result['contents'][0]['content_type']);
+        $this->assertArrayHasKey('gallery', $result['contents'][0]);
+        $this->assertCount(2, $result['contents'][0]['gallery']['pictures']);
+
+        // Verify captions are present (pictures are ordered by their 'order' pivot value)
+        $resultPicture1 = collect($result['contents'][0]['gallery']['pictures'])->firstWhere('filename', $picture1->filename);
+        $resultPicture2 = collect($result['contents'][0]['gallery']['pictures'])->firstWhere('filename', $picture2->filename);
+
+        $this->assertEquals('Caption for picture 1', $resultPicture1['caption']);
+        $this->assertEquals('Caption for picture 2', $resultPicture2['caption']);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_content_gallery_block_mixed_captions(): void
+    {
+        $creation = Creation::factory()->create();
+
+        // Create pictures - one with caption, one without
+        $picture1 = \App\Models\Picture::factory()->create();
+        $picture2 = \App\Models\Picture::factory()->create();
+
+        $captionKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'en',
+            'text' => 'Only picture 1 has a caption',
+        ]);
+
+        // Create gallery
+        $gallery = ContentGallery::create([
+            'layout' => 'masonry',
+            'columns' => 2,
+        ]);
+
+        // Attach pictures - only first one has caption
+        $gallery->pictures()->attach([
+            $picture1->id => [
+                'order' => 1,
+                'caption_translation_key_id' => $captionKey->id,
+            ],
+            $picture2->id => [
+                'order' => 2,
+                'caption_translation_key_id' => null,
+            ],
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentGallery::class,
+            'content_id' => $gallery->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $resultPicture1 = collect($result['contents'][0]['gallery']['pictures'])->firstWhere('filename', $picture1->filename);
+        $resultPicture2 = collect($result['contents'][0]['gallery']['pictures'])->firstWhere('filename', $picture2->filename);
+
+        // Picture 1 should have caption
+        $this->assertArrayHasKey('caption', $resultPicture1);
+        $this->assertEquals('Only picture 1 has a caption', $resultPicture1['caption']);
+
+        // Picture 2 should NOT have caption key
+        $this->assertArrayNotHasKey('caption', $resultPicture2);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_content_video_block_filters_by_status_and_visibility(): void
+    {
+        $creation = Creation::factory()->create();
+
+        // Create videos with different statuses and visibilities
+        $readyPublicVideo = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::READY,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+
+        $readyPrivateVideo = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::READY,
+            'visibility' => VideoVisibility::PRIVATE,
+        ]);
+
+        $transcodingPublicVideo = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::TRANSCODING,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+
+        // Create content video blocks for each
+        $contentVideo1 = ContentVideo::create(['video_id' => $readyPublicVideo->id]);
+        $contentVideo2 = ContentVideo::create(['video_id' => $readyPrivateVideo->id]);
+        $contentVideo3 = ContentVideo::create(['video_id' => $transcodingPublicVideo->id]);
+
+        $creation->contents()->create([
+            'content_type' => ContentVideo::class,
+            'content_id' => $contentVideo1->id,
+            'order' => 1,
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentVideo::class,
+            'content_id' => $contentVideo2->id,
+            'order' => 2,
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentVideo::class,
+            'content_id' => $contentVideo3->id,
+            'order' => 3,
+        ]);
+
+        $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertCount(3, $result['contents']);
+
+        // Only the READY + PUBLIC video should have 'video' key
+        $this->assertArrayHasKey('video', $result['contents'][0]);
+        $this->assertEquals($readyPublicVideo->id, $result['contents'][0]['video']['id']);
+
+        // READY + PRIVATE should NOT have 'video' key
+        $this->assertArrayNotHasKey('video', $result['contents'][1]);
+
+        // TRANSCODING + PUBLIC should NOT have 'video' key
+        $this->assertArrayNotHasKey('video', $result['contents'][2]);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_content_video_block_with_caption(): void
+    {
+        $creation = Creation::factory()->create();
+
+        $video = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::READY,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+
+        // Create caption
+        $captionKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $captionKey->id,
+            'locale' => 'en',
+            'text' => 'This is a video caption',
+        ]);
+
+        $contentVideo = ContentVideo::create([
+            'video_id' => $video->id,
+            'caption_translation_key_id' => $captionKey->id,
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentVideo::class,
+            'content_id' => $contentVideo->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('video', $result['contents'][0]);
+        $this->assertEquals('This is a video caption', $result['contents'][0]['video']['caption']);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_mixed_content_blocks_ordered_correctly(): void
+    {
+        $creation = Creation::factory()->create();
+
+        // Create markdown block (order 2)
+        $markdownKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $markdownKey->id,
+            'locale' => 'en',
+            'text' => 'Markdown content',
+        ]);
+        $markdown = ContentMarkdown::create(['translation_key_id' => $markdownKey->id]);
+
+        // Create gallery block (order 1)
+        $gallery = ContentGallery::create(['layout' => 'grid', 'columns' => 2]);
+        $picture = \App\Models\Picture::factory()->create();
+        $gallery->pictures()->attach($picture->id, ['order' => 1]);
+
+        // Create video block (order 3)
+        $video = \App\Models\Video::factory()->create([
+            'status' => VideoStatus::READY,
+            'visibility' => VideoVisibility::PUBLIC,
+        ]);
+        $contentVideo = ContentVideo::create(['video_id' => $video->id]);
+
+        // Add content blocks in non-sequential order
+        $creation->contents()->create([
+            'content_type' => ContentGallery::class,
+            'content_id' => $gallery->id,
+            'order' => 1,
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 2,
+        ]);
+
+        $creation->contents()->create([
+            'content_type' => ContentVideo::class,
+            'content_id' => $contentVideo->id,
+            'order' => 3,
+        ]);
+
+        $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertCount(3, $result['contents']);
+
+        // Verify ordering
+        $this->assertEquals(1, $result['contents'][0]['order']);
+        $this->assertEquals(ContentGallery::class, $result['contents'][0]['content_type']);
+
+        $this->assertEquals(2, $result['contents'][1]['order']);
+        $this->assertEquals(ContentMarkdown::class, $result['contents'][1]['content_type']);
+
+        $this->assertEquals(3, $result['contents'][2]['order']);
+        $this->assertEquals(ContentVideo::class, $result['contents'][2]['content_type']);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_with_no_content_blocks_returns_empty_array(): void
+    {
+        $creation = Creation::factory()->create();
+
+        $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertIsArray($result['contents']);
+        $this->assertEmpty($result['contents']);
+    }
+
+    #[Test]
+    public function test_format_creation_for_ssr_full_backward_compatibility_with_full_description(): void
+    {
+        $creation = Creation::factory()->create();
+
+        // Add both fullDescription (legacy) and content blocks (new system)
+        $fullDescKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $fullDescKey->id,
+            'locale' => 'en',
+            'text' => 'Legacy full description',
+        ]);
+        $creation->update(['full_description_translation_key_id' => $fullDescKey->id]);
+
+        // Also add a content block
+        $markdownKey = TranslationKey::factory()->create();
+        Translation::factory()->create([
+            'translation_key_id' => $markdownKey->id,
+            'locale' => 'en',
+            'text' => 'New content block',
+        ]);
+        $markdown = ContentMarkdown::create(['translation_key_id' => $markdownKey->id]);
+        $creation->contents()->create([
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $markdown->id,
+            'order' => 1,
+        ]);
+
+        $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatCreationForSSRFull($creation);
+
+        // Both should be present for backward compatibility
+        $this->assertArrayHasKey('fullDescription', $result);
+        $this->assertEquals('Legacy full description', $result['fullDescription']);
+
+        $this->assertArrayHasKey('contents', $result);
+        $this->assertCount(1, $result['contents']);
+        $this->assertEquals('New content block', $result['contents'][0]['markdown']);
+    }
 }

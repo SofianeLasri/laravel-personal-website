@@ -49,7 +49,6 @@ class CreationDraftRequestTest extends TestCase
             'started_at' => now()->toDateString(),
             'ended_at' => now()->addDays(10)->toDateString(),
             'short_description_content' => 'Contenu court de description',
-            'full_description_content' => 'Contenu complet de description',
             'external_url' => 'https://example.com',
             'source_code_url' => 'https://github.com/example',
             'original_creation_id' => $originalCreation->id,
@@ -80,7 +79,6 @@ class CreationDraftRequestTest extends TestCase
             'type' => null,
             'started_at' => null,
             'short_description_content' => null,
-            'full_description_content' => null,
         ]);
 
         $validator = Validator::make($data, $this->rules());
@@ -93,7 +91,6 @@ class CreationDraftRequestTest extends TestCase
         $this->assertArrayHasKey('type', $errors);
         $this->assertArrayHasKey('started_at', $errors);
         $this->assertArrayHasKey('short_description_content', $errors);
-        $this->assertArrayHasKey('full_description_content', $errors);
     }
 
     #[Test]

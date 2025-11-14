@@ -5,7 +5,9 @@ namespace Tests\Browser\Pages;
 use App\Enums\CreationType;
 use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
+use App\Models\ContentMarkdown;
 use App\Models\Creation;
+use App\Models\CreationContent;
 use App\Models\Feature;
 use App\Models\OptimizedPicture;
 use App\Models\Person;
@@ -744,6 +746,18 @@ class ProjectDetailPageTest extends DuskTestCase
         foreach ($this->videos as $video) {
             $this->testProject->videos()->attach($video->id);
         }
+
+        // Create content blocks for the description
+        $contentMarkdown = ContentMarkdown::create([
+            'translation_key_id' => $descKey->id,
+        ]);
+
+        CreationContent::create([
+            'creation_id' => $this->testProject->id,
+            'content_type' => ContentMarkdown::class,
+            'content_id' => $contentMarkdown->id,
+            'order' => 1,
+        ]);
     }
 
     /**

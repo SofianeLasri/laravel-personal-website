@@ -10,6 +10,7 @@ use App\Models\Person;
 use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\TranslationKey;
+use App\Services\BlogContentDuplicationService;
 use App\Services\CreationConversionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -27,7 +28,8 @@ class CreationConversionServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new CreationConversionService;
+        $contentDuplicationService = new BlogContentDuplicationService;
+        $this->service = new CreationConversionService($contentDuplicationService);
     }
 
     #[Test]

@@ -265,10 +265,85 @@ class PublicControllersService
     {
         $response = $this->formatCreationForSSRShort($creation);
 
+        // Format content blocks
+        $contents = $creation->contents->map(function ($content) {
+            $result = [
+                'id' => $content->id,
+                'order' => $content->order,
+                'content_type' => $content->content_type,
+            ];
+
+            // Handle different content types
+            if ($content->content_type === ContentMarkdown::class && $content->content instanceof ContentMarkdown) {
+                $markdownContent = $content->content->translationKey ?
+                    $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
+                // Resolve custom emojis (:emoji_name:) to HTML picture tags
+                try {
+                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+                } catch (Exception $e) {
+                    // Fallback to original markdown if emoji resolution fails
+                    $result['markdown'] = $markdownContent;
+                }
+            } elseif ($content->content_type === ContentGallery::class && $content->content instanceof ContentGallery) {
+                // Get caption translation keys from the pivot data
+                $captionTranslationKeyIds = $content->content->pictures
+                    ->pluck('pivot.caption_translation_key_id')
+                    ->filter()
+                    ->unique();
+
+                // Load translation keys with their translations if any captions exist
+                $captionTranslations = [];
+                if ($captionTranslationKeyIds->isNotEmpty()) {
+                    $translationKeys = TranslationKey::with('translations')
+                        ->whereIn('id', $captionTranslationKeyIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    foreach ($translationKeys as $key => $translationKey) {
+                        $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
+                    }
+                }
+
+                $result['gallery'] = [
+                    'id' => $content->content->id,
+                    'pictures' => $content->content->pictures->map(function (Picture $picture) use ($captionTranslations) {
+                        $formattedPicture = $this->formatPictureForSSR($picture);
+
+                        // Add caption if it exists in the pivot data
+                        /** @phpstan-ignore-next-line Property pivot exists on Picture when loaded through BelongsToMany */
+                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
+                        if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
+                            $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
+                        }
+
+                        return $formattedPicture;
+                    })->toArray(),
+                ];
+            } elseif ($content->content_type === ContentVideo::class && $content->content instanceof ContentVideo) {
+                $video = $content->content->video;
+
+                if ($video && $video->status === VideoStatus::READY && $video->visibility === VideoVisibility::PUBLIC) {
+                    $caption = null;
+                    if ($content->content->captionTranslationKey) {
+                        $caption = $this->getTranslationWithFallback($content->content->captionTranslationKey->translations);
+                    }
+
+                    $formattedVideo = $this->formatVideoForSSR($video);
+                    $formattedVideo['caption'] = $caption;
+
+                    $result['video'] = $formattedVideo;
+                }
+            }
+
+            return $result;
+        });
+
+        // Keep fullDescription for backward compatibility (will be null if no content blocks exist yet)
         $fullDescription = $creation->fullDescriptionTranslationKey ?
             $this->getTranslationWithFallback($creation->fullDescriptionTranslationKey->translations) : null;
 
         $response['fullDescription'] = $fullDescription;
+        $response['contents'] = $contents->toArray();
         $response['externalUrl'] = $creation->external_url;
         $response['sourceCodeUrl'] = $creation->source_code_url;
         $response['features'] = $creation->features->map(function (Feature $feature) {

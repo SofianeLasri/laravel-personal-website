@@ -21,8 +21,24 @@ class ProjectController extends PublicController
             return redirect()->route('public.projects.show', ['slug' => $legacyMappings[$slug]], 301);
         }
 
-        $creation = Creation::where('slug', $slug)->firstOrFail()
-            ->withRelationshipAutoloading();
+        $creation = Creation::where('slug', $slug)
+            ->with([
+                'logo',
+                'coverImage',
+                'shortDescriptionTranslationKey.translations',
+                'fullDescriptionTranslationKey.translations',
+                'features.titleTranslationKey.translations',
+                'features.descriptionTranslationKey.translations',
+                'features.picture',
+                'screenshots.picture',
+                'screenshots.captionTranslationKey.translations',
+                'contents.content',
+                'technologies.iconPicture',
+                'people.picture',
+                'videos.coverPicture',
+                'tags',
+            ])
+            ->firstOrFail();
 
         $formattedCreation = $this->service->formatCreationForSSRFull($creation);
 

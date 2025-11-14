@@ -24,7 +24,6 @@ class CreationDraftController extends Controller
     public function store(CreationDraftRequest $request): JsonResponse
     {
         $shortDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->short_description_content);
-        $fullDescriptionTranslation = Translation::createOrUpdate(uniqid(), $request->input('locale'), $request->full_description_content);
 
         $draft = CreationDraft::create([
             'name' => $request->name,
@@ -35,7 +34,6 @@ class CreationDraftController extends Controller
             'started_at' => $request->started_at,
             'ended_at' => $request->ended_at,
             'short_description_translation_key_id' => $shortDescriptionTranslation->translation_key_id,
-            'full_description_translation_key_id' => $fullDescriptionTranslation->translation_key_id,
             'featured' => $request->featured ?? false,
             'external_url' => $request->external_url,
             'source_code_url' => $request->source_code_url,
@@ -54,7 +52,10 @@ class CreationDraftController extends Controller
             $draft->tags()->sync($request->tags);
         }
 
-        return response()->json($draft, Response::HTTP_CREATED);
+        return response()->json(
+            $draft->load('shortDescriptionTranslationKey.translations'),
+            Response::HTTP_CREATED
+        );
     }
 
     public function show(CreationDraft $creationDraft): JsonResponse
@@ -69,11 +70,6 @@ class CreationDraftController extends Controller
             $request->input('locale'),
             $request->short_description_content
         );
-        $fullDescriptionTranslation = Translation::createOrUpdate(
-            $creationDraft->fullDescriptionTranslationKey ?? uniqid(),
-            $request->input('locale'),
-            $request->full_description_content
-        );
 
         $creationDraft->update([
             'name' => $request->name,
@@ -84,7 +80,6 @@ class CreationDraftController extends Controller
             'started_at' => $request->started_at,
             'ended_at' => $request->ended_at,
             'short_description_translation_key_id' => $shortDescriptionTranslation->translation_key_id,
-            'full_description_translation_key_id' => $fullDescriptionTranslation->translation_key_id,
             'featured' => $request->featured ?? false,
             'external_url' => $request->external_url,
             'source_code_url' => $request->source_code_url,
@@ -107,7 +102,9 @@ class CreationDraftController extends Controller
             $creationDraft->tags()->sync($request->tags);
         }
 
-        return response()->json($creationDraft);
+        return response()->json(
+            $creationDraft->load('shortDescriptionTranslationKey.translations')
+        );
     }
 
     public function destroy(CreationDraft $creationDraft): Response

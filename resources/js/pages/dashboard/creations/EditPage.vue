@@ -5,7 +5,7 @@ import CreationDraftScreenshots from '@/components/dashboard/creations/CreationD
 import CreationDraftTags from '@/components/dashboard/creations/CreationDraftTags.vue';
 import CreationDraftTechnologies from '@/components/dashboard/creations/CreationDraftTechnologies.vue';
 import CreationDraftVideos from '@/components/dashboard/creations/CreationDraftVideos.vue';
-import MarkdownEditor from '@/components/dashboard/forms/MarkdownEditor.vue';
+import ContentBuilder from '@/components/dashboard/media/ContentBuilder.vue';
 import PictureInput from '@/components/dashboard/media/PictureInput.vue';
 import Heading from '@/components/dashboard/shared/ui/Heading.vue';
 import HeadingSmall from '@/components/dashboard/shared/ui/HeadingSmall.vue';
@@ -27,7 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useRoute } from '@/composables/useRoute';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, TranslationKey } from '@/types';
+import { BreadcrumbItem, CreationDraftWithTranslations, CreationType, Picture, TranslationKey, Video } from '@/types';
 import { creationTypeLabels, getTypeLabel } from '@/utils/creationTypes';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -40,6 +40,8 @@ import * as z from 'zod';
 
 const props = defineProps<{
     creationDraft?: CreationDraftWithTranslations;
+    pictures: Picture[];
+    videos: Video[];
 }>();
 const route = useRoute();
 
@@ -99,7 +101,6 @@ const formSchema = toTypedSchema(
             .string()
             .max(160, 'La description courte ne doit pas dépasser 160 caractères')
             .min(1, 'La description courte est requise'),
-        full_description_content: z.string().min(1, 'La description complète est requise'),
         featured: z.boolean().default(false),
         started_at: z.string().min(1, 'La date de début est requise'),
         ended_at: z.string().nullable(),
@@ -113,14 +114,9 @@ const getContentForLocale = (translationKey: TranslationKey | undefined, targetL
 };
 
 let shortDescriptionContent = '';
-let fullDescriptionContent = '';
 
 if (currentCreationDraft.value?.short_description_translation_key) {
     shortDescriptionContent = getContentForLocale(currentCreationDraft.value.short_description_translation_key, locale.value);
-}
-
-if (currentCreationDraft.value?.full_description_translation_key) {
-    fullDescriptionContent = getContentForLocale(currentCreationDraft.value.full_description_translation_key, locale.value);
 }
 
 const { isFieldDirty, handleSubmit, setFieldValue, meta } = useForm({
@@ -135,7 +131,6 @@ const { isFieldDirty, handleSubmit, setFieldValue, meta } = useForm({
         type: currentCreationDraft.value?.type ?? creationTypes[0],
         locale: locale.value,
         short_description_content: shortDescriptionContent,
-        full_description_content: fullDescriptionContent,
         featured: currentCreationDraft.value?.featured ?? false,
         started_at: currentCreationDraft.value?.started_at ? currentCreationDraft.value.started_at.split('T')[0] : today,
         ended_at: currentCreationDraft.value?.ended_at ? currentCreationDraft.value.ended_at.split('T')[0] : null,
@@ -165,14 +160,9 @@ watch(nameField, (newName) => {
 const updateContentForLocale = (newLocale: string) => {
     if (currentCreationDraft.value) {
         const newShortDesc = getContentForLocale(currentCreationDraft.value.short_description_translation_key, newLocale);
-
-        const newFullDesc = getContentForLocale(currentCreationDraft.value.full_description_translation_key, newLocale);
-
         setFieldValue('short_description_content', newShortDesc);
-        setFieldValue('full_description_content', newFullDesc);
     }
 
-    setFieldValue('locale', newLocale);
     locale.value = newLocale;
 };
 
@@ -314,21 +304,29 @@ onMounted(() => {
             <!-- Locale -->
             <div class="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <FormField v-slot="{ componentField }" name="locale">
-                    <FormItem v-bind="componentField">
+                    <FormItem>
                         <FormLabel>Langue</FormLabel>
-
-                        <Select v-model="locale" @update:model-value="handleLocaleChange">
-                            <FormControl>
+                        <FormControl>
+                            <Select
+                                :model-value="componentField.modelValue"
+                                @update:model-value="
+                                    (value) => {
+                                        componentField['onUpdate:modelValue'](value);
+                                        handleLocaleChange(value);
+                                    }
+                                "
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sélectionner une langue" />
                                 </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="fr">Français</SelectItem>
-                                <SelectItem value="en">Anglais</SelectItem>
-                            </SelectContent>
-                        </Select>
+                                <SelectContent>
+                                    <SelectItem value="fr">Français</SelectItem>
+                                    <SelectItem value="en">Anglais</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
                         <FormDescription> La langue dans laquelle seront enregistrés les champs traductibles. </FormDescription>
+                        <FormMessage />
                     </FormItem>
                 </FormField>
             </div>
@@ -411,11 +409,11 @@ onMounted(() => {
                             <FormLabel>Type de création</FormLabel>
                             <FormControl>
                                 <Select v-bind="componentField">
-                                    <SelectTrigger>
+                                    <SelectTrigger data-testid="creation-type-selector">
                                         <SelectValue placeholder="Sélectionner un type de création" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem v-for="type in creationTypes" :key="type" :value="type">
+                                        <SelectItem v-for="type in creationTypes" :key="type" :value="type" :data-testid="`type-${type}`">
                                             {{ getTypeLabel(type) }}
                                         </SelectItem>
                                     </SelectContent>
@@ -473,16 +471,32 @@ onMounted(() => {
                 </FormField>
             </div>
 
-            <div class="mb-4">
-                <FormField v-slot="{ componentField }" name="full_description_content">
-                    <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                            <MarkdownEditor v-bind="componentField" placeholder="Commencez à écrire..." />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                </FormField>
+            <div
+                v-if="!currentCreationDraft?.id"
+                class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20"
+            >
+                <p class="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Info :</strong> Veuillez d'abord sauvegarder le brouillon pour pouvoir ajouter du contenu à la création.
+                </p>
+                <p class="mt-2 text-xs text-blue-600 dark:text-blue-300">
+                    Cette mesure évite la création de contenus orphelins dans la base de données.
+                </p>
+            </div>
+            <div v-else class="mb-4">
+                <HeadingSmall title="Contenu de la création" />
+                <ContentBuilder
+                    :draft-id="currentCreationDraft.id"
+                    :contents="currentCreationDraft.contents || []"
+                    :pictures="pictures"
+                    :videos="videos"
+                    :locale="locale"
+                    :content-routes="{
+                        store: 'dashboard.api.creation-draft-contents.store',
+                        destroy: 'dashboard.api.creation-draft-contents.destroy',
+                        reorder: 'dashboard.api.creation-draft-contents.reorder',
+                    }"
+                    entity-type="creation"
+                />
             </div>
 
             <div class="flex space-x-4">

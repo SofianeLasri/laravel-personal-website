@@ -266,6 +266,7 @@ const insertEmoji = (emoji: string) => {
                 type="button"
                 :title="rawMode ? 'Mode visuel' : 'Mode Markdown brut'"
                 class="ml-auto"
+                data-testid="toggle-raw-mode"
                 @click="toggleRawMode"
             >
                 <FileCode />
@@ -390,12 +391,14 @@ const insertEmoji = (emoji: string) => {
 
 .raw-markdown-editor {
     width: 100%;
-    min-height: 150px;
+    min-height: 200px;
+    max-height: 600px;
     padding: 1rem;
     font-family: monospace;
     border: none;
     outline: none;
     resize: vertical;
+    overflow-y: auto;
     background-color: inherit;
     color: inherit;
 }

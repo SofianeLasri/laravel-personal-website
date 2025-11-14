@@ -36,6 +36,7 @@ class ContentVideo extends Model
     ];
 
     protected $with = [
+        'video',
         'captionTranslationKey.translations',
     ];
 

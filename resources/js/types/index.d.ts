@@ -338,6 +338,26 @@ interface SSRSimplifiedCreation {
 
 interface SSRFullCreation extends SSRSimplifiedCreation {
     fullDescription: string;
+    contents: Array<{
+        id: number;
+        order: number;
+        content_type: string;
+        markdown?: string;
+        gallery?: {
+            id: number;
+            layout: string;
+            columns: number | null;
+            pictures: SSRPicture[];
+        };
+        video?: {
+            id: number;
+            bunnyVideoId: string;
+            name: string;
+            coverPicture: SSRPicture;
+            libraryId: string;
+            caption: string | null;
+        };
+    }>;
     externalUrl: string | null;
     sourceCodeUrl: string | null;
     features: SSRFeature[];

@@ -34,6 +34,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $full_description_translation_keys_count
  * @property int|null $features_count
  * @property int|null $screenshots_count
+ * @property int|null $contents_count
  * @property int|null $technologies_count
  * @property int|null $people_count
  * @property int|null $tags_count
@@ -45,6 +46,7 @@ use Illuminate\Support\Carbon;
  * @property-read TranslationKey|null $fullDescriptionTranslationKey
  * @property-read Collection|Feature[] $features
  * @property-read Collection|Screenshot[] $screenshots
+ * @property-read Collection|CreationContent[] $contents
  * @property-read Collection|Technology[] $technologies
  * @property-read Collection|Person[] $people
  * @property-read Collection|Tag[] $tags
@@ -128,6 +130,14 @@ class Creation extends Model
     public function screenshots(): HasMany
     {
         return $this->hasMany(Screenshot::class)->orderBy('order');
+    }
+
+    /**
+     * @return HasMany<CreationContent, $this>
+     */
+    public function contents(): HasMany
+    {
+        return $this->hasMany(CreationContent::class)->orderBy('order');
     }
 
     /**

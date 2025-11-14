@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CreationType;
+use App\Services\BlogContentDuplicationService;
 use App\Services\CreationConversionService;
 use Database\Factories\CreationDraftFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -39,6 +40,7 @@ use Illuminate\Validation\ValidationException;
  * @property int|null $full_description_translation_keys_count
  * @property int|null $features_count
  * @property int|null $screenshots_count
+ * @property int|null $contents_count
  * @property int|null $technologies_count
  * @property int|null $people_count
  * @property int|null $tags_count
@@ -50,6 +52,7 @@ use Illuminate\Validation\ValidationException;
  * @property-read TranslationKey|null $fullDescriptionTranslationKey
  * @property-read Collection|CreationDraftFeature[] $features
  * @property-read Collection|CreationDraftScreenshot[] $screenshots
+ * @property-read Collection|CreationDraftContent[] $contents
  * @property-read Collection|Technology[] $technologies
  * @property-read Collection|Person[] $people
  * @property-read Collection|Tag[] $tags
@@ -144,6 +147,14 @@ class CreationDraft extends Model
     }
 
     /**
+     * @return HasMany<CreationDraftContent, $this>
+     */
+    public function contents(): HasMany
+    {
+        return $this->hasMany(CreationDraftContent::class)->orderBy('order');
+    }
+
+    /**
      * @return BelongsToMany<Technology, $this>
      */
     public function technologies(): BelongsToMany
@@ -212,6 +223,26 @@ class CreationDraft extends Model
                 'caption_translation_key_id' => $screenshot->caption_translation_key_id,
                 'order' => $screenshot->order,
             ]);
+        }
+
+        // Copy content blocks
+        $duplicationService = app(BlogContentDuplicationService::class);
+        foreach ($creation->contents()->with('content')->orderBy('order')->get() as $creationContent) {
+            // Duplicate the content entity
+            $newContent = match (get_class($creationContent->content)) {
+                ContentMarkdown::class => $duplicationService->duplicateMarkdownContent($creationContent->content),
+                ContentGallery::class => $duplicationService->duplicateGalleryContent($creationContent->content),
+                ContentVideo::class => $duplicationService->duplicateVideoContent($creationContent->content),
+                default => null,
+            };
+
+            if ($newContent) {
+                $draft->contents()->create([
+                    'content_type' => $creationContent->content_type,
+                    'content_id' => $newContent->id,
+                    'order' => $creationContent->order,
+                ]);
+            }
         }
 
         $draft->technologies()->attach($creation->technologies()->pluck('technologies.id'));

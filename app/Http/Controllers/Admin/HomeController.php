@@ -51,8 +51,8 @@ class HomeController extends Controller
         // Get all visits for period calculations
         $visits = $visitStatsService->getUniqueVisits($filters);
 
-        // Calculate totals by period
-        $totalsByPeriods = $visitStatsService->getTotalVisitsByPeriods($filters);
+        // Calculate totals by period (reusing $visits to avoid duplicate query)
+        $totalsByPeriods = $visitStatsService->getTotalVisitsByPeriods($filters, $visits);
 
         // Get available periods for selector
         $periods = $visitStatsService->getAvailablePeriods($visits);
@@ -65,12 +65,15 @@ class HomeController extends Controller
         $filters['date_from'] = $startDate;
         $filters['date_to'] = $dateEnd;
 
-        // Get aggregated statistics for the selected period
-        $visitsPerDay = $visitStatsService->getVisitsGroupedByDay($filters);
-        $visitsByCountry = $visitStatsService->getVisitsGroupedByCountry($filters);
-        $mostVisitedPages = $visitStatsService->getMostVisitedPages($filters);
-        $bestsReferrers = $visitStatsService->getBestReferrers($filters);
-        $bestOrigins = $visitStatsService->getBestOrigins($filters);
+        // Fetch visits once with date filters to avoid N+1 queries
+        $visitsForPeriod = $visitStatsService->getUniqueVisits($filters);
+
+        // Get aggregated statistics for the selected period (reusing $visitsForPeriod)
+        $visitsPerDay = $visitStatsService->getVisitsGroupedByDay($filters, $visitsForPeriod);
+        $visitsByCountry = $visitStatsService->getVisitsGroupedByCountry($filters, $visitsForPeriod);
+        $mostVisitedPages = $visitStatsService->getMostVisitedPages($filters, 10, $visitsForPeriod);
+        $bestsReferrers = $visitStatsService->getBestReferrers($filters, 10, $visitsForPeriod);
+        $bestOrigins = $visitStatsService->getBestOrigins($filters, 10, $visitsForPeriod);
 
         return response()->json([
             'totalVisitsPastTwentyFourHours' => $totalsByPeriods['past_24h'],

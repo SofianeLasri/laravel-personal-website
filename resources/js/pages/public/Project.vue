@@ -103,7 +103,7 @@ if (props.creation.screenshots.length > 0) {
                 />
 
                 <div class="content-sections mt-8" data-testid="project-content">
-                    <section id="description" class="flex w-full min-w-0 flex-col gap-8" data-testid="description-section">
+                    <section id="description" class="flex w-full min-w-0 flex-col" data-testid="description-section">
                         <ContentSectionTitle>{{ t('project.description') }}</ContentSectionTitle>
                         <template v-for="content in creation.contents" :key="content.id">
                             <!-- Markdown Content -->
@@ -125,7 +125,7 @@ if (props.creation.screenshots.length > 0) {
                         </template>
                     </section>
 
-                    <section v-if="creation.features.length > 0" id="features" class="mt-16 flex flex-col gap-8" data-testid="features-section">
+                    <section v-if="creation.features.length > 0" id="features" class="mt-16 flex flex-col" data-testid="features-section">
                         <ContentSectionTitle>{{ t('project.key_features') }}</ContentSectionTitle>
                         <div class="grid gap-16 md:grid-cols-2 lg:grid-cols-3">
                             <div v-for="feature in creation.features" :key="feature.id" class="flex flex-col gap-6" data-testid="feature-card">
@@ -148,7 +148,7 @@ if (props.creation.screenshots.length > 0) {
                         </div>
                     </section>
 
-                    <section v-if="creation.people.length > 0" id="people" class="mt-16 flex flex-col gap-8" data-testid="people-section">
+                    <section v-if="creation.people.length > 0" id="people" class="mt-16 flex flex-col" data-testid="people-section">
                         <ContentSectionTitle>{{ t('project.people_involved') }}</ContentSectionTitle>
                         <div class="grid grid-cols-1 gap-3 self-stretch sm:grid-cols-2 lg:gap-4 xl:grid-cols-3">
                             <div

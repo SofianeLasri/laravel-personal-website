@@ -28,6 +28,7 @@ use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -169,38 +170,39 @@ class PublicControllersServiceTest extends TestCase
         $this->assertArrayHasKey('name', $result[0]['technologies'][0]);
     }
 
-    #[Test]
-    public function test_format_date_with_string(): void
+    /**
+     * Data provider for date formatting scenarios
+     */
+    public static function dateFormattingProvider(): array
     {
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-
-        $date = '01/04/2025';
-        $result = $service->formatDate($date);
-
-        $this->assertEquals('Janvier 2025', $result);
-        $this->assertNotEquals('01/04/2025', $result);
+        return [
+            'string date' => [
+                '01/04/2025',
+                'Janvier 2025',
+            ],
+            'carbon object' => [
+                fn () => now(),
+                fn () => ucfirst(now()->translatedFormat('F Y')),
+            ],
+            'null date' => [
+                null,
+                null,
+            ],
+        ];
     }
 
     #[Test]
-    public function test_format_date_with_carbon_object(): void
+    #[DataProvider('dateFormattingProvider')]
+    public function test_date_formatting($input, $expected): void
     {
+        // Resolve callables
+        $input = is_callable($input) ? $input() : $input;
+        $expected = is_callable($expected) ? $expected() : $expected;
+
         $service = new PublicControllersService(new CustomEmojiResolverService);
+        $result = $service->formatDate($input);
 
-        $date = now();
-        $result = $service->formatDate($date);
-
-        $this->assertEquals(ucfirst(now()->translatedFormat('F Y')), $result);
-        $this->assertNotEquals(now(), $result);
-    }
-
-    #[Test]
-    public function test_format_date_returns_null_if_date_is_null(): void
-    {
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-
-        $result = $service->formatDate(null);
-
-        $this->assertNull($result);
+        $this->assertEquals($expected, $result);
     }
 
     #[Test]
@@ -360,114 +362,113 @@ class PublicControllersServiceTest extends TestCase
         }
     }
 
-    #[Test]
-    public function test_translation_fallback_when_current_locale_translation_missing(): void
+    /**
+     * Data provider for technology translation fallback scenarios
+     */
+    public static function technologyTranslationProvider(): array
     {
-        app()->setLocale('es'); // Set a locale that doesn't have translations
-        config(['app.fallback_locale' => 'en']);
+        return [
+            'fallback to English when Spanish missing' => [
+                'es',
+                'en',
+                [
+                    ['locale' => 'en', 'text' => 'English description'],
+                ],
+                'English description',
+            ],
+            'uses current locale when available' => [
+                'fr',
+                'en',
+                [
+                    ['locale' => 'en', 'text' => 'English description'],
+                    ['locale' => 'fr', 'text' => 'Description française'],
+                ],
+                'Description française',
+            ],
+            'returns empty when no translation available' => [
+                'es',
+                'en',
+                [],
+                '',
+            ],
+            'locale same as fallback' => [
+                'en',
+                'en',
+                [
+                    ['locale' => 'en', 'text' => 'English description'],
+                ],
+                'English description',
+            ],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('technologyTranslationProvider')]
+    public function test_technology_translation_fallback(string $locale, string $fallbackLocale, array $translations, string $expected): void
+    {
+        app()->setLocale($locale);
+        config(['app.fallback_locale' => $fallbackLocale]);
 
         $technology = Technology::factory()->create();
 
-        // Create only English translation, no Spanish
+        // Remove existing translations and add test translations
         $technology->descriptionTranslationKey->translations()->delete();
-        Translation::factory()->create([
-            'translation_key_id' => $technology->descriptionTranslationKey->id,
-            'locale' => 'en',
-            'text' => 'English description',
-        ]);
+        foreach ($translations as $translationData) {
+            Translation::factory()->create([
+                'translation_key_id' => $technology->descriptionTranslationKey->id,
+                'locale' => $translationData['locale'],
+                'text' => $translationData['text'],
+            ]);
+        }
 
         $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatTechnologyForSSR($technology);
 
-        $this->assertEquals('English description', $result['description']);
+        $this->assertEquals($expected, $result['description']);
     }
 
-    #[Test]
-    public function test_translation_uses_current_locale_when_available(): void
+    /**
+     * Data provider for creation translation fallback scenarios
+     */
+    public static function creationTranslationProvider(): array
     {
-        app()->setLocale('fr');
-        config(['app.fallback_locale' => 'en']);
-
-        $technology = Technology::factory()->create();
-
-        // Create both French and English translations
-        $technology->descriptionTranslationKey->translations()->delete();
-        Translation::factory()->create([
-            'translation_key_id' => $technology->descriptionTranslationKey->id,
-            'locale' => 'en',
-            'text' => 'English description',
-        ]);
-        Translation::factory()->create([
-            'translation_key_id' => $technology->descriptionTranslationKey->id,
-            'locale' => 'fr',
-            'text' => 'Description française',
-        ]);
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatTechnologyForSSR($technology);
-
-        $this->assertEquals('Description française', $result['description']);
+        return [
+            'short description fallback' => [
+                'shortDescriptionTranslationKey',
+                'formatCreationForSSRShort',
+                'shortDescription',
+                'English short description',
+            ],
+            'full description fallback' => [
+                'fullDescriptionTranslationKey',
+                'formatCreationForSSRFull',
+                'fullDescription',
+                'English full description',
+            ],
+        ];
     }
 
     #[Test]
-    public function test_translation_returns_empty_when_no_translation_available(): void
-    {
-        app()->setLocale('es');
-        config(['app.fallback_locale' => 'en']);
-
-        $technology = Technology::factory()->create();
-
-        // Remove all translations
-        $technology->descriptionTranslationKey->translations()->delete();
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatTechnologyForSSR($technology);
-
-        $this->assertEquals('', $result['description']);
-    }
-
-    #[Test]
-    public function test_creation_translation_fallback_for_short_description(): void
+    #[DataProvider('creationTranslationProvider')]
+    public function test_creation_translation_fallback(string $translationKeyField, string $formatMethod, string $resultField, string $text): void
     {
         app()->setLocale('es');
         config(['app.fallback_locale' => 'en']);
 
         $creation = Creation::factory()->create();
 
-        // Create only English translation for short description
-        $creation->shortDescriptionTranslationKey->translations()->delete();
+        // Create only English translation
+        $creation->{$translationKeyField}->translations()->delete();
         Translation::factory()->create([
-            'translation_key_id' => $creation->shortDescriptionTranslationKey->id,
+            'translation_key_id' => $creation->{$translationKeyField}->id,
             'locale' => 'en',
-            'text' => 'English short description',
+            'text' => $text,
         ]);
 
         $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatCreationForSSRShort($creation);
+        $result = $service->$formatMethod($creation);
 
-        $this->assertEquals('English short description', $result['shortDescription']);
-    }
-
-    #[Test]
-    public function test_creation_translation_fallback_for_full_description(): void
-    {
-        app()->setLocale('es');
-        config(['app.fallback_locale' => 'en']);
-
-        $creation = Creation::factory()->create();
-
-        // Create only English translation for full description
-        $creation->fullDescriptionTranslationKey->translations()->delete();
-        Translation::factory()->create([
-            'translation_key_id' => $creation->fullDescriptionTranslationKey->id,
-            'locale' => 'en',
-            'text' => 'English full description',
-        ]);
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatCreationForSSRFull($creation);
-
-        $this->assertEquals('English full description', $result['fullDescription']);
+        $this->assertEquals($text, $result[$resultField]);
     }
 
     #[Test]
@@ -599,95 +600,59 @@ class PublicControllersServiceTest extends TestCase
         $this->assertEquals(5.0, $result['githubLanguages']['CSS']);
     }
 
-    #[Test]
-    public function test_format_creation_without_github_url(): void
+    /**
+     * Data provider for GitHub error scenarios
+     */
+    public static function githubErrorScenariosProvider(): array
     {
-        $creation = Creation::factory()->create([
-            'name' => 'Test Creation',
-            'source_code_url' => null,
-        ]);
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatCreationForSSRFull($creation);
-
-        $this->assertArrayHasKey('githubData', $result);
-        $this->assertArrayHasKey('githubLanguages', $result);
-        $this->assertNull($result['githubData']);
-        $this->assertNull($result['githubLanguages']);
+        return [
+            'no GitHub URL' => [
+                null,
+                null,
+                null,
+            ],
+            'non-GitHub URL' => [
+                'https://gitlab.com/owner/repo',
+                null,
+                null,
+            ],
+            'GitHub API 404 error' => [
+                'https://github.com/owner/nonexistent',
+                'api.github.com/repos/owner/nonexistent',
+                ['response' => null, 'status' => 404],
+            ],
+            'private GitHub repo' => [
+                'https://github.com/owner/private-repo',
+                'api.github.com/repos/owner/private-repo',
+                ['response' => ['message' => 'Not Found'], 'status' => 404],
+            ],
+            'GitHub rate limit' => [
+                'https://github.com/owner/repo',
+                'api.github.com/repos/owner/repo',
+                ['response' => ['message' => 'API rate limit exceeded'], 'status' => 403],
+            ],
+            'GitHub server error' => [
+                'https://github.com/owner/repo',
+                'api.github.com/repos/owner/repo',
+                ['response' => null, 'status' => 500],
+            ],
+        ];
     }
 
     #[Test]
-    public function test_format_creation_with_non_github_url(): void
+    #[DataProvider('githubErrorScenariosProvider')]
+    public function test_github_error_scenarios(?string $sourceCodeUrl, ?string $apiEndpoint, ?array $httpMock): void
     {
         $creation = Creation::factory()->create([
             'name' => 'Test Creation',
-            'source_code_url' => 'https://gitlab.com/owner/repo',
+            'source_code_url' => $sourceCodeUrl,
         ]);
 
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatCreationForSSRFull($creation);
-
-        $this->assertArrayHasKey('githubData', $result);
-        $this->assertArrayHasKey('githubLanguages', $result);
-        $this->assertNull($result['githubData']);
-        $this->assertNull($result['githubLanguages']);
-    }
-
-    #[Test]
-    public function test_format_creation_with_github_api_error(): void
-    {
-        $creation = Creation::factory()->create([
-            'name' => 'Test Creation',
-            'source_code_url' => 'https://github.com/owner/nonexistent',
-        ]);
-
-        Http::fake([
-            'api.github.com/repos/owner/nonexistent' => Http::response(null, 404),
-        ]);
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatCreationForSSRFull($creation);
-
-        $this->assertArrayHasKey('githubData', $result);
-        $this->assertArrayHasKey('githubLanguages', $result);
-        $this->assertNull($result['githubData']);
-        $this->assertNull($result['githubLanguages']);
-    }
-
-    #[Test]
-    public function test_format_creation_with_private_github_repo(): void
-    {
-        $creation = Creation::factory()->create([
-            'name' => 'Test Creation',
-            'source_code_url' => 'https://github.com/owner/private-repo',
-        ]);
-
-        Http::fake([
-            'api.github.com/repos/owner/private-repo' => Http::response(['message' => 'Not Found'], 404),
-        ]);
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatCreationForSSRFull($creation);
-
-        $this->assertArrayHasKey('githubData', $result);
-        $this->assertArrayHasKey('githubLanguages', $result);
-        $this->assertNull($result['githubData']);
-        $this->assertNull($result['githubLanguages']);
-    }
-
-    #[Test]
-    public function test_format_creation_with_github_rate_limit(): void
-    {
-        $creation = Creation::factory()->create([
-            'name' => 'Test Creation',
-            'source_code_url' => 'https://github.com/owner/repo',
-        ]);
-
-        Http::fake([
-            'api.github.com/repos/owner/repo' => Http::response([
-                'message' => 'API rate limit exceeded',
-            ], 403),
-        ]);
+        if ($httpMock !== null) {
+            Http::fake([
+                $apiEndpoint => Http::response($httpMock['response'], $httpMock['status']),
+            ]);
+        }
 
         $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
@@ -1426,30 +1391,38 @@ class PublicControllersServiceTest extends TestCase
         $this->assertEquals(50000, $result['packagistData']['downloads']);
     }
 
-    #[Test]
-    public function test_format_creation_with_packagist_api_error(): void
+    /**
+     * Data provider for Packagist error scenarios
+     */
+    public static function packagistErrorScenariosProvider(): array
     {
-        $creation = Creation::factory()->create([
-            'external_url' => 'https://packagist.org/packages/vendor/nonexistent',
-        ]);
-
-        Http::fake([
-            'packagist.org/packages/vendor/nonexistent.json' => Http::response(null, 404),
-        ]);
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatCreationForSSRFull($creation);
-
-        $this->assertArrayHasKey('packagistData', $result);
-        $this->assertNull($result['packagistData']);
+        return [
+            'Packagist API error' => [
+                'https://packagist.org/packages/vendor/nonexistent',
+                'packagist.org/packages/vendor/nonexistent.json',
+                ['response' => null, 'status' => 404],
+            ],
+            'non-Packagist URL' => [
+                'https://example.com',
+                null,
+                null,
+            ],
+        ];
     }
 
     #[Test]
-    public function test_format_creation_without_packagist_url(): void
+    #[DataProvider('packagistErrorScenariosProvider')]
+    public function test_packagist_error_scenarios(string $externalUrl, ?string $apiEndpoint, ?array $httpMock): void
     {
         $creation = Creation::factory()->create([
-            'external_url' => 'https://example.com',
+            'external_url' => $externalUrl,
         ]);
+
+        if ($httpMock !== null) {
+            Http::fake([
+                $apiEndpoint => Http::response($httpMock['response'], $httpMock['status']),
+            ]);
+        }
 
         $service = new PublicControllersService(new CustomEmojiResolverService);
         $result = $service->formatCreationForSSRFull($creation);
@@ -1536,46 +1509,6 @@ class PublicControllersServiceTest extends TestCase
         $this->assertStringNotContainsString('*', $result['excerpt']);
         $this->assertStringNotContainsString('_', $result['excerpt']);
         $this->assertStringNotContainsString('`', $result['excerpt']);
-    }
-
-    #[Test]
-    public function test_translation_fallback_when_locale_same_as_fallback(): void
-    {
-        app()->setLocale('en');
-        config(['app.fallback_locale' => 'en']);
-
-        $technology = Technology::factory()->create();
-        $technology->descriptionTranslationKey->translations()->delete();
-        Translation::factory()->create([
-            'translation_key_id' => $technology->descriptionTranslationKey->id,
-            'locale' => 'en',
-            'text' => 'English description',
-        ]);
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatTechnologyForSSR($technology);
-
-        $this->assertEquals('English description', $result['description']);
-    }
-
-    #[Test]
-    public function test_format_creation_with_github_data_null_but_url_exists(): void
-    {
-        $creation = Creation::factory()->create([
-            'source_code_url' => 'https://github.com/owner/repo',
-        ]);
-
-        Http::fake([
-            'api.github.com/repos/owner/repo' => Http::response(null, 500),
-        ]);
-
-        $service = new PublicControllersService(new CustomEmojiResolverService);
-        $result = $service->formatCreationForSSRFull($creation);
-
-        $this->assertArrayHasKey('githubData', $result);
-        $this->assertArrayHasKey('githubLanguages', $result);
-        $this->assertNull($result['githubData']);
-        $this->assertNull($result['githubLanguages']);
     }
 
     #[Test]

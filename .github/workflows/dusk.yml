@@ -68,8 +68,8 @@ jobs:
       - name: Publish Ziggy Configuration
         run: php artisan ziggy:generate
 
-      - name: Build SSR Assets
-        run: npm run build:ssr
+      - name: Build Assets
+        run: npm run build
 
       - name: Run Database Migrations
         run: php artisan migrate --force
@@ -79,9 +79,6 @@ jobs:
 
       - name: Run Laravel Server
         run: php artisan serve --no-reload &
-
-      - name: Run Inertia SSR Server
-        run: php artisan inertia:start-ssr &
 
       - name: Wait for servers to be ready
         run: sleep 5

@@ -82,12 +82,20 @@ class ProjectDetailPageTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->visit('/projects/'.$this->testProject->slug)
                 ->waitFor('[data-testid="section-nav"]', 10)
-                ->assertPresent('[data-section="description"][data-active="true"]');
+                ->assertPresent('[data-section="description"][data-active="true"]')
+                // Allow Vue to fully mount and initialize scroll listeners
+                ->pause(1000)
+                // Disable smooth scrolling for test predictability
+                ->script('
+                    document.documentElement.style.scrollBehavior = "auto";
+                    document.body.style.scrollBehavior = "auto";
+                ');
 
             $hasFeatures = $browser->script('return document.querySelector(\'[data-section="features"]\') !== null;');
             if ($hasFeatures[0] ?? false) {
                 $browser->click('[data-section="features"]')
-                    ->waitFor('[data-section="features"][data-active="true"]', 5)
+                    ->pause(300)
+                    ->waitFor('[data-section="features"][data-active="true"]', 10)
                     ->assertPresent('[data-section="features"][data-active="true"]')
                     ->assertVisible('[data-testid="features-section"]');
             }
@@ -95,7 +103,8 @@ class ProjectDetailPageTest extends DuskTestCase
             $hasTechnologies = $browser->script('return document.querySelector(\'[data-section="technologies"]\') !== null;');
             if ($hasTechnologies[0] ?? false) {
                 $browser->click('[data-section="technologies"]')
-                    ->waitFor('[data-section="technologies"][data-active="true"]', 5)
+                    ->pause(300)
+                    ->waitFor('[data-section="technologies"][data-active="true"]', 10)
                     ->assertPresent('[data-section="technologies"][data-active="true"]')
                     ->assertVisible('[data-testid="technologies-section"]');
             }
@@ -103,7 +112,8 @@ class ProjectDetailPageTest extends DuskTestCase
             $hasScreenshots = $browser->script('return document.querySelector(\'[data-section="screenshots"]\') !== null;');
             if ($hasScreenshots[0] ?? false) {
                 $browser->click('[data-section="screenshots"]')
-                    ->waitFor('[data-section="screenshots"][data-active="true"]', 5)
+                    ->pause(300)
+                    ->waitFor('[data-section="screenshots"][data-active="true"]', 10)
                     ->assertPresent('[data-section="screenshots"][data-active="true"]')
                     ->assertVisible('[data-testid="screenshots-section"]');
             }

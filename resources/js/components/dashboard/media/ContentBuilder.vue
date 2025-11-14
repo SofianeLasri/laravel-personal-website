@@ -258,8 +258,7 @@ const removeContent = async (index: number) => {
     }
 
     try {
-        const contentParamKey =
-            props.entityType === 'blog' ? 'blog_post_draft_content' : 'creation_draft_content';
+        const contentParamKey = props.entityType === 'blog' ? 'blog_post_draft_content' : 'creation_draft_content';
         await axios.delete(
             route(props.contentRoutes.destroy, {
                 [contentParamKey]: content.id,

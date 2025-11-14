@@ -17,13 +17,11 @@ use App\Models\Picture;
 use App\Models\TranslationKey;
 use App\Models\Video;
 use App\Services\ContentManagementService;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
-use RuntimeException;
 use Tests\TestCase;
 
 class ContentManagementServiceTest extends TestCase
@@ -35,7 +33,7 @@ class ContentManagementServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new ContentManagementService();
+        $this->service = new ContentManagementService;
     }
 
     /**

@@ -423,7 +423,7 @@ const handleCategoryCreated = (newCategory: BlogCategory) => {
                         :content-routes="{
                             store: 'dashboard.api.blog-post-draft-contents.store',
                             destroy: 'dashboard.api.blog-post-draft-contents.destroy',
-                            reorder: 'dashboard.api.blog-post-draft-contents.reorder'
+                            reorder: 'dashboard.api.blog-post-draft-contents.reorder',
                         }"
                         entity-type="blog"
                         data-testid="content-builder"

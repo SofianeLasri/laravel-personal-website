@@ -30,7 +30,7 @@ class MarkdownEditorRawModeTest extends DuskTestCase
     {
         // Create a long markdown content
         $longContent = implode("\n\n", array_map(
-            fn ($i) => "## Section $i\n\nThis is paragraph $i with some content to make it longer. ".str_repeat("Lorem ipsum dolor sit amet. ", 10),
+            fn ($i) => "## Section $i\n\nThis is paragraph $i with some content to make it longer. ".str_repeat('Lorem ipsum dolor sit amet. ', 10),
             range(1, 20)
         ));
 

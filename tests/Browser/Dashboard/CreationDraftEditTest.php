@@ -2,7 +2,6 @@
 
 namespace Tests\Browser\Dashboard;
 
-use App\Enums\CreationType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;

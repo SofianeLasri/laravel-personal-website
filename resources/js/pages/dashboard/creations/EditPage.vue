@@ -309,7 +309,12 @@ onMounted(() => {
                         <FormControl>
                             <Select
                                 :model-value="componentField.modelValue"
-                                @update:model-value="(value) => { componentField['onUpdate:modelValue'](value); handleLocaleChange(value); }"
+                                @update:model-value="
+                                    (value) => {
+                                        componentField['onUpdate:modelValue'](value);
+                                        handleLocaleChange(value);
+                                    }
+                                "
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sélectionner une langue" />
@@ -466,7 +471,10 @@ onMounted(() => {
                 </FormField>
             </div>
 
-            <div v-if="!currentCreationDraft?.id" class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+            <div
+                v-if="!currentCreationDraft?.id"
+                class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20"
+            >
                 <p class="text-sm text-blue-800 dark:text-blue-200">
                     <strong>Info :</strong> Veuillez d'abord sauvegarder le brouillon pour pouvoir ajouter du contenu à la création.
                 </p>
@@ -485,7 +493,7 @@ onMounted(() => {
                     :content-routes="{
                         store: 'dashboard.api.creation-draft-contents.store',
                         destroy: 'dashboard.api.creation-draft-contents.destroy',
-                        reorder: 'dashboard.api.creation-draft-contents.reorder'
+                        reorder: 'dashboard.api.creation-draft-contents.reorder',
                     }"
                     entity-type="creation"
                 />

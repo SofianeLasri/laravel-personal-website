@@ -124,11 +124,12 @@ class VisitStatsService
      * Get visits grouped by day for charting and trend analysis.
      *
      * @param  array{url_pattern?: string, excluded_urls?: array<int, string>, date_from?: string, date_to?: string}  $filters  Same as getUniqueVisits()
+     * @param  Collection<int, mixed>|null  $visits  Optional pre-fetched visits collection for performance
      * @return Collection<int, array{date: string, count: int}> Collection of ['date' => 'YYYY-MM-DD', 'count' => int]
      */
-    public function getVisitsGroupedByDay(array $filters = []): Collection
+    public function getVisitsGroupedByDay(array $filters = [], ?Collection $visits = null): Collection
     {
-        $visits = $this->getUniqueVisits($filters);
+        $visits = $visits ?? $this->getUniqueVisits($filters);
 
         $startDate = $filters['date_from'] ?? null;
         $endDate = $filters['date_to'] ?? null;
@@ -156,11 +157,12 @@ class VisitStatsService
      * Get visits grouped by country for geographic analysis.
      *
      * @param  array{url_pattern?: string, excluded_urls?: array<int, string>, date_from?: string, date_to?: string}  $filters  Same as getUniqueVisits()
+     * @param  Collection<int, mixed>|null  $visits  Optional pre-fetched visits collection for performance
      * @return Collection<int, mixed> Collection of ['country_code' => 'FR', 'count' => int]
      */
-    public function getVisitsGroupedByCountry(array $filters = []): Collection
+    public function getVisitsGroupedByCountry(array $filters = [], ?Collection $visits = null): Collection
     {
-        $visits = $this->getUniqueVisits($filters);
+        $visits = $visits ?? $this->getUniqueVisits($filters);
 
         $startDate = $filters['date_from'] ?? null;
         $endDate = $filters['date_to'] ?? null;
@@ -189,11 +191,12 @@ class VisitStatsService
      *
      * @param  array{url_pattern?: string, excluded_urls?: array<int, string>, date_from?: string, date_to?: string}  $filters  Same as getUniqueVisits()
      * @param  int  $limit  Number of results to return
+     * @param  Collection<int, mixed>|null  $visits  Optional pre-fetched visits collection for performance
      * @return Collection<int, mixed> Collection of ['url' => string, 'count' => int]
      */
-    public function getMostVisitedPages(array $filters = [], int $limit = 10): Collection
+    public function getMostVisitedPages(array $filters = [], int $limit = 10, ?Collection $visits = null): Collection
     {
-        $visits = $this->getUniqueVisits($filters);
+        $visits = $visits ?? $this->getUniqueVisits($filters);
 
         $startDate = $filters['date_from'] ?? null;
         $endDate = $filters['date_to'] ?? null;
@@ -222,11 +225,12 @@ class VisitStatsService
      *
      * @param  array{url_pattern?: string, excluded_urls?: array<int, string>, date_from?: string, date_to?: string}  $filters  Same as getUniqueVisits()
      * @param  int  $limit  Number of results to return
+     * @param  Collection<int, mixed>|null  $visits  Optional pre-fetched visits collection for performance
      * @return Collection<int, mixed> Collection of ['url' => string, 'count' => int]
      */
-    public function getBestReferrers(array $filters = [], int $limit = 10): Collection
+    public function getBestReferrers(array $filters = [], int $limit = 10, ?Collection $visits = null): Collection
     {
-        $visits = $this->getUniqueVisits($filters);
+        $visits = $visits ?? $this->getUniqueVisits($filters);
 
         $startDate = $filters['date_from'] ?? null;
         $endDate = $filters['date_to'] ?? null;
@@ -255,11 +259,12 @@ class VisitStatsService
      *
      * @param  array{url_pattern?: string, excluded_urls?: array<int, string>, date_from?: string, date_to?: string}  $filters  Same as getUniqueVisits()
      * @param  int  $limit  Number of results to return
+     * @param  Collection<int, mixed>|null  $visits  Optional pre-fetched visits collection for performance
      * @return Collection<int, mixed> Collection of ['url' => string, 'count' => int]
      */
-    public function getBestOrigins(array $filters = [], int $limit = 10): Collection
+    public function getBestOrigins(array $filters = [], int $limit = 10, ?Collection $visits = null): Collection
     {
-        $visits = $this->getUniqueVisits($filters);
+        $visits = $visits ?? $this->getUniqueVisits($filters);
 
         $startDate = $filters['date_from'] ?? null;
         $endDate = $filters['date_to'] ?? null;
@@ -287,11 +292,12 @@ class VisitStatsService
      * Calculate total visits for different time periods.
      *
      * @param  array{url_pattern?: string, excluded_urls?: array<int, string>, date_from?: string, date_to?: string}  $filters  Same as getUniqueVisits()
+     * @param  Collection<int, mixed>|null  $visits  Optional pre-fetched visits collection for performance
      * @return array{past_24h: int, past_7d: int, past_30d: int, all_time: int} Array with keys: 'past_24h', 'past_7d', 'past_30d', 'all_time'
      */
-    public function getTotalVisitsByPeriods(array $filters = []): array
+    public function getTotalVisitsByPeriods(array $filters = [], ?Collection $visits = null): array
     {
-        $visits = $this->getUniqueVisits($filters);
+        $visits = $visits ?? $this->getUniqueVisits($filters);
         $now = now();
 
         return [

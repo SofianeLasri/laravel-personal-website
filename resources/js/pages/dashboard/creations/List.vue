@@ -227,7 +227,7 @@ const navigateToDraftEdit = () => {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                        <DropdownMenuItem :data-testid="'creation-' + creation.id + '-edit'" @click="handleEditCreation(creation)">
+                                        <DropdownMenuItem :data-testid="`creation-${  creation.id  }-edit`" @click="handleEditCreation(creation)">
                                             <Edit class="mr-2 h-4 w-4" />
                                             <span>Modifier</span>
                                         </DropdownMenuItem>

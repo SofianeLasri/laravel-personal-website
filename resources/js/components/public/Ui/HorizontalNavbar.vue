@@ -32,9 +32,19 @@ const isNavSticky = ref(false);
 const navHeight = ref(0);
 const showLeftArrow = ref(false);
 const showRightArrow = ref(false);
+const isUserNavigating = ref(false);
 
 const navigateToItem = (itemId: string) => {
     emit('item-click', itemId);
+
+    currentActiveItem.value = itemId;
+    emit('update:activeItem', itemId);
+
+    // Prevent handleScroll from overriding the clicked state during navigation
+    isUserNavigating.value = true;
+    setTimeout(() => {
+        isUserNavigating.value = false;
+    }, 300);
 
     if (props.mode === 'auto') {
         const section = document.getElementById(itemId);
@@ -50,9 +60,6 @@ const navigateToItem = (itemId: string) => {
             }
         }
     }
-
-    currentActiveItem.value = itemId;
-    emit('update:activeItem', itemId);
 };
 
 const checkNavArrows = () => {
@@ -90,6 +97,9 @@ const scrollToActiveButton = () => {
 };
 
 const handleScroll = () => {
+    // Don't override active item during user navigation
+    if (isUserNavigating.value) return;
+
     if (props.mode === 'auto' && typeof window !== 'undefined') {
         const scrollPosition = window.scrollY + 200;
         for (const item of props.items) {

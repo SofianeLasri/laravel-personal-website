@@ -89,7 +89,7 @@ class BotDetectionService
         $isBotByParameters = false;
 
         // Load relationships
-        $request->load(['ipAddress', 'userAgent', 'url']);
+        $request->load(['ipAddress', 'userAgent', 'url', 'refererUrl']);
 
         // Analyze frequency patterns
         $frequencyAnalysis = $this->analyzeRequestFrequency($request);
@@ -110,6 +110,15 @@ class BotDetectionService
             }
         }
 
+        // Analyze referer patterns
+        if ($request->refererUrl) {
+            $refererAnalysis = $this->analyzeReferer($request->refererUrl->url);
+            if ($refererAnalysis['is_suspicious']) {
+                $isBotByUserAgent = true;
+                $reasons[] = $refererAnalysis['reason'] ?? 'Suspicious referer';
+            }
+        }
+
         // Analyze URL parameters
         if ($request->url) {
             $parameterAnalysis = $this->analyzeUrlParameters($request->url->url);
@@ -124,6 +133,7 @@ class BotDetectionService
             'reasons' => $reasons,
             'frequency_analysis' => $frequencyAnalysis,
             'user_agent_analysis' => $userAgentAnalysis ?? null,
+            'referer_analysis' => $refererAnalysis ?? null,
             'parameter_analysis' => $parameterAnalysis ?? null,
         ];
 
@@ -313,6 +323,35 @@ class BotDetectionService
                 return [
                     'is_suspicious' => true,
                     'reason' => 'No browser identified with high request rate',
+                ];
+            }
+        }
+
+        return ['is_suspicious' => false];
+    }
+
+    /**
+     * Analyze referer for suspicious patterns
+     *
+     * @return array{is_suspicious: bool, reason?: string}
+     */
+    private function analyzeReferer(string $referer): array
+    {
+        $suspiciousReferers = config('bot-detection.suspicious_referers', []);
+
+        if (empty($suspiciousReferers)) {
+            return ['is_suspicious' => false];
+        }
+
+        $refererLower = strtolower($referer);
+
+        foreach ($suspiciousReferers as $suspiciousTerm) {
+            if (str_contains($refererLower, strtolower($suspiciousTerm))) {
+                return [
+                    'is_suspicious' => true,
+                    'reason' => sprintf('Suspicious referer detected: contains "%s"', $suspiciousTerm),
+                    'matched_term' => $suspiciousTerm,
+                    'referer' => $referer,
                 ];
             }
         }

@@ -224,4 +224,113 @@ class BotDetectionServiceTest extends TestCase
         $this->assertNotNull($ipMetadata->first_seen_at);
         $this->assertNotNull($ipMetadata->last_seen_at);
     }
+
+    #[Test]
+    public function detects_suspicious_referer_containing_myworkdayjobs(): void
+    {
+        $ipAddress = IpAddress::create(['ip' => '192.168.1.7']);
+        $userAgent = UserAgent::create(['user_agent' => 'Mozilla/5.0']);
+        $url = Url::create(['url' => 'https://example.com/']);
+        $refererUrl = Url::create(['url' => 'https://example.myworkdayjobs.com/recruiting']);
+
+        $request = LoggedRequest::create([
+            'ip_address_id' => $ipAddress->id,
+            'user_agent_id' => $userAgent->id,
+            'url_id' => $url->id,
+            'referer_url_id' => $refererUrl->id,
+            'method' => HttpMethod::GET,
+            'status_code' => 200,
+        ]);
+
+        $result = $this->service->analyzeRequest($request);
+
+        $freshRequest = DB::table('logged_requests')->where('id', $request->id)->first();
+
+        $this->assertTrue($result['is_bot'], 'Expected bot detection for suspicious referer');
+        $this->assertTrue((bool) $freshRequest->is_bot_by_user_agent, 'Expected detection by user agent (referer)');
+        $this->assertNotEmpty($result['reasons']);
+        $this->assertStringContainsString('Suspicious referer', implode(' ', $result['reasons']));
+    }
+
+    #[Test]
+    public function detects_suspicious_referer_case_insensitive(): void
+    {
+        $ipAddress = IpAddress::create(['ip' => '192.168.1.8']);
+        $userAgent = UserAgent::create(['user_agent' => 'Mozilla/5.0']);
+        $url = Url::create(['url' => 'https://example.com/']);
+        $refererUrl = Url::create(['url' => 'https://example.MyWorkDayJobs.com/careers']);
+
+        $request = LoggedRequest::create([
+            'ip_address_id' => $ipAddress->id,
+            'user_agent_id' => $userAgent->id,
+            'url_id' => $url->id,
+            'referer_url_id' => $refererUrl->id,
+            'method' => HttpMethod::GET,
+            'status_code' => 200,
+        ]);
+
+        $result = $this->service->analyzeRequest($request);
+
+        $freshRequest = DB::table('logged_requests')->where('id', $request->id)->first();
+
+        $this->assertTrue($result['is_bot'], 'Expected bot detection for suspicious referer (case insensitive)');
+        $this->assertTrue((bool) $freshRequest->is_bot_by_user_agent);
+
+        $metadata = json_decode($freshRequest->bot_detection_metadata, true);
+        $this->assertNotNull($metadata['referer_analysis']);
+        $this->assertTrue($metadata['referer_analysis']['is_suspicious']);
+        $this->assertEquals('myworkdayjobs', $metadata['referer_analysis']['matched_term']);
+    }
+
+    #[Test]
+    public function does_not_flag_normal_referer_as_bot(): void
+    {
+        $ipAddress = IpAddress::create(['ip' => '192.168.1.9']);
+        $userAgent = UserAgent::create(['user_agent' => 'Mozilla/5.0']);
+        $url = Url::create(['url' => 'https://example.com/projects']);
+        $refererUrl = Url::create(['url' => 'https://google.com/']);
+
+        $request = LoggedRequest::create([
+            'ip_address_id' => $ipAddress->id,
+            'user_agent_id' => $userAgent->id,
+            'url_id' => $url->id,
+            'referer_url_id' => $refererUrl->id,
+            'method' => HttpMethod::GET,
+            'status_code' => 200,
+        ]);
+
+        $result = $this->service->analyzeRequest($request);
+
+        $freshRequest = DB::table('logged_requests')->where('id', $request->id)->first();
+
+        $this->assertFalse($result['is_bot'], 'Expected no bot detection for normal referer');
+        $this->assertFalse((bool) $freshRequest->is_bot_by_user_agent);
+        $this->assertFalse((bool) $freshRequest->is_bot_by_frequency);
+        $this->assertFalse((bool) $freshRequest->is_bot_by_parameters);
+    }
+
+    #[Test]
+    public function handles_requests_without_referer(): void
+    {
+        $ipAddress = IpAddress::create(['ip' => '192.168.1.10']);
+        $userAgent = UserAgent::create(['user_agent' => 'Mozilla/5.0']);
+        $url = Url::create(['url' => 'https://example.com/']);
+
+        $request = LoggedRequest::create([
+            'ip_address_id' => $ipAddress->id,
+            'user_agent_id' => $userAgent->id,
+            'url_id' => $url->id,
+            'referer_url_id' => null,
+            'method' => HttpMethod::GET,
+            'status_code' => 200,
+        ]);
+
+        $result = $this->service->analyzeRequest($request);
+
+        $freshRequest = DB::table('logged_requests')->where('id', $request->id)->first();
+
+        // Should complete analysis without errors
+        $this->assertNotNull($freshRequest->bot_analyzed_at);
+        $this->assertFalse($result['is_bot'], 'Expected no bot detection for request without referer');
+    }
 }

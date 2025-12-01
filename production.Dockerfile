@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp
+FROM dunglas/frankenphp:php8.4-bookworm
 
 # Installation des extensions PHP
 RUN install-php-extensions \

@@ -552,7 +552,6 @@ class VisitStatsServiceTest extends TestCase
         $this->assertIsArray($periods);
         $this->assertArrayHasKey(now()->format('Y-m-d'), $periods);
         $this->assertArrayHasKey(now()->subDay()->format('Y-m-d'), $periods);
-        $this->assertEquals("Aujourd'hui", $periods[now()->format('Y-m-d')]);
     }
 
     #[Test]

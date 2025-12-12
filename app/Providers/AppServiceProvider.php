@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Formatters\TranslationHelper;
 use App\Services\ImageTranscodingService;
 use App\Services\NotificationService;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -21,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(ImageTranscodingService::class, function ($app) {
             return new ImageTranscodingService($app->make(NotificationService::class));
+        });
+
+        $this->app->bind(TranslationHelper::class, function () {
+            return TranslationHelper::fromAppLocale();
         });
     }
 

@@ -10,10 +10,20 @@
   </component>
   <component name="MessDetector">
     <phpmd_settings>
-      <phpmd_by_interpreter asDefaultInterpreter="true" interpreter_id="7cf6f4eb-4309-4a63-b388-c18568ac6795" timeout="30000" />
+      <phpmd_by_interpreter interpreter_id="7cf6f4eb-4309-4a63-b388-c18568ac6795" tool_path="/app/vendor/bin/phpmd" timeout="30000" />
+      <phpmd_by_interpreter asDefaultInterpreter="true" deletedFromTheList="true" interpreter_id="7cf6f4eb-4309-4a63-b388-c18568ac6795" tool_path="/app/vendor/bin/phpmd" timeout="30000" />
+      <MessDetectorConfiguration deletedFromTheList="true" />
     </phpmd_settings>
   </component>
   <component name="MessDetectorOptionsConfiguration">
+    <option name="customRulesets">
+      <list>
+        <RulesetDescriptor>
+          <option name="name" value="Laravel PHPMD Rules" />
+          <option name="path" value="$PROJECT_DIR$/phpmd.xml" />
+        </RulesetDescriptor>
+      </list>
+    </option>
     <option name="transferred" value="true" />
   </component>
   <component name="PHPCSFixerOptionsConfiguration">
@@ -193,6 +203,12 @@
       <path value="$PROJECT_DIR$/vendor/symfony/options-resolver" />
       <path value="$PROJECT_DIR$/vendor/itsgoingd/clockwork" />
       <path value="$PROJECT_DIR$/vendor/spatie/laravel-feed" />
+      <path value="$PROJECT_DIR$/vendor/phpmd/phpmd" />
+      <path value="$PROJECT_DIR$/vendor/pdepend/pdepend" />
+      <path value="$PROJECT_DIR$/vendor/symfony/dependency-injection" />
+      <path value="$PROJECT_DIR$/vendor/symfony/var-exporter" />
+      <path value="$PROJECT_DIR$/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/vendor/symfony/config" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

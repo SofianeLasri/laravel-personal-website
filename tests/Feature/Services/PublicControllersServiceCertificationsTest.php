@@ -8,7 +8,6 @@ use App\Models\Experience;
 use App\Models\Picture;
 use App\Models\Translation;
 use App\Models\TranslationKey;
-use App\Services\CustomEmojiResolverService;
 use App\Services\PublicControllersService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,7 +24,7 @@ class PublicControllersServiceCertificationsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new PublicControllersService(new CustomEmojiResolverService);
+        $this->service = app()->make(PublicControllersService::class);
     }
 
     #[Test]

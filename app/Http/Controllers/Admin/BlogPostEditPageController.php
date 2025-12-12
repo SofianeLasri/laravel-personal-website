@@ -24,8 +24,6 @@ class BlogPostEditPageController extends Controller
         $draftId = $request->query('draft-id');
         $blogPostId = $request->query('blog-post-id');
 
-        $draft = null;
-
         if ($draftId) {
             // Editing an existing draft
             $draft = BlogPostDraft::with([

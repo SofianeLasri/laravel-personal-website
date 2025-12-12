@@ -13,6 +13,7 @@ use App\Models\Screenshot;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class CreationConversionService
 {
@@ -191,7 +192,7 @@ class CreationConversionService
             ContentMarkdown::class => $this->contentDuplicationService->duplicateMarkdownContent($content),
             ContentGallery::class => $this->contentDuplicationService->duplicateGalleryContent($content),
             ContentVideo::class => $this->contentDuplicationService->duplicateVideoContent($content),
-            default => throw new \RuntimeException('Unknown content type: '.get_class($content)),
+            default => throw new RuntimeException('Unknown content type: '.get_class($content)),
         };
     }
 }

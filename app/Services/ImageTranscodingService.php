@@ -116,7 +116,6 @@ class ImageTranscodingService
     {
         $startTime = microtime(true);
         $attempts = [];
-        $lastException = null;
 
         // Get prioritized drivers for this format
         $driversToTry = $this->getDriversForFormat($codec);
@@ -151,7 +150,6 @@ class ImageTranscodingService
 
             } catch (ImageTranscodingException $e) {
                 $attempts[$driverName] = $e->getMessage();
-                $lastException = $e;
 
                 Log::warning('Driver failed, trying next', [
                     'failed_driver' => $driverName,

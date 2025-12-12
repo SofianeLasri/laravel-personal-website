@@ -75,9 +75,7 @@ class CustomEmojiController extends Controller
             return response()->json($emoji, Response::HTTP_CREATED);
         } catch (Exception $e) {
             // Clean up uploaded picture if emoji creation failed
-            if ($picture !== null) {
-                $picture->delete();
-            }
+            $picture?->delete();
 
             return response()->json([
                 'message' => __('emoji.creation_error', ['error' => $e->getMessage()]),
@@ -102,9 +100,6 @@ class CustomEmojiController extends Controller
     public function destroy(int $id): Response
     {
         $emoji = CustomEmoji::findOrFail($id);
-
-        // Get the picture_id before deleting (in case we need to manually clean up)
-        $pictureId = $emoji->picture_id;
 
         // Delete the emoji (cascade will delete the picture)
         $emoji->delete();

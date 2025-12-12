@@ -32,7 +32,7 @@ class ExperienceFactory extends Factory
             'short_description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'full_description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'started_at' => $this->faker->dateTimeBetween('-10 years', '-2 years'),
-            'ended_at' => $this->faker->optional(0.7)->dateTimeBetween('-2 years', 'now'),
+            'ended_at' => $this->faker->optional(0.7)->dateTimeBetween('-2 years'),
         ];
     }
 

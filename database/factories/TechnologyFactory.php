@@ -151,7 +151,7 @@ class TechnologyFactory extends Factory
      */
     public function createSet(): Collection
     {
-        $technologies = collect([
+        return collect([
             $this->language()->complete()->create(['name' => 'PHP']),
             $this->framework()->complete()->create(['name' => 'Laravel']),
             $this->language()->complete()->create(['name' => 'JavaScript']),
@@ -161,7 +161,5 @@ class TechnologyFactory extends Factory
             $this->framework()->complete()->create(['name' => 'React']),
             $this->gameEngine()->complete()->create(['name' => 'Unity']),
         ]);
-
-        return $technologies;
     }
 }

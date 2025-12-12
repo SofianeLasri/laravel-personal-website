@@ -23,7 +23,7 @@ class BlogPostPreviewTokenFactory extends Factory
     public function expired(): static
     {
         return $this->state([
-            'expires_at' => now()->subDays(1),
+            'expires_at' => now()->subDays(),
         ]);
     }
 

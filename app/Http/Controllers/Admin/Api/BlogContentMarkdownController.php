@@ -77,12 +77,10 @@ class BlogContentMarkdownController extends Controller
 
         // Update the translation for the current locale
         $translationKey = $blogContentMarkdown->translationKey;
-        if ($translationKey) {
-            $translationKey->translations()->updateOrCreate(
-                ['locale' => $request->locale],
-                ['text' => $request->content]
-            );
-        }
+        $translationKey?->translations()->updateOrCreate(
+            ['locale' => $request->locale],
+            ['text' => $request->content]
+        );
 
         $blogContentMarkdown->load('translationKey.translations');
 

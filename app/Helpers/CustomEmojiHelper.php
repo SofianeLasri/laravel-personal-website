@@ -48,14 +48,12 @@ class CustomEmojiHelper
         // Build <picture> tag with multiple sources
         $sources = [];
         $fallbackUrl = null;
-        $fallbackFormat = null;
 
         foreach ($optimizedPictures as $optimized) {
             $url = Storage::url($optimized->path);
 
             if ($fallbackUrl === null) {
                 $fallbackUrl = $url;
-                $fallbackFormat = $optimized->format;
             }
 
             // Get MIME type for format

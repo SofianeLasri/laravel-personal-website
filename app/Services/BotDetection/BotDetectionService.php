@@ -185,7 +185,7 @@ class BotDetectionService
         $recentRequests = LoggedRequest::where('ip_address_id', $request->ip_address_id)
             ->where('created_at', '>=', $createdAt->copy()->subHour())
             ->where('created_at', '<=', $createdAt)
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at')
             ->get();
 
         if ($recentRequests->count() < $this->minRequestsForAnalysis) {
@@ -384,16 +384,14 @@ class BotDetectionService
 
         if (! empty($unexpectedParams)) {
             // Check if parameters look like random/bot-generated
-            foreach ($unexpectedParams as $param) {
-                if ($this->isRandomParameter((string) $param, $params[$param] ?? '')) {
-                    return [
-                        'is_suspicious' => true,
-                        'reason' => sprintf(
-                            'Suspicious URL parameters detected: %s',
-                            implode(', ', $unexpectedParams)
-                        ),
-                    ];
-                }
+            if (array_any($unexpectedParams, fn ($param) => $this->isRandomParameter((string) $param, $params[$param] ?? ''))) {
+                return [
+                    'is_suspicious' => true,
+                    'reason' => sprintf(
+                        'Suspicious URL parameters detected: %s',
+                        implode(', ', $unexpectedParams)
+                    ),
+                ];
             }
         }
 
@@ -417,10 +415,8 @@ class BotDetectionService
             $valueStr = '';
         }
 
-        foreach ($suspiciousPatterns as $pattern) {
-            if (preg_match($pattern, $key) || preg_match($pattern, $valueStr)) {
-                return true;
-            }
+        if (array_any($suspiciousPatterns, fn ($pattern) => preg_match($pattern, $key) || preg_match($pattern, $valueStr))) {
+            return true;
         }
 
         // Check for high entropy (randomness)

@@ -15,9 +15,6 @@ class CustomEmojiRequest extends FormRequest
         $nameMaxLength = config('emoji.name_max_length', 50);
         $namePattern = config('emoji.name_pattern', '/^[a-zA-Z0-9_]+$/');
 
-        // Extract the regex pattern without delimiters for Laravel validation
-        $pattern = str_replace('/', '\/', trim($namePattern, '/^$'));
-
         return [
             'name' => [
                 'required',

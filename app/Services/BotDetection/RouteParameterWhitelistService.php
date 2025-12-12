@@ -91,7 +91,6 @@ class RouteParameterWhitelistService
 
         try {
             $reflection = new ReflectionMethod($controller, $method);
-            $docComment = $reflection->getDocComment();
 
             // Look for FormRequest validation
             foreach ($reflection->getParameters() as $param) {
@@ -133,7 +132,7 @@ class RouteParameterWhitelistService
                 }
             }
 
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Silently fail and return common parameters
         }
 
@@ -160,7 +159,7 @@ class RouteParameterWhitelistService
                     return explode('.', (string) $param)[0];
                 }, $parameters);
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Silently fail
         }
 

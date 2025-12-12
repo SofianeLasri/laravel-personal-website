@@ -39,7 +39,7 @@ class TriggerBotAnalysis
 
         if ($hasUnanalyzed) {
             // Dispatch job with small batch to analyze recent requests
-            AnalyzeBotRequestsJob::dispatch(null, 10, true)
+            AnalyzeBotRequestsJob::dispatch(null, 10)
                 ->delay(now()->addSeconds(5));
         }
     }

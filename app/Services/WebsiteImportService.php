@@ -338,7 +338,7 @@ class WebsiteImportService
                         // Update the sqlite_sequence table if it exists
                         DB::statement("UPDATE sqlite_sequence SET seq = 0 WHERE name = '{$table}'");
                     }
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // Some tables might not have auto-increment columns, ignore errors
                     continue;
                 }
@@ -353,7 +353,7 @@ class WebsiteImportService
     {
         try {
             return DB::getSchemaBuilder()->hasTable($table);
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
     }

@@ -25,9 +25,7 @@ class SocialMediaLinkController extends Controller
 
     public function show(int $id): SocialMediaLink
     {
-        $socialMediaLink = SocialMediaLink::findOrFail($id);
-
-        return $socialMediaLink;
+        return SocialMediaLink::findOrFail($id);
     }
 
     public function update(SocialMediaLinkRequest $request, int $id): SocialMediaLink

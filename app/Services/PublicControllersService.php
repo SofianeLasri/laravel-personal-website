@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Enums\BlogPostType;
 use App\Enums\CategoryColor;
 use App\Enums\CreationType;
 use App\Enums\ExperienceType;
+use App\Enums\TechnologyType;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
@@ -76,7 +78,20 @@ class PublicControllersService
     /**
      * Get all the Laravel projects.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @return Collection<int, array{
+     *     id: int,
+     *     name: string,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null,
+     *     type: CreationType,
+     *     shortDescription: string|null,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>
+     * }>
      */
     public function getLaravelCreations(): Collection
     {
@@ -105,7 +120,20 @@ class PublicControllersService
     /**
      * Get all the projects.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @return Collection<int, array{
+     *     id: int,
+     *     name: string,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null,
+     *     type: CreationType,
+     *     shortDescription: string|null,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>
+     * }>
      */
     public function getCreations(): Collection
     {
@@ -123,7 +151,20 @@ class PublicControllersService
     /**
      * Format the Creation model for SSR short view.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     id: int,
+     *     name: string,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null,
+     *     type: CreationType,
+     *     shortDescription: string|null,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>
+     * }
      */
     public function formatCreationForSSRShort(Creation $creation): array
     {
@@ -133,7 +174,31 @@ class PublicControllersService
     /**
      * Format the Creation model for SSR full view.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     id: int,
+     *     name: string,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string|null,
+     *     endedAtFormatted: string|null,
+     *     type: CreationType,
+     *     shortDescription: string|null,
+     *     fullDescription: string|null,
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, mixed>}, video?: array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string, caption: string|null}}>,
+     *     externalUrl: string|null,
+     *     sourceCodeUrl: string|null,
+     *     features: array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
+     *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string, order: int}>,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
+     *     people: array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
+     *     videos: array<int, array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string}>,
+     *     githubData: array{name: string, description: string|null, stars: int, forks: int, watchers: int, language: string|null, topics: array<string>, license: string|null, updated_at: string, created_at: string, open_issues: int, default_branch: string, size: int, url: string, homepage: string|null}|null,
+     *     githubLanguages: array<string, float>|null,
+     *     packagistData: array{name: string, description: string|null, downloads: int, daily_downloads: int, monthly_downloads: int, stars: int, dependents: int, suggesters: int, type: string|null, repository: string|null, github_stars: int|null, github_watchers: int|null, github_forks: int|null, github_open_issues: int|null, language: string|null, license: array<string>|null, latest_version: string|null, latest_stable_version: string|null, created_at: string|null, updated_at: string|null, url: string, maintainers: array<array{name: string, avatar_url: string|null}>, php_version: string|null, laravel_version: string|null}|null
+     * }
      */
     public function formatCreationForSSRFull(Creation $creation): array
     {
@@ -143,7 +208,16 @@ class PublicControllersService
     /**
      * Get all the technology experiences.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @return Collection<int, array{
+     *     id: int,
+     *     technologyId: int,
+     *     name: string,
+     *     description: string,
+     *     creationCount: int,
+     *     type: TechnologyType,
+     *     typeLabel: string,
+     *     iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}
+     * }>
      */
     public function getTechnologyExperiences(): Collection
     {
@@ -159,7 +233,23 @@ class PublicControllersService
     /**
      * Get all the experiences.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @return Collection<int, array{
+     *     id: int,
+     *     title: string,
+     *     organizationName: string,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     location: string,
+     *     websiteUrl: string|null,
+     *     shortDescription: string,
+     *     fullDescription: string,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
+     *     type: ExperienceType,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string,
+     *     endedAtFormatted: string|null
+     * }>
      */
     public function getExperiences(): Collection
     {
@@ -178,7 +268,16 @@ class PublicControllersService
     /**
      * Get all certifications for SSR.
      *
-     * @return Collection<int, array<string, mixed>>
+     * @return Collection<int, array{
+     *     id: int,
+     *     name: string,
+     *     level: string|null,
+     *     score: string|null,
+     *     date: string,
+     *     dateFormatted: string,
+     *     link: string|null,
+     *     picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null
+     * }>
      */
     public function getCertifications(): Collection
     {
@@ -191,7 +290,23 @@ class PublicControllersService
      * Get experiences filtered by type for SSR.
      *
      * @param  ExperienceType  $type  The experience type to filter by
-     * @return Collection<int, array<string, mixed>>
+     * @return Collection<int, array{
+     *     id: int,
+     *     title: string,
+     *     organizationName: string,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     location: string,
+     *     websiteUrl: string|null,
+     *     shortDescription: string,
+     *     fullDescription: string,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
+     *     type: ExperienceType,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string,
+     *     endedAtFormatted: string|null
+     * }>
      */
     public function getExperiencesByType(ExperienceType $type): Collection
     {
@@ -213,7 +328,11 @@ class PublicControllersService
     /**
      * Get all data needed for the certifications career page.
      *
-     * @return array{certifications: Collection<int, array<string, mixed>>, educationExperiences: Collection<int, array<string, mixed>>, workExperiences: Collection<int, array<string, mixed>>}
+     * @return array{
+     *     certifications: Collection<int, array{id: int, name: string, level: string|null, score: string|null, date: string, dateFormatted: string, link: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
+     *     educationExperiences: Collection<int, array{id: int, title: string, organizationName: string, slug: string, logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null, location: string, websiteUrl: string|null, shortDescription: string, fullDescription: string, technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>, type: ExperienceType, startedAt: string, endedAt: string|null, startedAtFormatted: string, endedAtFormatted: string|null}>,
+     *     workExperiences: Collection<int, array{id: int, title: string, organizationName: string, slug: string, logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null, location: string, websiteUrl: string|null, shortDescription: string, fullDescription: string, technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>, type: ExperienceType, startedAt: string, endedAt: string|null, startedAtFormatted: string, endedAtFormatted: string|null}>
+     * }
      */
     public function getCertificationsCareerData(): array
     {
@@ -247,7 +366,17 @@ class PublicControllersService
     /**
      * Format the BlogPost model for SSR with short excerpt.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
+     *     excerpt: string
+     * }
      */
     public function formatBlogPostForSSRShort(BlogPost $blogPost): array
     {
@@ -257,7 +386,17 @@ class PublicControllersService
     /**
      * Format the BlogPost model for SSR with long excerpt for hero.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     slug: string,
+     *     type: BlogPostType,
+     *     category: array{name: string, color: CategoryColor},
+     *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     publishedAt: Carbon|null,
+     *     publishedAtFormatted: string|null,
+     *     excerpt: string
+     * }
      */
     public function formatBlogPostForSSRHero(BlogPost $blogPost): array
     {
@@ -455,7 +594,23 @@ class PublicControllersService
     /**
      * Format the Experience model for SSR.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     id: int,
+     *     title: string,
+     *     organizationName: string,
+     *     slug: string,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     location: string,
+     *     websiteUrl: string|null,
+     *     shortDescription: string,
+     *     fullDescription: string,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
+     *     type: ExperienceType,
+     *     startedAt: string,
+     *     endedAt: string|null,
+     *     startedAtFormatted: string,
+     *     endedAtFormatted: string|null
+     * }
      */
     public function formatExperienceForSSR(Experience $experience): array
     {
@@ -465,7 +620,16 @@ class PublicControllersService
     /**
      * Format the Certification model for SSR.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     id: int,
+     *     name: string,
+     *     level: string|null,
+     *     score: string|null,
+     *     date: string,
+     *     dateFormatted: string,
+     *     link: string|null,
+     *     picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null
+     * }
      */
     public function formatCertificationForSSR(Certification $certification): array
     {
@@ -475,7 +639,14 @@ class PublicControllersService
     /**
      * Format the Technology model for SSR.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     id: int,
+     *     creationCount: int,
+     *     name: string,
+     *     description: string,
+     *     type: TechnologyType,
+     *     iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}
+     * }
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
@@ -485,7 +656,14 @@ class PublicControllersService
     /**
      * Format the Picture model for SSR.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     filename: string,
+     *     width: int|null,
+     *     height: int|null,
+     *     avif: array{thumbnail: string, small: string, medium: string, large: string, full: string},
+     *     webp: array{thumbnail: string, small: string, medium: string, large: string, full: string},
+     *     jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}
+     * }
      */
     public function formatPictureForSSR(Picture $picture): array
     {
@@ -495,7 +673,19 @@ class PublicControllersService
     /**
      * Format the Video model for SSR.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     id: int,
+     *     bunnyVideoId: string,
+     *     name: string,
+     *     coverPicture: array{
+     *         filename: string,
+     *         width: int|null,
+     *         height: int|null,
+     *         avif: array{thumbnail: string, small: string, medium: string, large: string, full: string},
+     *         webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}
+     *     },
+     *     libraryId: string
+     * }
      */
     public function formatVideoForSSR(Video $video): array
     {

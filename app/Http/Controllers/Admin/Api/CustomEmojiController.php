@@ -75,9 +75,7 @@ class CustomEmojiController extends Controller
             return response()->json($emoji, Response::HTTP_CREATED);
         } catch (Exception $e) {
             // Clean up uploaded picture if emoji creation failed
-            if ($picture !== null) {
-                $picture->delete();
-            }
+            $picture?->delete();
 
             return response()->json([
                 'message' => __('emoji.creation_error', ['error' => $e->getMessage()]),

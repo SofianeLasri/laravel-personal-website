@@ -14,6 +14,7 @@ use App\Models\Technology;
 use App\Models\Video;
 use App\Services\GitHubService;
 use App\Services\PackagistService;
+use Illuminate\Database\Eloquent\Collection;
 
 class CreationFormatter
 {
@@ -209,10 +210,10 @@ class CreationFormatter
     /**
      * Format features for SSR.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<int, Feature>  $features
+     * @param  Collection<int, Feature>  $features
      * @return array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>
      */
-    private function formatFeatures(\Illuminate\Database\Eloquent\Collection $features): array
+    private function formatFeatures(Collection $features): array
     {
         return $features->map(function (Feature $feature) {
             $title = $this->translationHelper->getWithFallback($feature->titleTranslationKey->translations);
@@ -231,10 +232,10 @@ class CreationFormatter
     /**
      * Format screenshots for SSR.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<int, Screenshot>  $screenshots
+     * @param  Collection<int, Screenshot>  $screenshots
      * @return array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string, order: int}>
      */
-    private function formatScreenshots(\Illuminate\Database\Eloquent\Collection $screenshots): array
+    private function formatScreenshots(Collection $screenshots): array
     {
         return $screenshots->map(function (Screenshot $screenshot) {
             $caption = '';
@@ -254,10 +255,10 @@ class CreationFormatter
     /**
      * Format people for SSR.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<int, Person>  $people
+     * @param  Collection<int, Person>  $people
      * @return array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>
      */
-    private function formatPeople(\Illuminate\Database\Eloquent\Collection $people): array
+    private function formatPeople(Collection $people): array
     {
         return $people->map(function (Person $person) {
             $picture = $person->picture ? $this->mediaFormatter->formatPicture($person->picture) : null;
@@ -274,10 +275,10 @@ class CreationFormatter
     /**
      * Format videos for SSR.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection<int, Video>  $videos
+     * @param  Collection<int, Video>  $videos
      * @return array<int, array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string}>
      */
-    private function formatVideos(\Illuminate\Database\Eloquent\Collection $videos): array
+    private function formatVideos(Collection $videos): array
     {
         return $videos
             ->where('visibility', VideoVisibility::PUBLIC)

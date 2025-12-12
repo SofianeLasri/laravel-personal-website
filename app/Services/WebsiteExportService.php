@@ -198,7 +198,7 @@ class WebsiteExportService
     {
         try {
             return DB::getSchemaBuilder()->hasTable($table);
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
     }

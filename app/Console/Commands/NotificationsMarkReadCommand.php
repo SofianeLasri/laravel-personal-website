@@ -191,7 +191,7 @@ class NotificationsMarkReadCommand extends Command
         // Try to parse as a date
         try {
             return Carbon::parse($period);
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Default to 7 days
             $this->warn("Could not parse period '{$period}', defaulting to 7 days");
 

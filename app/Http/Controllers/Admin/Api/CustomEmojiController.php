@@ -103,9 +103,6 @@ class CustomEmojiController extends Controller
     {
         $emoji = CustomEmoji::findOrFail($id);
 
-        // Get the picture_id before deleting (in case we need to manually clean up)
-        $pictureId = $emoji->picture_id;
-
         // Delete the emoji (cascade will delete the picture)
         $emoji->delete();
 

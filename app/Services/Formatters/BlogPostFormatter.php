@@ -85,7 +85,7 @@ class BlogPostFormatter
             fn ($content) => $this->contentBlockFormatter->format($content)
         );
 
-        $excerpt = $this->extractExcerptFromFormattedContents($contents, 200);
+        $excerpt = $this->extractExcerptFromFormattedContents($contents);
 
         $result = [
             'id' => $blogPost->id,
@@ -131,7 +131,7 @@ class BlogPostFormatter
             fn ($content) => $this->contentBlockFormatter->format($content, ContentRenderContext::PREVIEW)
         );
 
-        $excerpt = $this->extractExcerptFromFormattedContents($contents, 200);
+        $excerpt = $this->extractExcerptFromFormattedContents($contents);
 
         $result = [
             'id' => $draft->id,
@@ -270,14 +270,14 @@ class BlogPostFormatter
      *
      * @param  \Illuminate\Support\Collection<int, array<string, mixed>>  $formattedContents
      */
-    private function extractExcerptFromFormattedContents(\Illuminate\Support\Collection $formattedContents, int $maxLength): string
+    private function extractExcerptFromFormattedContents(\Illuminate\Support\Collection $formattedContents): string
     {
         $firstMarkdownContent = $formattedContents->first(function ($content) {
             return $content['content_type'] === ContentMarkdown::class;
         });
 
         if ($firstMarkdownContent && isset($firstMarkdownContent['markdown'])) {
-            return Str::limit(strip_tags($firstMarkdownContent['markdown']), $maxLength);
+            return Str::limit(strip_tags($firstMarkdownContent['markdown']), 200);
         }
 
         return '';

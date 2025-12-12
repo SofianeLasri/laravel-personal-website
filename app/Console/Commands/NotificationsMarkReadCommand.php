@@ -140,8 +140,8 @@ class NotificationsMarkReadCommand extends Command
 
         // Show summary of remaining unread notifications
         $remainingUnread = Notification::where('is_read', false)->count();
+        $this->newLine();
         if ($remainingUnread > 0) {
-            $this->newLine();
             $this->info("Remaining unread notifications: {$remainingUnread}");
 
             // Show breakdown of remaining
@@ -163,7 +163,6 @@ class NotificationsMarkReadCommand extends Command
                 );
             }
         } else {
-            $this->newLine();
             $this->success('All notifications have been marked as read!');
         }
 

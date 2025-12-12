@@ -142,7 +142,7 @@ class WebsiteExportService
     private function exportFiles(ZipArchive $zip): void
     {
         $publicDisk = Storage::disk('public');
-        $files = $this->getAllFiles($publicDisk, '');
+        $files = $this->getAllFiles($publicDisk);
 
         foreach ($files as $file) {
             $content = $publicDisk->get($file);
@@ -157,9 +157,9 @@ class WebsiteExportService
      *
      * @return array<string>
      */
-    private function getAllFiles(Filesystem $disk, string $directory): array
+    private function getAllFiles(Filesystem $disk): array
     {
-        return $disk->allFiles($directory);
+        return $disk->allFiles('');
     }
 
     /**

@@ -18,7 +18,10 @@ class SitemapControllerTest extends TestCase
         $response = $this->get('/sitemap.xml');
 
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'text/xml; charset=UTF-8');
+
+        // Use case-insensitive comparison as charset case varies by environment
+        $contentType = strtolower($response->headers->get('content-type'));
+        $this->assertEquals('text/xml; charset=utf-8', $contentType);
     }
 
     #[Test]

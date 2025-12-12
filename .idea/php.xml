@@ -12,12 +12,16 @@
     <phpmd_settings>
       <phpmd_by_interpreter interpreter_id="7cf6f4eb-4309-4a63-b388-c18568ac6795" tool_path="/app/vendor/bin/phpmd" timeout="30000" />
       <phpmd_by_interpreter asDefaultInterpreter="true" deletedFromTheList="true" interpreter_id="7cf6f4eb-4309-4a63-b388-c18568ac6795" tool_path="/app/vendor/bin/phpmd" timeout="30000" />
-      <MessDetectorConfiguration deletedFromTheList="true" />
+      <MessDetectorConfiguration deletedFromTheList="true" tool_path="$PROJECT_DIR$/vendor/bin/phpmd" />
     </phpmd_settings>
   </component>
   <component name="MessDetectorOptionsConfiguration">
     <option name="customRulesets">
       <list>
+        <RulesetDescriptor>
+          <option name="name" value="Laravel PHPMD Rules" />
+          <option name="path" value="$PROJECT_DIR$/phpmd.xml" />
+        </RulesetDescriptor>
         <RulesetDescriptor>
           <option name="name" value="Laravel PHPMD Rules" />
           <option name="path" value="$PROJECT_DIR$/phpmd.xml" />

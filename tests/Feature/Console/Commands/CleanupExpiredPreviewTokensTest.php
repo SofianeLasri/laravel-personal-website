@@ -129,6 +129,8 @@ class CleanupExpiredPreviewTokensTest extends TestCase
     #[Test]
     public function it_only_deletes_tokens_past_cutoff_date(): void
     {
+        $this->freezeTime();
+
         $draft = BlogPostDraft::factory()->create();
 
         // Create token exactly at the cutoff (30 days ago) - should NOT be deleted

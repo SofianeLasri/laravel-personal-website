@@ -19,9 +19,9 @@ use Exception;
 class ContentBlockFormatter
 {
     public function __construct(
-        private MediaFormatter $mediaFormatter,
-        private TranslationHelper $translationHelper,
-        private CustomEmojiResolverService $emojiResolver,
+        private readonly MediaFormatter $mediaFormatter,
+        private readonly TranslationHelper $translationHelper,
+        private readonly CustomEmojiResolverService $emojiResolver,
     ) {}
 
     /**

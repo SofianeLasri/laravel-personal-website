@@ -40,11 +40,11 @@ class PublicControllersService
     ];
 
     public function __construct(
-        private TranslationHelper $translationHelper,
-        private MediaFormatter $mediaFormatter,
-        private CreationFormatter $creationFormatter,
-        private BlogPostFormatter $blogPostFormatter,
-        private ExperienceFormatter $experienceFormatter,
+        private readonly TranslationHelper   $translationHelper,
+        private readonly MediaFormatter      $mediaFormatter,
+        private readonly CreationFormatter   $creationFormatter,
+        private readonly BlogPostFormatter   $blogPostFormatter,
+        private readonly ExperienceFormatter $experienceFormatter,
     ) {}
 
     /**

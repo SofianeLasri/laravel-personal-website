@@ -10,8 +10,8 @@ use Illuminate\Support\Str;
 class TranslationHelper
 {
     public function __construct(
-        private string $locale,
-        private string $fallbackLocale,
+        private readonly string $locale,
+        private readonly string $fallbackLocale,
     ) {}
 
     /**

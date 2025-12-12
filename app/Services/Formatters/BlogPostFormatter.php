@@ -20,9 +20,9 @@ use Illuminate\Support\Str;
 class BlogPostFormatter
 {
     public function __construct(
-        private MediaFormatter $mediaFormatter,
-        private TranslationHelper $translationHelper,
-        private ContentBlockFormatter $contentBlockFormatter,
+        private readonly MediaFormatter $mediaFormatter,
+        private readonly TranslationHelper $translationHelper,
+        private readonly ContentBlockFormatter $contentBlockFormatter,
     ) {}
 
     /**

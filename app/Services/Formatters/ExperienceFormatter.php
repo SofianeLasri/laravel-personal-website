@@ -19,8 +19,8 @@ class ExperienceFormatter
     private ?array $creationCountByTechnology = null;
 
     public function __construct(
-        private MediaFormatter $mediaFormatter,
-        private TranslationHelper $translationHelper,
+        private readonly MediaFormatter $mediaFormatter,
+        private readonly TranslationHelper $translationHelper,
     ) {}
 
     /**

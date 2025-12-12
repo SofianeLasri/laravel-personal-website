@@ -23,11 +23,11 @@ class CreationFormatter
     private ?array $creationCountByTechnology = null;
 
     public function __construct(
-        private MediaFormatter $mediaFormatter,
-        private TranslationHelper $translationHelper,
-        private ContentBlockFormatter $contentBlockFormatter,
-        private GitHubService $gitHubService,
-        private PackagistService $packagistService,
+        private readonly MediaFormatter $mediaFormatter,
+        private readonly TranslationHelper $translationHelper,
+        private readonly ContentBlockFormatter $contentBlockFormatter,
+        private readonly GitHubService $gitHubService,
+        private readonly PackagistService $packagistService,
     ) {}
 
     /**

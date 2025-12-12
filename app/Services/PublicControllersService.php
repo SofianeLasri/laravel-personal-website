@@ -29,6 +29,7 @@ use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\Video;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -104,7 +105,7 @@ class PublicControllersService
 
         // Calculate years of experience based on the earliest professional experience
         $earliestWorkExperience = Experience::where('type', ExperienceType::EMPLOI)
-            ->orderBy('started_at', 'asc')
+            ->orderBy('started_at')
             ->first();
 
         if ($earliestWorkExperience) {
@@ -241,10 +242,11 @@ class PublicControllersService
      * Returns a SSRFullCreation TypeScript type compatible array.
      *
      * @param  Creation  $creation  The creation to format
-     * @return array{id: int,
+     * @return array{
+     *     id: int,
      *     name: string,
      *     slug: string,
-     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
+     *     logo: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     coverImage: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null,
      *     startedAt: string,
      *     endedAt: string|null,
@@ -253,13 +255,18 @@ class PublicControllersService
      *     type: CreationType,
      *     shortDescription: string|null,
      *     fullDescription: string|null,
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, mixed>}, video?: array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string, caption: string|null}}>,
      *     externalUrl: string|null,
      *     sourceCodeUrl: string|null,
-     *     features: array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
-     *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string}>,
-     *     technologies: array<int, array{id: int, creationCount: int, name: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
-     *     people: array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
-     *     videos: array<int, array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>}
+     *     features: array<int, array{id: int, title: string, description: string, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
+     *     screenshots: array<int, array{id: int, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, caption: string, order: int}>,
+     *     technologies: array<int, array{id: int, creationCount: int, name: string, description: string, type: TechnologyType, iconPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}}>,
+     *     people: array<int, array{id: int, name: string, url: string|null, picture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}>,
+     *     videos: array<int, array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string}>,
+     *     githubData: array{name: string, description: string|null, stars: int, forks: int, watchers: int, language: string|null, topics: array<string>, license: string|null, updated_at: string, created_at: string, open_issues: int, default_branch: string, size: int, url: string, homepage: string|null}|null,
+     *     githubLanguages: array<string, float>|null,
+     *     packagistData: array{name: string, description: string|null, downloads: int, daily_downloads: int, monthly_downloads: int, stars: int, dependents: int, suggesters: int, type: string|null, repository: string|null, github_stars: int|null, github_watchers: int|null, github_forks: int|null, github_open_issues: int|null, language: string|null, license: array<string>|null, latest_version: string|null, latest_stable_version: string|null, created_at: string|null, updated_at: string|null, url: string, maintainers: array<array{name: string, avatar_url: string|null}>, php_version: string|null, laravel_version: string|null}|null
+     * }
      */
     public function formatCreationForSSRFull(Creation $creation): array
     {
@@ -280,7 +287,7 @@ class PublicControllersService
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
                 try {
                     $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // Fallback to original markdown if emoji resolution fails
                     $result['markdown'] = $markdownContent;
                 }
@@ -310,7 +317,7 @@ class PublicControllersService
                         $formattedPicture = $this->formatPictureForSSR($picture);
 
                         // Add caption if it exists in the pivot data
-                        /** @phpstan-ignore-next-line Property pivot exists on Picture when loaded through BelongsToMany */
+                        /** @phpstan-ignore property.notFound */
                         $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
                         if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
                             $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
@@ -527,8 +534,7 @@ class PublicControllersService
      */
     public function formatTechnologyForSSR(Technology $technology): array
     {
-        $description = $technology->descriptionTranslationKey ?
-            $this->getTranslationWithFallback($technology->descriptionTranslationKey->translations) : '';
+        $description = $this->getTranslationWithFallback($technology->descriptionTranslationKey->translations);
 
         return [
             'id' => $technology->id,
@@ -898,10 +904,11 @@ class PublicControllersService
      */
     public function formatBlogPostForSSRShort(BlogPost $blogPost): array
     {
-        $title = $blogPost->titleTranslationKey ?
-            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
-        $categoryName = $blogPost->category->nameTranslationKey ?
-            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
+        /** @phpstan-ignore ternary.alwaysTrue */
+        $title = $blogPost->titleTranslationKey
+            ? $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey
+            ? $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
         $excerpt = $this->extractExcerptFromFirstTextBlock($blogPost, 150);
 
         return [
@@ -939,10 +946,11 @@ class PublicControllersService
      */
     public function formatBlogPostForSSRHero(BlogPost $blogPost): array
     {
-        $title = $blogPost->titleTranslationKey ?
-            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
-        $categoryName = $blogPost->category->nameTranslationKey ?
-            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
+        /** @phpstan-ignore ternary.alwaysTrue */
+        $title = $blogPost->titleTranslationKey
+            ? $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey
+            ? $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
         $excerpt = $this->extractExcerptFromFirstTextBlock($blogPost, 300);
 
         return [
@@ -986,7 +994,7 @@ class PublicControllersService
             return '';
         }
 
-        if (! $markdownContent->translationKey || ! $markdownContent->translationKey->translations) {
+        if (! $markdownContent->translationKey) {
             return '';
         }
 
@@ -1065,7 +1073,8 @@ class PublicControllersService
         // Apply search filter
         if (! empty($filters['search'])) {
             $searchTerm = $filters['search'];
-            $query->whereHas('titleTranslationKey.translations', function ($q) use ($searchTerm) {
+            $query->whereHas('titleTranslationKey.translations', function (Builder $q) use ($searchTerm) {
+                /** @phpstan-ignore argument.type */
                 $q->where('text', 'like', '%'.$searchTerm.'%');
             });
         }
@@ -1074,15 +1083,15 @@ class PublicControllersService
         $sort = $filters['sort'] ?? 'newest';
         switch ($sort) {
             case 'oldest':
-                $query->orderBy('created_at', 'asc');
+                $query->orderBy('created_at');
                 break;
             case 'alphabetical':
                 $query->join('translation_keys', 'blog_posts.title_translation_key_id', '=', 'translation_keys.id')
                     ->join('translations', function ($join) {
                         $join->on('translation_keys.id', '=', 'translations.translation_key_id')
-                            ->where('translations.locale', '=', $this->locale);
+                            ->where('translations.locale', $this->locale);
                     })
-                    ->orderBy('translations.text', 'asc')
+                    ->orderBy('translations.text')
                     ->select('blog_posts.*');
                 break;
             case 'newest':
@@ -1170,7 +1179,7 @@ class PublicControllersService
      *     publishedAt: Carbon|null,
      *     publishedAtFormatted: string,
      *     excerpt: string,
-     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}, video?: array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string, caption: string|null}}>,
      *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array<string, mixed>|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
      * }|null
      */
@@ -1202,10 +1211,11 @@ class PublicControllersService
             return null;
         }
 
-        $title = $blogPost->titleTranslationKey ?
-            $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
-        $categoryName = $blogPost->category->nameTranslationKey ?
-            $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
+        /** @phpstan-ignore ternary.alwaysTrue */
+        $title = $blogPost->titleTranslationKey
+            ? $this->getTranslationWithFallback($blogPost->titleTranslationKey->translations) : '';
+        $categoryName = $blogPost->category->nameTranslationKey
+            ? $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
 
         // Format contents
         $contents = $blogPost->contents->map(function ($content) {
@@ -1222,7 +1232,7 @@ class PublicControllersService
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
                 try {
                     $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // Fallback to original markdown if emoji resolution fails
                     $result['markdown'] = $markdownContent;
                 }
@@ -1252,7 +1262,7 @@ class PublicControllersService
                         $formattedPicture = $this->formatPictureForSSR($picture);
 
                         // Add caption if it exists in the pivot data
-                        /** @phpstan-ignore-next-line Property pivot exists on Picture when loaded through BelongsToMany */
+                        /** @phpstan-ignore property.notFound */
                         $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
                         if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
                             $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
@@ -1344,7 +1354,7 @@ class PublicControllersService
      *     publishedAt: Carbon|null,
      *     publishedAtFormatted: string,
      *     excerpt: string,
-     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}}>,
+     *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}, video?: array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string, caption: string|null}}>,
      *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array<int, string>|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null},
      *     isPreview: bool
      * }
@@ -1392,7 +1402,7 @@ class PublicControllersService
                 // Resolve custom emojis (:emoji_name:) to HTML picture tags
                 try {
                     $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // Fallback to original markdown if emoji resolution fails
                     $result['markdown'] = $markdownContent;
                 }
@@ -1422,8 +1432,8 @@ class PublicControllersService
                         $formattedPicture = $this->formatPictureForSSR($picture);
 
                         // Add caption if it exists in the pivot data
-                        // @phpstan-ignore-next-line (Pivot property access - known PHPStan limitation)
-                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id ?? null;
+                        /** @phpstan-ignore property.notFound */
+                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
                         if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
                             $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
                         }

@@ -45,6 +45,9 @@ docker exec laravel.test php artisan dusk
 # Run static analysis
 ./vendor/bin/phpstan analyse
 
+# Run mess detector (code quality issues)
+composer phpmd
+
 # Format PHP code
 ./vendor/bin/pint
 
@@ -54,6 +57,7 @@ npm run lint
 
 # Docker commands (recommended for local development)
 docker exec laravel.test ./vendor/bin/phpstan analyse
+docker exec laravel.test composer phpmd
 docker exec laravel.test ./vendor/bin/pint
 ```
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\BlogPostType;
 use App\Enums\CategoryColor;
+use App\Enums\ContentRenderContext;
 use App\Enums\CreationType;
 use App\Enums\ExperienceType;
 use App\Enums\GameReviewRating;
@@ -12,12 +13,17 @@ use App\Enums\VideoStatus;
 use App\Enums\VideoVisibility;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
+use App\Models\BlogPostContent;
 use App\Models\BlogPostDraft;
+use App\Models\BlogPostDraftContent;
 use App\Models\Certification;
 use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
 use App\Models\ContentVideo;
 use App\Models\Creation;
+use App\Models\CreationContent;
+use App\Models\GameReview;
+use App\Models\GameReviewDraft;
 use App\Models\Experience;
 use App\Models\Feature;
 use App\Models\Person;
@@ -273,77 +279,7 @@ class PublicControllersService
         $response = $this->formatCreationForSSRShort($creation);
 
         // Format content blocks
-        $contents = $creation->contents->map(function ($content) {
-            $result = [
-                'id' => $content->id,
-                'order' => $content->order,
-                'content_type' => $content->content_type,
-            ];
-
-            // Handle different content types
-            if ($content->content_type === ContentMarkdown::class && $content->content instanceof ContentMarkdown) {
-                $markdownContent = $content->content->translationKey ?
-                    $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
-                // Resolve custom emojis (:emoji_name:) to HTML picture tags
-                try {
-                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
-                } catch (Exception) {
-                    // Fallback to original markdown if emoji resolution fails
-                    $result['markdown'] = $markdownContent;
-                }
-            } elseif ($content->content_type === ContentGallery::class && $content->content instanceof ContentGallery) {
-                // Get caption translation keys from the pivot data
-                $captionTranslationKeyIds = $content->content->pictures
-                    ->pluck('pivot.caption_translation_key_id')
-                    ->filter()
-                    ->unique();
-
-                // Load translation keys with their translations if any captions exist
-                $captionTranslations = [];
-                if ($captionTranslationKeyIds->isNotEmpty()) {
-                    $translationKeys = TranslationKey::with('translations')
-                        ->whereIn('id', $captionTranslationKeyIds)
-                        ->get()
-                        ->keyBy('id');
-
-                    foreach ($translationKeys as $key => $translationKey) {
-                        $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
-                    }
-                }
-
-                $result['gallery'] = [
-                    'id' => $content->content->id,
-                    'pictures' => $content->content->pictures->map(function (Picture $picture) use ($captionTranslations) {
-                        $formattedPicture = $this->formatPictureForSSR($picture);
-
-                        // Add caption if it exists in the pivot data
-                        /** @phpstan-ignore property.notFound */
-                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
-                        if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
-                            $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
-                        }
-
-                        return $formattedPicture;
-                    })->toArray(),
-                ];
-            } elseif ($content->content_type === ContentVideo::class && $content->content instanceof ContentVideo) {
-                $video = $content->content->video;
-
-                if ($video && $video->status === VideoStatus::READY && $video->visibility === VideoVisibility::PUBLIC) {
-                    $caption = null;
-                    if ($content->content->captionTranslationKey) {
-                        $caption = $this->getTranslationWithFallback($content->content->captionTranslationKey->translations);
-                    }
-
-                    $formattedVideo = $this->formatVideoForSSR($video);
-                    $formattedVideo['caption'] = $caption;
-
-                    $result['video'] = $formattedVideo;
-                }
-            }
-
-            return $result;
-        });
+        $contents = $creation->contents->map(fn ($content) => $this->formatContentBlockForSSR($content));
 
         // Keep fullDescription for backward compatibility (will be null if no content blocks exist yet)
         $fullDescription = $creation->fullDescriptionTranslationKey ?
@@ -1218,77 +1154,7 @@ class PublicControllersService
             ? $this->getTranslationWithFallback($blogPost->category->nameTranslationKey->translations) : '';
 
         // Format contents
-        $contents = $blogPost->contents->map(function ($content) {
-            $result = [
-                'id' => $content->id,
-                'order' => $content->order,
-                'content_type' => $content->content_type,
-            ];
-
-            // Handle different content types
-            if ($content->content_type === ContentMarkdown::class && $content->content instanceof ContentMarkdown) {
-                $markdownContent = $content->content->translationKey ?
-                    $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
-                // Resolve custom emojis (:emoji_name:) to HTML picture tags
-                try {
-                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
-                } catch (Exception) {
-                    // Fallback to original markdown if emoji resolution fails
-                    $result['markdown'] = $markdownContent;
-                }
-            } elseif ($content->content_type === ContentGallery::class && $content->content instanceof ContentGallery) {
-                // Get caption translation keys from the pivot data
-                $captionTranslationKeyIds = $content->content->pictures
-                    ->pluck('pivot.caption_translation_key_id')
-                    ->filter()
-                    ->unique();
-
-                // Load translation keys with their translations if any captions exist
-                $captionTranslations = [];
-                if ($captionTranslationKeyIds->isNotEmpty()) {
-                    $translationKeys = TranslationKey::with('translations')
-                        ->whereIn('id', $captionTranslationKeyIds)
-                        ->get()
-                        ->keyBy('id');
-
-                    foreach ($translationKeys as $key => $translationKey) {
-                        $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
-                    }
-                }
-
-                $result['gallery'] = [
-                    'id' => $content->content->id,
-                    'pictures' => $content->content->pictures->map(function (Picture $picture) use ($captionTranslations) {
-                        $formattedPicture = $this->formatPictureForSSR($picture);
-
-                        // Add caption if it exists in the pivot data
-                        /** @phpstan-ignore property.notFound */
-                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
-                        if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
-                            $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
-                        }
-
-                        return $formattedPicture;
-                    })->toArray(),
-                ];
-            } elseif ($content->content_type === ContentVideo::class && $content->content instanceof ContentVideo) {
-                $video = $content->content->video;
-
-                if ($video && $video->status === VideoStatus::READY && $video->visibility === VideoVisibility::PUBLIC) {
-                    $caption = null;
-                    if ($content->content->captionTranslationKey) {
-                        $caption = $this->getTranslationWithFallback($content->content->captionTranslationKey->translations);
-                    }
-
-                    $formattedVideo = $this->formatVideoForSSR($video);
-                    $formattedVideo['caption'] = $caption;
-
-                    $result['video'] = $formattedVideo;
-                }
-            }
-
-            return $result;
-        });
+        $contents = $blogPost->contents->map(fn ($content) => $this->formatContentBlockForSSR($content));
 
         // Generate excerpt from first markdown content
         $excerpt = '';
@@ -1319,22 +1185,7 @@ class PublicControllersService
 
         // Add game review data if it's a game review
         if ($blogPost->type === BlogPostType::GAME_REVIEW && $blogPost->gameReview) {
-            $gameReview = $blogPost->gameReview;
-            $pros = $gameReview->prosTranslationKey ? $this->getTranslationWithFallback($gameReview->prosTranslationKey->translations) : null;
-            $cons = $gameReview->consTranslationKey ? $this->getTranslationWithFallback($gameReview->consTranslationKey->translations) : null;
-
-            $result['gameReview'] = [
-                'gameTitle' => $gameReview->game_title,
-                'releaseDate' => $gameReview->release_date,
-                'genre' => $gameReview->genre,
-                'developer' => $gameReview->developer,
-                'publisher' => $gameReview->publisher,
-                'platforms' => $gameReview->platforms,
-                'rating' => $gameReview->rating,
-                'pros' => $pros,
-                'cons' => $cons,
-                'coverPicture' => $gameReview->coverPicture ? $this->formatPictureForSSR($gameReview->coverPicture) : null,
-            ];
+            $result['gameReview'] = $this->formatGameReviewForSSR($blogPost->gameReview);
         }
 
         return $result;
@@ -1355,7 +1206,7 @@ class PublicControllersService
      *     publishedAtFormatted: string,
      *     excerpt: string,
      *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}, caption?: string}>}, video?: array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string, caption: string|null}}>,
-     *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array<int, string>|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null},
+     *     gameReview?: array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array<string, mixed>|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null},
      *     isPreview: bool
      * }
      */
@@ -1387,79 +1238,10 @@ class PublicControllersService
         $categoryName = $draft->category->nameTranslationKey ?
             $this->getTranslationWithFallback($draft->category->nameTranslationKey->translations) : '';
 
-        // Format contents (using BlogPostDraftContent instead of BlogPostContent)
-        $contents = $draft->contents->map(function ($content) {
-            $result = [
-                'id' => $content->id,
-                'order' => $content->order,
-                'content_type' => $content->content_type,
-            ];
-
-            // Handle different content types
-            if ($content->content_type === ContentMarkdown::class && $content->content instanceof ContentMarkdown) {
-                $markdownContent = $content->content->translationKey ?
-                    $this->getTranslationWithFallback($content->content->translationKey->translations) : '';
-                // Resolve custom emojis (:emoji_name:) to HTML picture tags
-                try {
-                    $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
-                } catch (Exception) {
-                    // Fallback to original markdown if emoji resolution fails
-                    $result['markdown'] = $markdownContent;
-                }
-            } elseif ($content->content_type === ContentGallery::class && $content->content instanceof ContentGallery) {
-                // Get caption translation keys from the pivot data
-                $captionTranslationKeyIds = $content->content->pictures
-                    ->pluck('pivot.caption_translation_key_id')
-                    ->filter()
-                    ->unique();
-
-                // Load translation keys with their translations if any captions exist
-                $captionTranslations = [];
-                if ($captionTranslationKeyIds->isNotEmpty()) {
-                    $translationKeys = TranslationKey::with('translations')
-                        ->whereIn('id', $captionTranslationKeyIds)
-                        ->get()
-                        ->keyBy('id');
-
-                    foreach ($translationKeys as $key => $translationKey) {
-                        $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
-                    }
-                }
-
-                $result['gallery'] = [
-                    'id' => $content->content->id,
-                    'pictures' => $content->content->pictures->map(function ($picture) use ($captionTranslations) {
-                        $formattedPicture = $this->formatPictureForSSR($picture);
-
-                        // Add caption if it exists in the pivot data
-                        /** @phpstan-ignore property.notFound */
-                        $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
-                        if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
-                            $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
-                        }
-
-                        return $formattedPicture;
-                    })->toArray(),
-                ];
-            } elseif ($content->content_type === ContentVideo::class && $content->content instanceof ContentVideo) {
-                $video = $content->content->video;
-
-                // For preview, show all videos regardless of visibility (but still check if ready)
-                if ($video && $video->status === VideoStatus::READY) {
-                    $caption = null;
-                    if ($content->content->captionTranslationKey) {
-                        $caption = $this->getTranslationWithFallback($content->content->captionTranslationKey->translations);
-                    }
-
-                    $formattedVideo = $this->formatVideoForSSR($video);
-                    $formattedVideo['caption'] = $caption;
-
-                    $result['video'] = $formattedVideo;
-                }
-            }
-
-            return $result;
-        });
+        // Format contents (PREVIEW context shows all ready videos regardless of visibility)
+        $contents = $draft->contents->map(
+            fn ($content) => $this->formatContentBlockForSSR($content, ContentRenderContext::PREVIEW),
+        );
 
         // Generate excerpt from first markdown content
         $excerpt = '';
@@ -1491,24 +1273,125 @@ class PublicControllersService
 
         // Add game review draft data if it's a game review
         if ($draft->type === BlogPostType::GAME_REVIEW && $draft->gameReviewDraft) {
-            $gameReviewDraft = $draft->gameReviewDraft;
-            $pros = $gameReviewDraft->prosTranslationKey ? $this->getTranslationWithFallback($gameReviewDraft->prosTranslationKey->translations) : null;
-            $cons = $gameReviewDraft->consTranslationKey ? $this->getTranslationWithFallback($gameReviewDraft->consTranslationKey->translations) : null;
-
-            $result['gameReview'] = [
-                'gameTitle' => $gameReviewDraft->game_title,
-                'releaseDate' => $gameReviewDraft->release_date,
-                'genre' => $gameReviewDraft->genre,
-                'developer' => $gameReviewDraft->developer,
-                'publisher' => $gameReviewDraft->publisher,
-                'platforms' => $gameReviewDraft->platforms,
-                'rating' => $gameReviewDraft->rating,
-                'pros' => $pros,
-                'cons' => $cons,
-                'coverPicture' => $gameReviewDraft->coverPicture ? $this->formatPictureForSSR($gameReviewDraft->coverPicture) : null,
-            ];
+            $result['gameReview'] = $this->formatGameReviewForSSR($draft->gameReviewDraft);
         }
 
         return $result;
+    }
+
+    /**
+     * Format a single content block for SSR.
+     * Handles ContentMarkdown, ContentGallery, and ContentVideo types.
+     *
+     * @return array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, mixed>}, video?: array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string, caption: string|null}}
+     */
+    private function formatContentBlockForSSR(
+        CreationContent|BlogPostContent|BlogPostDraftContent $content,
+        ContentRenderContext $context = ContentRenderContext::PUBLIC,
+    ): array {
+        $result = [
+            'id' => $content->id,
+            'order' => $content->order,
+            'content_type' => $content->content_type,
+        ];
+
+        $contentType = $content->content_type;
+        $contentModel = $content->content;
+
+        // Handle different content types
+        if ($contentType === ContentMarkdown::class && $contentModel instanceof ContentMarkdown) {
+            $markdownContent = $contentModel->translationKey ?
+                $this->getTranslationWithFallback($contentModel->translationKey->translations) : '';
+            // Resolve custom emojis (:emoji_name:) to HTML picture tags
+            try {
+                $result['markdown'] = $this->emojiResolver->resolveEmojisInMarkdown($markdownContent);
+            } catch (Exception) {
+                // Fallback to original markdown if emoji resolution fails
+                $result['markdown'] = $markdownContent;
+            }
+        } elseif ($contentType === ContentGallery::class && $contentModel instanceof ContentGallery) {
+            // Get caption translation keys from the pivot data
+            $captionTranslationKeyIds = $contentModel->pictures
+                ->pluck('pivot.caption_translation_key_id')
+                ->filter()
+                ->unique();
+
+            // Load translation keys with their translations if any captions exist
+            $captionTranslations = [];
+            if ($captionTranslationKeyIds->isNotEmpty()) {
+                $translationKeys = TranslationKey::with('translations')
+                    ->whereIn('id', $captionTranslationKeyIds)
+                    ->get()
+                    ->keyBy('id');
+
+                foreach ($translationKeys as $key => $translationKey) {
+                    $captionTranslations[$key] = $this->getTranslationWithFallback($translationKey->translations);
+                }
+            }
+
+            $result['gallery'] = [
+                'id' => $contentModel->id,
+                'pictures' => $contentModel->pictures->map(function (Picture $picture) use ($captionTranslations) {
+                    $formattedPicture = $this->formatPictureForSSR($picture);
+
+                    // Add caption if it exists in the pivot data
+                    /** @phpstan-ignore property.notFound */
+                    $captionTranslationKeyId = $picture->pivot?->caption_translation_key_id;
+                    if ($captionTranslationKeyId && isset($captionTranslations[$captionTranslationKeyId])) {
+                        $formattedPicture['caption'] = $captionTranslations[$captionTranslationKeyId];
+                    }
+
+                    return $formattedPicture;
+                })->toArray(),
+            ];
+        } elseif ($contentType === ContentVideo::class && $contentModel instanceof ContentVideo) {
+            $video = $contentModel->video;
+
+            // For preview context, show all videos regardless of visibility (but still check if ready)
+            // For public context, also check that visibility is PUBLIC
+            $videoIsReady = $video && $video->status === VideoStatus::READY;
+            $videoIsVisible = $context === ContentRenderContext::PREVIEW
+                || ($video && $video->visibility === VideoVisibility::PUBLIC);
+
+            if ($videoIsReady && $videoIsVisible) {
+                $caption = null;
+                if ($contentModel->captionTranslationKey) {
+                    $caption = $this->getTranslationWithFallback($contentModel->captionTranslationKey->translations);
+                }
+
+                $formattedVideo = $this->formatVideoForSSR($video);
+                $formattedVideo['caption'] = $caption;
+
+                $result['video'] = $formattedVideo;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Format a game review for SSR.
+     *
+     * @return array{gameTitle: string, releaseDate: Carbon|null, genre: string|null, developer: string|null, publisher: string|null, platforms: array<string, mixed>|null, rating: GameReviewRating|null, pros: string|null, cons: string|null, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}, jpg: array{thumbnail: string, small: string, medium: string, large: string, full: string}}|null}
+     */
+    private function formatGameReviewForSSR(GameReview|GameReviewDraft $gameReview): array
+    {
+        $pros = $gameReview->prosTranslationKey
+            ? $this->getTranslationWithFallback($gameReview->prosTranslationKey->translations) : null;
+        $cons = $gameReview->consTranslationKey
+            ? $this->getTranslationWithFallback($gameReview->consTranslationKey->translations) : null;
+
+        return [
+            'gameTitle' => $gameReview->game_title,
+            'releaseDate' => $gameReview->release_date,
+            'genre' => $gameReview->genre,
+            'developer' => $gameReview->developer,
+            'publisher' => $gameReview->publisher,
+            'platforms' => $gameReview->platforms,
+            'rating' => $gameReview->rating,
+            'pros' => $pros,
+            'cons' => $cons,
+            'coverPicture' => $gameReview->coverPicture ? $this->formatPictureForSSR($gameReview->coverPicture) : null,
+        ];
     }
 }

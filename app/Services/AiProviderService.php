@@ -146,7 +146,6 @@ class AiProviderService
                     0.001, // Minimal response time for cache hit
                     200,
                     true, // Mark as cached
-                    null
                 );
 
                 return $cached;

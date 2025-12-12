@@ -38,7 +38,7 @@ class NotificationFactory extends Factory
             'type' => $this->faker->randomElement($types),
             'title' => $this->faker->sentence(4),
             'message' => $this->faker->paragraph(2),
-            'data' => $this->faker->boolean(50) ? [
+            'data' => $this->faker->boolean() ? [
                 'key' => $this->faker->word(),
                 'value' => $this->faker->sentence(),
                 'timestamp' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
@@ -49,7 +49,7 @@ class NotificationFactory extends Factory
             'is_read' => $this->faker->boolean(40), // 40% chance of being read
             'is_persistent' => $this->faker->boolean(10), // 10% chance of being persistent
             'read_at' => function (array $attributes) {
-                return $attributes['is_read'] ? $this->faker->dateTimeBetween('-7 days', 'now') : null;
+                return $attributes['is_read'] ? $this->faker->dateTimeBetween('-7 days') : null;
             },
             'expires_at' => $this->faker->boolean(20) ? $this->faker->dateTimeBetween('now', '+30 days') : null,
         ];
@@ -76,7 +76,7 @@ class NotificationFactory extends Factory
         return $this->state(function () {
             return [
                 'is_read' => true,
-                'read_at' => $this->faker->dateTimeBetween('-7 days', 'now'),
+                'read_at' => $this->faker->dateTimeBetween('-7 days'),
             ];
         });
     }

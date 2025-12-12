@@ -50,7 +50,7 @@ class ApiRequestLogFactory extends Factory
                 'max_tokens' => $this->faker->numberBetween(100, 2000),
             ],
             'cached' => $this->faker->boolean(30), // 30% chance of being cached
-            'created_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
+            'created_at' => $this->faker->dateTimeBetween('-30 days'),
             'updated_at' => function (array $attributes) {
                 return $attributes['created_at'];
             },

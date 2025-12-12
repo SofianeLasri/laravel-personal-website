@@ -185,7 +185,7 @@ class BotDetectionService
         $recentRequests = LoggedRequest::where('ip_address_id', $request->ip_address_id)
             ->where('created_at', '>=', $createdAt->copy()->subHour())
             ->where('created_at', '<=', $createdAt)
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at')
             ->get();
 
         if ($recentRequests->count() < $this->minRequestsForAnalysis) {

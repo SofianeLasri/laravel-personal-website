@@ -41,7 +41,7 @@ class RequestLogController extends Controller
         $excludeIps = $request->get('exclude_ips', []);
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');
-        $excludeConnectedUsersIps = $request->boolean('exclude_connected_users_ips', false);
+        $excludeConnectedUsersIps = $request->boolean('exclude_connected_users_ips');
 
         // Build base query with all necessary joins and selects
         $query = $queryService->buildBaseQuery()
@@ -87,7 +87,7 @@ class RequestLogController extends Controller
 
         // Apply authenticated users filter if requested
         if ($excludeConnectedUsersIps) {
-            $queryService->applyAuthenticatedUserFilters($query, true);
+            $queryService->applyAuthenticatedUserFilters($query);
         }
 
         $requests = $query->paginate($perPage);

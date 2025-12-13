@@ -110,18 +110,41 @@ Both applications are served from the same Laravel backend but have completely s
 
 ### Core Domain Models
 - **Creation/CreationDraft**: Portfolio projects with draft-first editing workflow
+- **BlogPost/BlogPostDraft**: Blog posts with draft-first editing workflow
+- **GameReview/GameReviewDraft**: Game reviews with draft workflow and store links
 - **Technology**: Tech stack with SVG icons, types (Frontend/Backend/Database), and experience levels
 - **Experience**: Professional work history with types (Work/Education/Project/Certification)
 - **Person**: Collaborators/team members linked to projects
 - **Picture**: Advanced image system with automatic AVIF/WebP optimization and 5 size variants
 - **Video**: Video content with Bunny CDN streaming integration, cover images, and creation relationships
+- **Content Blocks**: `ContentMarkdown`, `ContentGallery`, `ContentVideo` - polymorphic content blocks for rich content in creations and blog posts
 
-### Key Services
-- **PublicControllersService**: Transforms and aggregates data for public pages (complex business logic)
-- **ImageTranscodingService**: Handles automatic image optimization with multiple formats (includes Imagick resource limit safety checks)
-- **CreationConversionService**: Converts drafts to published creations with relationship synchronization
-- **UploadedFilesService**: Manages file uploads and storage, dispatches background optimization jobs
-- **BunnyStreamService**: Video streaming service with Bunny CDN integration for upload, transcoding, and playback (two-phase upload with error recovery)
+### Service Architecture
+Services are organized into domain-specific directories:
+
+```
+app/Services/
+├── AI/                    # AI-related services (JSON parsing, prompts, API client)
+├── AiProviders/           # AI provider implementations (Anthropic, OpenAI)
+├── Analytics/             # Visit stats and filtered request queries
+├── BotDetection/          # Bot detection and route parameter whitelisting
+├── Content/               # Content CRUD operations (creation, update, deletion, reorder)
+├── Conversion/            # Draft-to-published conversion
+│   ├── BlogPost/          # Blog post conversion services
+│   └── Creation/          # Creation conversion services
+├── Export/                # Database and file export
+├── Formatters/            # Data formatting (Creation, Experience, Media, BlogPost)
+├── Image/                 # Image processing (dimensions, driver detection, resource limits)
+├── Import/                # Database and file import, validation
+└── Translation/           # Translation key generation, auto-translation, duplication
+```
+
+**Root-level Services** (complex cross-cutting concerns):
+- **PublicControllersService**: Transforms and aggregates data for public pages
+- **ImageTranscodingService**: Image optimization with multiple formats (includes Imagick resource limit safety checks)
+- **BunnyStreamService**: Video streaming via Bunny CDN (two-phase upload with error recovery)
+- **UploadedFilesService**: File upload management, dispatches background optimization jobs
+- **BlogContentService** / **CreationContentService**: Content block management for rich content
 
 ### Translation System
 **Dual Translation Architecture**:
@@ -335,5 +358,7 @@ Key environment variables to configure:
 - `IMAGICK_*`: ImageMagick resource limits
 - `QUEUE_CONNECTION`: Queue driver (sync/database/redis)
 - `FILESYSTEM_DISK`: Storage driver (local/bunnycdn)
-- Pour les tests Laravel dusk, on utilise le container laravel.dusk
-- Lance toujours les commandes npm en local et non sur docker car WSL est très lent
+
+## Platform-Specific Notes
+- For Laravel Dusk tests, use the `laravel.dusk` container
+- Always run npm commands locally (not in Docker) as WSL is very slow for node operations

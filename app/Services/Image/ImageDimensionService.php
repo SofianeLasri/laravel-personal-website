@@ -7,10 +7,10 @@ namespace App\Services\Image;
 /**
  * Service for image dimension utilities
  */
-class ImageDimensionService
+readonly class ImageDimensionService
 {
     public function __construct(
-        private readonly DriverDetectionService $driverDetection
+        private DriverDetectionService $driverDetection
     ) {}
 
     /**

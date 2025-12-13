@@ -9,10 +9,10 @@ use App\Models\TranslationKey;
 /**
  * Service for duplicating translation keys with their translations
  */
-class TranslationKeyDuplicationService
+readonly class TranslationKeyDuplicationService
 {
     public function __construct(
-        private readonly TranslationKeyGeneratorService $keyGenerator
+        private TranslationKeyGeneratorService $keyGenerator
     ) {}
 
     /**

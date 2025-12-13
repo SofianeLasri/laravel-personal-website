@@ -9,11 +9,11 @@ use ZipArchive;
 /**
  * Service for managing export metadata
  */
-class ExportMetadataService
+readonly class ExportMetadataService
 {
     public function __construct(
-        private readonly DatabaseExportService $databaseExport,
-        private readonly FileExportService $fileExport
+        private DatabaseExportService $databaseExport,
+        private FileExportService $fileExport
     ) {}
 
     /**

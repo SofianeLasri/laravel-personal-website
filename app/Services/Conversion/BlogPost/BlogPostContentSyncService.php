@@ -16,10 +16,10 @@ use App\Services\Content\ContentBlockDuplicationService;
 /**
  * Service for syncing content between blog post drafts and published posts
  */
-class BlogPostContentSyncService
+readonly class BlogPostContentSyncService
 {
     public function __construct(
-        private readonly ContentBlockDuplicationService $contentDuplication
+        private ContentBlockDuplicationService $contentDuplication
     ) {}
 
     /**

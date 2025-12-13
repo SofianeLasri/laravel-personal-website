@@ -14,10 +14,10 @@ use RuntimeException;
 /**
  * Service for duplicating content blocks
  */
-class ContentDuplicationService
+readonly class ContentDuplicationService
 {
     public function __construct(
-        private readonly ContentValidationService $validationService
+        private ContentValidationService $validationService
     ) {}
 
     /**

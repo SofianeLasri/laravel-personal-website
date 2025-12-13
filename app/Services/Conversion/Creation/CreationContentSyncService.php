@@ -17,10 +17,10 @@ use RuntimeException;
 /**
  * Service for syncing content between creation drafts and published creations
  */
-class CreationContentSyncService
+readonly class CreationContentSyncService
 {
     public function __construct(
-        private readonly ContentBlockDuplicationService $contentDuplication
+        private ContentBlockDuplicationService $contentDuplication
     ) {}
 
     /**

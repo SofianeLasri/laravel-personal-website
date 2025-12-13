@@ -23,10 +23,10 @@ use RuntimeException;
  * Service for duplicating content blocks with their translation keys.
  * Used during draft-to-published and published-to-draft conversions.
  */
-class ContentBlockDuplicationService
+readonly class ContentBlockDuplicationService
 {
     public function __construct(
-        private readonly TranslationKeyDuplicationService $translationKeyDuplication
+        private TranslationKeyDuplicationService $translationKeyDuplication
     ) {}
 
     /**

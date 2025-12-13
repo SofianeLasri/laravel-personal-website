@@ -14,12 +14,12 @@ use RuntimeException;
 /**
  * Service for converting published blog posts to drafts
  */
-class BlogPostToDraftConverter
+readonly class BlogPostToDraftConverter
 {
     public function __construct(
-        private readonly TranslationKeyDuplicationService $translationDuplication,
-        private readonly ContentBlockDuplicationService $contentDuplication,
-        private readonly GameReviewConversionService $gameReviewConversion
+        private TranslationKeyDuplicationService $translationDuplication,
+        private ContentBlockDuplicationService $contentDuplication,
+        private GameReviewConversionService $gameReviewConversion
     ) {}
 
     /**

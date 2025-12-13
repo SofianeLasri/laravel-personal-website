@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\DB;
 /**
  * Service for managing database integrity after imports
  */
-class DatabaseIntegrityService
+readonly class DatabaseIntegrityService
 {
     public function __construct(
-        private readonly DatabaseImportService $importService
+        private DatabaseImportService $importService
     ) {}
 
     /**

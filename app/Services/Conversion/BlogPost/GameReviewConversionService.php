@@ -14,10 +14,10 @@ use RuntimeException;
 /**
  * Service for handling GameReview conversion between drafts and published posts
  */
-class GameReviewConversionService
+readonly class GameReviewConversionService
 {
     public function __construct(
-        private readonly TranslationKeyDuplicationService $translationDuplication
+        private TranslationKeyDuplicationService $translationDuplication
     ) {}
 
     /**

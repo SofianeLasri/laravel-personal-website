@@ -18,11 +18,11 @@ use RuntimeException;
 /**
  * Service for handling AI prompts with image content
  */
-class AiImagePromptService
+readonly class AiImagePromptService
 {
     public function __construct(
-        private readonly AiApiClientService $apiClient,
-        private readonly NotificationService $notificationService
+        private AiApiClientService $apiClient,
+        private NotificationService $notificationService
     ) {}
 
     /**

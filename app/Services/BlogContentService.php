@@ -23,15 +23,15 @@ use Throwable;
  * Blog-specific content service
  * Provides type-safe wrapper for blog content operations
  */
-class BlogContentService
+readonly class BlogContentService
 {
     public function __construct(
-        private readonly ContentCreationService $creationService,
-        private readonly ContentUpdateService $updateService,
-        private readonly ContentReorderService $reorderService,
-        private readonly ContentDeletionService $deletionService,
-        private readonly ContentDuplicationService $duplicationService,
-        private readonly ContentValidationService $validationService
+        private ContentCreationService $creationService,
+        private ContentUpdateService $updateService,
+        private ContentReorderService $reorderService,
+        private ContentDeletionService $deletionService,
+        private ContentDuplicationService $duplicationService,
+        private ContentValidationService $validationService
     ) {}
 
     /**

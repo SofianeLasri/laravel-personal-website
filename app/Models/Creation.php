@@ -22,7 +22,6 @@ use Illuminate\Support\Carbon;
  * @property Carbon $started_at
  * @property Carbon|null $ended_at
  * @property int $short_description_translation_key_id
- * @property int $full_description_translation_key_id
  * @property string|null $external_url
  * @property string|null $source_code_url
  * @property bool $featured
@@ -31,7 +30,6 @@ use Illuminate\Support\Carbon;
  * @property int|null $logos_count
  * @property int|null $cover_images_count
  * @property int|null $short_description_translation_keys_count
- * @property int|null $full_description_translation_keys_count
  * @property int|null $features_count
  * @property int|null $screenshots_count
  * @property int|null $contents_count
@@ -43,7 +41,6 @@ use Illuminate\Support\Carbon;
  * @property-read Picture|null $logo
  * @property-read Picture|null $coverImage
  * @property-read TranslationKey|null $shortDescriptionTranslationKey
- * @property-read TranslationKey|null $fullDescriptionTranslationKey
  * @property-read Collection|Feature[] $features
  * @property-read Collection|Screenshot[] $screenshots
  * @property-read Collection|CreationContent[] $contents
@@ -67,7 +64,6 @@ class Creation extends Model
         'started_at',
         'ended_at',
         'short_description_translation_key_id',
-        'full_description_translation_key_id',
         'external_url',
         'source_code_url',
         'featured',
@@ -106,14 +102,6 @@ class Creation extends Model
     public function shortDescriptionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'short_description_translation_key_id');
-    }
-
-    /**
-     * @return BelongsTo<TranslationKey, $this>
-     */
-    public function fullDescriptionTranslationKey(): BelongsTo
-    {
-        return $this->belongsTo(TranslationKey::class, 'full_description_translation_key_id');
     }
 
     /**

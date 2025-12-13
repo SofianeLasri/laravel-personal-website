@@ -17,7 +17,6 @@ class CreationPageController extends Controller
     {
         $creations = Creation::all()->load([
             'shortDescriptionTranslationKey.translations',
-            'fullDescriptionTranslationKey.translations',
             'drafts']);
 
         return Inertia::render('dashboard/creations/List', [
@@ -27,7 +26,7 @@ class CreationPageController extends Controller
 
     public function listDraftPage(): Response
     {
-        $creationDrafts = CreationDraft::all()->load(['shortDescriptionTranslationKey.translations', 'fullDescriptionTranslationKey.translations']);
+        $creationDrafts = CreationDraft::all()->load(['shortDescriptionTranslationKey.translations']);
 
         return Inertia::render('dashboard/creations/ListDrafts', [
             'creationDrafts' => $creationDrafts,
@@ -55,7 +54,6 @@ class CreationPageController extends Controller
 
         $creationDraft?->load([
             'shortDescriptionTranslationKey.translations',
-            'fullDescriptionTranslationKey.translations',
             'contents.content',
         ]);
 

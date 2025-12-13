@@ -21,12 +21,10 @@ class CreationValidationService
     public function validate(CreationDraft $draft): void
     {
         if (! $draft->short_description_translation_key_id
-            || ! $draft->full_description_translation_key_id
             || ! $draft->logo_id
             || ! $draft->cover_image_id) {
             $validator = Validator::make([], [
                 'short_description_translation_key_id' => ['required'],
-                'full_description_translation_key_id' => ['required'],
                 'logo_id' => ['required'],
                 'cover_image_id' => ['required'],
             ]);
@@ -40,7 +38,6 @@ class CreationValidationService
     public function isValid(CreationDraft $draft): bool
     {
         return $draft->short_description_translation_key_id
-            && $draft->full_description_translation_key_id
             && $draft->logo_id
             && $draft->cover_image_id;
     }

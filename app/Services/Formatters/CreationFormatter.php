@@ -88,7 +88,6 @@ class CreationFormatter
      *     endedAtFormatted: string|null,
      *     type: CreationType,
      *     shortDescription: string|null,
-     *     fullDescription: string|null,
      *     contents: array<int, array{id: int, order: int, content_type: string, markdown?: string, gallery?: array{id: int, pictures: array<int, mixed>}, video?: array{id: int, bunnyVideoId: string, name: string, coverPicture: array{filename: string, width: int|null, height: int|null, avif: array{thumbnail: string, small: string, medium: string, large: string, full: string}, webp: array{thumbnail: string, small: string, medium: string, large: string, full: string}}, libraryId: string, caption: string|null}}>,
      *     externalUrl: string|null,
      *     sourceCodeUrl: string|null,
@@ -111,12 +110,6 @@ class CreationFormatter
             fn ($content) => $this->contentBlockFormatter->format($content)
         );
 
-        // Keep fullDescription for backward compatibility
-        $fullDescription = $creation->fullDescriptionTranslationKey
-            ? $this->translationHelper->getWithFallback($creation->fullDescriptionTranslationKey->translations)
-            : null;
-
-        $response['fullDescription'] = $fullDescription;
         $response['contents'] = $contents->toArray();
         $response['externalUrl'] = $creation->external_url;
         $response['sourceCodeUrl'] = $creation->source_code_url;

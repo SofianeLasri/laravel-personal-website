@@ -444,15 +444,6 @@ defineExpose({
 
 <template>
     <div class="space-y-4">
-        <!-- Indicateur de modifications non sauvegardées -->
-        <div
-            v-if="hasUnsavedChanges"
-            class="flex items-center gap-2 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200"
-        >
-            <div class="h-2 w-2 animate-pulse rounded-full bg-yellow-500"></div>
-            <span>Modifications en cours de sauvegarde... Ne fermez pas cette page.</span>
-        </div>
-
         <!-- Add Content Buttons -->
         <div class="flex gap-2">
             <Button
@@ -488,8 +479,8 @@ defineExpose({
                     <div v-if="getContentTypeFromClass(content.content_type) === 'markdown'" class="space-y-2">
                         <div class="flex items-center justify-between">
                             <Label>Contenu Markdown ({{ locale.toUpperCase() }})</Label>
-                            <!-- Indicateur de sauvegarde -->
-                            <div class="flex items-center gap-2 text-xs">
+                            <!-- Indicateur de sauvegarde avec hauteur fixe -->
+                            <div class="flex min-h-5 items-center gap-2 text-xs">
                                 <div v-if="savingStatus[content.content_id] === 'saving'" class="flex items-center gap-1 text-blue-600">
                                     <div class="h-3 w-3 animate-spin rounded-full border-b-2 border-blue-600"></div>
                                     Sauvegarde...

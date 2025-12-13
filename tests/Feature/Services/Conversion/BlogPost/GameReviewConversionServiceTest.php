@@ -216,7 +216,7 @@ class GameReviewConversionServiceTest extends TestCase
             'original_blog_post_id' => $blogPost->id,
             'type' => BlogPostType::GAME_REVIEW,
         ]);
-        $gameReviewDraft = GameReviewDraft::factory()->create([
+        $gameReviewDraft = GameReviewDraft::factory()->withProsAndCons()->create([
             'blog_post_draft_id' => $draft->id,
         ]);
         $gameReviewDraft->links()->create([

@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:php8.4-bookworm
+FROM dunglas/frankenphp:php8.5-bookworm
 
 # Installation des extensions PHP
 RUN install-php-extensions \
@@ -51,7 +51,7 @@ COPY docker-init/production.caddyfile /etc/caddy/Caddyfile.d/production.caddyfil
 WORKDIR /app
 
 COPY composer.json composer.lock /app/
-RUN composer install --no-scripts --no-autoloader
+RUN composer install --no-scripts --no-autoloader --no-dev --prefer-dist
 
 COPY package.json package-lock.json /app/
 RUN npm install

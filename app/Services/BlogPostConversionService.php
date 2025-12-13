@@ -15,6 +15,13 @@ use App\Models\ContentVideo;
 use App\Models\GameReview;
 use App\Models\GameReviewDraft;
 use App\Models\TranslationKey;
+use App\Services\Conversion\BlogPost\BlogPostContentSyncService;
+use App\Services\Conversion\BlogPost\BlogPostToDraftConverter;
+use App\Services\Conversion\BlogPost\BlogPostValidationService;
+use App\Services\Conversion\BlogPost\DraftToBlogPostConverter;
+use App\Services\Conversion\BlogPost\GameReviewConversionService;
+use App\Services\Translation\AutoTranslationService;
+use App\Services\Translation\TranslationKeyDuplicationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -23,18 +30,40 @@ use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Throwable;
 
+/**
+ * @deprecated This service is being refactored. Use the specialized services instead:
+ * - DraftToBlogPostConverter for draft to published conversion
+ * - BlogPostToDraftConverter for published to draft conversion
+ * - BlogPostValidationService for draft validation
+ * - BlogPostContentSyncService for content synchronization
+ * - GameReviewConversionService for game review handling
+ */
 class BlogPostConversionService
 {
     public function __construct(
-        private readonly BlogContentDuplicationService $contentDuplicationService
+        private readonly BlogContentDuplicationService $contentDuplicationService,
+        private readonly ?DraftToBlogPostConverter $draftConverter = null,
+        private readonly ?BlogPostToDraftConverter $blogPostConverter = null,
+        private readonly ?BlogPostValidationService $validationService = null,
+        private readonly ?BlogPostContentSyncService $contentSyncService = null,
+        private readonly ?GameReviewConversionService $gameReviewService = null,
+        private readonly ?TranslationKeyDuplicationService $translationDuplication = null,
+        private readonly ?AutoTranslationService $autoTranslation = null
     ) {}
 
     /**
      * Create a draft from an existing published blog post
      * This allows editing a published post through the draft workflow
+     *
+     * @deprecated Use BlogPostToDraftConverter::convert() instead
      */
     public function createDraftFromBlogPost(BlogPost $blogPost): BlogPostDraft
     {
+        // Delegate to new service if available
+        if ($this->blogPostConverter) {
+            return $this->blogPostConverter->convert($blogPost);
+        }
+
         return DB::transaction(function () use ($blogPost) {
             $titleTranslationKey = $blogPost->titleTranslationKey;
             if (! $titleTranslationKey) {
@@ -159,10 +188,17 @@ class BlogPostConversionService
     /**
      * Convert a BlogPostDraft to a published BlogPost
      *
+     * @deprecated Use DraftToBlogPostConverter::convert() instead
+     *
      * @throws Throwable
      */
     public function convertDraftToBlogPost(BlogPostDraft $draft): BlogPost
     {
+        // Delegate to new service if available
+        if ($this->draftConverter) {
+            return $this->draftConverter->convert($draft);
+        }
+
         $this->validateDraft($draft);
 
         return DB::transaction(function () use ($draft) {

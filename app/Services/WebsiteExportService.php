@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use App\Services\Export\DatabaseExportService;
+use App\Services\Export\ExportCleanupService;
+use App\Services\Export\ExportMetadataService;
+use App\Services\Export\FileExportService;
 use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
@@ -13,9 +17,35 @@ use ZipArchive;
 /**
  * Service responsible for exporting all website content (database + files) to a ZIP file.
  * Creates a complete backup that can be imported to restore the full website state.
+ *
+ * @deprecated This service is being refactored. Use the specialized services instead:
+ * - DatabaseExportService for database export
+ * - FileExportService for file export
+ * - ExportMetadataService for export metadata
+ * - ExportCleanupService for cleanup of old exports
  */
 class WebsiteExportService
 {
+    private ?DatabaseExportService $databaseExport;
+
+    private ?FileExportService $fileExport;
+
+    private ?ExportMetadataService $metadataService;
+
+    private ?ExportCleanupService $cleanupService;
+
+    public function __construct(
+        ?DatabaseExportService $databaseExport = null,
+        ?FileExportService $fileExport = null,
+        ?ExportMetadataService $metadataService = null,
+        ?ExportCleanupService $cleanupService = null
+    ) {
+        $this->databaseExport = $databaseExport;
+        $this->fileExport = $fileExport;
+        $this->metadataService = $metadataService;
+        $this->cleanupService = $cleanupService;
+    }
+
     /**
      * Database tables that contain the website content.
      * Ordered by dependencies to ensure proper import order.
@@ -116,10 +146,19 @@ class WebsiteExportService
     /**
      * Export database tables to JSON files in the ZIP.
      *
+     * @deprecated Use DatabaseExportService::export() instead
+     *
      * @throws RuntimeException
      */
     private function exportDatabase(ZipArchive $zip): void
     {
+        // Delegate to new service if available
+        if ($this->databaseExport) {
+            $this->databaseExport->export($zip);
+
+            return;
+        }
+
         foreach ($this->exportTables as $table) {
             if (! $this->tableExists($table)) {
                 continue;
@@ -138,9 +177,18 @@ class WebsiteExportService
 
     /**
      * Export public storage files to the ZIP.
+     *
+     * @deprecated Use FileExportService::export() instead
      */
     private function exportFiles(ZipArchive $zip): void
     {
+        // Delegate to new service if available
+        if ($this->fileExport) {
+            $this->fileExport->export($zip);
+
+            return;
+        }
+
         $publicDisk = Storage::disk('public');
         $files = $this->getAllFiles($publicDisk);
 
@@ -216,11 +264,18 @@ class WebsiteExportService
     /**
      * Clean up old export files.
      *
+     * @deprecated Use ExportCleanupService::cleanup() instead
+     *
      * @param  int  $keepDays  Number of days to keep export files
      * @return int Number of files deleted
      */
     public function cleanupOldExports(int $keepDays = 7): int
     {
+        // Delegate to new service if available
+        if ($this->cleanupService) {
+            return $this->cleanupService->cleanup($keepDays);
+        }
+
         if (! Storage::directoryExists('temp')) {
             return 0;
         }

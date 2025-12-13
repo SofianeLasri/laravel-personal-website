@@ -8,14 +8,28 @@ use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
 use App\Models\ContentVideo;
 use App\Models\TranslationKey;
+use App\Services\Translation\TranslationKeyDuplicationService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Log;
 use RuntimeException;
 
+/**
+ * Service for duplicating blog content blocks
+ *
+ * @deprecated The translation key duplication methods are being delegated to TranslationKeyDuplicationService
+ */
 class BlogContentDuplicationService
 {
+    private ?TranslationKeyDuplicationService $translationKeyDuplication;
+
+    public function __construct(
+        ?TranslationKeyDuplicationService $translationKeyDuplication = null
+    ) {
+        $this->translationKeyDuplication = $translationKeyDuplication;
+    }
+
     /**
      * Duplicate a markdown content with its translation key
      */
@@ -155,9 +169,16 @@ class BlogContentDuplicationService
 
     /**
      * Duplicate a translation key with all its translations
+     *
+     * @deprecated Use TranslationKeyDuplicationService::duplicateForCopy() instead
      */
     private function duplicateTranslationKey(TranslationKey $originalTranslationKey): TranslationKey
     {
+        // Delegate to new service if available
+        if ($this->translationKeyDuplication) {
+            return $this->translationKeyDuplication->duplicateForCopy($originalTranslationKey);
+        }
+
         // Create new translation key with a unique key
         $newTranslationKey = TranslationKey::create([
             'key' => $this->generateUniqueTranslationKey($originalTranslationKey->key),
@@ -176,6 +197,8 @@ class BlogContentDuplicationService
 
     /**
      * Generate a unique translation key based on the original key
+     *
+     * @deprecated Use TranslationKeyGeneratorService::generate() instead
      */
     private function generateUniqueTranslationKey(string $originalKey): string
     {

@@ -6,6 +6,9 @@ use App\Exceptions\ImageTranscodingException;
 use App\Models\Notification;
 use App\Models\OptimizedPicture;
 use App\Models\Picture;
+use App\Services\AI\AiApiClientService;
+use App\Services\AI\AiImagePromptService;
+use App\Services\AI\AiJsonParserService;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -17,6 +20,12 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RuntimeException;
 
+/**
+ * @deprecated This service is being refactored. Use the specialized services instead:
+ * - AiApiClientService for API calls to OpenAI/Anthropic
+ * - AiImagePromptService for prompts with images
+ * - AiJsonParserService for JSON parsing with error recovery
+ */
 class AiProviderService
 {
     private AiTranslationCacheService $cacheService;
@@ -25,18 +34,32 @@ class AiProviderService
 
     private NotificationService $notificationService;
 
+    private ?AiApiClientService $apiClient;
+
+    private ?AiImagePromptService $imagePrompt;
+
+    private ?AiJsonParserService $jsonParser;
+
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct(
+        ?AiApiClientService $apiClient = null,
+        ?AiImagePromptService $imagePrompt = null,
+        ?AiJsonParserService $jsonParser = null
+    ) {
         $this->cacheService = app(AiTranslationCacheService::class);
         $this->logger = app(ApiRequestLogger::class);
         $this->notificationService = app(NotificationService::class);
+        $this->apiClient = $apiClient;
+        $this->imagePrompt = $imagePrompt;
+        $this->jsonParser = $jsonParser;
     }
 
     /**
      * Prompt the AI provider with a text and pictures
+     *
+     * @deprecated Use AiImagePromptService::prompt() instead
      *
      * @param  string  $systemRole  The system role to send to the AI provider. E.g. "You are a helpful assistant."
      * @param  string  $prompt  The prompt to send to the AI provider
@@ -47,6 +70,11 @@ class AiProviderService
      */
     public function promptWithPictures(string $systemRole, string $prompt, Picture ...$pictures): array
     {
+        // Delegate to new service if available
+        if ($this->imagePrompt) {
+            return $this->imagePrompt->prompt($systemRole, $prompt, ...$pictures);
+        }
+
         // Note: Currently not caching image-based prompts due to complexity
         // This could be added in the future by including image hashes in the cache key
         try {
@@ -112,6 +140,8 @@ class AiProviderService
     /**
      * Prompt the AI provider with text only
      *
+     * @deprecated Use AiApiClientService::callOpenAi() or AiApiClientService::callAnthropic() instead
+     *
      * @param  string  $systemRole  The system role to send to the AI provider
      * @param  string  $prompt  The prompt to send to the AI provider
      * @return array<string, mixed> The response from the AI provider
@@ -123,6 +153,38 @@ class AiProviderService
     {
         $selectedProvider = config('ai-provider.selected-provider');
         $providerConfig = config('ai-provider.providers.'.$selectedProvider);
+
+        // Delegate to new service if available (after cache check)
+        if ($this->apiClient) {
+            // Check cache if enabled
+            if ($this->cacheService->isEnabled()) {
+                $cacheKey = $this->cacheService->generateCacheKey($selectedProvider, $systemRole, $prompt);
+                $cached = $this->cacheService->get($cacheKey, $this->cacheService->getTtl());
+
+                if ($cached !== null) {
+                    Log::info('Using cached AI response', [
+                        'provider' => $selectedProvider,
+                        'cache_key' => $cacheKey,
+                    ]);
+
+                    return $cached;
+                }
+            }
+
+            // Call the API using new service
+            if ($selectedProvider === 'anthropic') {
+                $response = $this->apiClient->callAnthropic($providerConfig, $systemRole, $prompt);
+            } else {
+                $response = $this->apiClient->callOpenAi($providerConfig, $systemRole, $prompt);
+            }
+
+            // Store in cache if enabled
+            if ($this->cacheService->isEnabled()) {
+                $this->cacheService->put($selectedProvider, $systemRole, $prompt, $response);
+            }
+
+            return $response;
+        }
 
         // Check cache if enabled
         if ($this->cacheService->isEnabled()) {

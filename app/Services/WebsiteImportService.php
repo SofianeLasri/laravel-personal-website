@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use App\Services\Import\DatabaseImportService;
+use App\Services\Import\DatabaseIntegrityService;
+use App\Services\Import\FileImportService;
+use App\Services\Import\ImportValidationService;
 use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
@@ -14,9 +18,35 @@ use ZipArchive;
 /**
  * Service responsible for importing website content from exported ZIP files.
  * Completely replaces current content and resets auto-increment IDs.
+ *
+ * @deprecated This service is being refactored. Use the specialized services instead:
+ * - DatabaseImportService for database import
+ * - FileImportService for file import
+ * - ImportValidationService for validation
+ * - DatabaseIntegrityService for integrity management
  */
 class WebsiteImportService
 {
+    private ?DatabaseImportService $databaseImport;
+
+    private ?FileImportService $fileImport;
+
+    private ?ImportValidationService $validationService;
+
+    private ?DatabaseIntegrityService $integrityService;
+
+    public function __construct(
+        ?DatabaseImportService $databaseImport = null,
+        ?FileImportService $fileImport = null,
+        ?ImportValidationService $validationService = null,
+        ?DatabaseIntegrityService $integrityService = null
+    ) {
+        $this->databaseImport = $databaseImport;
+        $this->fileImport = $fileImport;
+        $this->validationService = $validationService;
+        $this->integrityService = $integrityService;
+    }
+
     /**
      * Database tables that will be imported.
      * Must match the export order for proper dependency handling.
@@ -129,10 +159,19 @@ class WebsiteImportService
     /**
      * Validate that the ZIP file has the expected export structure.
      *
+     * @deprecated Use ImportValidationService::validateStructure() instead
+     *
      * @throws RuntimeException
      */
     private function validateExportStructure(ZipArchive $zip): void
     {
+        // Delegate to new service if available
+        if ($this->validationService) {
+            $this->validationService->validateStructure($zip);
+
+            return;
+        }
+
         // Check for metadata file
         if ($zip->locateName('export-metadata.json') === false) {
             throw new RuntimeException('Invalid export file: missing metadata');
@@ -156,9 +195,18 @@ class WebsiteImportService
     /**
      * Clear all existing data from the database.
      * This completely empties the content tables.
+     *
+     * @deprecated Use DatabaseImportService::clearData() instead
      */
     private function clearExistingData(): void
     {
+        // Delegate to new service if available
+        if ($this->databaseImport) {
+            $this->databaseImport->clearData();
+
+            return;
+        }
+
         // Handle different database types
         $connection = DB::connection();
         $driver = $connection->getDriverName();
@@ -200,12 +248,19 @@ class WebsiteImportService
     /**
      * Import database tables from the ZIP file.
      *
+     * @deprecated Use DatabaseImportService::import() instead
+     *
      * @return array<string, int> Statistics about imported data
      *
      * @throws RuntimeException
      */
     private function importDatabase(ZipArchive $zip): array
     {
+        // Delegate to new service if available
+        if ($this->databaseImport) {
+            return $this->databaseImport->import($zip);
+        }
+
         $stats = ['tables' => 0, 'records' => 0];
 
         foreach ($this->importTables as $table) {
@@ -247,10 +302,17 @@ class WebsiteImportService
     /**
      * Import files from the ZIP to public storage.
      *
+     * @deprecated Use FileImportService::import() instead
+     *
      * @return int Number of files imported
      */
     private function importFiles(ZipArchive $zip): int
     {
+        // Delegate to new service if available
+        if ($this->fileImport) {
+            return $this->fileImport->import($zip);
+        }
+
         $publicDisk = Storage::disk('public');
         $localDisk = Storage::disk('local');
         $filesImported = 0;
@@ -317,9 +379,18 @@ class WebsiteImportService
     /**
      * Reset auto-increment values for all tables.
      * This ensures IDs start from 1 after import.
+     *
+     * @deprecated Use DatabaseIntegrityService::resetAutoIncrements() instead
      */
     private function resetAutoIncrements(): void
     {
+        // Delegate to new service if available
+        if ($this->integrityService) {
+            $this->integrityService->resetAutoIncrements();
+
+            return;
+        }
+
         $connection = DB::connection();
         $driver = $connection->getDriverName();
 
@@ -361,10 +432,17 @@ class WebsiteImportService
     /**
      * Get import metadata from a ZIP file without importing.
      *
+     * @deprecated Use ImportValidationService::getMetadata() instead
+     *
      * @return array<string, mixed>|null
      */
     public function getImportMetadata(string $zipPath): ?array
     {
+        // Delegate to new service if available
+        if ($this->validationService) {
+            return $this->validationService->getMetadata($zipPath);
+        }
+
         if (! file_exists($zipPath)) {
             return null;
         }
@@ -388,10 +466,17 @@ class WebsiteImportService
     /**
      * Validate an export file before import.
      *
+     * @deprecated Use ImportValidationService::validateFile() instead
+     *
      * @return array<string, mixed> Validation results
      */
     public function validateImportFile(string $zipPath): array
     {
+        // Delegate to new service if available
+        if ($this->validationService) {
+            return $this->validationService->validateFile($zipPath);
+        }
+
         $results = [
             'valid' => false,
             'errors' => [],

@@ -7,6 +7,12 @@ namespace App\Services;
 use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
 use App\Models\ContentVideo;
+use App\Services\Content\ContentCreationService;
+use App\Services\Content\ContentDeletionService;
+use App\Services\Content\ContentDuplicationService;
+use App\Services\Content\ContentReorderService;
+use App\Services\Content\ContentUpdateService;
+use App\Services\Content\ContentValidationService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -15,16 +21,39 @@ use Throwable;
 /**
  * Generic content management service for polymorphic content blocks
  * Supports BlogPost, BlogPostDraft, Creation, CreationDraft
+ *
+ * @deprecated This service is being refactored. Use the specialized services instead:
+ * - ContentCreationService for creating content blocks
+ * - ContentUpdateService for updating content blocks
+ * - ContentReorderService for reordering content blocks
+ * - ContentDeletionService for deleting content blocks
+ * - ContentDuplicationService for duplicating content blocks
+ * - ContentValidationService for validating content structure
  */
 class ContentManagementService
 {
+    public function __construct(
+        private readonly ?ContentCreationService $creationService = null,
+        private readonly ?ContentUpdateService $updateService = null,
+        private readonly ?ContentReorderService $reorderService = null,
+        private readonly ?ContentDeletionService $deletionService = null,
+        private readonly ?ContentDuplicationService $duplicationService = null,
+        private readonly ?ContentValidationService $validationService = null
+    ) {}
+
     /**
      * Create markdown content for a parent entity
+     *
+     * @deprecated Use ContentCreationService::createMarkdown() instead
      *
      * @param  Model  $parent  BlogPostDraft|BlogPost|CreationDraft|Creation
      */
     public function createMarkdownContent(Model $parent, int $translationKeyId, int $order): Model
     {
+        if ($this->creationService) {
+            return $this->creationService->createMarkdown($parent, $translationKeyId, $order);
+        }
+
         $markdown = ContentMarkdown::create([
             'translation_key_id' => $translationKeyId,
         ]);
@@ -39,11 +68,17 @@ class ContentManagementService
     /**
      * Create gallery content for a parent entity
      *
+     * @deprecated Use ContentCreationService::createGallery() instead
+     *
      * @param  Model  $parent  BlogPostDraft|BlogPost|CreationDraft|Creation
      * @param  array<string, mixed>  $galleryData
      */
     public function createGalleryContent(Model $parent, array $galleryData, int $order): Model
     {
+        if ($this->creationService) {
+            return $this->creationService->createGallery($parent, $galleryData, $order);
+        }
+
         $gallery = ContentGallery::create([
             'layout' => $galleryData['layout'],
             'columns' => $galleryData['columns'] ?? null,
@@ -67,6 +102,8 @@ class ContentManagementService
     /**
      * Create video content for a parent entity
      *
+     * @deprecated Use ContentCreationService::createVideo() instead
+     *
      * @param  Model  $parent  BlogPostDraft|BlogPost|CreationDraft|Creation
      */
     public function createVideoContent(
@@ -75,6 +112,10 @@ class ContentManagementService
         int $order,
         ?int $captionTranslationKeyId = null
     ): Model {
+        if ($this->creationService) {
+            return $this->creationService->createVideo($parent, $videoId, $order, $captionTranslationKeyId);
+        }
+
         $videoContent = ContentVideo::create([
             'video_id' => $videoId,
             'caption_translation_key_id' => $captionTranslationKeyId,
@@ -89,9 +130,15 @@ class ContentManagementService
 
     /**
      * Update markdown content
+     *
+     * @deprecated Use ContentUpdateService::updateMarkdown() instead
      */
     public function updateMarkdownContent(ContentMarkdown $markdown, int $translationKeyId): ContentMarkdown
     {
+        if ($this->updateService) {
+            return $this->updateService->updateMarkdown($markdown, $translationKeyId);
+        }
+
         $markdown->update([
             'translation_key_id' => $translationKeyId,
         ]);
@@ -104,10 +151,16 @@ class ContentManagementService
     /**
      * Update gallery content
      *
+     * @deprecated Use ContentUpdateService::updateGallery() instead
+     *
      * @param  array<string, mixed>  $updateData
      */
     public function updateGalleryContent(ContentGallery $gallery, array $updateData): ContentGallery
     {
+        if ($this->updateService) {
+            return $this->updateService->updateGallery($gallery, $updateData);
+        }
+
         $gallery->update([
             'layout' => $updateData['layout'],
             'columns' => $updateData['columns'] ?? null,
@@ -129,12 +182,18 @@ class ContentManagementService
 
     /**
      * Update video content
+     *
+     * @deprecated Use ContentUpdateService::updateVideo() instead
      */
     public function updateVideoContent(
         ContentVideo $videoContent,
         int $videoId,
         ?int $captionTranslationKeyId = null
     ): ContentVideo {
+        if ($this->updateService) {
+            return $this->updateService->updateVideo($videoContent, $videoId, $captionTranslationKeyId);
+        }
+
         $videoContent->update([
             'video_id' => $videoId,
             'caption_translation_key_id' => $captionTranslationKeyId,
@@ -148,6 +207,8 @@ class ContentManagementService
     /**
      * Reorder content blocks
      *
+     * @deprecated Use ContentReorderService::reorder() instead
+     *
      * @param  Model  $parent  BlogPostDraft|BlogPost|CreationDraft|Creation
      * @param  array<int>  $newOrder  Array of content IDs in new order
      *
@@ -155,6 +216,12 @@ class ContentManagementService
      */
     public function reorderContent(Model $parent, array $newOrder): void
     {
+        if ($this->reorderService) {
+            $this->reorderService->reorder($parent, $newOrder);
+
+            return;
+        }
+
         DB::transaction(function () use ($parent, $newOrder) {
             foreach ($newOrder as $index => $contentId) {
                 $parent->contents()
@@ -167,10 +234,16 @@ class ContentManagementService
     /**
      * Delete a content block
      *
+     * @deprecated Use ContentDeletionService::delete() instead
+     *
      * @param  Model  $content  BlogPostDraftContent|BlogPostContent|CreationDraftContent|CreationContent
      */
     public function deleteContent(Model $content): bool
     {
+        if ($this->deletionService) {
+            return $this->deletionService->delete($content);
+        }
+
         return DB::transaction(function () use ($content): bool {
             // Delete the actual content
             if ($content->content) {
@@ -188,11 +261,17 @@ class ContentManagementService
     /**
      * Duplicate a content block
      *
+     * @deprecated Use ContentDuplicationService::duplicate() instead
+     *
      * @param  Model  $content  BlogPostDraftContent|BlogPostContent|CreationDraftContent|CreationContent
      * @return Model The duplicated content block
      */
     public function duplicateContent(Model $content): Model
     {
+        if ($this->duplicationService) {
+            return $this->duplicationService->duplicate($content);
+        }
+
         return DB::transaction(function () use ($content) {
             $newContent = null;
 
@@ -266,10 +345,16 @@ class ContentManagementService
     /**
      * Validate content structure
      *
+     * @deprecated Use ContentValidationService::validateStructure() instead
+     *
      * @param  Model  $parent  BlogPostDraft|BlogPost|CreationDraft|Creation
      */
     public function validateContentStructure(Model $parent): bool
     {
+        if ($this->validationService) {
+            return $this->validationService->validateStructure($parent);
+        }
+
         // A valid entity must have at least one content block
         return $parent->contents()->exists();
     }

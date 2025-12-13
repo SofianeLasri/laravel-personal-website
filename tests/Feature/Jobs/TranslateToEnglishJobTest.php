@@ -4,7 +4,7 @@ namespace Tests\Feature\Jobs;
 
 use App\Jobs\TranslateToEnglishJob;
 use App\Models\TranslationKey;
-use App\Services\AiProviderService;
+use App\Services\AI\AiTextPromptService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,7 +26,7 @@ class TranslateToEnglishJobTest extends TestCase
             'text' => 'Bonjour le monde',
         ]);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->once()
             ->with(
@@ -35,7 +35,7 @@ class TranslateToEnglishJobTest extends TestCase
             )
             ->andReturn(['message' => 'Hello world']);
 
-        $this->app->instance(AiProviderService::class, $mockAiService);
+        $this->app->instance(AiTextPromptService::class, $mockAiService);
 
         $job = new TranslateToEnglishJob($key->id);
         $job->handle($mockAiService);
@@ -54,7 +54,7 @@ class TranslateToEnglishJobTest extends TestCase
         $key->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
         $key->translations()->create(['locale' => 'en', 'text' => 'Hello']);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldNotReceive('prompt');
 
         $job = new TranslateToEnglishJob($key->id);
@@ -69,7 +69,7 @@ class TranslateToEnglishJobTest extends TestCase
     {
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldNotReceive('prompt');
 
         $job = new TranslateToEnglishJob($key->id);
@@ -82,7 +82,7 @@ class TranslateToEnglishJobTest extends TestCase
     #[Test]
     public function test_job_handles_nonexistent_translation_key()
     {
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldNotReceive('prompt');
 
         $job = new TranslateToEnglishJob(999999);
@@ -118,7 +118,7 @@ class TranslateToEnglishJobTest extends TestCase
             'text' => 'Old Hello World',
         ]);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->once()
             ->with(
@@ -147,7 +147,7 @@ class TranslateToEnglishJobTest extends TestCase
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
         $key->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->once()
             ->andReturn(['invalid' => 'response']);
@@ -166,7 +166,7 @@ class TranslateToEnglishJobTest extends TestCase
         $key = TranslationKey::factory()->create(['key' => 'test.hello']);
         $key->translations()->create(['locale' => 'fr', 'text' => 'Bonjour']);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->once()
             ->andThrow(new \Exception('AI service error'));

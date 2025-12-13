@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
-use App\Services\BlogPostConversionService;
+use App\Services\Conversion\BlogPost\DraftToBlogPostConverter;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ class BlogPostController extends Controller
         return response()->json(BlogPost::all());
     }
 
-    public function store(Request $request, BlogPostConversionService $conversionService): JsonResponse
+    public function store(Request $request, DraftToBlogPostConverter $converter): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'draft_id' => 'required|integer|exists:blog_post_drafts,id',
@@ -42,7 +42,7 @@ class BlogPostController extends Controller
                 'originalBlogPost',
             ])->findOrFail($request->draft_id);
 
-            $blogPost = $conversionService->convertDraftToBlogPost($draft);
+            $blogPost = $converter->convert($draft);
 
             return response()->json([
                 'message' => 'Blog post published successfully',

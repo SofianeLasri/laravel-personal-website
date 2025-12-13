@@ -3,7 +3,7 @@
 namespace Tests\Feature\Jobs;
 
 use App\Jobs\ProcessUserAgentJob;
-use App\Services\AiProviderService;
+use App\Services\AI\AiTextPromptService;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -20,7 +20,7 @@ class ProcessUserAgentJobTest extends TestCase
     {
         $userAgent = UserAgent::factory()->create(['user_agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)']);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->with(
                 'You are a robot detector designed to output JSON. ',
@@ -41,7 +41,7 @@ class ProcessUserAgentJobTest extends TestCase
     {
         $userAgent = UserAgent::factory()->create(['user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36']);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->with(
                 'You are a robot detector designed to output JSON. ',
@@ -62,7 +62,7 @@ class ProcessUserAgentJobTest extends TestCase
     {
         $userAgent = UserAgent::factory()->create(['user_agent' => 'Test User Agent']);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->andReturn(['some_other_key' => 'value']);
 
@@ -80,7 +80,7 @@ class ProcessUserAgentJobTest extends TestCase
         $userAgent = UserAgent::factory()->create(['user_agent' => 'Test User Agent']);
         $exception = new Exception('AI service failed');
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->andThrow($exception);
 
@@ -100,7 +100,7 @@ class ProcessUserAgentJobTest extends TestCase
         $userAgent = UserAgent::factory()->create(['user_agent' => 'Test User Agent']);
         $exception = new Exception('AI service failed');
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->andThrow($exception);
 
@@ -119,7 +119,7 @@ class ProcessUserAgentJobTest extends TestCase
         $userAgentString = 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15';
         $userAgent = UserAgent::factory()->create(['user_agent' => $userAgentString]);
 
-        $mockAiService = Mockery::mock(AiProviderService::class);
+        $mockAiService = Mockery::mock(AiTextPromptService::class);
         $mockAiService->shouldReceive('prompt')
             ->with(
                 'You are a robot detector designed to output JSON. ',

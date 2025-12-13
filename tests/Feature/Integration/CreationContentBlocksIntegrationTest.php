@@ -12,7 +12,7 @@ use App\Models\CreationDraft;
 use App\Models\Picture;
 use App\Models\TranslationKey;
 use App\Models\Video;
-use App\Services\CreationConversionService;
+use App\Services\Conversion\Creation\DraftToCreationConverter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -21,12 +21,12 @@ class CreationContentBlocksIntegrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private CreationConversionService $conversionService;
+    private DraftToCreationConverter $converter;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->conversionService = app(CreationConversionService::class);
+        $this->converter = app(DraftToCreationConverter::class);
     }
 
     #[Test]
@@ -44,7 +44,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             'order' => 1,
         ]);
 
-        $creation = $this->conversionService->convertDraftToCreation($draft);
+        $creation = $this->converter->convert($draft);
 
         $this->assertInstanceOf(Creation::class, $creation);
         $this->assertCount(1, $creation->contents);
@@ -87,7 +87,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             'order' => 3,
         ]);
 
-        $creation = $this->conversionService->convertDraftToCreation($draft);
+        $creation = $this->converter->convert($draft);
 
         $this->assertCount(3, $creation->contents);
 
@@ -133,7 +133,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             'order' => 2,
         ]);
 
-        $updatedCreation = $this->conversionService->convertDraftToCreation($draft);
+        $updatedCreation = $this->converter->convert($draft);
 
         $this->assertEquals($creation->id, $updatedCreation->id);
         $this->assertCount(2, $updatedCreation->contents);
@@ -167,7 +167,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             'order' => 1,
         ]);
 
-        $creation = $this->conversionService->convertDraftToCreation($draft);
+        $creation = $this->converter->convert($draft);
 
         $this->assertCount(1, $creation->contents);
 
@@ -198,7 +198,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             'order' => 1,
         ]);
 
-        $creation = $this->conversionService->convertDraftToCreation($draft);
+        $creation = $this->converter->convert($draft);
 
         $this->assertCount(1, $creation->contents);
 
@@ -227,7 +227,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             ]);
         }
 
-        $creation = $this->conversionService->convertDraftToCreation($draft);
+        $creation = $this->converter->convert($draft);
 
         $this->assertCount(5, $creation->contents);
 
@@ -253,7 +253,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             'order' => 1,
         ]);
 
-        $creation = $this->conversionService->convertDraftToCreation($draft);
+        $creation = $this->converter->convert($draft);
 
         $creationContent = $creation->contents->first();
 
@@ -277,7 +277,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
         $draft = CreationDraft::factory()->create();
         // No content blocks added
 
-        $creation = $this->conversionService->convertDraftToCreation($draft);
+        $creation = $this->converter->convert($draft);
 
         $this->assertInstanceOf(Creation::class, $creation);
         $this->assertCount(0, $creation->contents);
@@ -320,7 +320,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             'order' => 1,
         ]);
 
-        $updatedCreation = $this->conversionService->convertDraftToCreation($draft);
+        $updatedCreation = $this->converter->convert($draft);
 
         $this->assertEquals($creation->id, $updatedCreation->id);
         $this->assertCount(1, $updatedCreation->contents);
@@ -390,7 +390,7 @@ class CreationContentBlocksIntegrationTest extends TestCase
             'order' => 4,
         ]);
 
-        $creation = $this->conversionService->convertDraftToCreation($draft);
+        $creation = $this->converter->convert($draft);
 
         $this->assertCount(4, $creation->contents);
 

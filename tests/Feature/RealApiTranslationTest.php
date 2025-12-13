@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Services\AiProviderService;
+use App\Services\AI\AiTextPromptService;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
@@ -35,7 +35,7 @@ class RealApiTranslationTest extends TestCase
         // Force OpenAI provider
         config(['ai-provider.selected-provider' => 'openai']);
 
-        $aiService = app(AiProviderService::class);
+        $aiService = app(AiTextPromptService::class);
 
         $systemPrompt = 'You are a helpful assistant that translates french markdown text to english and outputs JSON in the format {message:string}. Markdown formatting must be preserved.';
         $userPrompt = "Translate this French text to English:\n\n".$this->sampleText;
@@ -97,7 +97,7 @@ class RealApiTranslationTest extends TestCase
         // Force Anthropic provider
         config(['ai-provider.selected-provider' => 'anthropic']);
 
-        $aiService = app(AiProviderService::class);
+        $aiService = app(AiTextPromptService::class);
 
         $systemPrompt = 'You are a helpful assistant that translates french markdown text to english and outputs JSON in the format {message:string}. Markdown formatting must be preserved.';
         $userPrompt = "Translate this French text to English:\n\n".$this->sampleText;

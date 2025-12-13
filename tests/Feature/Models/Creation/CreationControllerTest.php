@@ -13,7 +13,7 @@ use App\Models\Screenshot;
 use App\Models\Tag;
 use App\Models\Technology;
 use App\Models\User;
-use App\Services\CreationConversionService;
+use App\Services\Conversion\Creation\DraftToCreationConverter;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -106,9 +106,9 @@ class CreationControllerTest extends TestCase
     {
         $draft = CreationDraft::factory()->create();
 
-        $this->mock(CreationConversionService::class, function ($mock) use ($draft) {
-            $mock->shouldReceive('convertDraftToCreation')
-                ->with($draft)
+        $this->mock(DraftToCreationConverter::class, function ($mock) {
+            $mock->shouldReceive('convert')
+                ->once()
                 ->andThrow(new Exception('Something went wrong'));
         });
 

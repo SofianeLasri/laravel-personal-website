@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Exceptions\ImageTranscodingException;
+use App\Services\Image\DriverDetectionService;
+use App\Services\Image\ImageDimensionService;
+use App\Services\Image\ResourceLimitCheckerService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Imagick;
@@ -16,6 +19,15 @@ use Intervention\Image\Exceptions\RuntimeException;
 use Intervention\Image\ImageManager;
 use InvalidArgumentException;
 
+/**
+ * Image transcoding service with automatic driver fallback
+ *
+ * This service handles image transcoding using available drivers (Imagick/GD)
+ * with automatic fallback when a driver fails. It delegates specialized tasks to:
+ * - DriverDetectionService for driver detection and management
+ * - ResourceLimitCheckerService for resource limit checking
+ * - ImageDimensionService for image dimension utilities
+ */
 class ImageTranscodingService
 {
     /**
@@ -30,14 +42,36 @@ class ImageTranscodingService
 
     protected NotificationService $notificationService;
 
+    protected ?DriverDetectionService $driverDetection;
+
+    protected ?ResourceLimitCheckerService $resourceChecker;
+
+    protected ?ImageDimensionService $dimensionService;
+
     /**
      * @throws ImageTranscodingException
      */
-    public function __construct(NotificationService $notificationService)
-    {
+    public function __construct(
+        NotificationService $notificationService,
+        ?DriverDetectionService $driverDetection = null,
+        ?ResourceLimitCheckerService $resourceChecker = null,
+        ?ImageDimensionService $dimensionService = null
+    ) {
         $this->notificationService = $notificationService;
-        $this->detectAvailableDrivers();
-        $this->initializeDrivers();
+        $this->driverDetection = $driverDetection;
+        $this->resourceChecker = $resourceChecker;
+        $this->dimensionService = $dimensionService;
+
+        // If new services are available, use them
+        if ($this->driverDetection) {
+            $this->availableDrivers = $this->driverDetection->getAvailable();
+            foreach ($this->availableDrivers as $driver) {
+                $this->driverManagers[$driver] = $this->driverDetection->getManager($driver);
+            }
+        } else {
+            $this->detectAvailableDrivers();
+            $this->initializeDrivers();
+        }
     }
 
     /**
@@ -252,6 +286,13 @@ class ImageTranscodingService
      */
     protected function performPreflightChecks(string $source, string $driverName): void
     {
+        // Delegate to new service if available
+        if ($this->resourceChecker) {
+            $this->resourceChecker->check($source, $driverName);
+
+            return;
+        }
+
         if ($driverName === 'imagick' && config('image.imagick.check_resource_limits', true)) {
             $this->checkImagickResourceLimits($source);
         }
@@ -337,6 +378,11 @@ class ImageTranscodingService
      */
     protected function getDriversForFormat(string $format): array
     {
+        // Delegate to new service if available
+        if ($this->driverDetection) {
+            return $this->driverDetection->getForFormat($format);
+        }
+
         $driversToTry = [];
 
         foreach ($this->availableDrivers as $driver) {
@@ -394,6 +440,11 @@ class ImageTranscodingService
      */
     public function getDimensions(string $source): array
     {
+        // Delegate to new service if available
+        if ($this->dimensionService) {
+            return $this->dimensionService->get($source);
+        }
+
         // Try to get dimensions using basic PHP functions first (faster)
         $imageInfo = getimagesizefromstring($source);
         if ($imageInfo !== false) {

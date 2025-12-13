@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\UserAgentMetadata;
-use App\Services\AiProviderService;
+use App\Services\AI\AiTextPromptService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,10 +19,10 @@ class ProcessUserAgentJob implements ShouldQueue
 
     public function __construct(private readonly UserAgent $userAgent) {}
 
-    public function handle(AiProviderService $aiProviderService): void
+    public function handle(AiTextPromptService $aiService): void
     {
         try {
-            $result = $aiProviderService->prompt(
+            $result = $aiService->prompt(
                 'You are a robot detector designed to output JSON. ',
                 "Is this user agent a robot or a tool that is not a web browser? Please respond in the format {'is_bot': true/false}. The user agent is: {$this->userAgent->user_agent}"
             );

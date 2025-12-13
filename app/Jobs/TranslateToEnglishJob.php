@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Translation;
 use App\Models\TranslationKey;
-use App\Services\AiProviderService;
+use App\Services\AI\AiTextPromptService;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -20,7 +20,7 @@ class TranslateToEnglishJob implements ShouldQueue
         public bool $overwrite = false
     ) {}
 
-    public function handle(AiProviderService $aiService): void
+    public function handle(AiTextPromptService $aiService): void
     {
         $translationKey = TranslationKey::find($this->translationKeyId);
 

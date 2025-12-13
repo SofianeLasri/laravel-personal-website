@@ -11,7 +11,7 @@ use App\Models\Picture;
 use App\Models\Translation;
 use App\Models\TranslationKey;
 use App\Models\User;
-use App\Services\BlogPostConversionService;
+use App\Services\Conversion\BlogPost\DraftToBlogPostConverter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
@@ -234,8 +234,8 @@ class BlogPostControllerTest extends TestCase
     public function store_handles_conversion_service_exceptions(): void
     {
         // Mock the service to throw an exception
-        $this->mock(BlogPostConversionService::class, function ($mock) {
-            $mock->shouldReceive('convertDraftToBlogPost')
+        $this->mock(DraftToBlogPostConverter::class, function ($mock) {
+            $mock->shouldReceive('convert')
                 ->once()
                 ->andThrow(new \Exception('Conversion failed'));
         });

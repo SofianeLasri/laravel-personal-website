@@ -86,4 +86,14 @@ class ContentValidationService
 
         return str_contains($className, 'Draft');
     }
+
+    /**
+     * Validate content structure (alias for validate())
+     *
+     * @param  Model  $parent  BlogPostDraft|BlogPost|CreationDraft|Creation
+     */
+    public function validateStructure(Model $parent): bool
+    {
+        return $this->validate($parent);
+    }
 }

@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Services;
+declare(strict_types=1);
+
+namespace App\Services\Content;
 
 use App\Models\BlogPostContent;
 use App\Models\BlogPostDraftContent;
 use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
 use App\Models\ContentVideo;
+use App\Models\CreationContent;
+use App\Models\CreationDraftContent;
 use App\Models\TranslationKey;
 use App\Services\Translation\TranslationKeyDuplicationService;
 use Exception;
@@ -16,19 +20,14 @@ use Log;
 use RuntimeException;
 
 /**
- * Service for duplicating blog content blocks
- *
- * @deprecated The translation key duplication methods are being delegated to TranslationKeyDuplicationService
+ * Service for duplicating content blocks with their translation keys.
+ * Used during draft-to-published and published-to-draft conversions.
  */
-class BlogContentDuplicationService
+class ContentBlockDuplicationService
 {
-    private ?TranslationKeyDuplicationService $translationKeyDuplication;
-
     public function __construct(
-        ?TranslationKeyDuplicationService $translationKeyDuplication = null
-    ) {
-        $this->translationKeyDuplication = $translationKeyDuplication;
-    }
+        private readonly TranslationKeyDuplicationService $translationKeyDuplication
+    ) {}
 
     /**
      * Duplicate a markdown content with its translation key
@@ -36,15 +35,13 @@ class BlogContentDuplicationService
     public function duplicateMarkdownContent(ContentMarkdown $originalContent): ContentMarkdown
     {
         return DB::transaction(function () use ($originalContent) {
-            // Duplicate the translation key with all its translations
             $translationKey = $originalContent->translationKey;
             if (! $translationKey) {
                 throw new RuntimeException('Markdown content missing translation key');
             }
 
-            $newTranslationKey = $this->duplicateTranslationKey($translationKey);
+            $newTranslationKey = $this->translationKeyDuplication->duplicateForCopy($translationKey);
 
-            // Create new markdown content
             return ContentMarkdown::create([
                 'translation_key_id' => $newTranslationKey->id,
             ]);
@@ -57,25 +54,22 @@ class BlogContentDuplicationService
     public function duplicateGalleryContent(ContentGallery $originalContent): ContentGallery
     {
         return DB::transaction(function () use ($originalContent) {
-            // Create new gallery content
             $newGallery = ContentGallery::create([
                 'layout' => $originalContent->layout,
                 'columns' => $originalContent->columns,
             ]);
 
-            // Duplicate picture relationships with their pivot data
             foreach ($originalContent->pictures as $picture) {
                 $pivotData = [
                     'order' => $picture->pivot->order,
                 ];
 
-                // Duplicate caption translation key if it exists
                 if ($picture->pivot->caption_translation_key_id) {
                     $captionTranslationKey = TranslationKey::with('translations')
                         ->find($picture->pivot->caption_translation_key_id);
 
                     if ($captionTranslationKey instanceof TranslationKey) {
-                        $newCaptionTranslationKey = $this->duplicateTranslationKey($captionTranslationKey);
+                        $newCaptionTranslationKey = $this->translationKeyDuplication->duplicateForCopy($captionTranslationKey);
                         $pivotData['caption_translation_key_id'] = $newCaptionTranslationKey->id;
                     }
                 }
@@ -97,14 +91,13 @@ class BlogContentDuplicationService
                 'video_id' => $originalContent->video_id,
             ];
 
-            // Duplicate caption translation key if it exists
             if ($originalContent->caption_translation_key_id) {
                 $captionTranslationKey = $originalContent->captionTranslationKey;
                 if (! $captionTranslationKey) {
                     throw new RuntimeException('Video content missing caption translation key');
                 }
 
-                $newCaptionTranslationKey = $this->duplicateTranslationKey($captionTranslationKey);
+                $newCaptionTranslationKey = $this->translationKeyDuplication->duplicateForCopy($captionTranslationKey);
                 $data['caption_translation_key_id'] = $newCaptionTranslationKey->id;
             }
 
@@ -113,9 +106,9 @@ class BlogContentDuplicationService
     }
 
     /**
-     * Duplicate all contents from one blog post to another
+     * Duplicate all contents from a collection
      *
-     * @param  Collection<int, BlogPostContent|BlogPostDraftContent>  $originalContents
+     * @param  Collection<int, BlogPostContent|BlogPostDraftContent|CreationContent|CreationDraftContent>  $originalContents
      * @return array<int, array{content_type: string, content_id: int, order: int}>
      */
     public function duplicateAllContents($originalContents): array
@@ -123,7 +116,6 @@ class BlogContentDuplicationService
         $newContents = [];
 
         foreach ($originalContents as $originalContent) {
-            // Type guard: ensure we have the expected properties
             if (! isset($originalContent->content_type) || ! isset($originalContent->content)) {
                 continue;
             }
@@ -131,7 +123,6 @@ class BlogContentDuplicationService
             $contentType = $originalContent->content_type;
             $content = $originalContent->content;
 
-            // Skip if content is null
             if (! $content) {
                 continue;
             }
@@ -144,7 +135,6 @@ class BlogContentDuplicationService
                 } elseif ($contentType === ContentVideo::class && $content instanceof ContentVideo) {
                     $newContent = $this->duplicateVideoContent($content);
                 } else {
-                    // Skip unknown content types
                     continue;
                 }
 
@@ -154,7 +144,6 @@ class BlogContentDuplicationService
                     'order' => $originalContent->order ?? 0,
                 ];
             } catch (Exception $e) {
-                // Log error but continue with other contents
                 Log::warning('Failed to duplicate content', [
                     'content_type' => $contentType,
                     'error' => $e->getMessage(),
@@ -165,52 +154,5 @@ class BlogContentDuplicationService
         }
 
         return $newContents;
-    }
-
-    /**
-     * Duplicate a translation key with all its translations
-     *
-     * @deprecated Use TranslationKeyDuplicationService::duplicateForCopy() instead
-     */
-    private function duplicateTranslationKey(TranslationKey $originalTranslationKey): TranslationKey
-    {
-        // Delegate to new service if available
-        if ($this->translationKeyDuplication) {
-            return $this->translationKeyDuplication->duplicateForCopy($originalTranslationKey);
-        }
-
-        // Create new translation key with a unique key
-        $newTranslationKey = TranslationKey::create([
-            'key' => $this->generateUniqueTranslationKey($originalTranslationKey->key),
-        ]);
-
-        // Duplicate all translations
-        foreach ($originalTranslationKey->translations as $translation) {
-            $newTranslationKey->translations()->create([
-                'locale' => $translation->locale,
-                'text' => $translation->text,
-            ]);
-        }
-
-        return $newTranslationKey;
-    }
-
-    /**
-     * Generate a unique translation key based on the original key
-     *
-     * @deprecated Use TranslationKeyGeneratorService::generate() instead
-     */
-    private function generateUniqueTranslationKey(string $originalKey): string
-    {
-        $baseKey = $originalKey.'_copy';
-        $key = $baseKey;
-        $counter = 1;
-
-        while (TranslationKey::where('key', $key)->exists()) {
-            $key = $baseKey.'_'.$counter;
-            $counter++;
-        }
-
-        return $key;
     }
 }

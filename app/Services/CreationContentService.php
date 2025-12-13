@@ -11,16 +11,27 @@ use App\Models\Creation;
 use App\Models\CreationContent;
 use App\Models\CreationDraft;
 use App\Models\CreationDraftContent;
+use App\Services\Content\ContentCreationService;
+use App\Services\Content\ContentDeletionService;
+use App\Services\Content\ContentDuplicationService;
+use App\Services\Content\ContentReorderService;
+use App\Services\Content\ContentUpdateService;
+use App\Services\Content\ContentValidationService;
 use Throwable;
 
 /**
- * Creation-specific content service that delegates to ContentManagementService
+ * Creation-specific content service
  * Provides type-safe wrapper for creation content operations
  */
 class CreationContentService
 {
     public function __construct(
-        protected ContentManagementService $contentManagementService
+        private readonly ContentCreationService $creationService,
+        private readonly ContentUpdateService $updateService,
+        private readonly ContentReorderService $reorderService,
+        private readonly ContentDeletionService $deletionService,
+        private readonly ContentDuplicationService $duplicationService,
+        private readonly ContentValidationService $validationService
     ) {}
 
     /**
@@ -28,7 +39,7 @@ class CreationContentService
      */
     public function createMarkdownContent(CreationDraft $draft, int $translationKeyId, int $order): CreationDraftContent
     {
-        return $this->contentManagementService->createMarkdownContent($draft, $translationKeyId, $order);
+        return $this->creationService->createMarkdown($draft, $translationKeyId, $order);
     }
 
     /**
@@ -38,7 +49,7 @@ class CreationContentService
      */
     public function createGalleryContent(CreationDraft $draft, array $galleryData, int $order): CreationDraftContent
     {
-        return $this->contentManagementService->createGalleryContent($draft, $galleryData, $order);
+        return $this->creationService->createGallery($draft, $galleryData, $order);
     }
 
     /**
@@ -50,7 +61,7 @@ class CreationContentService
         int $order,
         ?int $captionTranslationKeyId = null
     ): CreationDraftContent {
-        return $this->contentManagementService->createVideoContent($draft, $videoId, $order, $captionTranslationKeyId);
+        return $this->creationService->createVideo($draft, $videoId, $order, $captionTranslationKeyId);
     }
 
     /**
@@ -58,7 +69,7 @@ class CreationContentService
      */
     public function updateMarkdownContent(ContentMarkdown $markdown, int $translationKeyId): ContentMarkdown
     {
-        return $this->contentManagementService->updateMarkdownContent($markdown, $translationKeyId);
+        return $this->updateService->updateMarkdown($markdown, $translationKeyId);
     }
 
     /**
@@ -68,7 +79,7 @@ class CreationContentService
      */
     public function updateGalleryContent(ContentGallery $gallery, array $updateData): ContentGallery
     {
-        return $this->contentManagementService->updateGalleryContent($gallery, $updateData);
+        return $this->updateService->updateGallery($gallery, $updateData);
     }
 
     /**
@@ -79,7 +90,7 @@ class CreationContentService
         int $videoId,
         ?int $captionTranslationKeyId = null
     ): ContentVideo {
-        return $this->contentManagementService->updateVideoContent($videoContent, $videoId, $captionTranslationKeyId);
+        return $this->updateService->updateVideo($videoContent, $videoId, $captionTranslationKeyId);
     }
 
     /**
@@ -91,7 +102,7 @@ class CreationContentService
      */
     public function reorderContent(CreationDraft|Creation $parent, array $newOrder): void
     {
-        $this->contentManagementService->reorderContent($parent, $newOrder);
+        $this->reorderService->reorder($parent, $newOrder);
     }
 
     /**
@@ -99,7 +110,7 @@ class CreationContentService
      */
     public function deleteContent(CreationDraftContent|CreationContent $content): bool
     {
-        return $this->contentManagementService->deleteContent($content);
+        return $this->deletionService->delete($content);
     }
 
     /**
@@ -107,7 +118,7 @@ class CreationContentService
      */
     public function duplicateContent(CreationDraftContent|CreationContent $content): CreationDraftContent|CreationContent
     {
-        return $this->contentManagementService->duplicateContent($content);
+        return $this->duplicationService->duplicate($content);
     }
 
     /**
@@ -115,7 +126,7 @@ class CreationContentService
      */
     public function validateContentStructure(CreationDraft|Creation $parent): bool
     {
-        return $this->contentManagementService->validateContentStructure($parent);
+        return $this->validationService->validateStructure($parent);
     }
 
     /**

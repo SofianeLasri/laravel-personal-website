@@ -11,7 +11,7 @@ use App\Models\Creation;
 use App\Models\CreationDraft;
 use App\Models\Feature;
 use App\Models\Screenshot;
-use App\Services\BlogContentDuplicationService;
+use App\Services\Content\ContentBlockDuplicationService;
 use RuntimeException;
 
 /**
@@ -20,7 +20,7 @@ use RuntimeException;
 class CreationContentSyncService
 {
     public function __construct(
-        private readonly BlogContentDuplicationService $contentDuplication
+        private readonly ContentBlockDuplicationService $contentDuplication
     ) {}
 
     /**

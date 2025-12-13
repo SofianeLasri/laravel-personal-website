@@ -20,7 +20,10 @@ use Intervention\Image\ImageManager;
 use InvalidArgumentException;
 
 /**
- * @deprecated This service is being refactored. Use the specialized services instead:
+ * Image transcoding service with automatic driver fallback
+ *
+ * This service handles image transcoding using available drivers (Imagick/GD)
+ * with automatic fallback when a driver fails. It delegates specialized tasks to:
  * - DriverDetectionService for driver detection and management
  * - ResourceLimitCheckerService for resource limit checking
  * - ImageDimensionService for image dimension utilities
@@ -431,8 +434,6 @@ class ImageTranscodingService
 
     /**
      * Get the dimensions of an image
-     *
-     * @deprecated Use ImageDimensionService::get() instead
      *
      * @param  string  $source  The source image path or content
      * @return array{width: int, height: int}

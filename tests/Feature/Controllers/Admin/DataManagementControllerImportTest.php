@@ -9,7 +9,8 @@ use App\Models\Creation;
 use App\Models\Technology;
 use App\Models\TranslationKey;
 use App\Models\User;
-use App\Services\WebsiteImportService;
+use App\Services\Import\DatabaseImportService;
+use App\Services\Import\ImportValidationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\App;
@@ -63,9 +64,9 @@ class DataManagementControllerImportTest extends TestCase
     #[Test]
     public function test_upload_import_file_handles_invalid_zip_content(): void
     {
-        // Create a mock for WebsiteImportService that returns invalid validation
-        $mockImportService = $this->mock(WebsiteImportService::class);
-        $mockImportService->shouldReceive('validateImportFile')
+        // Create a mock for ImportValidationService that returns invalid validation
+        $mockImportService = $this->mock(ImportValidationService::class);
+        $mockImportService->shouldReceive('validateFile')
             ->once()
             ->andReturn([
                 'valid' => false,
@@ -319,8 +320,8 @@ class DataManagementControllerImportTest extends TestCase
     {
         Storage::put('temp/invalid.zip', 'invalid content');
 
-        $mockImportService = $this->mock(WebsiteImportService::class);
-        $mockImportService->shouldReceive('getImportMetadata')
+        $mockImportService = $this->mock(ImportValidationService::class);
+        $mockImportService->shouldReceive('getMetadata')
             ->once()
             ->andReturn(null);
 
@@ -389,16 +390,7 @@ class DataManagementControllerImportTest extends TestCase
     #[Test]
     public function test_import_handles_service_failure(): void
     {
-        $this->mock(WebsiteImportService::class, function ($mock) {
-            $mock->shouldReceive('validateImportFile')
-                ->once()
-                ->andReturn(['valid' => true, 'errors' => [], 'metadata' => []]);
-
-            $mock->shouldReceive('importWebsite')
-                ->once()
-                ->andThrow(new RuntimeException('Import failed'));
-        });
-
+        // Upload a valid file first
         $validZip = $this->createValidZipFile();
         $uploadResponse = $this
             ->postJson('/dashboard/data-management/upload', [
@@ -407,6 +399,15 @@ class DataManagementControllerImportTest extends TestCase
 
         $filePath = $uploadResponse->json('file_path');
 
+        // Now mock the import service to throw an exception during import
+        $this->mock(DatabaseImportService::class, function ($mock) {
+            $mock->shouldReceive('clearData');
+            $mock->shouldReceive('getTables')->andReturn([]);
+            $mock->shouldReceive('import')
+                ->once()
+                ->andThrow(new RuntimeException('Import failed'));
+        });
+
         $response = $this
             ->postJson('/dashboard/data-management/import', [
                 'file_path' => $filePath,
@@ -414,9 +415,7 @@ class DataManagementControllerImportTest extends TestCase
             ]);
 
         $response->assertStatus(ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
-        $response->assertJson([
-            'message' => 'Import failed: Import failed',
-        ]);
+        $this->assertStringContainsString('Import failed', $response->json('message'));
     }
 
     #[Test]

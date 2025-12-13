@@ -109,7 +109,7 @@ class ResourceLimitCheckerService
     /**
      * Get current Imagick resource limits
      *
-     * @return array<string, int>
+     * @return array<string, int|float>
      */
     public function getImagickLimits(): array
     {

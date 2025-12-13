@@ -6,7 +6,7 @@ namespace App\Services\Conversion\BlogPost;
 
 use App\Models\BlogPost;
 use App\Models\BlogPostDraft;
-use App\Services\BlogContentDuplicationService;
+use App\Services\Content\ContentBlockDuplicationService;
 use App\Services\Translation\TranslationKeyDuplicationService;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -18,7 +18,7 @@ class BlogPostToDraftConverter
 {
     public function __construct(
         private readonly TranslationKeyDuplicationService $translationDuplication,
-        private readonly BlogContentDuplicationService $contentDuplication,
+        private readonly ContentBlockDuplicationService $contentDuplication,
         private readonly GameReviewConversionService $gameReviewConversion
     ) {}
 

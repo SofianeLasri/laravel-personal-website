@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\CreationType;
-use App\Services\BlogContentDuplicationService;
-use App\Services\CreationConversionService;
+use App\Services\Content\ContentBlockDuplicationService;
+use App\Services\Conversion\Creation\DraftToCreationConverter;
 use Database\Factories\CreationDraftFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -226,7 +226,7 @@ class CreationDraft extends Model
         }
 
         // Copy content blocks
-        $duplicationService = app(BlogContentDuplicationService::class);
+        $duplicationService = app(ContentBlockDuplicationService::class);
         foreach ($creation->contents()->with('content')->orderBy('order')->get() as $creationContent) {
             // Duplicate the content entity
             $newContent = match (get_class($creationContent->content)) {
@@ -260,7 +260,7 @@ class CreationDraft extends Model
      */
     public function toCreation(): Creation
     {
-        $creation = app(CreationConversionService::class)->convertDraftToCreation($this);
+        $creation = app(DraftToCreationConverter::class)->convert($this);
         $this->delete();
 
         return $creation;
@@ -273,6 +273,6 @@ class CreationDraft extends Model
      */
     public function updateCreation(Creation $creation): Creation
     {
-        return app(CreationConversionService::class)->updateCreationFromDraft($this, $creation);
+        return app(DraftToCreationConverter::class)->update($this, $creation);
     }
 }

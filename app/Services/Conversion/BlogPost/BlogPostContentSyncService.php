@@ -11,7 +11,7 @@ use App\Models\ContentGallery;
 use App\Models\ContentMarkdown;
 use App\Models\ContentVideo;
 use App\Models\TranslationKey;
-use App\Services\BlogContentDuplicationService;
+use App\Services\Content\ContentBlockDuplicationService;
 
 /**
  * Service for syncing content between blog post drafts and published posts
@@ -19,7 +19,7 @@ use App\Services\BlogContentDuplicationService;
 class BlogPostContentSyncService
 {
     public function __construct(
-        private readonly BlogContentDuplicationService $contentDuplication
+        private readonly ContentBlockDuplicationService $contentDuplication
     ) {}
 
     /**

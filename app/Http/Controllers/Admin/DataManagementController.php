@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\ExportWebsiteJob;
-use App\Services\WebsiteExportService;
-use App\Services\WebsiteImportService;
+use App\Services\Export\DatabaseExportService;
+use App\Services\Import\DatabaseImportService;
+use App\Services\Import\DatabaseIntegrityService;
+use App\Services\Import\FileImportService;
+use App\Services\Import\ImportValidationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -18,6 +22,8 @@ use Inertia\Response as InertiaResponse;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use Throwable;
+use ZipArchive;
 
 /**
  * Controller for managing website data export and import functionality.
@@ -25,8 +31,11 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 class DataManagementController extends Controller
 {
     public function __construct(
-        private readonly WebsiteExportService $exportService,
-        private readonly WebsiteImportService $importService
+        private readonly DatabaseExportService $databaseExportService,
+        private readonly DatabaseImportService $databaseImportService,
+        private readonly FileImportService $fileImportService,
+        private readonly ImportValidationService $importValidationService,
+        private readonly DatabaseIntegrityService $databaseIntegrityService
     ) {}
 
     /**
@@ -35,8 +44,8 @@ class DataManagementController extends Controller
     public function index(): InertiaResponse
     {
         return Inertia::render('dashboard/DataManagement', [
-            'exportTables' => $this->exportService->getExportTables(),
-            'importTables' => $this->importService->getImportTables(),
+            'exportTables' => $this->databaseExportService->getTables(),
+            'importTables' => $this->databaseImportService->getTables(),
             'isProduction' => app()->environment('production'),
         ]);
     }
@@ -167,7 +176,7 @@ class DataManagementController extends Controller
         $fullPath = Storage::path($path);
 
         // Validate the import file
-        $validation = $this->importService->validateImportFile($fullPath);
+        $validation = $this->importValidationService->validateFile($fullPath);
 
         if (! $validation['valid']) {
             Storage::delete($path);
@@ -220,7 +229,7 @@ class DataManagementController extends Controller
         }
 
         try {
-            $stats = $this->importService->importWebsite($fullPath);
+            $stats = $this->performImport($fullPath);
 
             Storage::delete($filePath);
 
@@ -232,6 +241,56 @@ class DataManagementController extends Controller
             return response()->json([
                 'message' => 'Import failed: '.$e->getMessage(),
             ], ResponseAlias::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Perform the actual import process.
+     *
+     * @param  string  $zipPath  Path to the export ZIP file
+     * @return array<string, mixed> Import statistics
+     *
+     * @throws Throwable
+     */
+    private function performImport(string $zipPath): array
+    {
+        set_time_limit(3600);
+        if (! file_exists($zipPath)) {
+            throw new RuntimeException('Import file does not exist');
+        }
+
+        $zip = new ZipArchive;
+
+        if ($zip->open($zipPath) !== true) {
+            throw new RuntimeException('Cannot open ZIP file');
+        }
+
+        $stats = [
+            'tables_imported' => 0,
+            'records_imported' => 0,
+            'files_imported' => 0,
+            'import_date' => now()->toISOString(),
+        ];
+
+        try {
+            $this->importValidationService->validateStructure($zip);
+            $this->databaseImportService->clearData();
+
+            $dbStats = $this->databaseImportService->import($zip);
+            $stats['tables_imported'] = $dbStats['tables'];
+            $stats['records_imported'] = $dbStats['records'];
+            $stats['files_imported'] = $this->fileImportService->import($zip);
+
+            $this->databaseIntegrityService->resetAutoIncrements();
+
+            $zip->close();
+
+            return $stats;
+        } catch (Throwable $e) {
+            $zip->close();
+            Log::error('Import failed');
+            Log::error($e->getMessage(), $e->getTrace());
+            throw new RuntimeException('Import failed: '.$e->getMessage(), 0, $e);
         }
     }
 
@@ -253,7 +312,7 @@ class DataManagementController extends Controller
             ], ResponseAlias::HTTP_NOT_FOUND);
         }
 
-        $metadata = $this->importService->getImportMetadata($fullPath);
+        $metadata = $this->importValidationService->getMetadata($fullPath);
 
         if ($metadata === null) {
             return response()->json([

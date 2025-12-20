@@ -82,7 +82,6 @@ class DraftToCreationConverterTest extends TestCase
         $creation = $this->service->convert($draft);
 
         $this->assertEquals($draft->short_description_translation_key_id, $creation->short_description_translation_key_id);
-        $this->assertEquals($draft->full_description_translation_key_id, $creation->full_description_translation_key_id);
     }
 
     #[Test]

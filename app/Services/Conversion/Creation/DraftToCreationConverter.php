@@ -82,7 +82,6 @@ class DraftToCreationConverter
      *     source_code_url: string|null,
      *     featured: bool,
      *     short_description_translation_key_id: int|null,
-     *     full_description_translation_key_id: int|null,
      * }
      */
     private function mapAttributes(CreationDraft $draft): array
@@ -90,7 +89,7 @@ class DraftToCreationConverter
         return $draft->only([
             'name', 'slug', 'logo_id', 'cover_image_id', 'type',
             'started_at', 'ended_at', 'external_url', 'source_code_url', 'featured',
-            'short_description_translation_key_id', 'full_description_translation_key_id',
+            'short_description_translation_key_id',
         ]);
     }
 }

@@ -23,10 +23,10 @@ RUN apt-get install -y mariadb-client
 # Install Composer
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install Nodejs and NPM
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh && \
-    bash nodesource_setup.sh && \
-    apt-get install -y nodejs
+# Install Bun
+RUN apt-get install -y unzip
+RUN curl -fsSL https://bun.sh/install | bash && \
+    ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
 # Install supervisor
 RUN apt-get install -y supervisor
@@ -53,8 +53,8 @@ WORKDIR /app
 COPY composer.json composer.lock /app/
 RUN composer install --no-scripts --no-autoloader --no-dev --prefer-dist
 
-COPY package.json package-lock.json /app/
-RUN npm install
+COPY package.json bun.lock /app/
+RUN bun install
 
 COPY . /app/
 COPY stack.env /app/.env
@@ -66,7 +66,7 @@ RUN chmod -R 775 /app/storage/framework
 RUN composer dump-autoload --optimize
 RUN php artisan ziggy:generate
 RUN php artisan storage:link
-RUN npm run build:ssr
+RUN bun run build:ssr
 
 # Copy entrypoint script
 COPY docker-init/entrypoint-production.sh /app/docker-init/entrypoint.sh

@@ -41,14 +41,11 @@ jobs:
           tools: composer:v2
           coverage: xdebug
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
-      - name: Install Node Dependencies
-        run: npm ci
+      - name: Install Bun Dependencies
+        run: bun install --frozen-lockfile
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -69,7 +66,7 @@ jobs:
         run: php artisan ziggy:generate
 
       - name: Build SSR Assets
-        run: npm run build:ssr
+        run: bun run build:ssr
 
       - name: Run Database Migrations
         run: php artisan migrate --force

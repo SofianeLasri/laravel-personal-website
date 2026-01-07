@@ -62,5 +62,5 @@ jobs:
             Be constructive and helpful in your feedback.' || '' }}
           
           # Allow running tests and code quality checks
-          allowed_tools: "Bash(docker exec laravel.test php artisan test),Bash(docker exec laravel.test ./vendor/bin/phpstan analyse),Bash(npm run lint),Bash(npm run typecheck)"
+          allowed_tools: "Bash(docker exec laravel.test php artisan test),Bash(docker exec laravel.test ./vendor/bin/phpstan analyse),Bash(bun run lint),Bash(bun run typecheck)"
 

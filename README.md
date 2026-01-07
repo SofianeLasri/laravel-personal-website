@@ -49,7 +49,7 @@ docker-compose up -d
 ```bash
 # Installer les dépendances
 composer install
-npm install
+bun install
 
 # Configuration
 cp .env.example .env
@@ -114,8 +114,8 @@ docker-compose exec app ./vendor/bin/phpstan analyse
 docker-compose exec app ./vendor/bin/pint
 
 # Linting et formatage JavaScript/Vue
-npm run lint
-npm run format
+bun run lint
+bun run format
 ```
 
 ## 📞 Contact

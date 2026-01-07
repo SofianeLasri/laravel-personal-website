@@ -22,10 +22,10 @@ RUN apt-get install -y mariadb-client
 # Install Composer
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install Bun
-RUN apt-get install -y unzip
-RUN curl -fsSL https://bun.sh/install | bash && \
-    ln -s /root/.bun/bin/bun /usr/local/bin/bun
+# Install Nodejs and NPM
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh && \
+    bash nodesource_setup.sh && \
+    apt-get install -y nodejs
 
 # Install supervisor
 RUN apt-get install -y supervisor

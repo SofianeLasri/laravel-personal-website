@@ -4,13 +4,13 @@ echo "Installing dependencies..."
 composer install
 php artisan key:generate
 
-bun install
+npm install
 
 # Vérifier que les assets ont été compilés (optionnel en dev, mais recommandé)
 if [ ! -f "/app/public/build/manifest.json" ]; then
     echo "⚠️  WARNING: Frontend assets not built!"
-    echo "   Run 'bun run build' or 'bun run dev' on your host machine for better performance."
-    # Note: pas d'exit ici car en dev on peut utiliser bun run dev
+    echo "   Run 'npm run build' or 'npm run dev' on your host machine for better performance."
+    # Note: pas d'exit ici car en dev on peut utiliser npm run dev
 fi
 
 echo "Migrating database..."

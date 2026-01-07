@@ -19,10 +19,10 @@ Tous les services Dusk sont intégrés dans le `docker-compose.yml` principal av
 ### Prérequis (IMPORTANT sur WSL)
 ```bash
 # Compiler les assets AVANT de démarrer les containers Dusk
-bun run build
+npm run build
 ```
-⚠️ **Note WSL** : La compilation des assets est très lente dans les containers sur WSL.
-Il est donc obligatoire de faire `bun run build` sur la machine hôte avant de lancer Dusk.
+⚠️ **Note WSL** : La compilation des assets est très lente dans les containers sur WSL. 
+Il est donc obligatoire de faire `npm run build` sur la machine hôte avant de lancer Dusk.
 
 ### Démarrer l'environnement Dusk
 ```bash

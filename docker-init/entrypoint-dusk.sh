@@ -5,7 +5,7 @@ echo "🚀 Initializing Dusk testing environment..."
 # Installer les dépendances
 echo "📦 Installing dependencies..."
 composer install
-bun install
+npm install
 
 # Créer le fichier SQLite pour les tests Dusk
 echo "🗃️ Preparing SQLite database for Dusk..."
@@ -16,7 +16,7 @@ chmod 666 database/dusk.sqlite
 echo "📦 Checking frontend assets..."
 if [ ! -f "/app/public/build/manifest.json" ]; then
     echo "❌ ERROR: Frontend assets not built!"
-    echo "   Please run 'bun run build' on your host machine before starting Dusk containers."
+    echo "   Please run 'npm run build' on your host machine before starting Dusk containers."
     echo "   This is required because building on WSL is too slow."
     exit 1
 fi

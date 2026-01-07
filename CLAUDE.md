@@ -52,8 +52,8 @@ composer phpmd
 ./vendor/bin/pint
 
 # Format/lint frontend code
-bun run format
-bun run lint
+npm run format
+npm run lint
 
 # Docker commands (recommended for local development)
 docker exec laravel.test ./vendor/bin/phpstan analyse
@@ -64,16 +64,16 @@ docker exec laravel.test ./vendor/bin/pint
 ### Build Commands
 ```bash
 # Development build (watch mode)
-bun run dev
+npm run dev
 
 # Production build
-bun run build
+npm run build
 
 # Production build with SSR
-bun run build:ssr
+npm run build:ssr
 
 # Preview production build
-bun run preview
+npm run preview
 ```
 
 ### Database Commands
@@ -361,4 +361,4 @@ Key environment variables to configure:
 
 ## Platform-Specific Notes
 - For Laravel Dusk tests, use the `laravel.dusk` container
-- Always run bun commands locally (not in Docker) as WSL is very slow for node operations
+- Always run npm commands locally (not in Docker) as WSL is very slow for node operations

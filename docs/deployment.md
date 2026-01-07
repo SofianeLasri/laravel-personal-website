@@ -88,7 +88,7 @@ docker-compose exec app php artisan view:cache
 docker-compose exec app php artisan icons:cache
 
 # Build des assets frontend
-docker-compose exec app bun run build:ssr
+docker-compose exec app npm run build:ssr
 ```
 
 ## Déploiement avec Portainer
@@ -195,8 +195,8 @@ jobs:
             docker-compose -f docker-compose.production.yml down
             docker-compose -f docker-compose.production.yml up -d --build
             docker-compose exec -T app composer install --no-dev --optimize-autoloader
-            docker-compose exec -T app bun install --frozen-lockfile
-            docker-compose exec -T app bun run build:ssr
+            docker-compose exec -T app npm ci
+            docker-compose exec -T app npm run build:ssr
             docker-compose exec -T app php artisan migrate --force
             docker-compose exec -T app php artisan config:cache
             docker-compose exec -T app php artisan route:cache

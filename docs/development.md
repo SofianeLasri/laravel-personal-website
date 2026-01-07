@@ -8,8 +8,8 @@
 - Git
 
 ### Sans Docker
-- PHP 8.2+ avec extensions : `imagick`, `zip`, `curl`, `mbstring`, `pdo_mysql`, `redis`
-- Node.js 20+ et npm
+- PHP 8.4+ avec extensions : `imagick`, `zip`, `curl`, `mbstring`, `pdo_mysql`, `redis`
+- Bun (runtime JavaScript rapide)
 - Composer 2+
 - MariaDB/MySQL ou PostgreSQL
 - Redis (optionnel mais recommandé)
@@ -31,7 +31,7 @@ docker-compose up -d
 
 # Installer les dépendances (si pas fait automatiquement)
 docker-compose exec app composer install
-docker-compose exec app npm install
+docker-compose exec app bun install
 
 # Générer la clé d'application
 docker-compose exec app php artisan key:generate
@@ -40,7 +40,7 @@ docker-compose exec app php artisan key:generate
 docker-compose exec app php artisan migrate --seed
 
 # Compiler les assets
-docker-compose exec app npm run dev
+docker-compose exec app bun run dev
 ```
 
 L'application sera accessible sur http://localhost
@@ -50,7 +50,7 @@ L'application sera accessible sur http://localhost
 ```bash
 # Installation des dépendances
 composer install
-npm install
+bun install
 
 # Configuration
 cp .env.example .env
@@ -227,7 +227,7 @@ git checkout -b feature/nouvelle-fonctionnalite
 
 ```bash
 # Développement avec hot reload
-npm run dev
+bun run dev
 
 # Tests pendant le développement
 php artisan test --filter MonTest
@@ -243,7 +243,7 @@ php artisan test --filter MonTest
 ./vendor/bin/pint
 
 # Linting JavaScript/Vue
-npm run lint
+bun run lint
 
 # Tests complets
 php artisan test

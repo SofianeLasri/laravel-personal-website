@@ -37,14 +37,11 @@ jobs:
           extensions: imagick
           tools: composer:v2
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
-      - name: Install Node Dependencies
-        run: npm ci
+      - name: Install Bun Dependencies
+        run: bun install --frozen-lockfile
 
       - name: Create SQLite Database
         run: touch database/database.sqlite
@@ -68,7 +65,7 @@ jobs:
         run: php artisan ziggy:generate
 
       - name: Build Assets
-        run: npm run build
+        run: bun run build
 
       - name: Run All API Tests
         if: github.event.inputs.provider == 'all'

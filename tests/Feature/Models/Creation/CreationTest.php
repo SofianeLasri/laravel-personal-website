@@ -26,7 +26,6 @@ class CreationTest extends TestCase
     public function it_can_create_a_creation()
     {
         $shortDescKey = TranslationKey::factory()->create();
-        $fullDescKey = TranslationKey::factory()->create();
 
         $creation = Creation::factory()->create([
             'name' => 'My Test Project',
@@ -35,7 +34,6 @@ class CreationTest extends TestCase
             'started_at' => '2023-01-01',
             'ended_at' => '2023-12-31',
             'short_description_translation_key_id' => $shortDescKey->id,
-            'full_description_translation_key_id' => $fullDescKey->id,
             'external_url' => 'https://example.com',
             'source_code_url' => 'https://github.com/example/project',
             'featured' => true,

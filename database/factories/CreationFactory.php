@@ -35,7 +35,6 @@ class CreationFactory extends Factory
             'started_at' => $this->faker->dateTimeBetween('-5 years', '-6 months'),
             'ended_at' => $this->faker->optional(0.8)->dateTimeBetween('-5 months'),
             'short_description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
-            'full_description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'external_url' => $this->faker->optional(0.7)->url(),
             'source_code_url' => $this->faker->optional()->url(),
             'featured' => $this->faker->boolean(20), // 20% chance to be featured

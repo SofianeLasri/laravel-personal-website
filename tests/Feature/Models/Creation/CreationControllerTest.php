@@ -91,7 +91,6 @@ class CreationControllerTest extends TestCase
     {
         $draft = CreationDraft::factory()->create([
             'short_description_translation_key_id' => null,
-            'full_description_translation_key_id' => null,
         ]);
 
         $response = $this->postJson(route('dashboard.api.creations.store'), [

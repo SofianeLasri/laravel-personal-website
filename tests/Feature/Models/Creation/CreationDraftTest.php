@@ -181,23 +181,6 @@ class CreationDraftTest extends TestCase
     }
 
     #[Test]
-    public function it_can_have_full_description()
-    {
-        $fullDescKey = TranslationKey::factory()->create(['key' => 'draft.test.full']);
-        Translation::create([
-            'translation_key_id' => $fullDescKey->id,
-            'locale' => 'fr',
-            'text' => 'Description complète du brouillon',
-        ]);
-
-        $creationDraft = CreationDraft::factory()->create([
-            'full_description_translation_key_id' => $fullDescKey->id,
-        ]);
-
-        $this->assertEquals($fullDescKey->id, $creationDraft->fullDescriptionTranslationKey->id);
-    }
-
-    #[Test]
     public function it_can_create_a_draft_from_an_existing_creation()
     {
         $creation = $this->createFullCreation();
@@ -245,11 +228,10 @@ class CreationDraftTest extends TestCase
     }
 
     #[Test]
-    public function it_cannot_create_creation_without_descriptions()
+    public function it_cannot_create_creation_without_short_description()
     {
         $draft = CreationDraft::factory()->create([
             'short_description_translation_key_id' => null,
-            'full_description_translation_key_id' => null,
         ]);
 
         $this->expectException(Exception::class);
@@ -307,7 +289,6 @@ class CreationDraftTest extends TestCase
     private function createFullCreation(): Creation
     {
         $shortDescKey = TranslationKey::factory()->create(['key' => 'creation.test.short']);
-        $fullDescKey = TranslationKey::factory()->create(['key' => 'creation.test.full']);
 
         Translation::create([
             'translation_key_id' => $shortDescKey->id,
@@ -315,17 +296,10 @@ class CreationDraftTest extends TestCase
             'text' => 'Description courte en français',
         ]);
 
-        Translation::create([
-            'translation_key_id' => $fullDescKey->id,
-            'locale' => 'fr',
-            'text' => 'Description complète en français',
-        ]);
-
         $creation = Creation::factory()->create([
             'name' => 'Test Complete Creation',
             'slug' => 'test-complete-creation',
             'short_description_translation_key_id' => $shortDescKey->id,
-            'full_description_translation_key_id' => $fullDescKey->id,
         ]);
 
         $featureTitleKey = TranslationKey::factory()->create(['key' => 'feature.test.title']);
@@ -363,7 +337,6 @@ class CreationDraftTest extends TestCase
     private function createFullDraft(): CreationDraft
     {
         $shortDescKey = TranslationKey::factory()->create(['key' => 'draft.test.short']);
-        $fullDescKey = TranslationKey::factory()->create(['key' => 'draft.test.full']);
 
         Translation::create([
             'translation_key_id' => $shortDescKey->id,
@@ -371,17 +344,10 @@ class CreationDraftTest extends TestCase
             'text' => 'Description courte du brouillon',
         ]);
 
-        Translation::create([
-            'translation_key_id' => $fullDescKey->id,
-            'locale' => 'fr',
-            'text' => 'Description complète du brouillon',
-        ]);
-
         $draft = CreationDraft::factory()->create([
             'name' => 'Test Complete Draft',
             'slug' => 'test-complete-draft',
             'short_description_translation_key_id' => $shortDescKey->id,
-            'full_description_translation_key_id' => $fullDescKey->id,
         ]);
 
         $featureTitleKey = TranslationKey::factory()->create(['key' => 'feature.draft.title']);

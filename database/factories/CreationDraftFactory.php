@@ -32,7 +32,6 @@ class CreationDraftFactory extends Factory
             'started_at' => $this->faker->date(),
             'ended_at' => $this->faker->optional(0.7)->date(),
             'short_description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
-            'full_description_translation_key_id' => TranslationKey::factory()->withTranslations()->create(),
             'external_url' => $this->faker->optional(0.8)->url(),
             'source_code_url' => $this->faker->optional(0.6)->url(),
             'featured' => $this->faker->boolean(20),

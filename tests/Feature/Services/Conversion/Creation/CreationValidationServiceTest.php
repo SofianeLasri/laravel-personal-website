@@ -48,17 +48,6 @@ class CreationValidationServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_exception_for_missing_full_description(): void
-    {
-        $draft = CreationDraft::factory()->create();
-        $draft->full_description_translation_key_id = null;
-
-        $this->expectException(ValidationException::class);
-
-        $this->service->validate($draft);
-    }
-
-    #[Test]
     public function it_throws_exception_for_missing_logo(): void
     {
         $draft = CreationDraft::factory()->create();

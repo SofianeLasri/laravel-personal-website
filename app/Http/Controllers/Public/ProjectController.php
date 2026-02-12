@@ -26,7 +26,6 @@ class ProjectController extends PublicController
                 'logo',
                 'coverImage',
                 'shortDescriptionTranslationKey.translations',
-                'fullDescriptionTranslationKey.translations',
                 'features.titleTranslationKey.translations',
                 'features.descriptionTranslationKey.translations',
                 'features.picture',

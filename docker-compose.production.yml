@@ -12,6 +12,8 @@ services:
     depends_on:
       - mariadb
       - redis
+    labels:
+      - "traefik.http.services.app.loadbalancer.server.port=80"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/up"]
       interval: 30s

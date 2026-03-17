@@ -10,14 +10,27 @@ services:
     ports:
       - "${DOCKER_APP_PORT:-80}:8000"
     env_file:
-      - stack.env
+      - .env
     volumes:
       - app-data:/app/storage
     depends_on:
+      - mariadb
       - redis
     networks:
       - app-network
     mem_limit: 4g
+
+  mariadb:
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
+    networks:
+      - app-network
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    mem_limit: 1g
 
   redis:
     image: redis:alpine
@@ -33,4 +46,5 @@ networks:
 
 volumes:
   app-data:
+  mariadb-data:
   redis-data:

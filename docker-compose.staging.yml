@@ -10,10 +10,8 @@ services:
     volumes:
       - app-data:/app/storage
     depends_on:
-      mariadb:
-        condition: service_healthy
-      redis:
-        condition: service_started
+      - mariadb
+      - redis
     networks:
       - app-network
     mem_limit: 4g
@@ -24,12 +22,6 @@ services:
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
       MARIADB_DATABASE: ${DB_DATABASE}
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
     networks:
       - app-network
     volumes:

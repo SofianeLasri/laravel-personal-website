@@ -1,7 +1,5 @@
 #!/bin/bash
 
-php artisan key:generate
-
 echo "Migrating database..."
 php artisan migrate --force
 

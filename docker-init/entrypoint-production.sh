@@ -14,4 +14,4 @@ echo "Running SSR..."
 php artisan inertia:start-ssr &
 
 echo "Running Octane..."
-php artisan octane:frankenphp
+php artisan octane:frankenphp --port=80

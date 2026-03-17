@@ -16,7 +16,8 @@
       "WebFetch(domain:image.intervention.io)",
       "Bash(npx eslint:*)",
       "Bash(./vendor/bin/phpstan:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "WebFetch(domain:coolify.io)"
     ],
     "deny": []
   },

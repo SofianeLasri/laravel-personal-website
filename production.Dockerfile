@@ -57,7 +57,6 @@ COPY package.json package-lock.json /app/
 RUN npm install
 
 COPY . /app/
-COPY .env /app/.env
 
 # Create directories
 RUN mkdir -p /app/storage/framework/{sessions,views,cache}

@@ -9,13 +9,17 @@ services:
     working_dir: /app
     ports:
       - "${DOCKER_APP_PORT:-80}:8000"
-    env_file:
-      - .env
     volumes:
       - app-data:/app/storage
     depends_on:
       - mariadb
       - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     networks:
       - app-network
     mem_limit: 4g
@@ -45,8 +49,6 @@ services:
       context: .
       dockerfile: backup.Dockerfile
     restart: unless-stopped
-    env_file:
-      - .env
     volumes:
       - backup-data:/app/backups
     depends_on:

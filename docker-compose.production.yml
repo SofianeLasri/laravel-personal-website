@@ -10,7 +10,7 @@ services:
     ports:
       - "${DOCKER_APP_PORT:-80}:8000"
     env_file:
-      - stack.env
+      - .env
     volumes:
       - app-data:/app/storage
     depends_on:
@@ -46,7 +46,7 @@ services:
       dockerfile: backup.Dockerfile
     restart: unless-stopped
     env_file:
-      - stack.env
+      - .env
     volumes:
       - backup-data:/app/backups
     depends_on:

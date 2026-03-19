@@ -20,8 +20,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    networks:
-      - app-network
     mem_limit: 4g
 
   mariadb:
@@ -30,8 +28,6 @@ services:
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
       MARIADB_DATABASE: ${DB_DATABASE}
-    networks:
-      - app-network
     volumes:
       - mariadb-data:/var/lib/mysql
     mem_limit: 1g
@@ -39,8 +35,6 @@ services:
   redis:
     image: redis:alpine
     restart: unless-stopped
-    networks:
-      - app-network
     volumes:
       - redis-data:/data
 
@@ -53,13 +47,7 @@ services:
       - backup-data:/app/backups
     depends_on:
       - app
-    networks:
-      - app-network
     mem_limit: 512m
-
-networks:
-  app-network:
-    driver: bridge
 
 volumes:
   app-data:

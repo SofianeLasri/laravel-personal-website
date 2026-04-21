@@ -25,6 +25,8 @@ services:
   mariadb:
     image: mariadb:latest
     restart: unless-stopped
+    ports:
+      - "3308:3306"
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
       MARIADB_DATABASE: ${DB_DATABASE}

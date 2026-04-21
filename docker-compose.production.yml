@@ -10,7 +10,6 @@ services:
     volumes:
       - app-data:/app/storage
     depends_on:
-      - mariadb
       - redis
     labels:
       - "traefik.http.services.app.loadbalancer.server.port=80"
@@ -21,18 +20,6 @@ services:
       retries: 3
       start_period: 60s
     mem_limit: 4g
-
-  mariadb:
-    image: mariadb:latest
-    restart: unless-stopped
-    ports:
-      - "3308:3306"
-    environment:
-      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
-      MARIADB_DATABASE: ${DB_DATABASE}
-    volumes:
-      - mariadb-data:/var/lib/mysql
-    mem_limit: 1g
 
   redis:
     image: redis:alpine

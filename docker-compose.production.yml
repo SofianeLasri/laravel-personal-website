@@ -21,12 +21,6 @@ services:
       start_period: 60s
     mem_limit: 4g
 
-  redis:
-    image: redis:alpine
-    restart: unless-stopped
-    volumes:
-      - redis-data:/data
-
   backup:
     build:
       context: .

@@ -9,8 +9,6 @@ services:
     working_dir: /app
     volumes:
       - app-data:/app/storage
-    depends_on:
-      - redis
     labels:
       - "traefik.http.services.app.loadbalancer.server.port=80"
     healthcheck:

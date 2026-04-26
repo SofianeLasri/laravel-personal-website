@@ -25,7 +25,6 @@ use Illuminate\Validation\ValidationException;
  * @property Carbon $started_at
  * @property Carbon|null $ended_at
  * @property int|null $short_description_translation_key_id
- * @property int|null $full_description_translation_key_id
  * @property string|null $external_url
  * @property string|null $source_code_url
  * @property bool $featured
@@ -37,7 +36,6 @@ use Illuminate\Validation\ValidationException;
  * @property int|null $logos_count
  * @property int|null $cover_images_count
  * @property int|null $short_description_translation_keys_count
- * @property int|null $full_description_translation_keys_count
  * @property int|null $features_count
  * @property int|null $screenshots_count
  * @property int|null $contents_count
@@ -49,7 +47,6 @@ use Illuminate\Validation\ValidationException;
  * @property-read Picture|null $logo
  * @property-read Picture|null $coverImage
  * @property-read TranslationKey|null $shortDescriptionTranslationKey
- * @property-read TranslationKey|null $fullDescriptionTranslationKey
  * @property-read Collection|CreationDraftFeature[] $features
  * @property-read Collection|CreationDraftScreenshot[] $screenshots
  * @property-read Collection|CreationDraftContent[] $contents
@@ -72,7 +69,6 @@ class CreationDraft extends Model
         'started_at',
         'ended_at',
         'short_description_translation_key_id',
-        'full_description_translation_key_id',
         'external_url',
         'source_code_url',
         'featured',
@@ -120,14 +116,6 @@ class CreationDraft extends Model
     public function shortDescriptionTranslationKey(): BelongsTo
     {
         return $this->belongsTo(TranslationKey::class, 'short_description_translation_key_id');
-    }
-
-    /**
-     * @return BelongsTo<TranslationKey, $this>
-     */
-    public function fullDescriptionTranslationKey(): BelongsTo
-    {
-        return $this->belongsTo(TranslationKey::class, 'full_description_translation_key_id');
     }
 
     /**
@@ -200,7 +188,6 @@ class CreationDraft extends Model
             'started_at' => $creation->started_at,
             'ended_at' => $creation->ended_at,
             'short_description_translation_key_id' => $creation->short_description_translation_key_id,
-            'full_description_translation_key_id' => $creation->full_description_translation_key_id,
             'external_url' => $creation->external_url,
             'source_code_url' => $creation->source_code_url,
             'featured' => $creation->featured,

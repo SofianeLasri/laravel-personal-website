@@ -117,7 +117,6 @@ class CreationFormatterTest extends TestCase
             ->andReturn(
                 'Short description',
                 'Tech description',
-                'Full description',
                 'Feature title',
                 'Feature description',
                 'Screenshot caption'
@@ -160,7 +159,6 @@ class CreationFormatterTest extends TestCase
 
         $result = $this->formatter->formatFull($creation);
 
-        $this->assertEquals('Full description', $result['fullDescription']);
         $this->assertEquals('https://example.com', $result['externalUrl']);
         $this->assertEquals('https://github.com/test/repo', $result['sourceCodeUrl']);
         $this->assertArrayHasKey('contents', $result);
@@ -439,10 +437,6 @@ class CreationFormatterTest extends TestCase
 
         $translations = new Collection;
 
-        /** @var TranslationKey&MockInterface $fullDescriptionKey */
-        $fullDescriptionKey = Mockery::mock(TranslationKey::class)->makePartial();
-        $fullDescriptionKey->translations = $translations;
-
         /** @var TranslationKey&MockInterface $featureTitleKey */
         $featureTitleKey = Mockery::mock(TranslationKey::class)->makePartial();
         $featureTitleKey->translations = $translations;
@@ -502,7 +496,6 @@ class CreationFormatterTest extends TestCase
         $content->id = 1;
         $content->order = 0;
 
-        $creation->fullDescriptionTranslationKey = $fullDescriptionKey;
         $creation->external_url = 'https://example.com';
         $creation->source_code_url = 'https://github.com/test/repo';
         $creation->contents = new Collection([$content]);
@@ -554,13 +547,6 @@ class CreationFormatterTest extends TestCase
         $video3->visibility = VideoVisibility::PUBLIC;
         $video3->coverPicture = $videoCover;
 
-        $translations = new Collection;
-
-        /** @var TranslationKey&MockInterface $fullDescriptionKey */
-        $fullDescriptionKey = Mockery::mock(TranslationKey::class)->makePartial();
-        $fullDescriptionKey->translations = $translations;
-
-        $creation->fullDescriptionTranslationKey = $fullDescriptionKey;
         $creation->external_url = null;
         $creation->source_code_url = null;
         $creation->contents = new Collection;
